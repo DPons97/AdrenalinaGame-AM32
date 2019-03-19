@@ -1,8 +1,5 @@
-.gitignore
+/*
+!.gitignore
 !pom.xml
-!src
-AdrenalinaGame.iml
+!src/
 !README.md
-.idea
-.target
-target

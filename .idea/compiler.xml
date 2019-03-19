@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="AdrenalinaGame" />
         <module name="AM00" />
+        <module name="source code" />
       </profile>
     </annotationProcessing>
   </component>
