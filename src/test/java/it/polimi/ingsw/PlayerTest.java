@@ -21,7 +21,7 @@ class PlayerTest {
     void reload() throws TooManyWeaponsException, InsufficientResourcesException, NoItemInInventoryException {
         Weapon testWeaponMode = new WeaponMode();
         Weapon testWeaponEffect = new WeaponEffect();
-        Player testPlayer = new Player(new AdrenalinaMatch(), "TestPlayer", new SpawnCell());
+        Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer", new SpawnCell());
 
         List<Resource> testCost = new ArrayList<>();
 
@@ -98,7 +98,7 @@ class PlayerTest {
     void pickWeapon() throws TooManyWeaponsException {
         Weapon testWeaponMode = new WeaponMode();
         Weapon testWeaponEffect = new WeaponEffect();
-        Player testPlayer = new Player(new AdrenalinaMatch(), "TestPlayer", new SpawnCell());
+        Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer", new SpawnCell());
 
         // Add weapon (effect) and check successful add
         testPlayer.pickWeapon(testWeaponEffect);
