@@ -1,0 +1,90 @@
+{
+  "Cells": [
+    {
+      "color": "B",
+      "north": "B",
+      "sud": "D",
+      "east": "N",
+      "west": "B",
+      "isSpawn": false
+    },
+    {
+      "color": "B",
+      "north": "B",
+      "sud": "W",
+      "east": "N",
+      "west": "N",
+      "isSpawn": false
+    },
+    {
+      "color": "B",
+      "north": "B",
+      "sud": "D",
+      "east": "B",
+      "west": "N",
+      "isSpawn": true
+    },
+    {
+      "color": "X"
+    },
+    {
+      "color": "R",
+      "north": "D",
+      "sud": "B",
+      "east": "N",
+      "west": "B",
+      "isSpawn": true
+    },
+    {
+      "color": "R",
+      "north": "W",
+      "sud": "D",
+      "east": "N",
+      "west": "N",
+      "isSpawn": false
+    },
+    {
+      "color": "P",
+      "north": "D",
+      "sud": "W",
+      "east": "W",
+      "west": "N",
+      "isSpawn": false
+    },
+    {
+      "color": "Y",
+      "north": "B",
+      "sud": "N",
+      "east": "B",
+      "west": "D",
+      "isSpawn": false
+    },
+    {
+      "color": "X"
+    },
+    {
+      "color": "W",
+      "north": "D",
+      "sud": "B",
+      "east": "N",
+      "west": "B",
+      "isSpawn": false
+    },
+    {
+      "color": "W",
+      "north": "W",
+      "sud": "B",
+      "east": "D",
+      "west": "N",
+      "isSpawn": false
+    },
+    {
+      "color": "W",
+      "north": "N",
+      "sud": "B",
+      "east": "B",
+      "west": "D",
+      "isSpawn": true
+    }
+  ]
+}
