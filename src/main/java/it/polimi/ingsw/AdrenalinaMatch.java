@@ -106,7 +106,7 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 *	create map from a json file map#id.json (eg. map1.json)
+	 *	create map from a json file mapid.json (eg. map1.json)
 	 * @param mapID identifies map to build from json file
 	 */
 	private void buildMap(int mapID) {
