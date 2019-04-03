@@ -20,15 +20,15 @@ class AdrenalinaMatchTest {
     @Test
     void addDeath() throws PlayerNotExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
-        testMatch.addPlayer(new Player());
-        testMatch.addPlayer(new Player());
+        testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell()));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell()));
         assertEquals(0, testMatch.getCurrentDeaths());
 
         testMatch.addDeath(testMatch.getFirstPlayer(), false);
         assertEquals(1, testMatch.getCurrentDeaths());
         assertEquals(testMatch.getFirstPlayer(), testMatch.getDeathTrack().get(testMatch.getDeathTrack().size()-1));
 
-        assertThrows(PlayerNotExistsException.class, ()-> testMatch.addDeath(new Player(), true));
+        assertThrows(PlayerNotExistsException.class, ()-> testMatch.addDeath(new Player(testMatch, "unknownPlayer", new SpawnCell()), true));
 
         testMatch.addDeath(testMatch.getPlayers().get(1), true);
         assertEquals(2, testMatch.getCurrentDeaths());
