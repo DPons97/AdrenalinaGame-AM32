@@ -1,47 +1,62 @@
 package it.polimi.ingsw;
 import java.util.*;
-
+import java.util.LinkedList;
 /**
  * 
  */
 public class Deck<T> {
 	/**
-	 * 
+	 * list of cards in the deck
 	 */
 	private List<T> deckList;
 
 	/**
-	 * 
+	 * list of discarded cards
 	 */
 	private List<T> discards;
 
 
 	/**
-	 * 
-	 */
-	public void shuffle() {
-		// TODO implement here
-	}
-
-	/**
 	 * Default constructor
+	 * basic initialization
 	 */
 	public Deck() {
+		LinkedList<T>
+				deckList = new LinkedList<T>();
+				discards = new LinkedList<T>();
+
 	}
 
+
 	/**
-	 * @return
+	 * 	if deck is empty then take cards from discards shuffle and add to deck
+	 */
+	private void shuffle() {
+		if(deckList.isEmpty()){
+			deckList.addAll(discards);
+			discards.clear();
+			Collections.shuffle(deckList);}
+	}
+
+
+	/**
+	 * @return first card of the deck
 	 */
 	public T drawCard() {
-		// TODO implement here
-		return null;
+		T c;
+		if(deckList.isEmpty()){
+			this.shuffle();
+		}
+		c = deckList.get(0);
+		deckList.remove(0);
+		return c;
 	}
 
 	/**
-	 * @param toDiscard
+	 * @param toDiscard card to add to discards
 	 */
 	public void discardCard(T toDiscard) {
-		// TODO implement here
+		discards.add(toDiscard);
 	}
 
 }
