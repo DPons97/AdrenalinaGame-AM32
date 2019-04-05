@@ -21,9 +21,9 @@ public class Deck<T> {
 	 * basic initialization
 	 */
 	public Deck() {
-		LinkedList<T>
-				deckList = new LinkedList<T>();
-				discards = new LinkedList<T>();
+
+		deckList = new LinkedList<>();
+		discards = new LinkedList<>();
 
 	}
 

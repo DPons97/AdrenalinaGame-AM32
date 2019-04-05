@@ -16,7 +16,7 @@ class PlayerTest {
 
     @Test
     void getReward() throws DeadPlayerException {
-        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 0);
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, "Victim");
         Player killerPlayer = new Player(testMatch, "Killer");
 
@@ -90,7 +90,7 @@ class PlayerTest {
 
     @Test
     void takeDamage() throws DeadPlayerException {
-        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 0);
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, "Victim");
         Player killerPlayer = new Player(testMatch, "Killer");
 
@@ -124,7 +124,7 @@ class PlayerTest {
 
     @Test
     void takeMark() {
-        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 0);
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, "Victim");
         Player killerPlayer = new Player(testMatch, "Killer");
 
@@ -200,7 +200,7 @@ class PlayerTest {
 
     @Test
     void respawn() throws DeadPlayerException {
-        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 0);
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, "Victim");
         Player killerPlayer = new Player(testMatch, "Killer");
 

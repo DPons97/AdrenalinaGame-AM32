@@ -1,15 +1,17 @@
 package it.polimi.ingsw;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import java.util.Iterator;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+
 /**
- * 
+ *
  */
 public class AdrenalinaMatch {
 	/**
@@ -20,7 +22,7 @@ public class AdrenalinaMatch {
 	/**
 	 * Representation of the map, bidemensional array of cells.
 	 */
-	private Cell map[][];
+	private Cell[][] map;
 
 	/**
 	 * List to trace spawn cells, not necessary but convenient
@@ -92,31 +94,31 @@ public class AdrenalinaMatch {
 	 * @param maxDeaths maximum number of deaths befor frenzy.
 	 * 					the same as skulls in the manual
 	 * @param turnDuration max duration of a turn in seconds.
-	 * @param mapID id of map to play.
+	 * @param mapID id of map to play [1,4].
 	 *
 	 */
 	public AdrenalinaMatch(int nPlayers, int maxDeaths, int turnDuration, int mapID) {
 		this.nPlayers = nPlayers;
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
-		this.players = new ArrayList<Player>();
+		this.players = new ArrayList<>();
 		currentDeaths = 0;
-		deathTrack = new ArrayList<Player>();
-		spawnPoints = new ArrayList<SpawnCell>();
+		deathTrack = new ArrayList<>();
+		spawnPoints = new ArrayList<>();
 		frenzyEnabled = false;
 		this.initAmmoDeck();
 		this.initPerkDeck();
 		this.initWeaponDeck();
 		this.buildMap(mapID);
 	}
-
 	/**
 	 *	create map from a json file mapid.json (eg. map1.json)
 	 * @param mapID identifies map to build from json file
 	 */
 	private void buildMap(int mapID) {
 		JSONParser parser = new JSONParser();
-		String fileName = "map"+mapID+".json";
+
+		String fileName = "././././././resources/json/map"+mapID+".json";
 		map = new Cell[3][4];
 		String cardinals[] = {"north", "sud", "west", "east"};
 		try {
@@ -127,16 +129,15 @@ public class AdrenalinaMatch {
 
 			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
 
-			Iterator iterator = mapCells.iterator();
-			while (iterator.hasNext()) {
-				JSONObject currCell = (JSONObject) iterator;
+			for (Object mapCell : mapCells) {
+				JSONObject currCell = (JSONObject) mapCell;
 				Side[] cords = new Side[4];
 				String color = currCell.get("color").toString();
 				Color c = null;
-				if (color.equals("X")){
-					map[(i/4)%3][i%4] = null;
+				if (color.equals("X")) {
+					map[(i / 4) % 3][i % 4] = null;
 				} else {
-					switch (color){
+					switch (color) {
 						case "B":
 							c = Color.BLUE;
 							break;
@@ -153,8 +154,8 @@ public class AdrenalinaMatch {
 							c = Color.YELLOW;
 							break;
 					}
-					for(int k = 0; k < 4; k++){
-						switch (currCell.get(cardinals[k]).toString()){
+					for (int k = 0; k < 4; k++) {
+						switch (currCell.get(cardinals[k]).toString()) {
 							case "B":
 								cords[k] = Side.Border;
 								break;
@@ -171,13 +172,13 @@ public class AdrenalinaMatch {
 						}
 					}
 
-					if(Boolean.parseBoolean(currCell.get("isSpawn").toString())){
+					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
-						map[(i/4)%3][i%4] = new SpawnCell(cords[0],cords[1],cords[2],cords[3], c, (i/4)%3,i%4);
-						spawnPoints.add(map[(i/4)%3][i%4]);
-					} else{
+						map[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / 4) % 3, i % 4);
+						spawnPoints.add((SpawnCell) map[(i / 4) % 3][i % 4]);
+					} else {
 						// create AmmoCell
-						map[(i/4)%3][i%4] = new AmmoCell(cords[0],cords[1],cords[2],cords[3], c, (i/4)%3,i%4);
+						map[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / 4) % 3, i % 4);
 					}
 				}
 
@@ -194,7 +195,7 @@ public class AdrenalinaMatch {
 	 */
 	private void initAmmoDeck() {
 		// TODO implement here
-		ammoDeck = new Deck<Ammo>();
+		ammoDeck = new Deck<>();
 	}
 
 	/**
@@ -203,7 +204,7 @@ public class AdrenalinaMatch {
 	 */
 	private void initPerkDeck() {
 		// TODO implement here
-		perksDeck = new Deck<Perk>();
+		perksDeck = new Deck<>();
 
 	}
 
@@ -213,7 +214,7 @@ public class AdrenalinaMatch {
 	 */
 	private void initWeaponDeck() {
 		// TODO implement here
-		weaponDeck = new Deck<Weapon>();
+		weaponDeck = new Deck<>();
 	}
 
 	/**
@@ -228,7 +229,6 @@ public class AdrenalinaMatch {
 	 * @return the cells that are spawn points.
 	 */
 	public List<SpawnCell> getSpawnPoints() {
-		// TODO implement here
 		return spawnPoints;
 	}
 
@@ -236,7 +236,6 @@ public class AdrenalinaMatch {
 	 * @return the first player.
 	 */
 	public Player getFirstPlayer() {
-		// TODO implement here
 		return players.get(0);
 	}
 
@@ -244,7 +243,6 @@ public class AdrenalinaMatch {
 	 * @return a List<Player> with the players in the game.
 	 */
 	public List<Player> getPlayers() {
-		// TODO implement here
 		return players;
 	}
 
