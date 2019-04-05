@@ -15,7 +15,7 @@ public class SpawnCell extends Cell {
 	 */
 	public SpawnCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
 		super(north, sud, weast, east, c, x, y);
-		weapons = new ArrayList<Weapon>();
+		weapons = new ArrayList<>();
 	}
 
 	/**
