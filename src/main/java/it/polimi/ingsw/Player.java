@@ -21,6 +21,11 @@ public class Player {
 	private static int maxDamage = 10;
 
 	/**
+	 *	Maximum marks that a player can have
+	 */
+	private static int maxMarks = 3;
+
+	/**
 	 *	Match reference this player is playing
 	 */
 	private AdrenalinaMatch match;
@@ -50,7 +55,7 @@ public class Player {
 	/**
 	 *  True if player is dead
 	 */
-	private Boolean dead;
+	private boolean dead;
 
 	/**
 	 *  Number of times this player has been killed
@@ -86,6 +91,29 @@ public class Player {
 	 * Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
+	 */
+	public Player(AdrenalinaMatch match, String nickname) {
+		this.match = match;
+		this.nickname = nickname;
+		score = 0;
+
+		dmgPoints = new ArrayList<>();
+		marks = new ArrayList<>();
+
+		dead = false;
+		deaths = 0;
+		givenMarks = 0;
+		position = null;
+
+		weapons = new ArrayList<>();
+		perks = new ArrayList<>();
+		ammos = new ArrayList<>();
+	}
+
+	/**
+	 * Default Constructor
+	 * @param 	match Reference to match this player is playing
+	 * @param	nickname This player's nickname
 	 * @param	spawnPosition Cell in which this player is spawning for the first time
 	 */
 	public Player(AdrenalinaMatch match, String nickname, Cell spawnPosition) {
@@ -114,57 +142,92 @@ public class Player {
 	}
 
 	/**
-	 * @return current Player's taken damage.
+	 * @return List of kill rewards
 	 */
-	public int getDmgPoints() {
-		return dmgPoints.size();
+	public static List<Integer> getKillRewards() {
+		List<Integer> returnReward = new ArrayList<>();
+		for (int i : killRewards) {
+			returnReward.add(i);
+		}
+		return returnReward;
 	}
+
+	/**
+	 * @return List of kill rewards during frenzy
+	 */
+	public static List<Integer> getFrenzyRewards() {
+		List<Integer> returnReward = new ArrayList<>();
+		for (int i : frenzyRewards) {
+			returnReward.add(i);
+		}
+		return returnReward;
+	}
+
+	/**
+	 *
+	 * @return max damage a player can take before he's considered dead
+	 */
+	public static int getMaxDamage() { return maxDamage; }
+
+	/**
+	 *
+	 * @return max marks a player can have
+	 */
+	public static int getMaxMarks() { return maxMarks; }
+
+	/**
+	 * @return current Player's taken damage ponints
+	 */
+	public List<Player> getDmgPoints() { return new ArrayList<>(dmgPoints); }
+
+	/**
+	 * @return current Player's taken marks
+	 */
+	public List<Player> getMarks() { return new ArrayList<>(marks); }
 
 	/**
 	 * @return true if player is dead
 	 */
-	public Boolean isDead() {
-		return (getDmgPoints() >= maxDamage);
-	}
+	public boolean isDead() { return dead; }
 
 	/**
 	 * @return get current Player's position (Cell)
 	 */
-	public Cell getPosition() {
-		return position;
-	}
+	public Cell getPosition() { return position; }
 
 	/**
-	 * @return death reward
+	 * @return last kill reward list. Empty list if player never died
 	 */
-	public int getReward() {
-		return killRewards[
-				(deaths <= killRewards.length) ?
-				deaths :
-				killRewards.length
-				];
+	public List<Integer> getReward() {
+		// Player never died
+		if (deaths <= 0) return new ArrayList<>();
+
+		// Player died at least once
+		List<Integer> returnList = new ArrayList<>();
+		if (deaths <= killRewards.length) {
+			for (int i = deaths-1; i < killRewards.length; i++) {
+				returnList.add(killRewards[i]);
+			}
+		} else {
+			returnList.add(killRewards[killRewards.length - 1]);
+		}
+		return returnList;
 	}
 
 	/**
 	 * @return current Player's score
 	 */
-	public int getScore() {
-		return score;
-	}
+	public int getScore() { return score; }
 
 	/**
 	 * @return List of Player's Weapons (Max: 3)
 	 */
-	public List<Weapon> getWeapons() {
-		return new ArrayList<>(weapons);
-	}
+	public List<Weapon> getWeapons() { return new ArrayList<>(weapons); }
 
 	/**
 	 * @return List of Player's Perks (Max: 3)
 	 */
-	public List<Perk> getPerks() {
-		return new ArrayList<>(perks);
-	}
+	public List<Perk> getPerks() { return new ArrayList<>(perks); }
 
 	/**
 	 * @param toLoad Weapon to reload
@@ -187,6 +250,7 @@ public class Player {
 	}
 
 	/**
+	 * Move player to destination
 	 * @param destination Destination Cell to move into
 	 */
 	public void move(Cell destination) {
@@ -194,17 +258,43 @@ public class Player {
 	}
 
 	/**
+	 * Apply damage to player. Additional damage due to source's marks on this player are also applied.
 	 * @param source Damage dealt to this player
+	 * @return true if player's dead after damage
 	 */
-	public void takeDamage(Player source) {
-		// TODO implement here
+	public boolean takeDamage(Player source) throws DeadPlayerException {
+		// Player take damage from source only if not overkilled
+		if (dmgPoints.size() <= maxDamage) {
+			dmgPoints.add(source);
+
+			if (marks.contains(source)) {
+				// Source has marked this player at least once
+				marks.remove(source);
+				takeDamage(source);
+			}
+		} else throw new DeadPlayerException();
+
+		if (dmgPoints.size() > maxDamage) {
+			// Player is overkilled
+			return true;
+		} else if (dmgPoints.size() == maxDamage) {
+			// Player is dead, but not overkilled
+			deaths++;
+			dead = true;
+			return true;
+		}  else return false;
 	}
 
 	/**
+	 * Add mark to this player, if maximum from source is not reached
 	 * @param source Player who gave the mark
 	 */
 	public void takeMark(Player source) {
-		// TODO implement here
+		// Count how many marks from source this player has
+		int sourceMarks = 0;
+		for (Player p : marks) sourceMarks = (p.equals(source)) ? sourceMarks + 1 : sourceMarks;
+
+		if (sourceMarks < maxMarks) marks.add(source);
 	}
 
 	/**
@@ -283,4 +373,15 @@ public class Player {
 		// TODO implement here
 	}
 
+	/**
+	 *	If dead, respawn player and reset his health
+	 * @param respawnPosition position to respawn
+	 */
+	public void respawn(SpawnCell respawnPosition) {
+		if (dead) {
+			dmgPoints.clear();
+			dead = false;
+			move(respawnPosition);
+		}
+	}
 }
