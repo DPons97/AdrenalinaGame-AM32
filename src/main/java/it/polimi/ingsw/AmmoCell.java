@@ -6,37 +6,39 @@ import java.util.*;
  */
 public class AmmoCell extends Cell {
 	/**
-	 * 
+	 *
 	 */
 	private Ammo resource;
 
 	/**
 	 * Default constructor
 	 */
-	public AmmoCell() {
+	public AmmoCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
+		super(north, sud, weast, east, c, x, y);
+		this.resource = null;
+	}
+
+
+	/**
+	 * @return
+	 */
+	public boolean isSpawn() {
+		return false;
 	}
 
 	/**
 	 * @return
 	 */
-	public Boolean isSpawn() {
-		// TODO implement here
-		return null;
-	}
+	public Ammo getResource() {
 
-	/**
-	 * @return
-	 */
-	public Ammo getResources() {
-		// TODO implement here
-		return null;
+		return resource;
 	}
 
 	/**
 	 * @param toPlace
 	 */
 	public void setAmmo(Ammo toPlace) {
-		// TODO implement here
+		resource = toPlace;
 	}
 
 }

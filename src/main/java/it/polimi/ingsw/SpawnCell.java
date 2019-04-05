@@ -6,30 +6,40 @@ import java.util.*;
  */
 public class SpawnCell extends Cell {
 	/**
-	 * 
+	 * list of the weapons
 	 */
 	private List<Weapon> weapons;
 
 	/**
-	 * Default constructor
+	 * basic initialization of sides, color and coordinate of the Spawncell
 	 */
-	public SpawnCell() {
+	public SpawnCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
+		super(north, sud, weast, east, c, x, y);
+		weapons = new ArrayList<Weapon>();
 	}
 
 	/**
-	 * @return
+	 * @return true because the cell is spawned
 	 */
-	public Boolean isSpawn() {
-		// TODO implement here
-		return null;
+	public boolean isSpawn() {
+		return true;
 	}
 
 	/**
-	 * @return
+	 * @return the weapons in the spowned cell
 	 */
 	public List<Weapon> getWeapons() {
-		// TODO implement here
-		return null;
+		return weapons;
 	}
 
+	/**
+	 * @return add one weapon
+	 */
+	public void addWeapon(Weapon w) throws TooManyWeaponsException{
+		if (weapons.size()==3) {
+			throw new TooManyWeaponsException();
+		}
+		weapons.add(w);
+
+	}
 }
