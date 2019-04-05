@@ -43,4 +43,12 @@ class AdrenalinaMatchTest {
         assertEquals(3, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(0)));
         assertTrue(testMatch.isFrenzyEnabled());
     }
+
+    @Test
+    void getSpawnPoints(){
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
+        assertEquals(3, testMatch.getSpawnPoints().size());
+    }
+
+
 }

@@ -1,75 +1,79 @@
 package it.polimi.ingsw;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.util.Iterator;
 /**
  * 
  */
 public class AdrenalinaMatch {
 	/**
-	 * 
+	 * Unique match identifier
 	 */
 	private int matchID;
 
 	/**
-	 * 
+	 * Representation of the map, bidemensional array of cells.
 	 */
 	private Cell map[][];
 
 	/**
-	 * 
+	 * List to trace spawn cells, not necessary but convenient
 	 */
-	private List<Cell> spawnPoints;
+	private List<SpawnCell> spawnPoints;
 
 	/**
-	 * 
+	 * Number of deaths in the match before the frenzy.
 	 */
 	private int maxDeaths;
 
 	/**
-	 * 
+	 * Number of deaths
 	 */
 	private int currentDeaths;
 
 	/**
-	 * 
+	 * Ordered list of player that simulate the death track.
 	 */
 	private List<Player> deathTrack;
 
 	/**
-	 * 
+	 * Deck of weapon cards
 	 */
 	private Deck<Weapon> weaponDeck;
 
 	/**
-	 * 
+	 * Deck of perk cards
 	 */
 	private Deck<Perk> perksDeck;
 
 	/**
-	 * 
+	 * Deck of ammo cards
 	 */
 	private Deck<Ammo> ammoDeck;
 
 	/**
-	 *
+	 * Number of players
 	 */
 	private int nPlayers;
 
 	/**
-	 * 
+	 * List of players in the match
 	 */
 	private List<Player> players;
 
 	/**
-	 * 
+	 * First player to play
 	 */
 	private Player firstPlayer;
 
 	/**
-	 * 
+	 * True when frenzy is on
 	 */
 	private Boolean frenzyEnabled;
 
@@ -98,6 +102,7 @@ public class AdrenalinaMatch {
 		this.players = new ArrayList<Player>();
 		currentDeaths = 0;
 		deathTrack = new ArrayList<Player>();
+		spawnPoints = new ArrayList<SpawnCell>();
 		frenzyEnabled = false;
 		this.initAmmoDeck();
 		this.initPerkDeck();
@@ -110,8 +115,77 @@ public class AdrenalinaMatch {
 	 * @param mapID identifies map to build from json file
 	 */
 	private void buildMap(int mapID) {
-		// TODO implement here
+		JSONParser parser = new JSONParser();
+		String fileName = "map"+mapID+".json";
 		map = new Cell[3][4];
+		String cardinals[] = {"north", "sud", "west", "east"};
+		try {
+			int i = 0;
+			Object obj = parser.parse(new FileReader(fileName));
+
+			JSONObject jsonObject = (JSONObject) obj;
+
+			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
+
+			Iterator iterator = mapCells.iterator();
+			while (iterator.hasNext()) {
+				JSONObject currCell = (JSONObject) iterator;
+				Side[] cords = new Side[4];
+				String color = currCell.get("color").toString();
+				Color c = null;
+				if (color.equals("X")){
+					map[(i/4)%3][i%4] = null;
+				} else {
+					switch (color){
+						case "B":
+							c = Color.BLUE;
+							break;
+						case "R":
+							c = Color.RED;
+							break;
+						case "W":
+							c = Color.WHITE;
+							break;
+						case "P":
+							c = Color.PURPLE;
+							break;
+						case "Y":
+							c = Color.YELLOW;
+							break;
+					}
+					for(int k = 0; k < 4; k++){
+						switch (currCell.get(cardinals[k]).toString()){
+							case "B":
+								cords[k] = Side.Border;
+								break;
+							case "W":
+								cords[k] = Side.Wall;
+								break;
+							case "N":
+								cords[k] = Side.Free;
+								break;
+							case "D":
+								cords[k] = Side.Door;
+								break;
+
+						}
+					}
+
+					if(Boolean.parseBoolean(currCell.get("isSpawn").toString())){
+						// create spawn cell
+						map[(i/4)%3][i%4] = new SpawnCell(cords[0],cords[1],cords[2],cords[3], c, (i/4)%3,i%4);
+						spawnPoints.add(map[(i/4)%3][i%4]);
+					} else{
+						// create AmmoCell
+						map[(i/4)%3][i%4] = new AmmoCell(cords[0],cords[1],cords[2],cords[3], c, (i/4)%3,i%4);
+					}
+				}
+
+			}
+
+		} catch (ParseException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -153,9 +227,9 @@ public class AdrenalinaMatch {
 	/**
 	 * @return the cells that are spawn points.
 	 */
-	public Cell[] getSpawnPoints() {
+	public List<SpawnCell> getSpawnPoints() {
 		// TODO implement here
-		return null;
+		return spawnPoints;
 	}
 
 	/**
