@@ -18,7 +18,7 @@ class AmmoTest {
 
     @Test
     void ammoTestConstructor2(){
-        Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX, true);
+        Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX);
         assertTrue(a.hasPerk());
         assertTrue(a.getResources().contains(Resource.RED_BOX));
         assertTrue(a.getResources().contains(Resource.YELLOW_BOX));

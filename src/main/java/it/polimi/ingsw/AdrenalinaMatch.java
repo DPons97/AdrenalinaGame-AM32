@@ -110,6 +110,7 @@ public class AdrenalinaMatch {
 		this.initPerkDeck();
 		this.initWeaponDeck();
 		this.buildMap(mapID);
+		this.initAmmoCells();
 	}
 	/**
 	 *	create map from a json file mapid.json (eg. map1.json)
@@ -120,23 +121,25 @@ public class AdrenalinaMatch {
 
 		String fileName = "././././././resources/json/map"+mapID+".json";
 		map = new Cell[3][4];
-		String cardinals[] = {"north", "sud", "west", "east"};
+		String[] cardinals = {"north", "sud", "west", "east"};
 		try {
 			int i = 0;
 			Object obj = parser.parse(new FileReader(fileName));
 
 			JSONObject jsonObject = (JSONObject) obj;
-
+			// get the array of cells
 			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
 
+			// for every cell object in the list
 			for (Object mapCell : mapCells) {
 				JSONObject currCell = (JSONObject) mapCell;
 				Side[] cords = new Side[4];
 				String color = currCell.get("color").toString();
 				Color c = null;
+				// if color is X then is a corner empyt cell
 				if (color.equals("X")) {
 					map[(i / 4) % 3][i % 4] = null;
-				} else {
+				} else { // otherwise is a valid cell
 					switch (color) {
 						case "B":
 							c = Color.BLUE;
@@ -154,6 +157,7 @@ public class AdrenalinaMatch {
 							c = Color.YELLOW;
 							break;
 					}
+					// for every side add the value to the coords array [noth, sud, wesr, east]
 					for (int k = 0; k < 4; k++) {
 						switch (currCell.get(cardinals[k]).toString()) {
 							case "B":
@@ -171,7 +175,7 @@ public class AdrenalinaMatch {
 
 						}
 					}
-
+					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
 						map[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / 4) % 3, i % 4);
@@ -194,8 +198,47 @@ public class AdrenalinaMatch {
 	 * parses a ammos.json file
 	 */
 	private void initAmmoDeck() {
-		// TODO implement here
+		// utility list to add parsed resources
+		List<Resource> resources = new ArrayList<>();
 		ammoDeck = new Deck<>();
+		JSONParser parser = new JSONParser();
+		try {
+			Object obj = parser.parse(new FileReader("././././././resources/json/ammos.json"));
+
+			JSONObject jsonObject = (JSONObject) obj;
+
+			JSONArray ammoCards = (JSONArray) jsonObject.get("ammoCards");
+			// ammo card is the json object of a card in the list of cards in the file
+			for (Object ammoCard : ammoCards) {
+				JSONObject currAmmo = (JSONObject) ammoCard;
+				// get list of ammos of the current card
+				JSONArray ammos = (JSONArray) currAmmo.get("ammos");
+
+				//clear utility list
+				resources.clear();
+				// for every ammo in the current ammo list add the resource to the utility list
+				for (Object ammo : ammos) {
+					switch (ammo.toString()){
+						case "R":
+							resources.add(Resource.RED_BOX);
+							break;
+						case "B":
+							resources.add(Resource.BLUE_BOX);
+							break;
+						case "Y":
+							resources.add(Resource.YELLOW_BOX);
+							break;
+					}
+				}
+				// based on the number of resources create a new card
+				if(resources.size()==2)
+					ammoDeck.discardCard(new Ammo(resources.get(0), resources.get(1)));
+				else
+					ammoDeck.discardCard(new Ammo(resources.get(0), resources.get(1),resources.get(2)));
+			}
+		} catch (ParseException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -215,6 +258,20 @@ public class AdrenalinaMatch {
 	private void initWeaponDeck() {
 		// TODO implement here
 		weaponDeck = new Deck<>();
+	}
+
+	/**
+	 * private method to initialize ammo cells with an ammo card
+	 */
+	private void initAmmoCells() {
+		for(int i = 0; i<map.length; i++){
+			for(int j = 0; j< map[i].length; j++){
+				if(map[i][j] != null && !map[i][j].isSpawn()){ //if not empty cell and not a spawn cell
+					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
+					((AmmoCell) map[i][j]).setAmmo(ammoDeck.drawCard());
+				}
+			}
+		}
 	}
 
 	/**

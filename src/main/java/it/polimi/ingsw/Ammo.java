@@ -29,7 +29,7 @@ public class Ammo {
     /**
      * Constructor for ammo card with 2 resources and a perk card
      */
-	public Ammo(Resource res1, Resource res2, boolean powerup) {
+	public Ammo(Resource res1, Resource res2) {
 		this.resources = new ArrayList<>();
 		this.resources.add(res1);
 		this.resources.add(res2);

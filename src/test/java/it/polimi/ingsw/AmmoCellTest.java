@@ -13,6 +13,5 @@ class AmmoCellTest {
         Ammo a = new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX);
         cellTest.setAmmo(a);
         assertEquals(a,cellTest.getResource());
-
     }
 }
