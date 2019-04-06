@@ -57,7 +57,7 @@ public abstract class Cell {
 		this.east = east;
 		this.west = west;
 		this.color = c;
-		players = new ArrayList<Player>();
+		players = new ArrayList<>();
 		this.coordX = x;
 		this.coordY = y;
 	}
@@ -72,22 +72,17 @@ public abstract class Cell {
 		return sud;
 	}
 	/**
-	 * return the weast side
+	 * return the west side
 	 */
-	public Side getweast() {
+	public Side getWest() {
 		return west;
 	}
 	/**
 	 * return the east side
 	 */
-	public Side geteast() {
+	public Side getEast() {
 		return east;
 	}
-
-
-	/**
-	 * if the spawn is in the cell is true
-	 */
 
 	/**
 	 * @return the coordinate X
@@ -116,6 +111,21 @@ public abstract class Cell {
 		return players;
 	}
 
-	public abstract boolean isSpawn();
+	/**
+	 * Place [toPlace] inside this map cell, if it's not present
+	 * @param toPlace
+	 */
+	public void addPlayer(Player toPlace) {
+		if (!players.contains(toPlace)) players.add(toPlace);
+	}
 
+	/**
+	 * Remove [toRemove] from this map cell, if it's present
+	 * @param toRemove
+	 */
+	public void removePlayer(Player toRemove) {
+		players.remove(toRemove);
+	}
+
+	public abstract boolean isSpawn();
 }

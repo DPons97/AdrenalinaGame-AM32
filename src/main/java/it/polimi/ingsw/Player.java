@@ -250,11 +250,17 @@ public class Player {
 	}
 
 	/**
-	 * Move player to destination
+	 * Move player to destination and update previous and next cell
 	 * @param destination Destination Cell to move into
+	 * @throws NullPointerException if destination is a pointer
 	 */
 	public void move(Cell destination) {
-		// TODO implement here
+		if (destination == null) throw new NullPointerException();
+
+		// Update old player's cell only if there's one
+		if (position != null) position.removePlayer(this);
+		position = destination;
+		position.addPlayer(this);
 	}
 
 	/**

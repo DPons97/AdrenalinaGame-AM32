@@ -10,6 +10,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
 
+    private static String victimName = "Victim";
+    private static String killerName = "Killer";
+
     @Test
     void beginPlay() {
     }
@@ -17,8 +20,8 @@ class PlayerTest {
     @Test
     void getReward() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player victimPlayer = new Player(testMatch, "Victim");
-        Player killerPlayer = new Player(testMatch, "Killer");
+        Player victimPlayer = new Player(testMatch, victimName);
+        Player killerPlayer = new Player(testMatch, killerName);
 
         // Victim never died
         assertTrue(victimPlayer.getReward().isEmpty());
@@ -86,13 +89,30 @@ class PlayerTest {
 
     @Test
     void move() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, "Player1");
+        Cell fromCell = new AmmoCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0);
+        Cell destCell = new AmmoCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0);
+
+        assertThrows(NullPointerException.class, () -> testPlayer.move(null));
+
+        // Check correct first move
+        testPlayer.move(fromCell);
+        assertEquals(testPlayer.getPosition(), fromCell);
+        assertTrue(fromCell.getPlayers().contains(testPlayer));
+
+        // Check correct movement from one cell to another
+        testPlayer.move(destCell);
+        assertEquals(testPlayer.getPosition(), destCell);
+        assertFalse(fromCell.getPlayers().contains(testPlayer));
+        assertTrue(destCell.getPlayers().contains(testPlayer));
     }
 
     @Test
     void takeDamage() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player victimPlayer = new Player(testMatch, "Victim");
-        Player killerPlayer = new Player(testMatch, "Killer");
+        Player victimPlayer = new Player(testMatch, victimName);
+        Player killerPlayer = new Player(testMatch, killerName);
 
         // Check that player isn't already dead
         assertFalse(victimPlayer.isDead());
@@ -125,8 +145,8 @@ class PlayerTest {
     @Test
     void takeMark() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player victimPlayer = new Player(testMatch, "Victim");
-        Player killerPlayer = new Player(testMatch, "Killer");
+        Player victimPlayer = new Player(testMatch, victimName);
+        Player killerPlayer = new Player(testMatch, killerName);
 
         victimPlayer.takeMark(killerPlayer);
         assertEquals(victimPlayer.getMarks().get(0), killerPlayer);
@@ -201,8 +221,8 @@ class PlayerTest {
     @Test
     void respawn() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player victimPlayer = new Player(testMatch, "Victim");
-        Player killerPlayer = new Player(testMatch, "Killer");
+        Player victimPlayer = new Player(testMatch, victimName);
+        Player killerPlayer = new Player(testMatch, killerName);
 
         // Kill player
         for (int j = 0; j < Player.getMaxDamage() + 1; j++) {
