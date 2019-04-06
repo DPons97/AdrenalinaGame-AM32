@@ -7,7 +7,7 @@ import java.util.*;
 public class Action {
 
 	/**
-	 *
+	 * Functional interface to compose base actions
 	 */
 	public interface BaseAction {
 		/**
@@ -17,22 +17,22 @@ public class Action {
 	}
 
 	/**
-	 * 
+	 * List of base actions to run in order
 	 */
 	private List<BaseAction> actions;
 
 	/**
-	 * 
+	 * List of target players
 	 */
 	private List<Player> targetPlayers;
 
 	/**
-	 * 
+	 * List of target cells
 	 */
 	private List<Cell> targetCells;
 
 	/**
-	 * 
+	 * direction to apply action (may not be needed in some actions)
 	 */
 	private Direction targetDirection;
 
@@ -40,13 +40,17 @@ public class Action {
 	 * Default constructor
 	 */
 	public Action() {
+		this.actions = new ArrayList<>();
+		this.targetCells = new ArrayList<>();
+		this.targetDirection = null;
+		this.targetPlayers = new ArrayList<>();
 	}
 
 	/**
-	 * 
+	 * @return copy of actions list
 	 */
-	public void getActions() {
-		// TODO implement here
+	public ArrayList<BaseAction> getActions() {
+		return new ArrayList<>(actions);
 	}
 
 	/**
@@ -57,48 +61,45 @@ public class Action {
 	}
 
 	/**
-	 * @return
+	 * @return copy of target players
 	 */
 	public List<Player> getTargetPlayers() {
-		// TODO implement here
-		return null;
+		return new ArrayList<>(targetPlayers);
 	}
 
 	/**
-	 * @return
+	 * @return copy of target cells
 	 */
 	public List<Cell> getTargetCells() {
-		// TODO implement here
-		return null;
+		return new ArrayList<>(targetCells);
 	}
 
 	/**
-	 * @return
+	 * @return target direction
 	 */
-	public List<Direction> getTargetDirection() {
-		// TODO implement here
-		return null;
+	public Direction getTargetDirection() {
+		return targetDirection;
 	}
 
 	/**
-	 * @param newP
+	 * @param newP new players to add as targets
 	 */
 	public void setTargetPlayers(List<Player> newP) {
-		// TODO implement here
+		this.targetPlayers.addAll(newP);
 	}
 
 	/**
-	 * @param newP
+	 * @param newC new cell to add as targets
 	 */
-	public void setTargetCells(List<Cell> newP) {
-		// TODO implement here
+	public void setTargetCells(List<Cell> newC) {
+		this.targetCells.addAll(newC);
 	}
 
 	/**
-	 * @param dir
+	 * @param dir new direction for action
 	 */
 	public void setTargetDirection(Direction dir) {
-		// TODO implement here
+		this.targetDirection = dir;
 	}
 
 }

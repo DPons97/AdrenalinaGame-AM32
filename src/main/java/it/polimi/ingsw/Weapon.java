@@ -7,22 +7,22 @@ import java.util.*;
  */
 public abstract class Weapon {
 	/**
-	 * 
+	 * weapon name
 	 */
 	private String name;
 
 	/**
-	 * 
+	 * true when weapon is ready to shoot
 	 */
 	private Boolean loaded;
 
 	/**
-	 * 
+	 * weapon description
 	 */
 	private String description;
 
 	/**
-	 * 
+	 * weapon cost
 	 */
 	private List<Resource> cost;
 
