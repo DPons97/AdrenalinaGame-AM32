@@ -28,7 +28,7 @@ public abstract class Cell {
 	/**
 	 * left side of the cell
 	 */
-	private Side weast;
+	private Side west;
 
 	/**
 	 * right side of the cell
@@ -51,11 +51,11 @@ public abstract class Cell {
 	/**
 	 * basic initialization of the list of player, color and sides
 	 */
-	public Cell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
+	public Cell(Side north, Side sud, Side west, Side east, Color c, int x, int y) {
 		this.north = north;
 		this.sud = sud;
 		this.east = east;
-		this.weast = weast;
+		this.west = west;
 		this.color = c;
 		players = new ArrayList<Player>();
 		this.coordX = x;
@@ -75,7 +75,7 @@ public abstract class Cell {
 	 * return the weast side
 	 */
 	public Side getweast() {
-		return weast;
+		return west;
 	}
 	/**
 	 * return the east side
