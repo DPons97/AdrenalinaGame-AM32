@@ -1,21 +1,208 @@
 {
   "Weapon": [
     {
-      "name": "Machine Gun",
+      "name": "Lock Rifle",
       "cost": [
         "B",
         "R"
       ],
-      "type": "effects",
-      "baseEffectDescription": " Choose 1 or 2 targets you can see and deal 1 damage to each. ",
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Deal 2 damage and 1 mark to 1 target you can see.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1
+            ]
+          }
+        ]
+      },
       "secondaryEffects": [
-        "focus-shot",
-        "turret-tripod"
+        "second-lock"
       ],
-      "focus-shotDescription": " Deal 1 additional damage to one of those targets. ",
-      "turret-tripodDescription": " Deal 1 additional damage to the other of those targets and/or deal 1 damage to a different target you can see. ",
-      "focus-shotCost": "Y",
-      "turret-tripodCost": "B"
+      "second-lock": {
+        "description": "Deal 1 mark to a different target you can see.",
+        "cost": [
+          "R"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentSelection": true,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rocket Launcher",
+      "cost": [
+        "B",
+        "R"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Deal 2 damage to 1 target you can see that is not on your square. Then you may move the target 1 square.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "rocket-jump",
+        "fragmentating-warhead"
+      ],
+      "rocket-jump": {
+        "description": "Move 1 or 2 squares. This effect can be used either before or after the basic effect.",
+        "cost": [
+          "B"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "SELF",
+            "from": "ANY",
+            "differentSelection": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              1,
+              2
+            ]
+          }
+        ]
+      },
+      "fragmentating-warhead": {
+        "description": "During the basic effect, deal 1 damage to every player on your target's original square – including the target, even if you move it.",
+        "cost": [
+          "Y"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 2,
+            "target": "CELL",
+            "from": 1,
+            "differentSelection": false,
+            "quantity": [
+              0,
+              4
+            ],
+            "distance": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": 1,
+            "differentSelection": false,
+            "quantity": [
+              0,
+              1
+            ],
+            "distance": [
+              -1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
+      }
     }
   ]
 }

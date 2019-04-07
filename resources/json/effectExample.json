@@ -1,0 +1,65 @@
+{
+  "Weapon": [
+    {
+      "name": "Machine Gun",
+      "cost": [
+        "B",
+        "R"
+      ],
+      "type": "EFFECT / MODE",
+      "base-effect": {
+        "description": " Choose 1 or 2 targets you can see and deal 1 damage to each. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": "[Select ID (-1 if not needed)]",
+            "target": "PLAYER / CELL / ROOM / SELF",
+            "from": "VISIBLE / NOT_VISIBLE / TARGET_VISIBLE / DIRECTION / PREV_TARGET / [int selectID] / ANY",
+            "differentSelection": true,
+            "quantity": [
+              "[MIN_QTY]",
+              "[MAX_QTY]"
+            ],
+            "distance": [
+              "[int MIN_DISTANCE]",
+              "[int MAX_DISTANCE]"
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              "[FIRST_PLAYER_DAMAGE]",
+              "[SECOND_PLAYER_DAMAGE]"
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ONE / ANY",
+            "distance": [
+              "[int MIN_DISTANCE]",
+              "[int MAX_DISTANCE]"
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              "[FIRST_PLAYER_MARKS]",
+              "[SECOND_PLAYER_MARKS]"
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "focus-shot",
+        "turret-tripod"
+      ],
+      "focus-shot": {
+        "description": "Deal 1 additional damage to one of those targets.",
+        "cost": [
+          "Y / B / R"
+        ]
+      }
+    }
+  ]
+}
