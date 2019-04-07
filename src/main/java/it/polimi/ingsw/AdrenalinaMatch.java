@@ -268,8 +268,12 @@ public class AdrenalinaMatch {
 			for(int j = 0; j< map[i].length; j++){
 				if(map[i][j] != null && !map[i][j].isSpawn()){ //if not empty cell and not a spawn cell
 					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
-					((AmmoCell) map[i][j]).setAmmo(ammoDeck.drawCard());
-				}
+                    try {
+                        ((AmmoCell) map[i][j]).setAmmo(ammoDeck.drawCard());
+                    } catch (AmmoAlreadyOnCellException e) {
+                        e.printStackTrace();
+                    }
+                }
 			}
 		}
 	}

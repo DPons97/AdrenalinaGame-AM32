@@ -7,11 +7,13 @@ import static org.junit.jupiter.api.Assertions.*;
 class AmmoCellTest {
 
     @Test
-    void setAmmo() {
+    void setAmmo() throws AmmoAlreadyOnCellException {
         AmmoCell cellTest = new AmmoCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5);
         assertNull(cellTest.getResource());
         Ammo a = new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX);
         cellTest.setAmmo(a);
+        assertThrows(AmmoAlreadyOnCellException.class, () ->cellTest.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX)));
         assertEquals(a,cellTest.getResource());
+        assertNull(cellTest.getResource());
     }
 }

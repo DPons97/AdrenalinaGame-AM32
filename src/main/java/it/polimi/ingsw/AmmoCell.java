@@ -8,14 +8,13 @@ public class AmmoCell extends Cell {
 	/**
 	 *
 	 */
-	private Ammo resource;
+	private Ammo resource = null;
 
 	/**
 	 * Default constructor
 	 */
 	public AmmoCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
 		super(north, sud, weast, east, c, x, y);
-		this.resource = null;
 	}
 
 
@@ -30,15 +29,20 @@ public class AmmoCell extends Cell {
 	 * @return
 	 */
 	public Ammo getResource() {
-
-		return resource;
+		Ammo a = resource;
+		resource = null;
+		return a;
 	}
 
 	/**
 	 * @param toPlace
 	 */
-	public void setAmmo(Ammo toPlace) {
-		resource = toPlace;
+	public void setAmmo(Ammo toPlace) throws AmmoAlreadyOnCellException {
+		if(resource==null){
+			resource = toPlace;}
+		else throw new AmmoAlreadyOnCellException();
+
 	}
+
 
 }
