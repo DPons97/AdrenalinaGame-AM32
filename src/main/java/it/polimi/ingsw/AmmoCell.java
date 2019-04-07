@@ -1,5 +1,5 @@
 package it.polimi.ingsw;
-import java.util.*;
+import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 
 /**
  * 
@@ -11,7 +11,13 @@ public class AmmoCell extends Cell {
 	private Ammo resource = null;
 
 	/**
-	 * Default constructor
+	 * @param north upper side of the cell
+	 * @param sud bottom side of the cell
+	 * @param west left side of the cell
+	 * @param east right side of the cell
+	 * @param c cell color
+	 * @param x cell x coordinate
+	 * @param y cell y coordinate
 	 */
 	public AmmoCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
 		super(north, sud, weast, east, c, x, y);
@@ -19,14 +25,14 @@ public class AmmoCell extends Cell {
 
 
 	/**
-	 * @return
+	 * @return false since ammo cell is not a spawn cell
 	 */
 	public boolean isSpawn() {
 		return false;
 	}
 
 	/**
-	 * @return
+	 * @return ammoCard on cell and removes it from the cell
 	 */
 	public Ammo getResource() {
 		Ammo a = resource;
@@ -35,7 +41,7 @@ public class AmmoCell extends Cell {
 	}
 
 	/**
-	 * @param toPlace
+	 * @param toPlace ammo card to place on cell
 	 */
 	public void setAmmo(Ammo toPlace) throws AmmoAlreadyOnCellException {
 		if(resource==null){

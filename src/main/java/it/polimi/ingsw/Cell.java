@@ -49,7 +49,13 @@ public abstract class Cell {
 	 */
 
 	/**
-	 * basic initialization of the list of player, color and sides
+	 * @param north upper side of the cell
+	 * @param sud bottom side of the cell
+	 * @param west left side of the cell
+	 * @param east right side of the cell
+	 * @param c cell color
+	 * @param x cell x coordinate
+	 * @param y cell y coordinate
 	 */
 	public Cell(Side north, Side sud, Side west, Side east, Color c, int x, int y) {
 		this.north = north;
@@ -113,7 +119,7 @@ public abstract class Cell {
 
 	/**
 	 * Place [toPlace] inside this map cell, if it's not present
-	 * @param toPlace
+	 * @param toPlace player to be placed on the cell
 	 */
 	public void addPlayer(Player toPlace) {
 		if (!players.contains(toPlace)) players.add(toPlace);
@@ -121,7 +127,7 @@ public abstract class Cell {
 
 	/**
 	 * Remove [toRemove] from this map cell, if it's present
-	 * @param toRemove
+	 * @param toRemove player to be removed from cell
 	 */
 	public void removePlayer(Player toRemove) {
 		players.remove(toRemove);

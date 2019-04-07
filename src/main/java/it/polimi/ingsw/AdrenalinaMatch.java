@@ -1,4 +1,5 @@
 package it.polimi.ingsw;
+import it.polimi.ingsw.custom_exceptions.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -8,6 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -102,15 +104,17 @@ public class AdrenalinaMatch {
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
 		this.players = new ArrayList<>();
-		currentDeaths = 0;
-		deathTrack = new ArrayList<>();
-		spawnPoints = new ArrayList<>();
-		frenzyEnabled = false;
+		this.started = false;
+		this.currentDeaths = 0;
+		this.deathTrack = new ArrayList<>();
+		this.spawnPoints = new ArrayList<>();
+		this.frenzyEnabled = false;
 		this.initAmmoDeck();
 		this.initPerkDeck();
 		this.initWeaponDeck();
 		this.buildMap(mapID);
 		this.initAmmoCells();
+		this.matchID = -1; // will be given a unique value from controller when match starts
 	}
 	/**
 	 *	create map from a json file mapid.json (eg. map1.json)
@@ -286,11 +290,23 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 *
+	 *	Add  new player to the game, only possible before the match starts
 	 */
-	public void addPlayer(Player toAdd) {
-		if(!started)
-			players.add(toAdd);
+	public void addPlayer(Player toAdd) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
+		if(!started){
+			if(players.size() < nPlayers) {
+				for(Player p: players){
+					if(p.getNickname().equals(toAdd.getNickname())){
+						throw new PlayerAlreadyExistsException();
+					}
+				}
+				players.add(toAdd);
+			} else {
+				throw new TooManyPlayersException();
+			}
+		} else {
+			throw new MatchAlreadyStartedException();
+		}
 	}
 
 	/**
@@ -379,12 +395,39 @@ public class AdrenalinaMatch {
 	/**
 	 * Insert new death in the game board, updates # of deaths and death track
 	 */
-	public void addDeath(Player killer, boolean isOverkill) throws PlayerNotExistsException{
+	public void addDeath(Player killer, boolean isOverkill) throws PlayerNotExistsException {
 		if(players.contains(killer)) {
 			currentDeaths++;
 			deathTrack.add(killer);
 			if (isOverkill) deathTrack.add(killer);
 			if (currentDeaths>= maxDeaths) frenzyEnabled = true;
 		} else throw new PlayerNotExistsException("Error, player not in game");
+	}
+
+
+	/**
+	 * Sets attributes to start the match
+	 */
+	public void startMatch(int matchID) throws NotEnoughPlayersException, MatchAlreadyStartedException {
+		if(nPlayers == players.size()) {
+			if(!started) {
+				int luckyFirstPlayerNumber = new Random().nextInt(nPlayers);
+				this.matchID = matchID;
+				this.started = true;
+				this.firstPlayer = players.get(luckyFirstPlayerNumber);
+			}else {
+				throw new MatchAlreadyStartedException();
+			}
+
+		} else {
+			throw new NotEnoughPlayersException();
+		}
+	}
+
+	/**
+	 * started getter
+	 */
+	public boolean isStarted (){
+		return started;
 	}
 }

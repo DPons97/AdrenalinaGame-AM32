@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.custom_exceptions;
 
 public class NoItemInInventoryException extends Throwable {
     public NoItemInInventoryException() {super();}

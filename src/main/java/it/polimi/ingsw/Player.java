@@ -1,4 +1,9 @@
 package it.polimi.ingsw;
+import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
+import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
+import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
+import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
+
 import java.util.*;
 
 /**
@@ -150,6 +155,13 @@ public class Player {
 			returnReward.add(i);
 		}
 		return returnReward;
+	}
+
+	/**
+	 * @return player's nickname
+	 */
+	public String getNickname(){
+		return nickname;
 	}
 
 	/**
