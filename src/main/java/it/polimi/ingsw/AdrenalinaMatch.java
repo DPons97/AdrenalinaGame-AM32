@@ -118,15 +118,22 @@ public class AdrenalinaMatch {
 	 */
 	private void buildMap(int mapID) {
 		JSONParser parser = new JSONParser();
-
+		int xSize;
+		int ySize;
 		String fileName = "././././././resources/json/map"+mapID+".json";
-		map = new Cell[3][4];
 		String[] cardinals = {"north", "sud", "west", "east"};
 		try {
 			int i = 0;
 			Object obj = parser.parse(new FileReader(fileName));
 
 			JSONObject jsonObject = (JSONObject) obj;
+
+			//get map size
+			JSONArray mapSize = (JSONArray) jsonObject.get("Size");
+			xSize = Integer.parseInt(mapSize.get(0).toString());
+			ySize = Integer.parseInt(mapSize.get(1).toString());
+			map = new Cell[xSize][ySize];
+
 			// get the array of cells
 			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
 
@@ -138,7 +145,7 @@ public class AdrenalinaMatch {
 				Color c = null;
 				// if color is X then is a corner empyt cell
 				if (color.equals("X")) {
-					map[(i / 4) % 3][i % 4] = null;
+					map[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
 					switch (color) {
 						case "B":
@@ -178,11 +185,11 @@ public class AdrenalinaMatch {
 					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
-						map[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / 4) % 3, i % 4);
-						spawnPoints.add((SpawnCell) map[(i / 4) % 3][i % 4]);
+						map[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+						spawnPoints.add((SpawnCell) map[(i / ySize) % xSize][i % ySize]);
 					} else {
 						// create AmmoCell
-						map[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / 4) % 3, i % 4);
+						map[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
 					}
 				}
 
