@@ -32,7 +32,7 @@ class PlayerTest {
             for (int j = 0; j < Player.getMaxDamage() + 1; j++) {
                 victimPlayer.takeDamage(killerPlayer);
             }
-            victimPlayer.respawn(new SpawnCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0));
+            victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
 
             // Check that reward is equal to player's default kill reward from i to end
             assertEquals(victimPlayer.getReward(), Player.getKillRewards().subList(i, Player.getKillRewards().size()));
@@ -43,7 +43,7 @@ class PlayerTest {
             victimPlayer.takeDamage(killerPlayer);
         }
 
-        victimPlayer.respawn(new SpawnCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0));
+        victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
         assertEquals(victimPlayer.getReward(), Player.getKillRewards().subList(Player.getKillRewards().size()-1, Player.getKillRewards().size()));
     }
 
@@ -91,8 +91,8 @@ class PlayerTest {
     void move() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, "Player1");
-        Cell fromCell = new AmmoCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0);
-        Cell destCell = new AmmoCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0);
+        Cell fromCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        Cell destCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
 
         assertThrows(NullPointerException.class, () -> testPlayer.move(null));
 
@@ -134,7 +134,7 @@ class PlayerTest {
         assertEquals(victimPlayer.getDmgPoints().size(), Player.getMaxDamage() + 1);
 
         // Check damage from marks is correctly dealt
-        victimPlayer.respawn(new SpawnCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0));
+        victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
         for (int i = 0; i < Player.getMaxMarks(); i++) {
             victimPlayer.takeMark(killerPlayer);
         }
@@ -229,7 +229,7 @@ class PlayerTest {
             victimPlayer.takeDamage(killerPlayer);
         }
         assertTrue(victimPlayer.isDead());
-        victimPlayer.respawn(new SpawnCell(Side.Free,Side.Free,Side.Free,Side.Free,Color.BLUE,0,0));
+        victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
         // Check player is respawned
         assertFalse(victimPlayer.isDead());
         assertTrue(victimPlayer.getDmgPoints().isEmpty());

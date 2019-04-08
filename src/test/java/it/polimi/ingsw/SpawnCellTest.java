@@ -9,7 +9,7 @@ class SpawnCellTest {
 
     @Test
     void addWeapons() throws TooManyWeaponsException {
-        SpawnCell cellTest = new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5);
+        SpawnCell cellTest = new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5);
         assertTrue(cellTest.getWeapons().isEmpty());
         WeaponEffect w = new WeaponEffect();
         cellTest.addWeapon(w);

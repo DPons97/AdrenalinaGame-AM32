@@ -172,16 +172,16 @@ public class AdrenalinaMatch {
 					for (int k = 0; k < 4; k++) {
 						switch (currCell.get(cardinals[k]).toString()) {
 							case "B":
-								cords[k] = Side.Border;
+								cords[k] = Side.BORDER;
 								break;
 							case "W":
-								cords[k] = Side.Wall;
+								cords[k] = Side.WALL;
 								break;
 							case "N":
-								cords[k] = Side.Free;
+								cords[k] = Side.FREE;
 								break;
 							case "D":
-								cords[k] = Side.Door;
+								cords[k] = Side.DOOR;
 								break;
 
 						}
@@ -338,6 +338,20 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @return the weapon deck.
+	 */
+	public Deck<Weapon> getWeaponDeck() {
+		return weaponDeck;
+	}
+
+	/**
+	 * @return the perk deck
+	 */
+	public Deck<Perk> getPerksDeck() {
+		return perksDeck;
+	}
+
+	/**
 	 * @return the match Id as an int.
 	 */
 	public int getMatchID() {
@@ -362,20 +376,6 @@ public class AdrenalinaMatch {
 	 */
 	public List<Player> getDeathTrack() {
 		return deathTrack;
-	}
-
-	/**
-	 * @return the weapon deck.
-	 */
-	public Deck<Weapon> getWeaponDeck() {
-		return weaponDeck;
-	}
-
-	/**
-	 * @return the perk deck
-	 */
-	public Deck<Perk> getPerksDeck() {
-		return perksDeck;
 	}
 
 	/**

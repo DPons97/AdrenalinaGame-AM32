@@ -1,7 +1,6 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.custom_exceptions.*;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -16,15 +15,15 @@ class AdrenalinaMatchTest {
     @Test
     void addDeath() throws PlayerNotExistsException, MatchAlreadyStartedException, TooManyPlayersException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
-        testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)));
-        testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
         assertEquals(0, testMatch.getCurrentDeaths());
 
         testMatch.addDeath(testMatch.getFirstPlayer(), false);
         assertEquals(1, testMatch.getCurrentDeaths());
         assertEquals(testMatch.getFirstPlayer(), testMatch.getDeathTrack().get(testMatch.getDeathTrack().size()-1));
 
-        assertThrows(PlayerNotExistsException.class, ()-> testMatch.addDeath(new Player(testMatch, "unknownPlayer", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)), true));
+        assertThrows(PlayerNotExistsException.class, ()-> testMatch.addDeath(new Player(testMatch, "unknownPlayer", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)), true));
 
         testMatch.addDeath(testMatch.getPlayers().get(1), true);
         assertEquals(2, testMatch.getCurrentDeaths());
@@ -50,10 +49,10 @@ class AdrenalinaMatchTest {
     void startMatch() throws MatchAlreadyStartedException, TooManyPlayersException, NotEnoughPlayersException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
         assertFalse(testMatch.isStarted());
-        testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)));
-        testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
         assertThrows(NotEnoughPlayersException.class, () -> testMatch.startMatch(41));
-        testMatch.addPlayer(new Player(testMatch, "testPlayer3", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5)));
+        testMatch.addPlayer(new Player(testMatch, "testPlayer3", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
         testMatch.startMatch(14);
         assertTrue(testMatch.isStarted());
         assertThrows(MatchAlreadyStartedException.class, () -> testMatch.startMatch(1));
@@ -62,13 +61,13 @@ class AdrenalinaMatchTest {
     @Test
     public void addPlayer(){
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
-        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
-        assertThrows(PlayerAlreadyExistsException.class,()->testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.Wall, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
-        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
-        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer3", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
-        assertThrows(TooManyPlayersException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer4", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
+        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
+        assertThrows(PlayerAlreadyExistsException.class,()->testMatch.addPlayer(new Player(testMatch, "testPlayer1", new SpawnCell(Side.WALL, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
+        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
+        assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer3", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
+        assertThrows(TooManyPlayersException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer4", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
         assertDoesNotThrow(()->testMatch.startMatch(77));
-        assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer5", new SpawnCell(Side.Border, Side.Door, Side.Free, Side.Wall, Color.BLUE, 3, 5))));
+        assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer5", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5))));
     }
 
 
