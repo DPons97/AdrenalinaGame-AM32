@@ -19,8 +19,8 @@ public class AmmoCell extends Cell {
 	 * @param x cell x coordinate
 	 * @param y cell y coordinate
 	 */
-	public AmmoCell(Side north, Side sud, Side weast, Side east, Color c, int x, int y) {
-		super(north, sud, weast, east, c, x, y);
+	public AmmoCell(Side north, Side sud, Side west, Side east, Color c, int x, int y) {
+		super(north, sud, west, east, c, x, y);
 	}
 
 
