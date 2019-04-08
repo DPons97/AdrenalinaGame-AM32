@@ -18,10 +18,6 @@ class PlayerTest {
     private static String killerName = "Killer";
 
     @Test
-    void beginPlay() {
-    }
-
-    @Test
     void getReward() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, victimName);

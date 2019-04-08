@@ -27,6 +27,7 @@ public class AmmoCell extends Cell {
 	/**
 	 * @return false since ammo cell is not a spawn cell
 	 */
+	@Override
 	public boolean isSpawn() {
 		return false;
 	}

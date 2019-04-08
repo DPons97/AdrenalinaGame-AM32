@@ -10,11 +10,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AdrenalinaMatchTest {
 
-    @BeforeEach
-    void setUp() {
-
-    }
-
     /**
      *  tests add death method
      */

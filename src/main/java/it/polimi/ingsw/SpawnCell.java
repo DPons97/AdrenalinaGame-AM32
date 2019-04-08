@@ -30,6 +30,7 @@ public class SpawnCell extends Cell {
 	/**
 	 * @return true because the cell is spawned
 	 */
+	@Override
 	public boolean isSpawn() {
 		return true;
 	}
