@@ -37,6 +37,11 @@ public class Action {
 	private Direction targetDirection;
 
 	/**
+	 * max
+	 */
+	private int maxDistance;
+
+	/**
 	 * Default constructor
 	 */
 	public Action() {
