@@ -1,5 +1,10 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.custom_exceptions.InvalidJSONException;
+import it.polimi.ingsw.custom_exceptions.InvalidStringException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +22,21 @@ public class Action {
 		 */
 		public void applyOn();
 	}
+
+	/**
+	 * Action name
+	 */
+	private String name;
+
+	/**
+	 * Action description
+	 */
+	private String description;
+
+	/**
+	 * Action description
+	 */
+	private List<Resource> cost;
 
 	/**
 	 * List of base actions to run in order
@@ -51,11 +71,14 @@ public class Action {
 	/**
 	 * Default constructor
 	 */
-	public Action() {
+	public Action(String name,JSONObject effect) {
+		this.name = name;
 		this.actions = new ArrayList<>();
 		this.targetCells = new ArrayList<>();
 		this.targetDirection = null;
 		this.targetPlayers = new ArrayList<>();
+		this.cost = new ArrayList<>();
+		parseEffect(effect);
 	}
 
 	/**
@@ -67,9 +90,40 @@ public class Action {
 
 	/**
 	 * @param
+	 * @param effect json effect to parse
 	 */
-	public void parseEffect(/*JSONObject*/) {
-		// TODO implement here
+	public void parseEffect(JSONObject effect) {
+		try {
+			this.description = effect.get("description").toString();
+			JSONArray costJSON = (JSONArray) effect.get("cost");
+			for(Object res: costJSON){
+				this.cost.add(AdrenalinaMatch.stringToResource(res.toString()));
+			}
+
+			JSONArray baseActionsJSON = (JSONArray) effect.get("actions");
+			for(Object baseActionObj: baseActionsJSON){
+				JSONObject baseActionJSON = (JSONObject) baseActionObj;
+				switch(baseActionJSON.get("type").toString()){
+					case "SELECT":
+						// TODO implement here
+						// might be controller work
+						break;
+					case "DAMAGE":
+						// TODO implement here
+						break;
+					case "MOVE":
+						// TODO implement here
+						break;
+					case "MARK":
+						// TODO implement here
+						break;
+					default:
+						throw new InvalidJSONException();
+				}
+			}
+		} catch (InvalidJSONException | InvalidStringException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**

@@ -229,17 +229,7 @@ public class AdrenalinaMatch {
 				resources.clear();
 				// for every ammo in the current ammo list add the resource to the utility list
 				for (Object ammo : ammos) {
-					switch (ammo.toString()){
-						case "R":
-							resources.add(Resource.RED_BOX);
-							break;
-						case "B":
-							resources.add(Resource.BLUE_BOX);
-							break;
-						case "Y":
-							resources.add(Resource.YELLOW_BOX);
-							break;
-					}
+					resources.add(stringToResource(ammo.toString()));
 				}
 				// based on the number of resources create a new card
 				if(resources.size()==2)
@@ -247,7 +237,7 @@ public class AdrenalinaMatch {
 				else
 					ammoDeck.discardCard(new Ammo(resources.get(0), resources.get(1),resources.get(2)));
 			}
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
 		}
 	}
@@ -259,7 +249,6 @@ public class AdrenalinaMatch {
 	private void initPowerupDeck() {
 		// TODO implement here
 		powerupDeck = new Deck<>();
-
 	}
 
 	/**
@@ -269,6 +258,34 @@ public class AdrenalinaMatch {
 	private void initWeaponDeck() {
 		// TODO implement here
 		weaponDeck = new Deck<>();
+		JSONParser parser = new JSONParser();
+		String name;
+		List<Resource> cost = new ArrayList<>();
+		try {
+			Object obj = parser.parse(new FileReader("././././././resources/json/weapons.json"));
+
+			JSONObject jsonObject = (JSONObject) obj;
+
+			JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");
+
+			for(Object weaponCard: weaponCards){
+				JSONObject currWeapon = (JSONObject) weaponCard;
+				name = currWeapon.get("name").toString();
+				JSONArray cardCost = (JSONArray) currWeapon.get("cost");
+				for(Object res:cardCost){
+					cost.add(stringToResource(res.toString()));
+				}
+
+				if(currWeapon.get("type").toString().equals("EFFECT")){
+					weaponDeck.discardCard(new WeaponEffect(name,cost, currWeapon));
+				} else {
+					weaponDeck.discardCard(new WeaponMode(name,cost, currWeapon));
+				}
+
+			}
+		} catch (ParseException | IOException | InvalidStringException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -429,5 +446,18 @@ public class AdrenalinaMatch {
 	 */
 	public boolean isStarted (){
 		return started;
+	}
+
+	public static Resource stringToResource(String s) throws InvalidStringException {
+		switch (s){
+			case "R":
+				return Resource.RED_BOX;
+			case "B":
+				return Resource.BLUE_BOX;
+			case "Y":
+				return Resource.YELLOW_BOX;
+			default:
+				throw new InvalidStringException();
+		}
 	}
 }

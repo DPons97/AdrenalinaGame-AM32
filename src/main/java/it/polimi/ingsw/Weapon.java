@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
 
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,45 +20,38 @@ public abstract class Weapon {
 	private Boolean loaded;
 
 	/**
-	 * weapon description
-	 */
-	private String description;
-
-	/**
 	 * weapon cost
 	 */
 	private List<Resource> cost;
 
 	/**
-	 * Default constructor
+	 * @param name weapon name
+	 * @param cost weapon cost
+	 * @param actions json object with effects description
 	 */
-	public Weapon() {
-		reload();
+	public Weapon(String name, List<Resource> cost, JSONObject actions) {
+		this.name = name;
+		this.loaded = true;
+		this.cost = cost;
+		parseEffects(actions);
 	}
 
 	/**
-	 *
+	 * @return weapon name
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
-	 *
+	 * @return loard
 	 */
 	public Boolean isLoaded() {
 		return loaded;
 	}
 
 	/**
-	 *
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 *
+	 * @return weapon cost
 	 */
 	public List<Resource> getCost() {
 		return new ArrayList<>(cost);
@@ -71,14 +66,14 @@ public abstract class Weapon {
 	}
 
 	/**
-	 *
+	 * Reload weapon
 	 */
 	public void reload() {
 		loaded = true;
 	}
 
 	/**
-	 * @return
+	 * Shoot with this weapon
 	 */
 	public void shoot() {
 		// TODO implement here
@@ -86,11 +81,9 @@ public abstract class Weapon {
 	}
 
 	/**
-	 * @param fileName
+	 * @param actions json object read from weapon file
 	 * @return
 	 */
-	private void parseEffects(String fileName) {
-		// TODO implement here
-	}
+	 protected abstract void parseEffects(JSONObject actions);
 
 }
