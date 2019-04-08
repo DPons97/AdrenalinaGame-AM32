@@ -1,17 +1,16 @@
 package it.polimi.ingsw;
-import java.util.*;
 
 /**
  * 
  */
-public class Perk {
+public class Powerup {
 	/**
-	 * Perk name
+	 * Powerup name
 	 */
 	private String name;
 
 	/**
-	 * Perk description
+	 * Powerup description
 	 */
 	private String description;
 
@@ -21,14 +20,14 @@ public class Perk {
 	private Resource bonusResource;
 
 	/**
-	 * Perk effect
+	 * Powerup effect
 	 */
 	private Action effect;
 
 	/**
 	 * Default constructor
 	 */
-	public Perk(Resource bonusResource, Action effect) {
+	public Powerup(Resource bonusResource, Action effect) {
 		this.bonusResource = bonusResource;
 		this.effect = effect;
 	}
@@ -36,14 +35,14 @@ public class Perk {
 	/**
 	 * 
 	 */
-	public void usePerk() {
+	public void useAsEffect() {
 		// TODO implement here
 	}
 
 	/**
 	 * @return bonus resource
 	 */
-	public Resource useResource() {
+	public Resource useAsResource() {
 		return bonusResource;
 	}
 

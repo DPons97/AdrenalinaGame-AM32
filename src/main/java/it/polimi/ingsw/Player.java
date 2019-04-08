@@ -1,10 +1,13 @@
 package it.polimi.ingsw;
+
 import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
 import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * 
@@ -83,9 +86,9 @@ public class Player {
 	private List<Weapon> weapons;
 
 	/**
-	 *  Perks this player has (Max 3)
+	 *  Powerups this player has (Max 3)
 	 */
-	private List<Perk> perks;
+	private List<Powerup> powerups;
 
 	/**
 	 *  Ammos this player has (Max 3 of each type)
@@ -111,7 +114,7 @@ public class Player {
 		position = null;
 
 		weapons = new ArrayList<>();
-		perks = new ArrayList<>();
+		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
 	}
 
@@ -135,7 +138,7 @@ public class Player {
 		position = spawnPosition;
 
 		weapons = new ArrayList<>();
-		perks = new ArrayList<>();
+		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
 	}
 
@@ -237,9 +240,9 @@ public class Player {
 	public List<Weapon> getWeapons() { return new ArrayList<>(weapons); }
 
 	/**
-	 * @return List of Player's Perks (Max: 3)
+	 * @return List of Player's Powerups (Max: 3)
 	 */
-	public List<Perk> getPerks() { return new ArrayList<>(perks); }
+	public List<Powerup> getPowerups() { return new ArrayList<>(powerups); }
 
 	/**
 	 * @param toLoad Weapon to reload
@@ -356,16 +359,16 @@ public class Player {
 	}
 
 	/**
-	 * Pick perk from deck
+	 * Pick powerup from deck
 	 */
-	public void pickPerk() {
+	public void pickPowerup() {
 		// TODO implement here
 	}
 
 	/**
-	 * @param toUse Perk to use
+	 * @param toUse Powerup to use
 	 */
-	public void usePerk(Perk toUse) {
+	public void usePowerup(Powerup toUse) {
 		// TODO implement here
 	}
 

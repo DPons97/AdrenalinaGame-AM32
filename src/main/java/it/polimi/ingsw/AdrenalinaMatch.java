@@ -52,9 +52,9 @@ public class AdrenalinaMatch {
 	private Deck<Weapon> weaponDeck;
 
 	/**
-	 * Deck of perk cards
+	 * Deck of powerup cards
 	 */
-	private Deck<Perk> perksDeck;
+	private Deck<Powerup> powerupDeck;
 
 	/**
 	 * Deck of ammo cards
@@ -110,7 +110,7 @@ public class AdrenalinaMatch {
 		this.spawnPoints = new ArrayList<>();
 		this.frenzyEnabled = false;
 		this.initAmmoDeck();
-		this.initPerkDeck();
+		this.initPowerupDeck();
 		this.initWeaponDeck();
 		this.buildMap(mapID);
 		this.initAmmoCells();
@@ -253,12 +253,12 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * private methos to initialize perk deck
-	 * parses perks.json file
+	 * private methos to initialize powerup deck
+	 * parses powerup.json file
 	 */
-	private void initPerkDeck() {
+	private void initPowerupDeck() {
 		// TODO implement here
-		perksDeck = new Deck<>();
+		powerupDeck = new Deck<>();
 
 	}
 
@@ -345,10 +345,10 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * @return the perk deck
+	 * @return the powerup deck
 	 */
-	public Deck<Perk> getPerksDeck() {
-		return perksDeck;
+	public Deck<Powerup> getPowerupDeck() {
+		return powerupDeck;
 	}
 
 	/**

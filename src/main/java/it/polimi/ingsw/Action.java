@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -37,9 +39,14 @@ public class Action {
 	private Direction targetDirection;
 
 	/**
-	 * max
+	 * max distace for action
 	 */
 	private int maxDistance;
+
+	/**
+	 * min distace for action
+	 */
+	private int minDistance;
 
 	/**
 	 * Default constructor
@@ -54,7 +61,7 @@ public class Action {
 	/**
 	 * @return copy of actions list
 	 */
-	public ArrayList<BaseAction> getActions() {
+	public List<BaseAction> getActions() {
 		return new ArrayList<>(actions);
 	}
 

@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -23,7 +25,7 @@ public abstract class Cell {
 	/**
 	 * down side of the cell
 	 */
-	private Side sud;
+	private Side south;
 
 	/**
 	 * left side of the cell
@@ -50,16 +52,16 @@ public abstract class Cell {
 
 	/**
 	 * @param north upper side of the cell
-	 * @param sud bottom side of the cell
+	 * @param south bottom side of the cell
 	 * @param west left side of the cell
 	 * @param east right side of the cell
 	 * @param c cell color
 	 * @param x cell x coordinate
 	 * @param y cell y coordinate
 	 */
-	public Cell(Side north, Side sud, Side west, Side east, Color c, int x, int y) {
+	public Cell(Side north, Side south, Side west, Side east, Color c, int x, int y) {
 		this.north = north;
-		this.sud = sud;
+		this.south = south;
 		this.east = east;
 		this.west = west;
 		this.color = c;
@@ -72,10 +74,10 @@ public abstract class Cell {
 		return north;
 	}
 	/**
-	 * return the sud side
+	 * return the south side
 	 */
-	public Side getSud() {
-		return sud;
+	public Side getSouth() {
+		return south;
 	}
 	/**
 	 * return the west side

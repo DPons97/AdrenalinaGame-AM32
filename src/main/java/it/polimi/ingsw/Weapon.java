@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -62,8 +63,8 @@ public abstract class Weapon {
 	}
 
 	/**
-	 *
-	 * @param cost
+	 * testing purposes
+	 * @param cost weapon cost
 	 */
 	public void setCost(List<Resource> cost) {
 		this.cost = new ArrayList<>(cost);

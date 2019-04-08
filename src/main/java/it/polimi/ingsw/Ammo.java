@@ -1,5 +1,7 @@
 package it.polimi.ingsw;
-import java.util.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -13,7 +15,7 @@ public class Ammo {
 	/**
 	 * Identifies presence of powerup on the card. if present resources.size()==2
 	 */
-	private boolean perk;
+	private boolean powerup;
 
 	/**
 	 * Constructor for ammo card with 3 resources
@@ -23,7 +25,7 @@ public class Ammo {
 		this.resources.add(res1);
 		this.resources.add(res2);
 		this.resources.add(res3);
-		this.perk  = false;
+		this.powerup  = false;
 	}
 
     /**
@@ -33,7 +35,7 @@ public class Ammo {
 		this.resources = new ArrayList<>();
 		this.resources.add(res1);
 		this.resources.add(res2);
-		this.perk = true;
+		this.powerup = true;
 	}
 
 	/**
@@ -46,8 +48,8 @@ public class Ammo {
 	/**
 	 * @return true if perk is present, otherwise false
 	 */
-	public boolean hasPerk() {
-		return perk;
+	public boolean hasPowerup() {
+		return powerup;
 	}
 
 }

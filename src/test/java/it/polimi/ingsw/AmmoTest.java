@@ -9,7 +9,7 @@ class AmmoTest {
     @Test
     void ammoTestConstructor1(){
         Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX, Resource.BLUE_BOX);
-        assertFalse(a.hasPerk());
+        assertFalse(a.hasPowerup());
         assertTrue(a.getResources().contains(Resource.RED_BOX));
         assertTrue(a.getResources().contains(Resource.YELLOW_BOX));
         assertTrue(a.getResources().contains(Resource.BLUE_BOX));
@@ -19,7 +19,7 @@ class AmmoTest {
     @Test
     void ammoTestConstructor2(){
         Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX);
-        assertTrue(a.hasPerk());
+        assertTrue(a.hasPowerup());
         assertTrue(a.getResources().contains(Resource.RED_BOX));
         assertTrue(a.getResources().contains(Resource.YELLOW_BOX));
         assertFalse(a.getResources().contains(Resource.BLUE_BOX));
