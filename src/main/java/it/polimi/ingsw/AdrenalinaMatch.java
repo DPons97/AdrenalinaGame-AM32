@@ -151,40 +151,10 @@ public class AdrenalinaMatch {
 				if (color.equals("X")) {
 					map[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
-					switch (color) {
-						case "B":
-							c = Color.BLUE;
-							break;
-						case "R":
-							c = Color.RED;
-							break;
-						case "W":
-							c = Color.WHITE;
-							break;
-						case "P":
-							c = Color.PURPLE;
-							break;
-						case "Y":
-							c = Color.YELLOW;
-							break;
-					}
-					// for every side add the value to the coords array [noth, sud, wesr, east]
+					c = stringToColor(color);
+					// for every side add the value to the coords array [north, south, wesr, east]
 					for (int k = 0; k < 4; k++) {
-						switch (currCell.get(cardinals[k]).toString()) {
-							case "B":
-								cords[k] = Side.BORDER;
-								break;
-							case "W":
-								cords[k] = Side.WALL;
-								break;
-							case "N":
-								cords[k] = Side.FREE;
-								break;
-							case "D":
-								cords[k] = Side.DOOR;
-								break;
-
-						}
+						cords[k] = stringToSide(currCell.get(cardinals[k]).toString());
 					}
 					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
@@ -199,7 +169,7 @@ public class AdrenalinaMatch {
 				i++;
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
 		}
 	}
@@ -229,17 +199,7 @@ public class AdrenalinaMatch {
 				resources.clear();
 				// for every ammo in the current ammo list add the resource to the utility list
 				for (Object ammo : ammos) {
-					switch (ammo.toString()){
-						case "R":
-							resources.add(Resource.RED_BOX);
-							break;
-						case "B":
-							resources.add(Resource.BLUE_BOX);
-							break;
-						case "Y":
-							resources.add(Resource.YELLOW_BOX);
-							break;
-					}
+					resources.add(stringToResource(ammo.toString()));
 				}
 				// based on the number of resources create a new card
 				if(resources.size()==2)
@@ -247,7 +207,7 @@ public class AdrenalinaMatch {
 				else
 					ammoDeck.discardCard(new Ammo(resources.get(0), resources.get(1),resources.get(2)));
 			}
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
 		}
 	}
@@ -259,7 +219,6 @@ public class AdrenalinaMatch {
 	private void initPowerupDeck() {
 		// TODO implement here
 		powerupDeck = new Deck<>();
-
 	}
 
 	/**
@@ -269,6 +228,34 @@ public class AdrenalinaMatch {
 	private void initWeaponDeck() {
 		// TODO implement here
 		weaponDeck = new Deck<>();
+		JSONParser parser = new JSONParser();
+		String name;
+		List<Resource> cost = new ArrayList<>();
+		try {
+			Object obj = parser.parse(new FileReader("././././././resources/json/weapons.json"));
+
+			JSONObject jsonObject = (JSONObject) obj;
+
+			JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");
+
+			for(Object weaponCard: weaponCards){
+				JSONObject currWeapon = (JSONObject) weaponCard;
+				name = currWeapon.get("name").toString();
+				JSONArray cardCost = (JSONArray) currWeapon.get("cost");
+				for(Object res:cardCost){
+					cost.add(stringToResource(res.toString()));
+				}
+
+				if(currWeapon.get("type").toString().equals("EFFECT")){
+					weaponDeck.discardCard(new WeaponEffect(name,cost, currWeapon));
+				} else {
+					weaponDeck.discardCard(new WeaponMode(name,cost, currWeapon));
+				}
+
+			}
+		} catch (ParseException | IOException | InvalidStringException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -439,5 +426,60 @@ public class AdrenalinaMatch {
 	 */
 	public boolean isStarted (){
 		return started;
+	}
+
+	/**
+	 * gat Resource associated with string
+	 */
+	public static Resource stringToResource(String s) throws InvalidStringException {
+		switch (s){
+			case "R":
+				return Resource.RED_BOX;
+			case "B":
+				return Resource.BLUE_BOX;
+			case "Y":
+				return Resource.YELLOW_BOX;
+			default:
+				throw new InvalidStringException();
+		}
+	}
+
+	/**
+	 * @return color Colo associated with string
+	 */
+	public static Color stringToColor(String s) throws InvalidStringException {
+		switch (s) {
+			case "B":
+				return Color.BLUE;
+			case "R":
+				return Color.RED;
+			case "W":
+				return Color.WHITE;
+			case "P":
+				return Color.PURPLE;
+			case "Y":
+				return Color.YELLOW;
+			default:
+				throw new InvalidStringException();
+		}
+	}
+
+	/**
+	 * @return Side associated with string
+	 */
+	public static Side stringToSide(String s) throws InvalidStringException {
+		switch (s) {
+			case "B":
+				return Side.BORDER;
+			case "W":
+				return Side.WALL;
+			case "N":
+				return Side.FREE;
+			case "D":
+				return Side.DOOR;
+			default:
+				throw new InvalidStringException();
+
+		}
 	}
 }

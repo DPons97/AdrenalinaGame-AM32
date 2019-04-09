@@ -4,6 +4,7 @@ import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
 import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -52,8 +53,8 @@ class PlayerTest {
      */
     @Test
     void reload() throws TooManyWeaponsException {
-        Weapon testWeaponMode = new WeaponMode();
-        Weapon testWeaponEffect = new WeaponEffect();
+        Weapon testWeaponMode = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
+        Weapon testWeaponEffect = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
         Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer");
 
         List<Resource> testCost = new ArrayList<>();
@@ -221,8 +222,8 @@ class PlayerTest {
 
     @Test
     void pickWeapon() throws TooManyWeaponsException {
-        Weapon testWeaponMode = new WeaponMode();
-        Weapon testWeaponEffect = new WeaponEffect();
+        Weapon testWeaponMode = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
+        Weapon testWeaponEffect = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
         Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer");
 
         // Add weapon (effect) and check successful add
@@ -238,8 +239,8 @@ class PlayerTest {
         assertFalse(Collections.frequency(testPlayer.getWeapons(), testWeaponEffect) > 1);
 
         // Try to add 4 weapons
-        Weapon testWeapon3 = new WeaponMode();
-        Weapon testWeapon4 = new WeaponEffect();
+        Weapon testWeapon3 = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
+        Weapon testWeapon4 = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
 
         testPlayer.pickWeapon(testWeapon3);
         assertThrows(TooManyWeaponsException.class, () -> testPlayer.pickWeapon(testWeapon4));
