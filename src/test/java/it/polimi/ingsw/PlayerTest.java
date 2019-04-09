@@ -4,7 +4,6 @@ import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
 import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
-import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -64,13 +63,13 @@ class PlayerTest {
         testCost.add(Resource.RED_BOX);
         testCost.add(Resource.RED_BOX);
         testWeaponEffect.setCost(testCost);
-        testWeaponEffect.shoot();   // Set weapon ready to reload
+        testWeaponEffect.shoot(0,testPlayer);   // Set weapon ready to reload
 
         testCost.clear();
         testCost.add(Resource.YELLOW_BOX);
         testCost.add(Resource.RED_BOX);
         testWeaponMode.setCost(testCost);
-        testWeaponMode.shoot();     // Set weapon ready to reload
+        testWeaponMode.shoot(0,testPlayer);     // Set weapon ready to reload
 
         // Check player cannot reload weapons he doesn't have
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeaponEffect));

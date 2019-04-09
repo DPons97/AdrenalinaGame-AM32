@@ -17,7 +17,7 @@ public abstract class Weapon {
 	/**
 	 * true when weapon is ready to shoot
 	 */
-	private Boolean loaded;
+	protected boolean loaded;
 
 	/**
 	 * weapon cost
@@ -44,7 +44,7 @@ public abstract class Weapon {
 	}
 
 	/**
-	 * @return loard
+	 * @return load
 	 */
 	public Boolean isLoaded() {
 		return loaded;
@@ -74,11 +74,16 @@ public abstract class Weapon {
 
 	/**
 	 * Shoot with this weapon
+	 * @param effectID effect identifier
+	 * @param shooter player shooting
 	 */
-	public void shoot() {
-		// TODO implement here
-		loaded = false;
-	}
+	public abstract void shoot(int effectID, Player shooter);
+
+	/**
+	 * @return list of possible shoot actions
+	 */
+	public abstract List<Action> getShootActions();
+
 
 	/**
 	 * @param actions json object read from weapon file
