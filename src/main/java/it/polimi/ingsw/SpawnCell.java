@@ -1,6 +1,6 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
+import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,9 +48,9 @@ public class SpawnCell extends Cell {
 	 * add one weapon
 	 * @param toAdd weapon to add
 	 */
-	public void addWeapon(Weapon toAdd) throws TooManyWeaponsException {
+	public void addWeapon(Weapon toAdd) throws InventoryFullException {
 		if (weapons.size()==3) {
-			throw new TooManyWeaponsException();
+			throw new InventoryFullException();
 		}
 		weapons.add(toAdd);
 	}

@@ -14,7 +14,7 @@ class AmmoCellTest {
         Ammo a = new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX);
         cellTest.setAmmo(a);
         assertThrows(AmmoAlreadyOnCellException.class, () ->cellTest.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX)));
-        assertEquals(a,cellTest.getResource());
+        assertEquals(a,cellTest.pickResource());
         assertNull(cellTest.getResource());
     }
 }

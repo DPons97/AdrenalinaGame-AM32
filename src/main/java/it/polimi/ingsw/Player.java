@@ -3,7 +3,7 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
 import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
-import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
+import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -201,6 +201,11 @@ public class Player {
 	public List<Player> getMarks() { return new ArrayList<>(marks); }
 
 	/**
+	 * @return current ammos in player's inventory
+	 */
+	public List<Resource> getAmmos() { return new ArrayList<>(ammos); }
+
+	/**
 	 * @return true if player is dead
 	 */
 	public boolean isDead() { return dead; }
@@ -246,6 +251,8 @@ public class Player {
 
 	/**
 	 * @param toLoad Weapon to reload
+	 * @throws NoItemInInventoryException if toLoad is not in player's inventory
+	 * @throws InsufficientResourcesException if there are insufficient resources in player's inventory
 	 */
 	public void reload(Weapon toLoad) throws NoItemInInventoryException, InsufficientResourcesException {
 		if (!weapons.contains(toLoad)) throw new NoItemInInventoryException();
@@ -254,9 +261,14 @@ public class Player {
 		if (toLoad.isLoaded()) return;
 
 		List<Resource> reloadCost = toLoad.getCost();
+		// Check if there are enough resources in player's inventory
+		for (Resource resource : reloadCost) {
+			if (!ammos.contains(resource)) throw new InsufficientResourcesException();
+		}
+
+		// Remove used resources
 		for (Iterator<Resource> itr = reloadCost.iterator(); itr.hasNext(); ) {
-			if (!ammos.contains(itr.next())) throw new InsufficientResourcesException();
-			else {
+			if (ammos.contains(itr.next())) {
 				ammos.remove(itr.next());
 				itr.remove();
 			}
@@ -282,6 +294,7 @@ public class Player {
 	 * Apply damage to player. Additional damage due to source's marks on this player are also applied.
 	 * @param source Damage dealt to this player
 	 * @return true if player's dead after damage
+	 * @throws DeadPlayerException if player is already dead
 	 */
 	public boolean takeDamage(Player source) throws DeadPlayerException {
 		// Player take damage from source only if not overkilled
@@ -324,7 +337,7 @@ public class Player {
 	 * @return List of all cells between [minDist] and [maxDist] distance
 	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
 	 */
-	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
+	public List<Cell> getCellAtDistance(int minDist, int maxDist) throws IllegalArgumentException {
 		if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
 
 		Cell[][] matchMap = match.getMap();
@@ -368,23 +381,40 @@ public class Player {
 	}
 
 	/**
+	 * Pick ammo and add resources + powerups to player's inventory
 	 * @param location Cell from which this player take monitions
 	 */
-	public void pickAmmo(Cell location) {
-		// TODO implement here
+	public void pickAmmo(AmmoCell location) {
+		// Pick resource
+		Ammo resourcePicked = location.pickResource();
+		List<Resource> resourcesInAmmo = resourcePicked.getResources();
+		boolean addPowerup = resourcePicked.hasPowerup();
+		List<Resource> resourcesToAdd = new ArrayList<>();
+
+		// Check if there is space for at least one resource to add. If there are already too many resources, remove from resources to add
+		for (Resource toAdd: resourcesInAmmo ) {
+			// Get player's ammo quantity of toAdd's resource type
+			int thisResourceQty = 0;
+			for (Resource res: ammos) if (res.equals(toAdd)) thisResourceQty++;
+			if (thisResourceQty < 3) resourcesToAdd.add(toAdd);
+		}
+
+		// Check if there is space for at least one powerup to add. If there are already too many powerups, do not add
+		if (powerups.size() >= 3) addPowerup = false;
+
+		// Add resources
+		if (!resourcesToAdd.isEmpty()) ammos.addAll(resourcesToAdd);
+		// Add powerup
+		if (addPowerup) powerups.add(match.getPowerupDeck().drawCard());
+
+		// Discard picked ammo to deck
+		match.getAmmoDeck().discardCard(resourcePicked);
 	}
 
 	/**
 	 * @param toUse Ammo to use
 	 */
 	public void useAmmo(Ammo toUse) {
-		// TODO implement here
-	}
-
-	/**
-	 * Pick powerup from deck
-	 */
-	public void pickPowerup() {
 		// TODO implement here
 	}
 
@@ -399,10 +429,11 @@ public class Player {
 	 * Add [toPick] weapon, if there are less then 3 weapons in player's inventory and
 	 * if [toPick] is not in inventory.
 	 * @param toPick Weapon to pick
+	 * @throws InventoryFullException if player has already 3 weapons
 	 */
-	public void pickWeapon(Weapon toPick) throws TooManyWeaponsException {
+	public void pickWeapon(Weapon toPick) throws InventoryFullException {
 		// Can't add weapons if inventory's full
-		if (weapons.size() >= 3) throw new TooManyWeaponsException();
+		if (weapons.size() >= 3) throw new InventoryFullException();
 		else {
 			// Add weapon only if it's not already in inventory
 			if(!weapons.contains(toPick)) weapons.add(toPick);

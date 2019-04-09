@@ -1,9 +1,6 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
-import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
-import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
-import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
+import it.polimi.ingsw.custom_exceptions.*;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -51,7 +48,7 @@ class PlayerTest {
      *
      */
     @Test
-    void reload() throws TooManyWeaponsException {
+    void reload() throws InventoryFullException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
@@ -63,13 +60,13 @@ class PlayerTest {
         testCost.add(Resource.RED_BOX);
         testCost.add(Resource.RED_BOX);
         testWeaponEffect.setCost(testCost);
-        testWeaponEffect.shoot(0,testPlayer);   // Set weapon ready to reload
+        testWeaponEffect.shoot(0, testPlayer);   // Set weapon ready to reload
 
         testCost.clear();
         testCost.add(Resource.YELLOW_BOX);
         testCost.add(Resource.RED_BOX);
         testWeaponMode.setCost(testCost);
-        testWeaponMode.shoot(0,testPlayer);     // Set weapon ready to reload
+        testWeaponMode.shoot(0, testPlayer);     // Set weapon ready to reload
 
         // Check player cannot reload weapons he doesn't have
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeaponEffect));
@@ -162,7 +159,7 @@ class PlayerTest {
     }
 
     @Test
-    void getCellAtDistance() {
+    void getCellAtDistance() throws IllegalArgumentException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, "testPlayer");
 
@@ -205,7 +202,47 @@ class PlayerTest {
     }
 
     @Test
-    void pickAmmo() {
+    void pickAmmo() throws AmmoAlreadyOnCellException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, "testPlayer");
+        testPlayer.respawn(testMatch.getSpawnPoints().get(0));
+
+        // Get first ammo cell
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        Ammo cellAmmo = new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.RED_BOX);
+        newAmmoCell.setAmmo(cellAmmo);
+
+        // Check player has no ammos
+        assertTrue(testPlayer.getAmmos().isEmpty());
+
+        // Check player's inventory has been updated after picking ammos
+        List<Resource> playerAmmos = new ArrayList<>();
+        playerAmmos.add(Resource.RED_BOX);
+        playerAmmos.add(Resource.RED_BOX);
+        playerAmmos.add(Resource.RED_BOX);
+        testPlayer.pickAmmo(newAmmoCell);
+        assertEquals(testPlayer.getAmmos(), playerAmmos);
+
+        // Try to add 4 ammos of same type
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+
+        // Count how many RED_BOXes there are in player's inventory and check there aren't more than 3
+        playerAmmos = testPlayer.getAmmos();
+        int i = 0;
+        for (Resource res : playerAmmos) {
+            if (res.equals(Resource.RED_BOX)) i++;
+        }
+        assertEquals(i, 3);
+
+        // Check powerup has been added
+        assertEquals(testPlayer.getPowerups().size(), 1);
+
+        // Try add only resources that player already has, and check cell's ammo is taken
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        assertEquals(i, 3);
+        assertNull(newAmmoCell.getResource());
     }
 
     @Test
@@ -221,7 +258,7 @@ class PlayerTest {
     }
 
     @Test
-    void pickWeapon() throws TooManyWeaponsException {
+    void pickWeapon() throws InventoryFullException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
@@ -244,7 +281,7 @@ class PlayerTest {
         Weapon testWeapon4 = newMatch.getWeaponDeck().drawCard();
 
         testPlayer.pickWeapon(testWeapon3);
-        assertThrows(TooManyWeaponsException.class, () -> testPlayer.pickWeapon(testWeapon4));
+        assertThrows(InventoryFullException.class, () -> testPlayer.pickWeapon(testWeapon4));
     }
 
     @Test

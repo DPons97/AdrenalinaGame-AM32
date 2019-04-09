@@ -1,17 +1,14 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.custom_exceptions.TooManyWeaponsException;
-import org.json.simple.JSONObject;
+import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class SpawnCellTest {
 
     @Test
-    void addWeapons() throws TooManyWeaponsException {
+    void addWeapons() throws InventoryFullException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
 
         SpawnCell cellTest = new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5);
@@ -24,7 +21,7 @@ class SpawnCellTest {
 
         cellTest.addWeapon(newMatch.getWeaponDeck().drawCard());
         cellTest.addWeapon(newMatch.getWeaponDeck().drawCard());
-        assertThrows(TooManyWeaponsException.class, ()-> cellTest.addWeapon(newMatch.getWeaponDeck().drawCard()));
+        assertThrows(InventoryFullException.class, ()-> cellTest.addWeapon(newMatch.getWeaponDeck().drawCard()));
 
 
     }

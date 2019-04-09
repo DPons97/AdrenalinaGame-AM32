@@ -33,9 +33,22 @@ public class AmmoCell extends Cell {
 	}
 
 	/**
-	 * @return ammoCard on cell and removes it from the cell
+	 * @return this cell's resource
 	 */
 	public Ammo getResource() {
+		if (resource == null) return null;
+
+		Ammo toReturn;
+		if (resource.hasPowerup()) toReturn = new Ammo(resource.getResources().get(0), resource.getResources().get(1));
+		else toReturn = new Ammo(resource.getResources().get(0), resource.getResources().get(1), resource.getResources().get(2));
+
+		return toReturn;
+	}
+
+	/**
+	 * @return ammoCard on cell and removes it from the cell
+	 */
+	public Ammo pickResource() {
 		Ammo a = resource;
 		resource = null;
 		return a;
