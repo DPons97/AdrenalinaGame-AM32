@@ -151,40 +151,10 @@ public class AdrenalinaMatch {
 				if (color.equals("X")) {
 					map[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
-					switch (color) {
-						case "B":
-							c = Color.BLUE;
-							break;
-						case "R":
-							c = Color.RED;
-							break;
-						case "W":
-							c = Color.WHITE;
-							break;
-						case "P":
-							c = Color.PURPLE;
-							break;
-						case "Y":
-							c = Color.YELLOW;
-							break;
-					}
-					// for every side add the value to the coords array [noth, sud, wesr, east]
+					c = stringToColor(color);
+					// for every side add the value to the coords array [north, south, wesr, east]
 					for (int k = 0; k < 4; k++) {
-						switch (currCell.get(cardinals[k]).toString()) {
-							case "B":
-								cords[k] = Side.BORDER;
-								break;
-							case "W":
-								cords[k] = Side.WALL;
-								break;
-							case "N":
-								cords[k] = Side.FREE;
-								break;
-							case "D":
-								cords[k] = Side.DOOR;
-								break;
-
-						}
+						cords[k] = stringToSide(currCell.get(cardinals[k]).toString());
 					}
 					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
@@ -199,7 +169,7 @@ public class AdrenalinaMatch {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
 		}
 	}
@@ -292,16 +262,16 @@ public class AdrenalinaMatch {
 	 * private method to initialize ammo cells with an ammo card
 	 */
 	private void initAmmoCells() {
-		for(int i = 0; i<map.length; i++){
-			for(int j = 0; j< map[i].length; j++){
-				if(map[i][j] != null && !map[i][j].isSpawn()){ //if not empty cell and not a spawn cell
+		for (Cell[] cells : map) {
+			for (Cell cell : cells) {
+				if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
 					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
-                    try {
-                        ((AmmoCell) map[i][j]).setAmmo(ammoDeck.drawCard());
-                    } catch (AmmoAlreadyOnCellException e) {
-                        e.printStackTrace();
-                    }
-                }
+					try {
+						((AmmoCell) cell).setAmmo(ammoDeck.drawCard());
+					} catch (AmmoAlreadyOnCellException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
@@ -448,6 +418,9 @@ public class AdrenalinaMatch {
 		return started;
 	}
 
+	/**
+	 * gat Resource associated with string
+	 */
 	public static Resource stringToResource(String s) throws InvalidStringException {
 		switch (s){
 			case "R":
@@ -458,6 +431,45 @@ public class AdrenalinaMatch {
 				return Resource.YELLOW_BOX;
 			default:
 				throw new InvalidStringException();
+		}
+	}
+
+	/**
+	 * @return color Colo associated with string
+	 */
+	public static Color stringToColor(String s) throws InvalidStringException {
+		switch (s) {
+			case "B":
+				return Color.BLUE;
+			case "R":
+				return Color.RED;
+			case "W":
+				return Color.WHITE;
+			case "P":
+				return Color.PURPLE;
+			case "Y":
+				return Color.YELLOW;
+			default:
+				throw new InvalidStringException();
+		}
+	}
+
+	/**
+	 * @return Side associated with string
+	 */
+	public static Side stringToSide(String s) throws InvalidStringException {
+		switch (s) {
+			case "B":
+				return Side.BORDER;
+			case "W":
+				return Side.WALL;
+			case "N":
+				return Side.FREE;
+			case "D":
+				return Side.DOOR;
+			default:
+				throw new InvalidStringException();
+
 		}
 	}
 }
