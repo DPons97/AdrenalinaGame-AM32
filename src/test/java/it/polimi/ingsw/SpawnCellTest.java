@@ -12,15 +12,19 @@ class SpawnCellTest {
 
     @Test
     void addWeapons() throws TooManyWeaponsException {
+        AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
+
         SpawnCell cellTest = new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5);
         assertTrue(cellTest.getWeapons().isEmpty());
-        WeaponMode w = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
+
+        Weapon w = newMatch.getWeaponDeck().drawCard();
         cellTest.addWeapon(w);
         assertTrue(cellTest.getWeapons().contains(w));
-        assertFalse(cellTest.getWeapons().contains(new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject())));
-        cellTest.addWeapon(new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject()));
-        cellTest.addWeapon(new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject()));
-        assertThrows(TooManyWeaponsException.class, ()-> cellTest.addWeapon(new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject())));
+        assertFalse(cellTest.getWeapons().contains(newMatch.getWeaponDeck().drawCard()));
+
+        cellTest.addWeapon(newMatch.getWeaponDeck().drawCard());
+        cellTest.addWeapon(newMatch.getWeaponDeck().drawCard());
+        assertThrows(TooManyWeaponsException.class, ()-> cellTest.addWeapon(newMatch.getWeaponDeck().drawCard()));
 
 
     }

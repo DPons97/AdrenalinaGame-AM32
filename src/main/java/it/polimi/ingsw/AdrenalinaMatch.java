@@ -226,7 +226,6 @@ public class AdrenalinaMatch {
 	 * parses weapons.json file.
 	 */
 	private void initWeaponDeck() {
-		// TODO implement here
 		weaponDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
 		String name;

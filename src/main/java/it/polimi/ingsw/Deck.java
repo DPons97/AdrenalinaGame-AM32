@@ -45,6 +45,7 @@ public class Deck<T> {
 	public T drawCard() {
 		T c;
 		if(deckList.isEmpty()){
+			if (discards.isEmpty()) return null;
 			this.shuffle();
 		}
 		c = deckList.get(0);

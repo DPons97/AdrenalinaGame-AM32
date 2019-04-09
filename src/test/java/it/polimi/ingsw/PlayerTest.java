@@ -53,9 +53,10 @@ class PlayerTest {
      */
     @Test
     void reload() throws TooManyWeaponsException {
-        Weapon testWeaponMode = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
-        Weapon testWeaponEffect = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
-        Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer");
+        AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
+        Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
+        Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
+        Player testPlayer = new Player(newMatch, "TestPlayer");
 
         List<Resource> testCost = new ArrayList<>();
 
@@ -222,9 +223,10 @@ class PlayerTest {
 
     @Test
     void pickWeapon() throws TooManyWeaponsException {
-        Weapon testWeaponMode = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
-        Weapon testWeaponEffect = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
-        Player testPlayer = new Player(new AdrenalinaMatch(3,8,120,1), "TestPlayer");
+        AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
+        Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
+        Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
+        Player testPlayer = new Player(newMatch, "TestPlayer");
 
         // Add weapon (effect) and check successful add
         testPlayer.pickWeapon(testWeaponEffect);
@@ -239,8 +241,8 @@ class PlayerTest {
         assertFalse(Collections.frequency(testPlayer.getWeapons(), testWeaponEffect) > 1);
 
         // Try to add 4 weapons
-        Weapon testWeapon3 = new WeaponMode("WeaponName",new ArrayList<Resource>(),new JSONObject());
-        Weapon testWeapon4 = new WeaponEffect("WeaponName",new ArrayList<Resource>(),new JSONObject());
+        Weapon testWeapon3 = newMatch.getWeaponDeck().drawCard();
+        Weapon testWeapon4 = newMatch.getWeaponDeck().drawCard();
 
         testPlayer.pickWeapon(testWeapon3);
         assertThrows(TooManyWeaponsException.class, () -> testPlayer.pickWeapon(testWeapon4));

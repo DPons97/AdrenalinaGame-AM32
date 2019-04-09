@@ -39,24 +39,23 @@ public class WeaponEffect extends Weapon {
 	protected void parseEffects(JSONObject actions) {
 		int i = 0;
 		try{
-		primaryFire = new Action("base effect",(JSONObject) actions.get("base-effect"));
-		JSONArray optionalEffectJ = (JSONArray) actions.get("secondaryEffects");
-		for(Object effectName:optionalEffectJ){
-			switch(i){
-				case 0:
-					firstOptional = new Action(effectName.toString(),
-							(JSONObject) actions.get(effectName.toString()));
-					i++;
-					break;
-				case 1:
-					secondOptional = new Action(effectName.toString(),
-							(JSONObject) actions.get(effectName.toString()));
-					i++;
-					break;
-				default:
-					throw new InvalidJSONException();
+			primaryFire = new Action("base effect",(JSONObject) actions.get("base-effect"));
+			JSONArray optionalEffectJ = (JSONArray) actions.get("secondaryEffects");
+			for(Object effectName:optionalEffectJ){
+				switch(i){
+					case 0:
+						firstOptional = new Action(effectName.toString(),
+								(JSONObject) actions.get(effectName.toString()));
+						break;
+					case 1:
+						secondOptional = new Action(effectName.toString(),
+								(JSONObject) actions.get(effectName.toString()));
+						break;
+					default:
+						throw new InvalidJSONException();
+				}
+				i++;
 			}
-		}
 		} catch (InvalidJSONException e) {
 			e.printStackTrace();
 		}
