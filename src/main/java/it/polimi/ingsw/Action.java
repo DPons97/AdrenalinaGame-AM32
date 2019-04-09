@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InvalidJSONException;
 import it.polimi.ingsw.custom_exceptions.InvalidStringException;
 import org.json.simple.JSONArray;
@@ -7,6 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * 
@@ -20,7 +22,7 @@ public class Action {
 		/**
 		 *
 		 */
-		public void applyOn();
+		public void applyOn(Player caller);
 	}
 
 	/**
@@ -107,15 +109,37 @@ public class Action {
 					case "SELECT":
 						// TODO implement here
 						// might be controller work
+
 						break;
 					case "DAMAGE":
-						// TODO implement here
+						for(int j = 0; j < targetPlayers.size(); j++){
+							int finalJ = j;
+							actions.add(caller -> {
+								int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(finalJ).toString());
+								IntStream.range(0, dmg).forEach(nDmg -> {
+									try {
+										targetPlayers.get(finalJ).takeDamage(caller);
+									} catch (DeadPlayerException e) {
+										e.printStackTrace();
+									}
+								});
+							});
+						}
 						break;
 					case "MOVE":
-						// TODO implement here
+						for(int j = 0; j < targetPlayers.size(); j++){
+							int finalJ = j;
+							actions.add(caller -> targetPlayers.get(finalJ).move(targetCells.get(0)));
+						}
 						break;
 					case "MARK":
-						// TODO implement here
+						for(int j = 0; j < targetPlayers.size(); j++){
+							int finalJ = j;
+							actions.add(caller -> {
+								int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(finalJ).toString());
+								IntStream.range(0, dmg).forEach(nDmg -> targetPlayers.get(finalJ).takeMark(caller));
+							});
+						}
 						break;
 					default:
 						throw new InvalidJSONException();
