@@ -196,7 +196,7 @@ public class AdrenalinaMatch {
 						map[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
 					}
 				}
-
+				i++;
 			}
 
 		} catch (ParseException | IOException e) {
@@ -275,16 +275,16 @@ public class AdrenalinaMatch {
 	 * private method to initialize ammo cells with an ammo card
 	 */
 	private void initAmmoCells() {
-		for(int i = 0; i<map.length; i++){
-			for(int j = 0; j< map[i].length; j++){
-				if(map[i][j] != null && !map[i][j].isSpawn()){ //if not empty cell and not a spawn cell
+		for (Cell[] cells : map) {
+			for (Cell cell : cells) {
+				if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
 					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
-                    try {
-                        ((AmmoCell) map[i][j]).setAmmo(ammoDeck.drawCard());
-                    } catch (AmmoAlreadyOnCellException e) {
-                        e.printStackTrace();
-                    }
-                }
+					try {
+						((AmmoCell) cell).setAmmo(ammoDeck.drawCard());
+					} catch (AmmoAlreadyOnCellException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 	}
@@ -349,6 +349,16 @@ public class AdrenalinaMatch {
 	 */
 	public Deck<Powerup> getPowerupDeck() {
 		return powerupDeck;
+	}
+
+	/**
+	 * @return match map
+	 */
+	public Cell[][] getMap() {
+		Cell[][] returnMap = new Cell[map.length][map[0].length];
+
+		for (int i = 0; i < map.length; i++ ) returnMap[i] = map[i].clone();
+		return returnMap;
 	}
 
 	/**

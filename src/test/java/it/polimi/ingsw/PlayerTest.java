@@ -115,8 +115,8 @@ class PlayerTest {
         Player killerPlayer = new Player(testMatch, killerName);
 
         // Check that player isn't already dead
-        assertFalse(victimPlayer.isDead());
-        assertFalse(killerPlayer.isDead());
+        assertTrue(victimPlayer.isDead());
+        assertTrue(killerPlayer.isDead());
 
         // Victim takes 1 damage, then check that he isn't dead
         assertFalse(victimPlayer.takeDamage(killerPlayer));
@@ -162,6 +162,37 @@ class PlayerTest {
 
     @Test
     void getCellAtDistance() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, "testPlayer");
+
+        testPlayer.respawn(testMatch.getSpawnPoints().get(0));
+        assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(-1, -1));
+        assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(0, -2));
+
+        List<Cell> mapCells = testPlayer.getCellAtDistance(0, -1);
+        Cell[][] matchMap = testMatch.getMap();
+
+        // Check every map's cell exists in mapCells
+        for (Cell[] col : matchMap) {
+            for (Cell cell : col) {
+                if (cell != null) assertTrue(mapCells.contains(cell));
+            }
+        }
+        // Number of not null cells = 10 (see Map1.json)
+        assertEquals(mapCells.size(), 10);
+
+        mapCells = testPlayer.getCellAtDistance(1, 3);
+        // Check every map's cell that is inside 1 and 3 distance exists in mapCells
+        for (Cell[] col : matchMap) {
+            for (Cell cell : col) {
+                if (cell != null) {
+                    int dist = Math.abs(cell.getCoordX()-testPlayer.getPosition().getCoordX()) + Math.abs(cell.getCoordY()-testPlayer.getPosition().getCoordY());
+                    if (dist <= 3 && dist >= 1) {
+                        assertTrue(mapCells.contains(cell));
+                    }
+                }
+            }
+        }
     }
 
     @Test

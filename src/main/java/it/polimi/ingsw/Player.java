@@ -108,7 +108,7 @@ public class Player {
 		dmgPoints = new ArrayList<>();
 		marks = new ArrayList<>();
 
-		dead = false;
+		dead = true;
 		deaths = 0;
 		givenMarks = 0;
 		position = null;
@@ -132,7 +132,7 @@ public class Player {
 		dmgPoints = new ArrayList<>();
 		marks = new ArrayList<>();
 
-		dead = false;
+		dead = true;
 		deaths = 0;
 		givenMarks = 0;
 		position = spawnPosition;
@@ -320,12 +320,35 @@ public class Player {
 
 	/**
 	 * @param minDist Minimum distance
-	 * @param maxDist Maximum distance
+	 * @param maxDist Maximum distance. -1 is equal to INFINITE
 	 * @return List of all cells between [minDist] and [maxDist] distance
+	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
 	 */
 	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
-		// TODO implement here
-		return null;
+		if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
+
+		Cell[][] matchMap = match.getMap();
+		List<Cell> cellAtDistance = new ArrayList<>();
+
+		if (maxDist == -1) {
+			// Set min/max distances to get all cells from minDist to end of map
+			maxDist = matchMap.length;
+		}
+
+		for (Cell[] cols : matchMap) {
+			for (Cell cell : cols) {
+				if (cell != null) {
+					// Calculate X and Y distances
+					int xDist = Math.abs(cell.getCoordX() - position.getCoordX());
+					int yDist = Math.abs(cell.getCoordY() - position.getCoordY());
+
+					// Add cell in case distance between minDist and maxDist
+					if (xDist + yDist >= minDist && xDist + yDist <= maxDist) cellAtDistance.add(cell);
+				}
+			}
+		}
+
+		return cellAtDistance;
 	}
 
 	/**
