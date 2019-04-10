@@ -481,6 +481,8 @@ public class AdrenalinaMatch {
 				return Color.PURPLE;
 			case "Y":
 				return Color.YELLOW;
+			case "G":
+				return Color.GREEN;
 			default:
 				throw new InvalidStringException();
 		}
