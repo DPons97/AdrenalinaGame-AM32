@@ -8,83 +8,83 @@
       "color": "B",
       "north": "B",
       "south": "D",
-      "east": "N",
+      "east": "D",
       "west": "B",
       "isSpawn": false
     },
     {
       "color": "B",
       "north": "B",
-      "south": "W",
+      "south": "D",
       "east": "N",
-      "west": "N",
+      "west": "D",
       "isSpawn": false
     },
     {
       "color": "B",
       "north": "B",
       "south": "D",
-      "east": "D",
+      "east": "B",
       "west": "N",
       "isSpawn": true
     },
     {
-      "color": "G",
-      "north": "B",
-      "south": "D",
-      "east": "B",
-      "west": "D",
-      "isSpawn": false
+      "color": "X"
     },
     {
       "color": "R",
       "north": "D",
       "south": "B",
-      "east": "N",
+      "east": "W",
       "west": "B",
       "isSpawn": true
     },
     {
-      "color": "R",
-      "north": "W",
+      "color": "P",
+      "north": "D",
       "south": "D",
-      "east": "B",
+      "east": "W",
+      "west": "N",
+      "isSpawn": false
+    },
+    {
+      "color": "P",
+      "north": "D",
+      "south": "W",
+      "east": "D",
       "west": "N",
       "isSpawn": false
     },
     {
       "color": "Y",
-      "north": "D",
+      "north": "B",
       "south": "N",
+      "east": "B",
+      "west": "D",
+      "isSpawn": false
+    },
+    {
+      "color": "W",
+      "north": "D",
+      "south": "B",
       "east": "N",
-      "west": "W",
+      "west": "B",
       "isSpawn": false
-    },
-    {
-      "color": "Y",
-      "north": "D",
-      "south": "N",
-      "east": "B",
-      "west": "N",
-      "isSpawn": false
-    },
-    {
-      "color": "X"
     },
     {
       "color": "W",
       "north": "D",
       "south": "B",
       "east": "D",
-      "west": "B",
+      "west": "N",
       "isSpawn": false
     },
     {
-      "color": "Y",
-      "north": "N",
+      "color": "W",
+      "north": "W",
       "south": "B",
-      "east": "N",
-      "west": "D",
+      "east": "D",
+      "west": "N",
       "isSpawn": false
     },
     {
@@ -92,7 +92,7 @@
       "north": "N",
       "south": "B",
       "east": "B",
-      "west": "N",
+      "west": "D",
       "isSpawn": true
     }
   ]

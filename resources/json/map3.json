@@ -7,7 +7,7 @@
     {
       "color": "R",
       "north": "B",
-      "south": "D",
+      "south": "N",
       "east": "D",
       "west": "B",
       "isSpawn": false
@@ -57,7 +57,7 @@
       "north": "D",
       "south": "N",
       "east": "N",
-      "west": "B",
+      "west": "W",
       "isSpawn": false
     },
     {
@@ -88,8 +88,8 @@
       "color": "Y",
       "north": "N",
       "south": "B",
-      "east": "D",
-      "west": "N",
+      "east": "N",
+      "west": "D",
       "isSpawn": false
     },
     {

@@ -47,6 +47,8 @@ class AdrenalinaMatchTest {
         assertEquals(3, testMatch.getSpawnPoints().size());
         testMatch = new AdrenalinaMatch(3, 5,120, 3);
         assertEquals(3, testMatch.getSpawnPoints().size());
+        testMatch = new AdrenalinaMatch(3, 5,120, 4);
+        assertEquals(3, testMatch.getSpawnPoints().size());
     }
 
     @Test
