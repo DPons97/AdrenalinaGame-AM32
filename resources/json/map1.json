@@ -51,7 +51,7 @@
       "color": "P",
       "north": "D",
       "south": "W",
-      "east": "W",
+      "east": "D",
       "west": "N",
       "isSpawn": false
     },
@@ -83,7 +83,7 @@
       "isSpawn": false
     },
     {
-      "color": "W",
+      "color": "Y",
       "north": "N",
       "south": "B",
       "east": "B",

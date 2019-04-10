@@ -48,7 +48,7 @@
       "color": "R",
       "north": "W",
       "south": "D",
-      "east": "B",
+      "east": "W",
       "west": "N",
       "isSpawn": false
     },

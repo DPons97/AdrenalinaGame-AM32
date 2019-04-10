@@ -5,9 +5,9 @@
   ],
   "Cells": [
     {
-      "color": "B",
+      "color": "R",
       "north": "B",
-      "south": "D",
+      "south": "N",
       "east": "D",
       "west": "B",
       "isSpawn": false
@@ -33,8 +33,8 @@
     },
     {
       "color": "R",
-      "north": "D",
-      "south": "B",
+      "north": "N",
+      "south": "D",
       "east": "W",
       "west": "B",
       "isSpawn": true
@@ -43,8 +43,8 @@
       "color": "P",
       "north": "D",
       "south": "D",
-      "east": "W",
-      "west": "N",
+      "east": "N",
+      "west": "W",
       "isSpawn": false
     },
     {
@@ -75,7 +75,7 @@
       "color": "W",
       "north": "D",
       "south": "B",
-      "east": "D",
+      "east": "N",
       "west": "N",
       "isSpawn": false
     },

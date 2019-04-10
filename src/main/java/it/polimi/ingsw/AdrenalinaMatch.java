@@ -153,7 +153,7 @@ public class AdrenalinaMatch {
 					map[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
 					c = stringToColor(color);
-					// for every side add the value to the coords array [north, south, wesr, east]
+					// for every side add the value to the coords array [north, south, west, east]
 					for (int k = 0; k < 4; k++) {
 						cords[k] = stringToSide(currCell.get(cardinals[k]).toString());
 					}
