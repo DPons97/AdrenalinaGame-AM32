@@ -19,9 +19,9 @@ class AdrenalinaMatchTest {
         testMatch.addPlayer(new Player(testMatch, "testPlayer2", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)));
         assertEquals(0, testMatch.getCurrentDeaths());
 
-        testMatch.addDeath(testMatch.getFirstPlayer(), false);
+        testMatch.addDeath(testMatch.getPlayers().get(0), false);
         assertEquals(1, testMatch.getCurrentDeaths());
-        assertEquals(testMatch.getFirstPlayer(), testMatch.getDeathTrack().get(testMatch.getDeathTrack().size()-1));
+        assertEquals(testMatch.getPlayers().get(0), testMatch.getDeathTrack().get(testMatch.getDeathTrack().size()-1));
 
         assertThrows(PlayerNotExistsException.class, ()-> testMatch.addDeath(new Player(testMatch, "unknownPlayer", new SpawnCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5)), true));
 

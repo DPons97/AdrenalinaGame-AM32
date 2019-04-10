@@ -2,8 +2,8 @@ package it.polimi.ingsw;
 
 import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
-import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
+import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -96,6 +96,11 @@ public class Player {
 	private List<Resource> ammos;
 
 	/**
+	 *  player id used to apply effects
+	 */
+	private int id;
+
+	/**
 	 * Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
@@ -128,6 +133,8 @@ public class Player {
 		this.match = match;
 		this.nickname = nickname;
 		score = 0;
+
+		id = -1;
 
 		dmgPoints = new ArrayList<>();
 		marks = new ArrayList<>();
@@ -238,6 +245,16 @@ public class Player {
 	 * @return current Player's score
 	 */
 	public int getScore() { return score; }
+
+	/**
+	 * @return player id
+	 */
+	public int getID() { return id; }
+
+	/**
+	 * @param id player id to set
+	 */
+	public void setID(int id) { this.id = id; }
 
 	/**
 	 * @return List of Player's Weapons (Max: 3)

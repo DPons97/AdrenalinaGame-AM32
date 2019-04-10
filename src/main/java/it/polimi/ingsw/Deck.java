@@ -1,6 +1,8 @@
 package it.polimi.ingsw;
-import java.util.*;
+
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 /**
  * 
  */
@@ -51,6 +53,20 @@ public class Deck<T> {
 		c = deckList.get(0);
 		deckList.remove(0);
 		return c;
+	}
+
+	/**
+	 * @return true if deck is empty, false otherwise
+	 */
+	public boolean isDeckEmpty() {
+		return deckList.isEmpty();
+	}
+
+	/**
+	 * @return true if discards pile is empty, false otherwise
+	 */
+	public boolean isDiscardPileEmpty() {
+		return discards.isEmpty();
 	}
 
 	/**

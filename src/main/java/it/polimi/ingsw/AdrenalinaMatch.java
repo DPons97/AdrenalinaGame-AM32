@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 
 /**
@@ -306,7 +307,7 @@ public class AdrenalinaMatch {
 	 * @return the first player.
 	 */
 	public Player getFirstPlayer() {
-		return players.get(0);
+		return firstPlayer;
 	}
 
 	/**
@@ -438,6 +439,8 @@ public class AdrenalinaMatch {
 				return Resource.BLUE_BOX;
 			case "Y":
 				return Resource.YELLOW_BOX;
+			case "U":
+				return Resource.UNDEFINED_BOX;
 			default:
 				throw new InvalidStringException();
 		}
@@ -481,4 +484,59 @@ public class AdrenalinaMatch {
 
 		}
 	}
+
+	/**
+	 * @param caller player requesting the selection
+	 * @param from string code identifying type of selecatble players: (VISIBLE, NOT_VISIBLE, TARGET_VISIBLE, DIRECTION,
+	 *                PREV_TARGET, #[playerid], ATTACKER, DAMAGED
+	 * @param minDistance minimum distance between caller and target
+	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
+	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
+	 * @return List with players that satisfy query
+	 */
+	public List<Player> getSelectablePlayers(Player caller, String from, int minDistance,
+											  int maxDistance, List<Player> players) throws InvalidStringException {
+		List<Player> toReturn = new ArrayList<>();
+		switch (from){
+			case "VISIBLE":
+				for(Cell c: caller.getVisibleCells())
+					toReturn.addAll(c.getPlayers());
+				break;
+			case "NOT-VISIBLE":
+				List<Cell> validCells = caller.getCellAtDistance(0,-1);
+				validCells.removeAll(caller.getVisibleCells());
+				for(Cell c: validCells)
+					toReturn.addAll(c.getPlayers());
+				break;
+			case "TARGET-VISIBLE":
+				for(Cell c: players.get(0).getVisibleCells())
+					toReturn.addAll(c.getPlayers());
+				break;
+			case "DIRECTION":
+				int pX = caller.getPosition().getCoordX();
+				int pY = caller.getPosition().getCoordY();
+				for (Cell c: map[pX])
+					toReturn.addAll(c.getPlayers());
+				for (Cell[] c: map)
+					if(c[pY].getCoordX() != pX)toReturn.addAll(c[pY].getPlayers());
+				break;
+			case "PREV_TARGET":
+				toReturn.addAll(players);
+				break;
+			case "ATTACKER":
+				// TODO: implement here
+				break;
+			case "DAMAGED":
+				// TODO: implement here
+				break;
+			default:
+				int id = Integer.parseInt(from);
+				toReturn.addAll(players.stream()
+						.filter(p -> p.getID() == id).collect(Collectors.toList()));
+
+		}
+		return toReturn;
+	}
+
+
 }

@@ -71,7 +71,8 @@ public class Action {
 	private int minDistance;
 
 	/**
-	 * Default constructor
+	 * @param name action name
+	 * @param effect action JSONObject effect to parse
 	 */
 	public Action(String name,JSONObject effect) {
 		this.name = name;
@@ -91,7 +92,6 @@ public class Action {
 	}
 
 	/**
-	 * @param
 	 * @param effect json effect to parse
 	 */
 	public void parseEffect(JSONObject effect) {
