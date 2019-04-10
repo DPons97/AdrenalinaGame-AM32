@@ -220,6 +220,26 @@ public class AdrenalinaMatch {
 	private void initPowerupDeck() {
 		// TODO implement here
 		powerupDeck = new Deck<>();
+		JSONParser parser = new JSONParser();
+		String name, description;
+		Resource bRes;
+		try {
+			Object obj = parser.parse(new FileReader("././././././resources/json/powerups.json"));
+
+			JSONObject jsonObject = (JSONObject) obj;
+
+			JSONArray pupCards = (JSONArray) jsonObject.get("Powerups");
+
+			for(Object pupCard: pupCards){
+				JSONObject currPup = (JSONObject) pupCard;
+				name = currPup.get("name").toString();
+				description = currPup.get("description").toString();
+				bRes = stringToResource(currPup.get("bonusResource").toString());
+				powerupDeck.discardCard(new Powerup(name, description, bRes, currPup));
+			}
+		} catch (ParseException | IOException | InvalidStringException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
