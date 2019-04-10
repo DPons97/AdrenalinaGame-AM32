@@ -10,14 +10,16 @@ class WeaponTest {
     void weaponTest(){
         AdrenalinaMatch tMatch = new AdrenalinaMatch(3,8, 120,1);
         Player p = new Player(tMatch,"Aldo");
-        Weapon w= tMatch.getWeaponDeck().drawCard();
-        int i = 0;
-        for(Action a: w.getShootActions()){
-            int finalI = i;
-            assertDoesNotThrow(()->w.shoot(finalI,p));
-            i++;
+        while(!tMatch.getWeaponDeck().isDeckEmpty()) {
+            Weapon w = tMatch.getWeaponDeck().drawCard();
+            int i = 0;
+            for (Action a : w.getShootActions()) {
+                int finalI = i;
+                assertDoesNotThrow(() -> w.shoot(finalI, p));
+                i++;
+            }
+            int finalI1 = i;
+            assertThrows(IllegalArgumentException.class, () -> w.shoot(finalI1 + 1, p));
         }
-        int finalI1 = i;
-        assertThrows(IllegalArgumentException.class, ()->w.shoot(finalI1 +1,p));
     }
 }

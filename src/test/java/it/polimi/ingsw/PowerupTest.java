@@ -9,9 +9,9 @@ class PowerupTest {
     void powerupTest(){
         AdrenalinaMatch tMatch = new AdrenalinaMatch(3,8, 120,1);
         Player p = new Player(tMatch,"Aldo");
-        Powerup up= tMatch.getPowerupDeck().drawCard();
-
-        assertDoesNotThrow(()->up.useAsEffect(p));
-
+        while(!tMatch.getPowerupDeck().isDeckEmpty()) {
+            Powerup up = tMatch.getPowerupDeck().drawCard();
+            assertDoesNotThrow(() -> up.useAsEffect(p));
+        }
     }
 }
