@@ -5,19 +5,19 @@
   ],
   "Cells": [
     {
-      "color": "B",
+      "color": "R",
       "north": "B",
       "south": "D",
-      "east": "N",
+      "east": "D",
       "west": "B",
       "isSpawn": false
     },
     {
       "color": "B",
       "north": "B",
-      "south": "W",
+      "south": "D",
       "east": "N",
-      "west": "N",
+      "west": "D",
       "isSpawn": false
     },
     {
@@ -38,18 +38,18 @@
     },
     {
       "color": "R",
-      "north": "D",
-      "south": "B",
-      "east": "N",
+      "north": "N",
+      "south": "D",
+      "east": "W",
       "west": "B",
       "isSpawn": true
     },
     {
-      "color": "R",
-      "north": "W",
+      "color": "P",
+      "north": "D",
       "south": "D",
-      "east": "B",
-      "west": "N",
+      "east": "W",
+      "west": "W",
       "isSpawn": false
     },
     {
@@ -69,14 +69,19 @@
       "isSpawn": false
     },
     {
-      "color": "X"
+      "color": "W",
+      "north": "D",
+      "south": "B",
+      "east": "N",
+      "west": "B",
+      "isSpawn": false
     },
     {
       "color": "W",
       "north": "D",
       "south": "B",
       "east": "D",
-      "west": "B",
+      "west": "N",
       "isSpawn": false
     },
     {

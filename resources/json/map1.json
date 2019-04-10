@@ -7,7 +7,7 @@
     {
       "color": "B",
       "north": "B",
-      "sud": "D",
+      "south": "D",
       "east": "N",
       "west": "B",
       "isSpawn": false
@@ -15,7 +15,7 @@
     {
       "color": "B",
       "north": "B",
-      "sud": "W",
+      "south": "W",
       "east": "N",
       "west": "N",
       "isSpawn": false
@@ -23,7 +23,7 @@
     {
       "color": "B",
       "north": "B",
-      "sud": "D",
+      "south": "D",
       "east": "B",
       "west": "N",
       "isSpawn": true
@@ -34,7 +34,7 @@
     {
       "color": "R",
       "north": "D",
-      "sud": "B",
+      "south": "B",
       "east": "N",
       "west": "B",
       "isSpawn": true
@@ -42,7 +42,7 @@
     {
       "color": "R",
       "north": "W",
-      "sud": "D",
+      "south": "D",
       "east": "N",
       "west": "N",
       "isSpawn": false
@@ -50,7 +50,7 @@
     {
       "color": "P",
       "north": "D",
-      "sud": "W",
+      "south": "W",
       "east": "W",
       "west": "N",
       "isSpawn": false
@@ -58,7 +58,7 @@
     {
       "color": "Y",
       "north": "B",
-      "sud": "N",
+      "south": "N",
       "east": "B",
       "west": "D",
       "isSpawn": false
@@ -69,7 +69,7 @@
     {
       "color": "W",
       "north": "D",
-      "sud": "B",
+      "south": "B",
       "east": "N",
       "west": "B",
       "isSpawn": false
@@ -77,7 +77,7 @@
     {
       "color": "W",
       "north": "W",
-      "sud": "B",
+      "south": "B",
       "east": "D",
       "west": "N",
       "isSpawn": false
@@ -85,7 +85,7 @@
     {
       "color": "W",
       "north": "N",
-      "sud": "B",
+      "south": "B",
       "east": "B",
       "west": "D",
       "isSpawn": true

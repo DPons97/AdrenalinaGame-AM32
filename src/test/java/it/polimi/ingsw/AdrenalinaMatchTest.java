@@ -40,10 +40,12 @@ class AdrenalinaMatchTest {
     }
 
     @Test
-    void getSpawnPoints(){
+    void checkMaps(){
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
         assertEquals(3, testMatch.getSpawnPoints().size());
         testMatch = new AdrenalinaMatch(3, 5,120, 2);
+        assertEquals(3, testMatch.getSpawnPoints().size());
+        testMatch = new AdrenalinaMatch(3, 5,120, 3);
         assertEquals(3, testMatch.getSpawnPoints().size());
     }
 

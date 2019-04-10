@@ -126,7 +126,7 @@ public class AdrenalinaMatch {
 		int xSize;
 		int ySize;
 		String fileName = "././././././resources/json/map"+mapID+".json";
-		String[] cardinals = {"north", "sud", "west", "east"};
+		String[] cardinals = {"north", "south", "west", "east"};
 		try {
 			int i = 0;
 			Object obj = parser.parse(new FileReader(fileName));
