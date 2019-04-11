@@ -557,25 +557,25 @@ public class AdrenalinaMatch {
 	 * @return List with cells that satisfy query
 	 */
 	public List<Cell> getSelectableCells(Player caller, String from, int minDistance,
-											 int maxDistance, List<Player> players) throws InvalidStringException {
+										 int maxDistance, List<Player> players) throws InvalidStringException {
 		List<Cell> toReturn = new ArrayList<>();
 		switch (from){
 			case "VISIBLE":
-				toReturn.addAll(caller.getVisibleCells());
+				toReturn.addAll(caller.getVisibleCellsAtDistance(0, -1));
 				break;
 			case "NOT-VISIBLE":
 				List<Cell> validCells = caller.getCellAtDistance(0,-1);
-				validCells.removeAll(caller.getVisibleCells());
+				validCells.removeAll(caller.getVisibleCellsAtDistance(0, -1));
 				toReturn.addAll(validCells);
 				break;
 			case "TARGET-VISIBLE":
-				toReturn.addAll(players.get(0).getVisibleCells());
+				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(0, -1));
 				break;
 			case "DIRECTION":
 				int pX = caller.getPosition().getCoordX();
 				int pY = caller.getPosition().getCoordY();
-				toReturn.addAll(Arrays.asList(map[pX]));
-				for (Cell[] c: map)
+				toReturn.addAll(Arrays.asList(map.getMap()[pX]));
+				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.add(c[pY]);
 				break;
 			case "PREV_TARGET":
@@ -587,7 +587,7 @@ public class AdrenalinaMatch {
 				break;
 			default:
 				int id = Integer.parseInt(from);
-				toReturn.addAll(Arrays.stream(map).flatMap(Arrays::stream)
+				toReturn.addAll(Arrays.stream(map.getMap()).flatMap(Arrays::stream)
 						.filter(c -> c.getID() == id).collect(Collectors.toList()));
 
 		}
