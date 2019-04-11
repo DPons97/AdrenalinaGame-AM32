@@ -8,6 +8,7 @@ import org.json.simple.parser.ParseException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -560,5 +561,51 @@ public class AdrenalinaMatch {
 		return toReturn;
 	}
 
+	/**
+	 * @param caller player requesting the selection
+	 * @param from string code identifying type of selecatble players: (VISIBLE, NOT_VISIBLE, TARGET_VISIBLE, DIRECTION,
+	 *                PREV_TARGET, #[playerid], ATTACKER, DAMAGED
+	 * @param minDistance minimum distance between caller and target
+	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
+	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
+	 * @return List with cells that satisfy query
+	 */
+	public List<Cell> getSelectableCells(Player caller, String from, int minDistance,
+											 int maxDistance, List<Player> players) throws InvalidStringException {
+		List<Cell> toReturn = new ArrayList<>();
+		switch (from){
+			case "VISIBLE":
+				toReturn.addAll(caller.getVisibleCells());
+				break;
+			case "NOT-VISIBLE":
+				List<Cell> validCells = caller.getCellAtDistance(0,-1);
+				validCells.removeAll(caller.getVisibleCells());
+				toReturn.addAll(validCells);
+				break;
+			case "TARGET-VISIBLE":
+				toReturn.addAll(players.get(0).getVisibleCells());
+				break;
+			case "DIRECTION":
+				int pX = caller.getPosition().getCoordX();
+				int pY = caller.getPosition().getCoordY();
+				toReturn.addAll(Arrays.asList(map[pX]));
+				for (Cell[] c: map)
+					if(c[pY].getCoordX() != pX)toReturn.add(c[pY]);
+				break;
+			case "PREV_TARGET":
+				// TODO implement here
+				// serve?
+				break;
+			case "ANY":
+				toReturn.addAll(caller.getCellAtDistance(0,-1));
+				break;
+			default:
+				int id = Integer.parseInt(from);
+				toReturn.addAll(Arrays.stream(map).flatMap(Arrays::stream)
+						.filter(c -> c.getID() == id).collect(Collectors.toList()));
+
+		}
+		return toReturn;
+	}
 
 }
