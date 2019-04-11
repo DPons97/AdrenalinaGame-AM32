@@ -11,6 +11,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PlayerTest {
 
+
+    private static String testName = "testPlayer";
     private static String victimName = "Victim";
     private static String killerName = "Killer";
 
@@ -52,7 +54,7 @@ class PlayerTest {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
-        Player testPlayer = new Player(newMatch, "TestPlayer");
+        Player testPlayer = new Player(newMatch, testName);
 
         List<Resource> testCost = new ArrayList<>();
 
@@ -161,7 +163,7 @@ class PlayerTest {
     @Test
     void getCellAtDistance() throws IllegalArgumentException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player testPlayer = new Player(testMatch, "testPlayer");
+        Player testPlayer = new Player(testMatch, testName);
 
         testPlayer.respawn(testMatch.getSpawnPoints().get(0));
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(-1, -1));
@@ -204,7 +206,7 @@ class PlayerTest {
     @Test
     void pickAmmo() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
-        Player testPlayer = new Player(testMatch, "testPlayer");
+        Player testPlayer = new Player(testMatch, testName);
         testPlayer.respawn(testMatch.getSpawnPoints().get(0));
 
         // Get first ammo cell
@@ -221,7 +223,7 @@ class PlayerTest {
         playerAmmos.add(Resource.RED_BOX);
         playerAmmos.add(Resource.RED_BOX);
         testPlayer.pickAmmo(newAmmoCell);
-        assertEquals(testPlayer.getAmmos(), playerAmmos);
+        assertEquals(playerAmmos, testPlayer.getAmmos());
 
         // Try to add 4 ammos of same type
         newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX));
@@ -233,28 +235,102 @@ class PlayerTest {
         for (Resource res : playerAmmos) {
             if (res.equals(Resource.RED_BOX)) i++;
         }
-        assertEquals(i, 3);
+        assertEquals(3, i);
 
         // Check powerup has been added
         assertEquals(testPlayer.getPowerups().size(), 1);
 
+        // Try to add more than 3 powerups
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        newAmmoCell.setAmmo(new Ammo(Resource.BLUE_BOX, Resource.BLUE_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        newAmmoCell.setAmmo(new Ammo(Resource.YELLOW_BOX, Resource.YELLOW_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        assertEquals(3, testPlayer.getPowerups().size());
+
+
         // Try add only resources that player already has, and check cell's ammo is taken
         newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.RED_BOX));
         testPlayer.pickAmmo(newAmmoCell);
-        assertEquals(i, 3);
+        playerAmmos = testPlayer.getAmmos();
+        i=0;
+        for (Resource res : playerAmmos) {
+            if (res.equals(Resource.RED_BOX)) i++;
+        }
+        assertEquals(3, i);
         assertNull(newAmmoCell.getResource());
     }
 
     @Test
-    void useAmmo() {
+    void usePowerupEffect() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        // Try to use powerup that player doesn't own
+        assertThrows(NoItemInInventoryException.class, () -> testPlayer.usePowerupEffect(testMatch.getPowerupDeck().drawCard()));
+
+        // Give player one powerup and use it
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        Powerup toBeUsed = testPlayer.getPowerups().get(0);
+        testPlayer.usePowerupEffect(toBeUsed);
+
+        // Check powerup has been discarded
+        assertFalse(testPlayer.getPowerups().contains(toBeUsed));
     }
 
     @Test
-    void pickPerk() {
+    void usePowerupResource() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        // Try to use powerup that player doesn't own
+        assertThrows(NoItemInInventoryException.class, () -> testPlayer.usePowerupEffect(testMatch.getPowerupDeck().drawCard()));
+
+        // Give player one powerup and use it
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        Powerup toBeUsed = testPlayer.getPowerups().get(0);
+        testPlayer.usePowerupResource(toBeUsed);
+
+        // Check powerup has been discarded
+        assertFalse(testPlayer.getPowerups().contains(toBeUsed));
     }
 
     @Test
-    void usePerk() {
+    void getAllPowerupByResource()  throws AmmoAlreadyOnCellException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        // Get resources if player not having any powerups
+        assertTrue(testPlayer.getAllPowerupByResource(Resource.RED_BOX).isEmpty());
+
+        // Give player one powerup and use it
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+
+        // Check return value
+        assertEquals(testPlayer.getPowerups(), testPlayer.getAllPowerupByResource(testPlayer.getPowerups().get(0).getBonusResource()));
+
+        // Add different type of resources but get only the RED ones
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+
+        // Check for all types of resources
+        for (Resource res : Resource.values()) {
+            int count = 0;
+            for (Powerup p : testPlayer.getPowerups()) if (p.getBonusResource() == res) count++;
+
+            // Check count of resources and that all have the right type
+            assertEquals(count, testPlayer.getAllPowerupByResource(res).size());
+            for (Powerup p : testPlayer.getAllPowerupByResource(res)) assertEquals(res, p.getBonusResource());
+        }
     }
 
     @Test
@@ -262,7 +338,7 @@ class PlayerTest {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
-        Player testPlayer = new Player(newMatch, "TestPlayer");
+        Player testPlayer = new Player(newMatch, testName);
 
         // Add weapon (effect) and check successful add
         testPlayer.pickWeapon(testWeaponEffect);

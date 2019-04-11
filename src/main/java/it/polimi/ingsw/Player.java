@@ -39,6 +39,11 @@ public class Player {
 	private AdrenalinaMatch match;
 
 	/**
+	 *  player's unique id
+	 */
+	private int id;
+
+	/**
 	 *  This player's nickname
 	 */
 	private String nickname;
@@ -96,11 +101,6 @@ public class Player {
 	private List<Resource> ammos;
 
 	/**
-	 *  player id used to apply effects
-	 */
-	private int id;
-
-	/**
 	 * Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
@@ -113,6 +113,7 @@ public class Player {
 		dmgPoints = new ArrayList<>();
 		marks = new ArrayList<>();
 
+		id = -1;
 		dead = true;
 		deaths = 0;
 		givenMarks = 0;
@@ -134,11 +135,10 @@ public class Player {
 		this.nickname = nickname;
 		score = 0;
 
-		id = -1;
-
 		dmgPoints = new ArrayList<>();
 		marks = new ArrayList<>();
 
+		id = -1;
 		dead = true;
 		deaths = 0;
 		givenMarks = 0;
@@ -354,7 +354,7 @@ public class Player {
 	 * @return List of all cells between [minDist] and [maxDist] distance
 	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
 	 */
-	public List<Cell> getCellAtDistance(int minDist, int maxDist) throws IllegalArgumentException {
+	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
 		if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
 
 		Cell[][] matchMap = match.getMap();
@@ -429,17 +429,40 @@ public class Player {
 	}
 
 	/**
-	 * @param toUse Ammo to use
+	 * Use toUse as an effect
+	 * @param toUse Powerup to use
+	 * @throws NoItemInInventoryException if player hasn't toUse in his inventory
 	 */
-	public void useAmmo(Ammo toUse) {
-		// TODO implement here
+	public void usePowerupEffect(Powerup toUse) throws NoItemInInventoryException {
+		if (!powerups.contains(toUse)) throw new NoItemInInventoryException();
+
+		toUse.useAsEffect(this);
+		powerups.remove(toUse);
+		match.getPowerupDeck().discardCard(toUse);
 	}
 
 	/**
+	 * Use toUse as a bonus resource
 	 * @param toUse Powerup to use
 	 */
-	public void usePowerup(Powerup toUse) {
-		// TODO implement here
+	public void usePowerupResource(Powerup toUse) throws NoItemInInventoryException {
+		if (!powerups.contains(toUse)) throw new NoItemInInventoryException();
+		powerups.remove(toUse);
+		match.getPowerupDeck().discardCard(toUse);
+	}
+
+	/**
+	 * @param resource needed
+	 * @return list of powerups that can be used as given resource
+	 */
+	public List<Powerup> getAllPowerupByResource(Resource resource) {
+		List<Powerup> containResource = new ArrayList<>();
+
+		for (Powerup powerup: powerups) {
+			if (powerup.getBonusResource().equals(resource)) containResource.add(powerup);
+		}
+
+		return containResource;
 	}
 
 	/**

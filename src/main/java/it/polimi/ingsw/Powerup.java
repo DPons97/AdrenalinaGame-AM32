@@ -58,16 +58,10 @@ public class Powerup {
 	/**
 	 * @return powerup effect
 	 */
-	public Action getEffect(){
-		return effect;
-	}
+	public Action getEffect(){ return effect; }
 
 	/**
 	 * @return bonus resource
 	 */
-	public Resource useAsResource() {
-		return bonusResource;
-	}
-
-
+	public Resource getBonusResource() { return bonusResource;	}
 }
