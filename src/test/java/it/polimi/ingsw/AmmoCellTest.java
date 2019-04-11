@@ -9,6 +9,7 @@ class AmmoCellTest {
 
     @Test
     void setAmmo() throws AmmoAlreadyOnCellException {
+        AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         AmmoCell cellTest = new AmmoCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5);
         assertNull(cellTest.getResource());
         Ammo a = new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.BLUE_BOX);

@@ -5,9 +5,8 @@ import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+
 
 /**
  * 
@@ -208,6 +207,16 @@ public class Player {
 	public List<Player> getMarks() { return new ArrayList<>(marks); }
 
 	/**
+	 * @return number of marks this player has given to others
+	 */
+	public int getGivenMarks() { return givenMarks; }
+
+	/**
+	 * Add +1 marks given to other players
+	 */
+	public void increaseGivenMarks() { givenMarks++; }
+
+	/**
 	 * @return current ammos in player's inventory
 	 */
 	public List<Resource> getAmmos() { return new ArrayList<>(ammos); }
@@ -267,30 +276,50 @@ public class Player {
 	public List<Powerup> getPowerups() { return new ArrayList<>(powerups); }
 
 	/**
+	 * ONLY FOR TESTING
+	 * @param toAdd powerup to add to player's inventory
+	 */
+	public void addPowerup(Powerup toAdd) { powerups.add(toAdd); }
+
+	/**
 	 * @param toLoad Weapon to reload
+	 * @param discountPowerups Powerups to use as discount on reload price
 	 * @throws NoItemInInventoryException if toLoad is not in player's inventory
 	 * @throws InsufficientResourcesException if there are insufficient resources in player's inventory
 	 */
-	public void reload(Weapon toLoad) throws NoItemInInventoryException, InsufficientResourcesException {
+	public void reload(Weapon toLoad, List<Powerup> discountPowerups) throws NoItemInInventoryException, InsufficientResourcesException {
 		if (!weapons.contains(toLoad)) throw new NoItemInInventoryException();
 
 		// Don't reload if it's already ready to shoot
 		if (toLoad.isLoaded()) return;
 
 		List<Resource> reloadCost = toLoad.getCost();
+
+		// Apply discount from powerups used
+		for (Powerup pow : discountPowerups) {
+			reloadCost.remove(pow.getBonusResource());
+			usePowerupResource(pow);
+		}
+
 		// Check if there are enough resources in player's inventory
 		for (Resource resource : reloadCost) {
 			if (!ammos.contains(resource)) throw new InsufficientResourcesException();
 		}
 
 		// Remove used resources
-		for (Iterator<Resource> itr = reloadCost.iterator(); itr.hasNext(); ) {
-			if (ammos.contains(itr.next())) {
-				ammos.remove(itr.next());
-				itr.remove();
-			}
+		for (Resource res : reloadCost) {
+			ammos.remove(res);
 		}
 		toLoad.reload();
+	}
+
+	/**
+	 * @param toLoad Weapon to reload
+	 * @throws NoItemInInventoryException if toLoad is not in player's inventory
+	 * @throws InsufficientResourcesException if there are insufficient resources in player's inventory
+	 */
+	public void reload(Weapon toLoad) throws NoItemInInventoryException, InsufficientResourcesException {
+		reload(toLoad, new ArrayList<>());
 	}
 
 	/**
@@ -342,10 +371,16 @@ public class Player {
 	 */
 	public void takeMark(Player source) {
 		// Count how many marks from source this player has
-		int sourceMarks = 0;
-		for (Player p : marks) sourceMarks = (p.equals(source)) ? sourceMarks + 1 : sourceMarks;
+		int marksFromSource = 0;
+		for (Player p : marks) marksFromSource = (p.equals(source)) ? marksFromSource + 1 : marksFromSource;
 
-		if (sourceMarks < maxMarks) marks.add(source);
+		// Count how many marks the source gave to other players
+		int sourceMarks = source.givenMarks;
+
+		if (sourceMarks < maxMarks && marksFromSource < maxMarks) {
+			marks.add(source);
+			source.increaseGivenMarks();
+		}
 	}
 
 	/**
@@ -357,15 +392,15 @@ public class Player {
 	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
 		if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
 
-		Cell[][] matchMap = match.getMap();
+		Map matchMap = match.getMap();
 		List<Cell> cellAtDistance = new ArrayList<>();
 
 		if (maxDist == -1) {
 			// Set min/max distances to get all cells from minDist to end of map
-			maxDist = matchMap.length;
+			maxDist = Math.max(matchMap.getXSize(), matchMap.getYSize());
 		}
 
-		for (Cell[] cols : matchMap) {
+		for (Cell[] cols : matchMap.getMap()) {
 			for (Cell cell : cols) {
 				if (cell != null) {
 					// Calculate X and Y distances
@@ -382,19 +417,74 @@ public class Player {
 	}
 
 	/**
-	 * @return List of all visible cells from this player
+	 *
+	 * @param minDist Minimum distance
+	 * @param maxDist Maximum distance. -1 is equal to INFINITE
+	 * @return List of all visible cells from this player between distance minDist and maxDist
 	 */
-	public List<Cell> getVisibleCells() {
-		// TODO implement here
-		return null;
+	public List<Cell> getVisibleCellsAtDistance(int minDist, int maxDist) {
+		Map matchMap = match.getMap();
+		List<Cell> visibleCells = new ArrayList<>();
+		List<Cell> visitedCells = new ArrayList<>();
+		List<Cell> cellsAtDistance = getCellAtDistance(minDist, maxDist);
+
+		// This player's position is visited
+		visitedCells.add(position);
+		visibleCells.add(position);
+
+		// Iterate for every possible direction
+		for (Direction dir : Direction.values()) {
+			// Player has a door nearby
+			if (position.getSide(dir) == Side.DOOR) {
+				visibleCells.addAll(matchMap.getRoomCells(matchMap.getAdjacentCell(position, dir)));
+			} else if (position.getSide(dir) == Side.FREE) {
+				// Player has no wall/door in this direction
+				visibleCells.addAll(getVisibleCell(matchMap.getAdjacentCell(position, dir), visitedCells));
+			}
+		}
+
+		// Remove all cells that are not visible between minDist, maxDist
+		cellsAtDistance.removeIf(cell -> !visibleCells.contains(cell));
+		return cellsAtDistance;
 	}
 
 	/**
-	 * @return List of non-visible cells
+	 * Support function to getVisibleCellsAtDistance. Recursively find all visible cells inside same room as the player's
+	 * @param currCell cell to check
+	 * @param visited cells already visited
+	 * @return list of visible cells
 	 */
-	public List<Cell> getOutOfSightCells() {
-		// TODO implement here
-		return null;
+	private List<Cell> getVisibleCell(Cell currCell, List<Cell> visited) {
+		if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
+
+		Map matchMap = match.getMap();
+		List<Cell> visibleCells = new ArrayList<>();
+
+		visited.add(currCell);
+		for (Direction dir : Direction.values()) {
+			// Player has no wall/door in this direction
+			if (position.getSide(dir) == Side.FREE) {
+				visibleCells.addAll(getVisibleCell(matchMap.getAdjacentCell(position, dir), visited));
+			}
+		}
+		return visibleCells;
+	}
+
+	/**
+	 * @param minDist Minimum distance
+	 * @param maxDist Maximum distance. -1 is equal to INFINITE
+	 * @return List of all non-visible cells from this player between distance minDist and maxDist
+	 */
+	public List<Cell> getOutOfSightCells(int minDist, int maxDist) {
+		List<Cell> visible = getVisibleCellsAtDistance(minDist, maxDist);
+		List<Cell> map = new ArrayList<>();
+
+		for (Cell[] row : match.getMap().getMap()) {
+			map.addAll(Arrays.asList(row));
+		}
+
+		map.removeIf(visible::contains);
+		return map;
 	}
 
 	/**
@@ -483,9 +573,51 @@ public class Player {
 	/**
 	 *  Shoot at another player
 	 * @param toShoot Player to shoot
+	 * @param weapon Weapon to use
 	 */
-	public void shoot(Player toShoot) {
-		// TODO implement here
+	public void shoot(Player toShoot, Weapon weapon) throws NoItemInInventoryException, DeadPlayerException {
+		/*if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
+		if (toShoot.isDead()) throw new DeadPlayerException();*/
+
+		// TODO implement
+
+	}
+
+	/**
+	 * Check if player can pay the whole toPay cost
+	 * @param toPay List of resources to pay.
+	 * @return PaymentResult:
+	 * 				canPay : True if player has enough resources to pay the whole amount, counting both ammos and powerups used as resources
+	 * 				powerupAsResources : List of powerups that can be used to reduce cost of payment
+	 */
+	public PaymentResult canPay(List<Resource> toPay) {
+		PaymentResult result = new PaymentResult();
+		List<Powerup> usablePowerups = new ArrayList<>();
+		List<Resource> resourcesToPay = new ArrayList<>(toPay);
+
+		for (Resource res : toPay) {
+			List<Powerup> thisPowerupRes = getAllPowerupByResource(res);
+
+			// If player has at least one powerup that can be used as this resource, count as ammo
+			if (!thisPowerupRes.isEmpty()) {
+				usablePowerups.addAll(thisPowerupRes);
+				resourcesToPay.remove(res);
+			}
+		}
+
+		// Remove resources that can be payed with player's ammos
+		resourcesToPay.removeIf(resource -> ammos.contains(resource));
+
+		if (resourcesToPay.isEmpty()) {
+			// Return that player can pay the whole amount, and set which powerups can be used as resources
+			result.setCanPay(true);
+			result.setPowerupAsResources(usablePowerups);
+			return result;
+		}
+
+		// Return that player can't pay the amount
+		result.setCanPay(false);
+		return result;
 	}
 
 	/**

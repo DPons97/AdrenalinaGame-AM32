@@ -46,9 +46,6 @@ public abstract class Cell {
 	 * return the coordinate Y
 	 */
 	private int coordY;
-	/**
-	 * return the north side
-	 */
 
 	/**
 	 * @param north upper side of the cell
@@ -68,6 +65,25 @@ public abstract class Cell {
 		players = new ArrayList<>();
 		this.coordX = x;
 		this.coordY = y;
+	}
+
+	/**
+ 	 * @param direction
+	 * @return type of side in [direction]
+	 */
+	public Side getSide(Direction direction) {
+		switch (direction) {
+			case NORTH:
+				return getNorth();
+			case EAST:
+				return getEast();
+			case WEST:
+				return getWest();
+			case SOUTH:
+				return getSouth();
+			default:
+				return null;
+		}
 	}
 
 	public Side getNorth() {

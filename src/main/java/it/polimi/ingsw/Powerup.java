@@ -36,7 +36,8 @@ public class Powerup {
 		this.name = name;
 		this.description = description;
 		this.bonusResource = bonusResource;
-		parseEffect(effect);
+		// [effect] can be null for testing purposes
+		if (effect != null) parseEffect(effect);
 	}
 
 	/**

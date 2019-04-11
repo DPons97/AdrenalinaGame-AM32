@@ -23,14 +23,9 @@ public class AdrenalinaMatch {
 	private int matchID;
 
 	/**
-	 * Representation of the map, bidemensional array of cells.
+	 * Reference to map
 	 */
-	private Cell[][] map;
-
-	/**
-	 * List to trace spawn cells, not necessary but convenient
-	 */
-	private List<SpawnCell> spawnPoints;
+	private Map map;
 
 	/**
 	 * Number of deaths in the match before the frenzy.
@@ -108,7 +103,6 @@ public class AdrenalinaMatch {
 		this.started = false;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
-		this.spawnPoints = new ArrayList<>();
 		this.frenzyEnabled = false;
 		this.initAmmoDeck();
 		this.initPowerupDeck();
@@ -137,7 +131,8 @@ public class AdrenalinaMatch {
 			JSONArray mapSize = (JSONArray) jsonObject.get("Size");
 			xSize = Integer.parseInt(mapSize.get(0).toString());
 			ySize = Integer.parseInt(mapSize.get(1).toString());
-			map = new Cell[xSize][ySize];
+			Cell[][] newMap = new Cell[xSize][ySize];
+			ArrayList<SpawnCell> spawnPoints = new ArrayList<>();
 
 			// get the array of cells
 			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
@@ -150,7 +145,7 @@ public class AdrenalinaMatch {
 				Color c = null;
 				// if color is X then is a corner empyt cell
 				if (color.equals("X")) {
-					map[(i / ySize) % xSize][i % ySize] = null;
+					newMap[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
 					c = stringToColor(color);
 					// for every side add the value to the coords array [north, south, west, east]
@@ -160,15 +155,18 @@ public class AdrenalinaMatch {
 					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
-						map[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
-						spawnPoints.add((SpawnCell) map[(i / ySize) % xSize][i % ySize]);
+						newMap[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+						spawnPoints.add((SpawnCell) newMap[(i / ySize) % xSize][i % ySize]);
 					} else {
 						// create AmmoCell
-						map[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+						newMap[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
 					}
 				}
 				i++;
 			}
+
+			// Generate Map object
+			map = new Map(newMap, spawnPoints, xSize, ySize);
 
 		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
@@ -282,7 +280,7 @@ public class AdrenalinaMatch {
 	 * private method to initialize ammo cells with an ammo card
 	 */
 	private void initAmmoCells() {
-		for (Cell[] cells : map) {
+		for (Cell[] cells : map.getMap()) {
 			for (Cell cell : cells) {
 				if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
 					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
@@ -314,13 +312,6 @@ public class AdrenalinaMatch {
 		} else {
 			throw new MatchAlreadyStartedException();
 		}
-	}
-
-	/**
-	 * @return the cells that are spawn points.
-	 */
-	public List<SpawnCell> getSpawnPoints() {
-		return spawnPoints;
 	}
 
 	/**
@@ -359,21 +350,16 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * @return match map
-	 */
-	public Cell[][] getMap() {
-		Cell[][] returnMap = new Cell[map.length][map[0].length];
-
-		for (int i = 0; i < map.length; i++ ) returnMap[i] = map[i].clone();
-		return returnMap;
-	}
-
-	/**
 	 * @return the match Id as an int.
 	 */
 	public int getMatchID() {
 		return matchID;
 	}
+
+	/**
+	 * @return current map
+	 */
+	public Map getMap() { return map; }
 
 	/**
 	 * @return the number of maximun deaths, usually 8 for a standard match.
@@ -521,25 +507,25 @@ public class AdrenalinaMatch {
 		List<Player> toReturn = new ArrayList<>();
 		switch (from){
 			case "VISIBLE":
-				for(Cell c: caller.getVisibleCells())
+				for(Cell c: caller.getVisibleCellsAtDistance(0, -1))
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "NOT-VISIBLE":
 				List<Cell> validCells = caller.getCellAtDistance(0,-1);
-				validCells.removeAll(caller.getVisibleCells());
+				validCells.removeAll(caller.getVisibleCellsAtDistance(0, -1));
 				for(Cell c: validCells)
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "TARGET-VISIBLE":
-				for(Cell c: players.get(0).getVisibleCells())
+				for(Cell c: players.get(0).getVisibleCellsAtDistance(0, -1))
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "DIRECTION":
 				int pX = caller.getPosition().getCoordX();
 				int pY = caller.getPosition().getCoordY();
-				for (Cell c: map[pX])
+				for (Cell c: map.getMap()[pX])
 					toReturn.addAll(c.getPlayers());
-				for (Cell[] c: map)
+				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.addAll(c[pY].getPlayers());
 				break;
 			case "PREV_TARGET":
@@ -559,6 +545,8 @@ public class AdrenalinaMatch {
 		}
 		return toReturn;
 	}
+
+
 
 
 }

@@ -34,7 +34,7 @@ class PlayerTest {
             victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
 
             // Check that reward is equal to player's default kill reward from i to end
-            assertEquals(victimPlayer.getReward(), Player.getKillRewards().subList(i, Player.getKillRewards().size()));
+            assertEquals(Player.getKillRewards().subList(i, Player.getKillRewards().size()), victimPlayer.getReward());
         }
 
         // Check rewards if player died more times than number of rewards
@@ -43,48 +43,77 @@ class PlayerTest {
         }
 
         victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
-        assertEquals(victimPlayer.getReward(), Player.getKillRewards().subList(Player.getKillRewards().size()-1, Player.getKillRewards().size()));
+        assertEquals(Player.getKillRewards().subList(Player.getKillRewards().size()-1, Player.getKillRewards().size()), victimPlayer.getReward());
     }
 
     /**
      *
      */
     @Test
-    void reload() throws InventoryFullException {
-        AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
-        Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
-        Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
-        Player testPlayer = new Player(newMatch, testName);
+    void reload() throws InventoryFullException, AmmoAlreadyOnCellException, InsufficientResourcesException, NoItemInInventoryException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
+        Weapon testWeapon = testMatch.getWeaponDeck().drawCard();
+        Player testPlayer = new Player(testMatch, testName);
 
         List<Resource> testCost = new ArrayList<>();
 
         testCost.add(Resource.RED_BOX);
         testCost.add(Resource.RED_BOX);
         testCost.add(Resource.RED_BOX);
-        testWeaponEffect.setCost(testCost);
-        testWeaponEffect.shoot(0, testPlayer);   // Set weapon ready to reload
-
-        testCost.clear();
-        testCost.add(Resource.YELLOW_BOX);
-        testCost.add(Resource.RED_BOX);
-        testWeaponMode.setCost(testCost);
-        testWeaponMode.shoot(0, testPlayer);     // Set weapon ready to reload
+        testWeapon.setCost(testCost);
+        testWeapon.shoot(0, testPlayer);   // Set weapon ready to reload
 
         // Check player cannot reload weapons he doesn't have
-        assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeaponEffect));
+        assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeapon));
 
         // Add weapons
-        testPlayer.pickWeapon(testWeaponEffect);
-        testPlayer.pickWeapon(testWeaponMode);
+        testPlayer.pickWeapon(testWeapon);
 
         // Check player cannot reaload if he doesn't have ammos
-        assertThrows(InsufficientResourcesException.class, () -> testPlayer.reload(testWeaponEffect));
+        assertThrows(InsufficientResourcesException.class, () -> testPlayer.reload(testWeapon));
 
-        // TODO: Add resources to player's inventory
+        // Add resources to player's inventory
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.RED_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
 
-        // Check if weapons load
-        //testPlayer.reload(testWeaponEffect);
-        //assertTrue(testWeaponMode.isLoaded());
+        // Check if weapon loads and check that player used his ammos
+        testPlayer.reload(testWeapon);
+        assertTrue(testWeapon.isLoaded());
+        assertTrue(testPlayer.getAmmos().isEmpty());
+
+        testWeapon.shoot(0, testPlayer);
+
+        // Try to reload only with powerups
+        Powerup newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+        newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+        newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+
+        testPlayer.reload(testWeapon, testPlayer.getAllPowerupByResource(Resource.RED_BOX));
+        assertTrue(testWeapon.isLoaded());
+        assertTrue(testPlayer.getAmmos().isEmpty());
+        assertTrue(testPlayer.getPowerups().isEmpty());
+
+        testWeapon.shoot(0, testPlayer);
+
+        // Try to reload with both ammos and powerups
+        newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+        newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.BLUE_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+
+        // Pay with 1 RED ammo and 2 RED powerups
+        testPlayer.reload(testWeapon, testPlayer.getAllPowerupByResource(Resource.RED_BOX));
+        assertTrue(testWeapon.isLoaded());
+        assertTrue(testPlayer.getAmmos().contains(Resource.RED_BOX));
+        assertTrue(testPlayer.getAmmos().contains(Resource.BLUE_BOX));
+        assertTrue(testPlayer.getPowerups().isEmpty());
     }
 
     @Test
@@ -98,12 +127,12 @@ class PlayerTest {
 
         // Check correct first move
         testPlayer.move(fromCell);
-        assertEquals(testPlayer.getPosition(), fromCell);
+        assertEquals(fromCell, testPlayer.getPosition());
         assertTrue(fromCell.getPlayers().contains(testPlayer));
 
         // Check correct movement from one cell to another
         testPlayer.move(destCell);
-        assertEquals(testPlayer.getPosition(), destCell);
+        assertEquals(destCell, testPlayer.getPosition());
         assertFalse(fromCell.getPlayers().contains(testPlayer));
         assertTrue(destCell.getPlayers().contains(testPlayer));
     }
@@ -131,7 +160,7 @@ class PlayerTest {
 
         // Victim takes another 1 damage and check he's still killed and overkilled
         assertTrue(victimPlayer.takeDamage(killerPlayer));
-        assertEquals(victimPlayer.getDmgPoints().size(), Player.getMaxDamage() + 1);
+        assertEquals(Player.getMaxDamage() + 1, victimPlayer.getDmgPoints().size());
 
         // Check damage from marks is correctly dealt
         victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
@@ -139,7 +168,7 @@ class PlayerTest {
             victimPlayer.takeMark(killerPlayer);
         }
         victimPlayer.takeDamage(killerPlayer);
-        assertEquals(victimPlayer.getDmgPoints().size(), Player.getMaxMarks() + 1);
+        assertEquals(Player.getMaxMarks() + 1, victimPlayer.getDmgPoints().size());
     }
 
     @Test
@@ -149,15 +178,16 @@ class PlayerTest {
         Player killerPlayer = new Player(testMatch, killerName);
 
         victimPlayer.takeMark(killerPlayer);
-        assertEquals(victimPlayer.getMarks().get(0), killerPlayer);
+        assertEquals(killerPlayer, victimPlayer.getMarks().get(0));
+        assertEquals(1, killerPlayer.getGivenMarks());
 
         // Add more marks than maximum allowed
         for (int i = 0; i < Player.getMaxMarks(); i++) {
             victimPlayer.takeMark(killerPlayer);
         }
 
-        assertEquals(victimPlayer.getMarks().size(), Player.getMaxMarks());
-
+        assertEquals(Player.getMaxMarks(), victimPlayer.getMarks().size());
+        assertEquals(3, killerPlayer.getGivenMarks());
     }
 
     @Test
@@ -165,12 +195,12 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
 
-        testPlayer.respawn(testMatch.getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(-1, -1));
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(0, -2));
 
         List<Cell> mapCells = testPlayer.getCellAtDistance(0, -1);
-        Cell[][] matchMap = testMatch.getMap();
+        Cell[][] matchMap = testMatch.getMap().getMap();
 
         // Check every map's cell exists in mapCells
         for (Cell[] col : matchMap) {
@@ -179,7 +209,7 @@ class PlayerTest {
             }
         }
         // Number of not null cells = 10 (see Map1.json)
-        assertEquals(mapCells.size(), 10);
+        assertEquals(10, mapCells.size());
 
         mapCells = testPlayer.getCellAtDistance(1, 3);
         // Check every map's cell that is inside 1 and 3 distance exists in mapCells
@@ -197,17 +227,53 @@ class PlayerTest {
 
     @Test
     void getVisibleCells() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+
+        // All cells of same room as player's are visible
+        for (Cell cell : testMatch.getMap().getRoomCells(testPlayer.getPosition())) {
+            assertTrue(testPlayer.getVisibleCellsAtDistance(0, -1).contains(cell));
+        }
+
+        // All room's cells behind adjacent doors are visible
+        for (Direction dir : Direction.values()) {
+            if (testPlayer.getPosition().getSide(dir) == Side.DOOR) {
+                for (Cell cell : testMatch.getMap().getRoomCells(testMatch.getMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
+                    assertTrue(testPlayer.getVisibleCellsAtDistance(0, -1).contains(cell));
+                }
+            }
+        }
     }
 
     @Test
     void getOutOfSightCells() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+
+        // All cells of same room as player's are visible
+        for (Cell cell : testMatch.getMap().getRoomCells(testPlayer.getPosition())) {
+            assertFalse(testPlayer.getOutOfSightCells(0, -1).contains(cell));
+        }
+
+        // All room's cells behind adjacent doors are visible
+        for (Direction dir : Direction.values()) {
+            if (testPlayer.getPosition().getSide(dir) == Side.DOOR) {
+                for (Cell cell : testMatch.getMap().getRoomCells(testMatch.getMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
+                    assertFalse(testPlayer.getOutOfSightCells(0, -1).contains(cell));
+                }
+            }
+        }
     }
 
     @Test
     void pickAmmo() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
-        testPlayer.respawn(testMatch.getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
 
         // Get first ammo cell
         AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
@@ -362,6 +428,51 @@ class PlayerTest {
 
     @Test
     void shoot() {
+    }
+
+    @Test
+    void canPay() throws AmmoAlreadyOnCellException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        List<Resource> testPayment = new ArrayList<>();
+        testPayment.add(Resource.RED_BOX);
+
+        // Player's inventory is empty
+        PaymentResult result = testPlayer.canPay(testPayment);
+        assertFalse(result.isCanPay());
+        assertTrue(result.getPowerupAsResources().isEmpty());
+
+        // Add enough resources to player's inventory, but no powerups
+        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.YELLOW_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+
+        result = testPlayer.canPay(testPayment);
+        assertTrue(result.isCanPay());
+        assertTrue(result.getPowerupAsResources().isEmpty());
+
+        // Increase cost
+        testPayment.add(Resource.BLUE_BOX);
+        testPayment.add(Resource.YELLOW_BOX);
+        testPayment.add(Resource.BLUE_BOX);
+        testPayment.add(Resource.RED_BOX);
+
+        // Add not enough resources to player's inventory, but powerups
+        Powerup newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.BLUE_BOX, null);
+        testPlayer.addPowerup(newPowerup);
+        result = testPlayer.canPay(testPayment);
+
+        assertTrue(result.isCanPay());
+        assertTrue(result.getPowerupAsResources().contains(newPowerup));
+
+        // Add enough resources to player's inventory AND additional powerups
+        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.YELLOW_BOX));
+        testPlayer.pickAmmo(newAmmoCell);
+        result = testPlayer.canPay(testPayment);
+
+        assertTrue(result.isCanPay());
+        assertTrue(result.getPowerupAsResources().contains(newPowerup));
     }
 
     @Test
