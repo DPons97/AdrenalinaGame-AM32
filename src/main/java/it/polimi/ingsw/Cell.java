@@ -48,6 +48,11 @@ public abstract class Cell {
 	private int coordY;
 
 	/**
+	 * id for targeting effects
+	 */
+	private int id;
+
+	/**
 	 * @param north upper side of the cell
 	 * @param south bottom side of the cell
 	 * @param west left side of the cell
@@ -65,6 +70,21 @@ public abstract class Cell {
 		players = new ArrayList<>();
 		this.coordX = x;
 		this.coordY = y;
+		this.id =-1;
+	}
+
+	/**
+	 * return the cell id
+	 */
+	public int getID() {
+		return id;
+	}
+
+	/**
+	 * set cell id
+	 */
+	public void setID(int id) {
+		this.id = id;
 	}
 
 	/**
@@ -86,6 +106,9 @@ public abstract class Cell {
 		}
 	}
 
+	/**
+	 * return the north side
+	 */
 	public Side getNorth() {
 		return north;
 	}

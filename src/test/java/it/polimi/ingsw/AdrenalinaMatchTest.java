@@ -57,6 +57,7 @@ class AdrenalinaMatchTest {
         assertEquals(3, testMatch.getMap().getSpawnPoints().size());
         checkMapTopology(testMatch.getMap().getMap());
     }
+
     private void checkMapTopology(Cell[][] map){
         // check topology -> edges of adjacent cells need to be the same!
         for(int i = 0; i < map.length; i++){
@@ -89,6 +90,7 @@ class AdrenalinaMatchTest {
             }
         }
     }
+
     @Test
     void startMatch() throws MatchAlreadyStartedException, TooManyPlayersException, NotEnoughPlayersException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
