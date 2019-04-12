@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -77,7 +78,7 @@ public abstract class Weapon {
 	 * @param effectID effect identifier
 	 * @param shooter player shooting
 	 */
-	public abstract void shoot(int effectID, Player shooter);
+	public abstract void shoot(int effectID, Player shooter) throws WeaponNotLoadedException;
 
 	/**
 	 * @return list of possible shoot actions

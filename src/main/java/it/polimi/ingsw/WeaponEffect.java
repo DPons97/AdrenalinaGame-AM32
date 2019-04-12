@@ -1,6 +1,7 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.custom_exceptions.InvalidJSONException;
+import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -72,7 +73,8 @@ public class WeaponEffect extends Weapon {
 	 * @param shooter player shooting
 	 */
 	@Override
-	public void shoot(int effectID, Player shooter) {
+	public void shoot(int effectID, Player shooter) throws WeaponNotLoadedException {
+		if(!loaded) throw new WeaponNotLoadedException();
 		switch (effectID){
 			case 0:
 				executePrimaryEffect(shooter);
@@ -86,6 +88,7 @@ public class WeaponEffect extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
+		//TODO: change this when controller is implemented
 		this.loaded = false;
 	}
 

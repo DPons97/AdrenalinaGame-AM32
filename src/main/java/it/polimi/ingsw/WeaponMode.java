@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -34,7 +35,8 @@ public class WeaponMode extends Weapon {
 	 * @param shooter player shooting
 	 */
 	@Override
-	public void shoot(int effectID, Player shooter) {
+	public void shoot(int effectID, Player shooter) throws WeaponNotLoadedException {
+		if(!loaded) throw new WeaponNotLoadedException();
 		switch (effectID){
 			case 0:
 				executePrimaryMode(shooter);
@@ -45,6 +47,7 @@ public class WeaponMode extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
+		// TODO change this and delegate to controller
 		this.loaded = false;
 	}
 

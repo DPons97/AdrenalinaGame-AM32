@@ -92,6 +92,13 @@ public class Action {
 	}
 
 	/**
+	 * @return copy of actions list
+	 */
+	public List<Resource> getCost() {
+		return cost;
+	}
+
+	/**
 	 * @param effect json effect to parse
 	 */
 	public void parseEffect(JSONObject effect) {

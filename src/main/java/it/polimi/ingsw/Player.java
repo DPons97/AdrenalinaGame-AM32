@@ -1,11 +1,10 @@
 package it.polimi.ingsw;
 
-import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
-import it.polimi.ingsw.custom_exceptions.InsufficientResourcesException;
-import it.polimi.ingsw.custom_exceptions.InventoryFullException;
-import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
+import it.polimi.ingsw.custom_exceptions.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 /**
@@ -302,14 +301,7 @@ public class Player {
 		}
 
 		// Check if there are enough resources in player's inventory
-		for (Resource resource : reloadCost) {
-			if (!ammos.contains(resource)) throw new InsufficientResourcesException();
-		}
-
-		// Remove used resources
-		for (Resource res : reloadCost) {
-			ammos.remove(res);
-		}
+		pay(reloadCost);
 		toLoad.reload();
 	}
 
@@ -572,15 +564,37 @@ public class Player {
 
 	/**
 	 *  Shoot at another player
-	 * @param toShoot Player to shoot
 	 * @param weapon Weapon to use
+	 * @param effectID
 	 */
-	public void shoot(Player toShoot, Weapon weapon) throws NoItemInInventoryException, DeadPlayerException {
-		/*if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
-		if (toShoot.isDead()) throw new DeadPlayerException();*/
+	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, DeadPlayerException, WeaponNotLoadedException, InsufficientResourcesException {
+		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
+		List<Resource> shootCost = weapon.getShootActions().get(effectID).getCost();
+		// Apply discount from powerups used
 
-		// TODO implement
+		for (Powerup pow : discountPowerups) {
+			shootCost.remove(pow.getBonusResource());
+			usePowerupResource(pow);
+		}
+		pay(shootCost);
+		weapon.shoot(effectID, this);
+	}
 
+	/**
+	 * Pay a certain amount of resources
+	 * @param cost to pay
+	 * @throws InsufficientResourcesException if there are not enough resources in player's inventory
+	 */
+	private void pay(List<Resource> cost) throws InsufficientResourcesException {
+		// Check if there are enough resources in player's inventory
+		for (Resource resource : cost) {
+			if (!ammos.contains(resource)) throw new InsufficientResourcesException();
+		}
+
+		// Remove used resources
+		for (Resource res : cost) {
+			ammos.remove(res);
+		}
 	}
 
 	/**
