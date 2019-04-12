@@ -34,7 +34,10 @@ public class WeaponEffect extends Weapon {
 	 * @param actions json object with effects description
 	 */
 	public WeaponEffect(String name, List<Resource> cost, JSONObject actions) {
+
 		super(name, cost, actions);
+		firstOptional = null;
+		secondOptional = null;
 	}
 
 	/**
@@ -46,20 +49,22 @@ public class WeaponEffect extends Weapon {
 		try{
 			primaryEffect = new Action("base effect",(JSONObject) actions.get("base-effect"));
 			JSONArray optionalEffectJ = (JSONArray) actions.get("secondaryEffects");
-			for(Object effectName:optionalEffectJ){
-				switch(i){
-					case 0:
-						firstOptional = new Action(effectName.toString(),
-								(JSONObject) actions.get(effectName.toString()));
-						break;
-					case 1:
-						secondOptional = new Action(effectName.toString(),
-								(JSONObject) actions.get(effectName.toString()));
-						break;
-					default:
-						throw new InvalidJSONException();
+			if(optionalEffectJ != null) {
+				for (Object effectName : optionalEffectJ) {
+					switch (i) {
+						case 0:
+							firstOptional = new Action(effectName.toString(),
+									(JSONObject) actions.get(effectName.toString()));
+							break;
+						case 1:
+							secondOptional = new Action(effectName.toString(),
+									(JSONObject) actions.get(effectName.toString()));
+							break;
+						default:
+							throw new InvalidJSONException();
+					}
+					i++;
 				}
-				i++;
 			}
 		} catch (InvalidJSONException e) {
 			e.printStackTrace();

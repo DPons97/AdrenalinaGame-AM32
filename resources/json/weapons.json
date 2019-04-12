@@ -241,37 +241,37 @@
               2
             ]
           }
+        ]
+      },
+      "high-voltage": {
+        "description": "Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you first use the chain reaction.",
+        "cost": [
+          "B"
         ],
-        "high-voltage": {
-          "description": "Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you first use the chain reaction.",
-          "cost": [
-            "B"
-          ],
-          "actions": [
-            {
-              "type": "SELECT",
-              "ID": 3,
-              "target": "PLAYER",
-              "from": "TARGET_VISIBLE",
-              "notID": "1-2",
-              "differentSelection": false,
-              "quantity": [
-                1,
-                1
-              ],
-              "distance": [
-                0,
-                -1
-              ]
-            },
-            {
-              "type": "DAMAGE",
-              "value": [
-                1
-              ]
-            }
-          ]
-        }
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 3,
+            "target": "PLAYER",
+            "from": "TARGET_VISIBLE",
+            "notID": "1-2",
+            "differentSelection": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
       }
     },
     {
@@ -715,7 +715,7 @@
           }
         ]
       },
-      "secondaryEffects": "cozy-fire-mode",
+      "secondaryMode": "cozy-fire-mode",
       "cozy-fire-mode": {
         "description": "Choose a square exactly one move away. Deal 1 damage and 1 mark to everyone on that square.",
         "cost": [
@@ -851,7 +851,7 @@
           }
         ]
       },
-      "secondaryEffects": "nano-tracer-mode",
+      "secondaryMode": "nano-tracer-mode",
       "nano-tracer-mode": {
         "description": "Deal 1 damage to 1 target you can see at least 1 move away. Then give 2 marks to that target and everyone else on that square.",
         "cost": [
@@ -950,7 +950,7 @@
       "secondaryEffects": [
         "extra-grenade"
       ],
-      "extra-granade": {
+      "extra-grenade": {
         "description": " Deal 1 damage to every player on a square you can see. You can use this before or after the basic effect's move. ",
         "cost": [
           "R"
@@ -1148,7 +1148,7 @@
           }
         ]
       },
-      "secondaryMode": "piercing mode",
+      "secondaryMode": "piercing-mode",
       "piercing-mode": {
         "description": "Choose a cardinal direction and 1 or 2 targets in that direction. Deal 2 damage to each.",
         "cost": [
@@ -1318,7 +1318,7 @@
         ]
       },
       "secondaryMode": "scanner-mode",
-      "piercing-mode": {
+      "scanner-mode": {
         "description": "Choose up to 3 targets you can see and deal 1 mark to each.",
         "cost": [
         ],
@@ -1392,7 +1392,7 @@
         ]
       },
       "secondaryMode": "long-barrel-mode",
-      "piercing-mode": {
+      "long-barrel-mode": {
         "description": " Deal 2 damage to 1 target on any square exactly one move away.",
         "cost": [
         ],
@@ -1485,7 +1485,7 @@
         ]
       },
       "secondaryMode": "rocket-fist-mode",
-      "piercing-mode": {
+      "rocket-fist-mode": {
         "description": "Choose up to 3 targets you can see and deal 1 mark to each.",
         "cost": [
         ],
@@ -1602,7 +1602,7 @@
         ]
       },
       "secondaryMode": "tsunami-mode",
-      "piercing-mode": {
+      "tsunami-mode": {
         "description": "Deal 1 damage to all targets that are exactly 1 move away.",
         "cost": [
         ],
@@ -1668,7 +1668,7 @@
         ]
       },
       "secondaryMode": "pulverized-mode",
-      "piercing-mode": {
+      "pulverized-mode": {
         "description": " Deal 3 damage to 1 target on your square, then move that target 0, 1, or 2 squares in one direction. ",
         "cost": [
           "R"

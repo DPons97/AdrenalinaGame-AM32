@@ -68,8 +68,8 @@ public class WeaponMode extends Weapon {
 	@Override
 	protected void parseEffects(JSONObject actions) {
 		primaryMode = new Action("base mode",(JSONObject) actions.get("base-mode"));
-		secondaryMode = new Action(actions.get("secondary-mode").toString(),
-				(JSONObject) actions.get(actions.get("secondary-mode").toString()));
+		secondaryMode = new Action(actions.get("secondaryMode").toString(),
+				(JSONObject) actions.get(actions.get("secondaryMode").toString()));
 	}
 
 	/**
