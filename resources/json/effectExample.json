@@ -7,6 +7,7 @@
         "R"
       ],
       "type": "EFFECT / MODE",
+      "sequential": true/false,,
       "base-effect": {
         "description": " Choose 1 or 2 targets you can see and deal 1 damage to each. ",
         "cost": [],
@@ -35,7 +36,7 @@
           },
           {
             "type": "MOVE",
-            "direction": "ONE / ANY",
+            "direction": "ONE / SAME / ANY / SHOOTER/ ID",
             "distance": [
               "[int MIN_DISTANCE]",
               "[int MAX_DISTANCE]"

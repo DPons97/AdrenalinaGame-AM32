@@ -4,7 +4,7 @@
       "name": "Lock Rifle",
       "cost": [
         "B",
-        "R"
+        "B"
       ],
       "type": "EFFECT",
       "base-effect": {
@@ -76,9 +76,917 @@
       }
     },
     {
-      "name": "Rocket Launcher",
+      "name": "Machine Gun",
       "cost": [
         "B",
+        "R"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": " Choose 1 or 2 targets you can see and deal 1 damage to each.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 3,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              2
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "focus-shot",
+        "turret-tripod"
+      ],
+      "focus-shot": {
+        "description": "Deal 1 additional damage to one of those targets.",
+        "cost": [
+          "Y"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 4,
+            "target": "PLAYER",
+            "from": "3",
+            "differentSelection": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
+      },
+      "turret-tripod": {
+        "description": "Deal 1 additional damage to the other of those targets and/or deal 1 damage to a different target you can see.",
+        "cost": [
+          "B"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 2,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "notID": 4,
+            "differentSelection": false,
+            "quantity": [
+              1,
+              2
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Thor",
+      "cost": [
+        "B",
+        "R"
+      ],
+      "type": "EFFECT",
+      "sequential": true,
+      "base-effect": {
+        "description": "Deal 2 damage to 1 target you can see.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "chain-reaction",
+        "high-voltage"
+      ],
+      "chain-reaction": {
+        "description": "Deal 1 damage to a second target that your first target can see.",
+        "cost": [
+          "B"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 2,
+            "target": "PLAYER",
+            "from": "TARGET_VISIBLE",
+            "notID": 1,
+            "differentSelection": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ],
+        "high-voltage": {
+          "description": "Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you first use the chain reaction.",
+          "cost": [
+            "B"
+          ],
+          "actions": [
+            {
+              "type": "SELECT",
+              "ID": 3,
+              "target": "PLAYER",
+              "from": "TARGET_VISIBLE",
+              "notID": "1-2",
+              "differentSelection": false,
+              "quantity": [
+                1,
+                1
+              ],
+              "distance": [
+                0,
+                -1
+              ]
+            },
+            {
+              "type": "DAMAGE",
+              "value": [
+                1
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "PlasmaGun",
+      "cost": [
+        "B",
+        "Y"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Deal 2 damage to 1 target you can see.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "phase-glide",
+        "charged-shot"
+      ],
+      "phase-glide": {
+        "description": "Move 1 or 2 squares. This effect can be used either before or after the basic effect.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "SELF",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              "1",
+              "2"
+            ]
+          }
+        ]
+      },
+      "charged-shot": {
+        "description": "Deal 1 additional damage to your target.",
+        "cost": [
+          "B"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "1",
+            "differentSelection": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Whisper",
+      "cost": [
+        "B",
+        "B",
+        "Y"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": " Deal 3 damage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              2,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Electroscythe",
+      "cost": [
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Deal 1 damage to every other player  on your square.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "reaper-mode",
+      "reaper-mode": {
+        "description": "Deal 2 damage to every other player  on your square.",
+        "cost": [
+          "B",
+          "R"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "TractorBeam",
+      "cost": [
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Move a target 0, 1, or 2 squares to a square you can see, and give it 1 damage.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              -1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              2
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              "0",
+              "2"
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "punisher-mode",
+      "punisher-mode": {
+        "description": "Choose a target 0, 1, or 2 moves away from you. Move the target to your square  and deal 3 damage to it.",
+        "cost": [
+          "R",
+          "Y"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              2
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "SHOOTER",
+            "distance": [
+              "0",
+              "2"
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "VortexCannon",
+      "cost": [
+        "R",
+        "B"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Choose a square you can see, but not your square. Call it \"the vortex\". Choose a target on the vortex or 1 move away from it. Move it onto the vortex and give it 2 damage.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": 2,
+            "target": "PLAYER",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "1",
+            "distance": [
+              "0",
+              "1"
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "black-hole"
+      ],
+      "black-hole": {
+        "description": "Choose up to 2 other targets on the vortex or 1 move away from it. Move them onto the vortex and give them each 1 damage.",
+        "cost": [
+          "R",
+          "Y"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "1",
+            "notID": 2,
+            "differentCells": false,
+            "quantity": [
+              1,
+              2
+            ],
+            "distance": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "1",
+            "distance": [
+              "0",
+              "1"
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Furnace",
+      "cost": [
+        "R",
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Choose a room you can see, but not the room you are in. Deal 1 damage to everyone in that room.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "ROOM",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": "cozy-fire-mode",
+      "cozy-fire-mode": {
+        "description": "Choose a square exactly one move away. Deal 1 damage and 1 mark to everyone on that square.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Heatseeker",
+      "cost": [
+        "R",
+        "R",
+        "Y"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Choose 1 target you cannot see and deal 3 damage to it.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "NOT_VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Hellion",
+      "cost": [
+        "R",
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Deal 1 damage to 1 target you can see at least 1 move away. Then give 1 mark to that target and everyone else on that square. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": "nano-tracer-mode",
+      "nano-tracer-mode": {
+        "description": "Deal 1 damage to 1 target you can see at least 1 move away. Then give 2 marks to that target and everyone else on that square.",
+        "cost": [
+          "R"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              -1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              2,
+              2,
+              2,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Grenade launcher",
+      "cost": [
+        "R"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Deal 1 damage to 1 target you can see. Then you may move the target 1 square. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              "0",
+              "1"
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "extra-grenade"
+      ],
+      "extra-granade": {
+        "description": " Deal 1 damage to every player on a square you can see. You can use this before or after the basic effect's move. ",
+        "cost": [
+          "R"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rocket Launcher",
+      "cost": [
+        "R",
         "R"
       ],
       "type": "EFFECT",
@@ -178,7 +1086,6 @@
             "value": [
               1,
               1,
-              1,
               1
             ]
           },
@@ -201,6 +1108,599 @@
             "type": "DAMAGE",
             "value": [
               1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Rail gun",
+      "cost": [
+        "Y",
+        "Y",
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": " Choose a cardinal direction and 1 target in that direction. Deal 3 damage to it. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "DIRECTION",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "piercing mode",
+      "piercing-mode": {
+        "description": "Choose a cardinal direction and 1 or 2 targets in that direction. Deal 2 damage to each.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "DIRECTION",
+            "differentCells": false,
+            "quantity": [
+              1,
+              2
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2,
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Cyberblade",
+      "cost": [
+        "Y",
+        "R"
+      ],
+      "type": "EFFECT",
+      "base-effect": {
+        "description": "Deal 2 damage to 1 target on your square.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryEffects": [
+        "shadow-step",
+        "slice-and-dice"
+      ],
+      "shadow-step": {
+        "description": "Move 1 square before or after the basic effect. ",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "SELF",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "slice-and-dice": {
+        "description": "Deal 2 damage to a different target on your square. The shadowstep may be used before or after this effect. ",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "ANY",
+            "notID": 1,
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "ZX-2",
+      "cost": [
+        "Y",
+        "R"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Deal 1 damage and 2 marks to 1 target you can see. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "scanner-mode",
+      "piercing-mode": {
+        "description": "Choose up to 3 targets you can see and deal 1 mark to each.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              3
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Shotgun",
+      "cost": [
+        "Y",
+        "Y"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Deal 3 damage to 1 target on your square. If you want, you may then move the target 1 square.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              0,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "long-barrel-mode",
+      "piercing-mode": {
+        "description": " Deal 2 damage to 1 target on any square exactly one move away.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Power glove",
+      "cost": [
+        "Y",
+        "B"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Choose 1 target on any square exactly 1 move away. Move onto that square and give the target 1 damage and 2 marks. ",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1
+            ]
+          },
+          {
+            "type": "MARK",
+            "value": [
+              2
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ANY",
+            "distance": [
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "rocket-fist-mode",
+      "piercing-mode": {
+        "description": "Choose up to 3 targets you can see and deal 1 mark to each.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "1",
+            "distance": [
+              0,
+              1
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ONE",
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Shockwave",
+      "cost": [
+        "Y"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Choose up to 3 targets on different squares, each exactly 1 move away. Deal 1 damage to each target.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": true,
+            "quantity": [
+              1,
+              3
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "tsunami-mode",
+      "piercing-mode": {
+        "description": "Deal 1 damage to all targets that are exactly 1 move away.",
+        "cost": [
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              4
+            ],
+            "distance": [
+              1,
+              1
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              1,
+              1,
+              1,
+              1
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "Sledgehammer",
+      "cost": [
+        "Y"
+      ],
+      "type": "MODE",
+      "base-mode": {
+        "description": "Deal 2 damage to 1 target on your square.",
+        "cost": [],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              2
+            ]
+          }
+        ]
+      },
+      "secondaryMode": "pulverized-mode",
+      "piercing-mode": {
+        "description": " Deal 3 damage to 1 target on your square, then move that target 0, 1, or 2 squares in one direction. ",
+        "cost": [
+          "R"
+        ],
+        "actions": [
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "PLAYER",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": [
+              3
+            ]
+          },
+          {
+            "type": "MOVE",
+            "direction": "ONE",
+            "distance": [
+              0,
+              2
             ]
           }
         ]
