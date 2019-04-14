@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 /**
@@ -119,19 +120,31 @@ public class Action {
 
 						break;
 					case "DAMAGE":
-						for(int j = 0; j < targetPlayers.size(); j++){
-							int finalJ = j;
-							actions.add(caller -> {
-								int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(finalJ).toString());
-								IntStream.range(0, dmg).forEach(nDmg -> {
-									try {
-										targetPlayers.get(finalJ).takeDamage(caller);
-									} catch (DeadPlayerException e) {
-										e.printStackTrace();
-									}
+						actions.add(caller -> {
+							if(targetPlayers.isEmpty()){
+								targetCells.stream().map(Cell::getPlayers).flatMap(List::stream).forEach(p-> {
+									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(0).toString());
+									IntStream.range(0,dmg).forEach(a-> {
+										try {
+											p.takeDamage(caller);
+										} catch (DeadPlayerException e) {
+											e.printStackTrace();
+										}
+									});
 								});
-							});
-						}
+							} else {
+								AtomicInteger i = new AtomicInteger();
+								targetPlayers.forEach(p-> {
+									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(i.getAndIncrement()).toString());
+									IntStream.range(0,dmg).forEach(a-> {
+										try {
+											p.takeDamage(caller);
+										} catch (DeadPlayerException e) {
+											e.printStackTrace();
+										}
+									});});
+							}
+						});
 						break;
 					case "MOVE":
 						for(int j = 0; j < targetPlayers.size(); j++){
