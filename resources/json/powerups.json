@@ -550,6 +550,21 @@
           ]
         },
         {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
           "type": "MOVE",
           "value": [
             0,
@@ -580,24 +595,9 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
-        }
-      ]
-    },
-    {
-      "name": "teleporter",
-      "bonusResource": "R",
-      "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
-      "cost": [],
-      "actions": [
-        {
           "type": "SELECT",
           "ID": -1,
-          "target": "SELF",
+          "target": "CELL",
           "from": "ANY",
           "differentSelection": false,
           "quantity": [
@@ -640,6 +640,21 @@
           ]
         },
         {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
           "type": "MOVE",
           "value": [
             0,
@@ -650,7 +665,7 @@
     },
     {
       "name": "teleporter",
-      "bonusResource": "B",
+      "bonusResource": "R",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
       "actions": [
@@ -658,6 +673,21 @@
           "type": "SELECT",
           "ID": -1,
           "target": "SELF",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
           "from": "ANY",
           "differentSelection": false,
           "quantity": [
@@ -688,6 +718,66 @@
           "type": "SELECT",
           "ID": -1,
           "target": "SELF",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
+          "type": "MOVE",
+          "value": [
+            0,
+            -1
+          ]
+        }
+      ]
+    },
+    {
+      "name": "teleporter",
+      "bonusResource": "B",
+      "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
+      "cost": [],
+      "actions": [
+        {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "SELF",
+          "from": "ANY",
+          "differentSelection": false,
+          "quantity": [
+            1,
+            1
+          ],
+          "distance": [
+            0,
+            -1
+          ]
+        },
+        {
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
           "from": "ANY",
           "differentSelection": false,
           "quantity": [
