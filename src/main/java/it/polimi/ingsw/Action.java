@@ -153,13 +153,19 @@ public class Action {
 						}
 						break;
 					case "MARK":
-						for(int j = 0; j < targetPlayers.size(); j++){
-							int finalJ = j;
-							actions.add(caller -> {
-								int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(finalJ).toString());
-								IntStream.range(0, dmg).forEach(nDmg -> targetPlayers.get(finalJ).takeMark(caller));
-							});
-						}
+						actions.add(caller -> {
+							if(targetPlayers.isEmpty()){
+								targetCells.stream().map(Cell::getPlayers).flatMap(List::stream).forEach(p-> {
+									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(0).toString());
+									IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
+								});
+							} else {
+								AtomicInteger i = new AtomicInteger();
+								targetPlayers.forEach(p-> {
+									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(i.getAndIncrement()).toString());
+									IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));});
+							}
+						});
 						break;
 					default:
 						throw new InvalidJSONException();
