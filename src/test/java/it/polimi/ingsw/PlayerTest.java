@@ -50,7 +50,7 @@ class PlayerTest {
      *
      */
     @Test
-    void reload() throws InventoryFullException, AmmoAlreadyOnCellException, InsufficientResourcesException, NoItemInInventoryException, WeaponNotLoadedException {
+    void reload() throws InventoryFullException, AmmoAlreadyOnCellException, InsufficientResourcesException, NoItemInInventoryException, WeaponNotLoadedException, RequirementsNotMetException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeapon = testMatch.getWeaponDeck().drawCard();
         Player testPlayer = new Player(testMatch, testName);

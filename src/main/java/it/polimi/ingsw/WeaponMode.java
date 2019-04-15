@@ -40,9 +40,11 @@ public class WeaponMode extends Weapon {
 		switch (effectID){
 			case 0:
 				executePrimaryMode(shooter);
+				primaryMode.setExecuted(true);
 				break;
 			case 1:
 				executeSecondaryMode(shooter);
+				secondaryMode.setExecuted(true);
 				break;
 			default:
 				throw new IllegalArgumentException();
@@ -60,6 +62,14 @@ public class WeaponMode extends Weapon {
 		toReturn.add(primaryMode);
 		toReturn.add(secondaryMode);
 		return toReturn;
+	}
+
+	/**
+	 * @return list of valid shoot actions
+	 */
+	@Override
+	public List<Action> getValidActions() {
+		return getShootActions();
 	}
 
 	/**
@@ -90,6 +100,12 @@ public class WeaponMode extends Weapon {
 		}
 	}
 
+	@Override
+	public void reload() {
+		super.reload();
+		primaryMode.setExecuted(false);
+		secondaryMode.setExecuted(false);
+	}
 
 
 }

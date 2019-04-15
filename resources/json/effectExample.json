@@ -7,7 +7,7 @@
         "R"
       ],
       "type": "EFFECT / MODE",
-      "sequential": true/false,,
+      "requires": "action-name"/"null"/null,
       "base-effect": {
         "description": " Choose 1 or 2 targets you can see and deal 1 damage to each. ",
         "cost": [],
@@ -15,8 +15,9 @@
           {
             "type": "SELECT",
             "ID": "[Select ID (-1 if not needed)]",
+            "notID": "id to exclude",
             "target": "PLAYER / CELL / ROOM / SELF",
-            "from": "VISIBLE / NOT_VISIBLE / TARGET_VISIBLE / DIRECTION / PREV_TARGET / [int selectID] / ANY",
+            "from": "VISIBLE / NOT_VISIBLE / TARGET_VISIBLE / DIRECTION / DIRECTION_VISIBLE/ PREV_TARGET / [int selectID] / ANY",
             "differentSelection": true,
             "quantity": [
               "[MIN_QTY]",

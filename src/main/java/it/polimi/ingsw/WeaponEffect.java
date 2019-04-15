@@ -1,12 +1,14 @@
 package it.polimi.ingsw;
 
 import it.polimi.ingsw.custom_exceptions.InvalidJSONException;
+import it.polimi.ingsw.custom_exceptions.RequirementsNotMetException;
 import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -78,23 +80,36 @@ public class WeaponEffect extends Weapon {
 	 * @param shooter player shooting
 	 */
 	@Override
-	public void shoot(int effectID, Player shooter) throws WeaponNotLoadedException {
+	public void shoot(int effectID, Player shooter) throws WeaponNotLoadedException, RequirementsNotMetException {
 		if(!loaded) throw new WeaponNotLoadedException();
+		String requirement;
 		switch (effectID){
 			case 0:
 				executePrimaryEffect(shooter);
+				primaryEffect.setExecuted(true);
 				break;
 			case 1:
+				requirement = firstOptional.getRequires();
+				if ( (primaryEffect.getName().equals(requirement) && !primaryEffect.isExecuted()) ||
+					 (secondOptional.getName().equals(requirement) && !secondOptional.isExecuted()) ) throw new RequirementsNotMetException();
+
 				executeFirstOptional(shooter);
+				firstOptional.setExecuted(true);
 				break;
 			case 2:
+				requirement = secondOptional.getRequires();
+				if ( (primaryEffect.getName().equals(requirement) && !primaryEffect.isExecuted()) ||
+						(firstOptional.getName().equals(requirement) && !firstOptional.isExecuted()) ) throw new RequirementsNotMetException();
+
 				executeSecondOptional(shooter);
+				secondOptional.setExecuted(true);
 				break;
 			default:
 				throw new IllegalArgumentException();
 		}
 		//TODO: change this when controller is implemented
 		this.loaded = false;
+
 	}
 
 	/**
@@ -110,8 +125,31 @@ public class WeaponEffect extends Weapon {
 	}
 
 	/**
-	 * @param caller player that excecute the effect
+	 * @return list of valid shoot actions
 	 */
+	@Override
+	public List<Action> getValidActions() {
+		return getShootActions().stream().
+				filter(a -> a.getRequires() == null || canExecute(a.getRequires())).
+				collect(Collectors.toList());
+	}
+
+	/**
+	 * @param actionName action to check
+	 * @return true if action can be executed
+	 */
+	private boolean canExecute(String actionName) {
+		for(Action a: getShootActions()){
+			if(a.getName().equals(actionName))
+				return a.isExecuted();
+		}
+		throw new IllegalArgumentException();
+	}
+
+
+		/**
+         * @param caller player that excecute the effect
+         */
 	private void executePrimaryEffect(Player caller) {
 		for(Action.BaseAction e: primaryEffect.getActions()){
 			e.applyOn(caller);
@@ -136,5 +174,10 @@ public class WeaponEffect extends Weapon {
 		}
 	}
 
+	@Override
+	public void reload() {
+		super.reload();
+		getShootActions().forEach(p->p.setExecuted(false));
+	}
 
 }

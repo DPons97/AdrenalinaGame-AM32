@@ -567,7 +567,7 @@ public class Player {
 	 * @param weapon Weapon to use
 	 * @param effectID
 	 */
-	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, DeadPlayerException, WeaponNotLoadedException, InsufficientResourcesException {
+	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, DeadPlayerException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
 		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
 		List<Resource> shootCost = weapon.getShootActions().get(effectID).getCost();
 		// Apply discount from powerups used

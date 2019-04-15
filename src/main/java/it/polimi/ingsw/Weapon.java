@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.custom_exceptions.RequirementsNotMetException;
 import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONObject;
 
@@ -78,13 +79,17 @@ public abstract class Weapon {
 	 * @param effectID effect identifier
 	 * @param shooter player shooting
 	 */
-	public abstract void shoot(int effectID, Player shooter) throws WeaponNotLoadedException;
+	public abstract void shoot(int effectID, Player shooter) throws WeaponNotLoadedException, RequirementsNotMetException;
 
 	/**
 	 * @return list of possible shoot actions
 	 */
 	public abstract List<Action> getShootActions();
 
+	/**
+	 * @return list of possible shoot actions
+	 */
+	public abstract List<Action> getValidActions();
 
 	/**
 	 * @param actions json object read from weapon file

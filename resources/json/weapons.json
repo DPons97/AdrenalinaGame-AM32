@@ -29,15 +29,11 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           },
           {
             "type": "MARK",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -68,9 +64,7 @@
           },
           {
             "type": "MARK",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -103,10 +97,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -137,9 +128,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -167,9 +156,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -181,7 +168,6 @@
         "R"
       ],
       "type": "EFFECT",
-      "sequential": true,
       "base-effect": {
         "description": "Deal 2 damage to 1 target you can see.",
         "cost": [],
@@ -203,9 +189,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       },
@@ -221,7 +205,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": 2,
+            "ID": 1,
             "target": "PLAYER",
             "from": "TARGET_VISIBLE",
             "notID": 1,
@@ -237,13 +221,12 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 1
           }
         ]
       },
       "high-voltage": {
+        "requires": "chain-reaction",
         "description": "Deal 2 damage to a third target that your second target can see. You cannot use this effect unless you first use the chain reaction.",
         "cost": [
           "B"
@@ -251,10 +234,10 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": 3,
+            "ID": -1,
             "target": "PLAYER",
             "from": "TARGET_VISIBLE",
-            "notID": "1-2",
+            "notID": 1,
             "differentSelection": false,
             "quantity": [
               1,
@@ -267,9 +250,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 2
           }
         ]
       }
@@ -302,9 +283,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       },
@@ -313,6 +292,7 @@
         "charged-shot"
       ],
       "phase-glide": {
+        "requires": "null",
         "description": "Move 1 or 2 squares. This effect can be used either before or after the basic effect.",
         "cost": [],
         "actions": [
@@ -332,12 +312,22 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
             "distance": [
-              "1",
-              "2"
+              1,
+              2
             ]
+          },
+          {
+            "type": "MOVE"
           }
         ]
       },
@@ -364,9 +354,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -380,7 +368,7 @@
       ],
       "type": "EFFECT",
       "base-effect": {
-        "description": " Deal 3 damage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.",
+        "description": "Deal 3 damage and 1 mark to 1 target you can see. Your target must be at least 2 moves away from you.",
         "cost": [],
         "actions": [
           {
@@ -400,15 +388,11 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           },
           {
             "type": "MARK",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -440,12 +424,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -474,9 +453,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       }
@@ -499,7 +476,7 @@
             "differentCells": false,
             "quantity": [
               1,
-              -1
+              1
             ],
             "distance": [
               0,
@@ -522,18 +499,11 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              "0",
-              "2"
-            ]
+            "type": "MOVE"
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -561,18 +531,26 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "SHOOTER",
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
             "distance": [
-              "0",
-              "2"
+              0,
+              0
             ]
           },
           {
+            "type": "MOVE"
+          },
+          {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           }
         ]
       }
@@ -619,18 +597,12 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "1",
-            "distance": [
-              "0",
-              "1"
-            ]
+            "type": "MOVE"
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
+
           }
         ]
       },
@@ -640,8 +612,7 @@
       "black-hole": {
         "description": "Choose up to 2 other targets on the vortex or 1 move away from it. Move them onto the vortex and give them each 1 damage.",
         "cost": [
-          "R",
-          "Y"
+          "R"
         ],
         "actions": [
           {
@@ -661,19 +632,11 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "1",
-            "distance": [
-              "0",
-              "1"
-            ]
+            "type": "MOVE"
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -706,12 +669,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -738,21 +696,11 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           },
           {
             "type": "MARK",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -786,9 +734,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           }
         ]
       }
@@ -821,9 +767,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           },
           {
             "type": "SELECT",
@@ -836,18 +780,13 @@
               1
             ],
             "distance": [
-              1,
-              -1
+              0,
+              0
             ]
           },
           {
             "type": "MARK",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -890,18 +829,13 @@
               1
             ],
             "distance": [
-              1,
-              -1
+              0,
+              0
             ]
           },
           {
             "type": "MARK",
-            "value": [
-              2,
-              2,
-              2,
-              2
-            ]
+            "value": 2
           }
         ]
       }
@@ -949,9 +883,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -965,10 +897,9 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "CELL",
-            "from": "DIRECTION",
-            "differentCells": false,
+            "from": "DIRECTION_VISIBLE",
             "quantity": [
               1,
               2
@@ -979,11 +910,57 @@
             ]
           },
           {
-            "type": "DAMAGE",
-            "value": [
-              2,
+            "type": "SELECT",
+            "ID": 2,
+            "target": "CELL",
+            "from": "ANY",
+            "notID": 1,
+            "quantity": [
+              1,
+              -1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": 3,
+            "target": "CELL",
+            "from": "ANY",
+            "notID": 2,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              1,
               1
             ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": 2
+          },
+          {
+            "type": "SELECT",
+            "ID": 3,
+            "target": "CELL",
+            "from": "ANY",
+            "notID": 2,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              2,
+              2
+            ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": 1
           }
         ]
       }
@@ -1000,7 +977,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "PLAYER",
             "from": "VISIBLE",
             "differentCells": false,
@@ -1015,15 +992,13 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           },
           {
             "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "TARGET",
+            "from": "1",
             "differentCells": false,
             "quantity": [
               1,
@@ -1035,12 +1010,7 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              "0",
-              "1"
-            ]
+            "type": "MOVE"
           }
         ]
       },
@@ -1048,6 +1018,7 @@
         "extra-grenade"
       ],
       "extra-grenade": {
+        "requires": "null",
         "description": " Deal 1 damage to every player on a square you can see. You can use this before or after the basic effect's move. ",
         "cost": [
           "R"
@@ -1070,12 +1041,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -1108,15 +1074,13 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           },
           {
             "type": "SELECT",
-            "ID": 1,
+            "ID": 2,
             "target": "CELL",
-            "from": "TARGET",
+            "from": "1",
             "differentCells": false,
             "quantity": [
               1,
@@ -1128,12 +1092,7 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              0,
-              1
-            ]
+            "type": "MOVE"
           }
         ]
       },
@@ -1142,6 +1101,7 @@
         "fragmentating-warhead"
       ],
       "rocket-jump": {
+        "requires": "null",
         "description": "Move 1 or 2 squares. This effect can be used either before or after the basic effect.",
         "cost": [
           "B"
@@ -1166,7 +1126,7 @@
             "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "TARGET",
+            "from": "ANY",
             "differentSelection": false,
             "quantity": [
               1,
@@ -1178,12 +1138,7 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              1,
-              2
-            ]
+            "type": "MOVE"
           }
         ]
       },
@@ -1196,25 +1151,22 @@
           {
             "type": "SELECT",
             "ID": 2,
-            "target": "CELL",
+            "target": "PLAYER",
             "from": 1,
+            "notID": 1,
             "differentSelection": false,
             "quantity": [
-              0,
-              4
+              1,
+              1
             ],
             "distance": [
-              -1,
-              -1
+              0,
+              0
             ]
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1
-            ]
+            "value": 1
           },
           {
             "type": "SELECT",
@@ -1227,15 +1179,13 @@
               1
             ],
             "distance": [
-              -1,
+              0,
               -1
             ]
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -1269,9 +1219,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           }
         ]
       },
@@ -1298,10 +1246,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2,
-              2
-            ]
+            "value": 2
           }
         ]
       }
@@ -1334,9 +1279,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       },
@@ -1345,7 +1288,8 @@
         "slice-and-dice"
       ],
       "shadow-step": {
-        "description": "Move 1 square before or after the basic effect. ",
+        "requires": "null",
+        "description": "Move 1 square before or after the basic effect.",
         "cost": [
         ],
         "actions": [
@@ -1380,18 +1324,15 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              1,
-              1
-            ]
+            "type": "MOVE"
           }
         ]
       },
       "slice-and-dice": {
+        "require": "base-effect",
         "description": "Deal 2 damage to a different target on your square. The shadowstep may be used before or after this effect. ",
         "cost": [
+          "Y"
         ],
         "actions": [
           {
@@ -1412,9 +1353,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       }
@@ -1447,15 +1386,11 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           },
           {
             "type": "MARK",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       },
@@ -1482,11 +1417,7 @@
           },
           {
             "type": "MARK",
-            "value": [
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -1504,7 +1435,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "PLAYER",
             "from": "ANY",
             "differentCells": false,
@@ -1519,15 +1450,13 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           },
           {
             "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "TARGET",
+            "from": "1",
             "differentSelection": false,
             "quantity": [
               1,
@@ -1539,12 +1468,7 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              0,
-              1
-            ]
+            "type": "MOVE"
           }
         ]
       },
@@ -1571,9 +1495,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       }
@@ -1606,15 +1528,11 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1
-            ]
+            "value": 1
           },
           {
             "type": "MARK",
-            "value": [
-              2
-            ]
+            "value": 2
           },
           {
             "type": "SELECT",
@@ -1647,12 +1565,7 @@
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "ANY",
-            "distance": [
-              1,
-              1
-            ]
+            "type": "MOVE"
           }
         ]
       },
@@ -1667,8 +1580,7 @@
             "type": "SELECT",
             "ID": 1,
             "target": "CELL",
-            "from": "DIRECTION",
-            "differentCells": false,
+            "from": "DIRECTION_VISIBLE",
             "quantity": [
               1,
               2
@@ -1681,105 +1593,88 @@
           {
             "type": "SELECT",
             "ID": 2,
-            "target": "PLAYER",
-            "from": "1",
-            "differentCells": false,
-            "quantity": [
-              1,
-              1
-            ],
-            "distance": [
-              1,
-              1
-            ]
-          },
-          {
-            "type": "DAMAGE",
-            "value": [
-              2
-            ]
-          },
-          {
-            "type": "SELECT",
-            "ID": -1,
             "target": "CELL",
-            "from": "2",
-            "differentCells": false,
-            "quantity": [
-              1,
-              1
-            ],
-            "distance": [
-              1,
-              1
-            ]
-          },
-          {
-            "type": "SELECT",
-            "ID": -1,
-            "target": "SELF",
             "from": "ANY",
-            "differentCells": false,
+            "notID": 1,
             "quantity": [
               1,
-              1
+              -1
             ],
             "distance": [
               0,
               -1
-            ]
-          },
-          {
-            "type": "MOVE",
-            "direction": "1",
-            "distance": [
-              1,
-              1
             ]
           },
           {
             "type": "SELECT",
             "ID": 3,
             "target": "PLAYER",
-            "from": "1",
-            "differentCells": false,
+            "from": "ANY",
+            "notID": 2,
             "quantity": [
-              0,
+              1,
               1
             ],
             "distance": [
-              2,
-              2
+              1,
+              1
             ]
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           },
           {
             "type": "SELECT",
-            "ID": -1,
-            "target": "SELF",
-            "from": "ANY",
-            "differentCells": false,
+            "ID": 3,
+            "target": "CELL",
+            "from": "3",
             "quantity": [
               1,
               1
             ],
             "distance": [
               0,
-              -1
+              0
             ]
           },
           {
-            "type": "MOVE",
-            "direction": "1",
-            "distance": [
+            "type": "MOVE"
+          },
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "1",
+            "quantity": [
               1,
               1
+            ],
+            "distance": [
+              0,
+              0
             ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": 2
+          },
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "CELL",
+            "from": "1",
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "MOVE"
           }
         ]
       }
@@ -1811,11 +1706,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       },
@@ -1832,7 +1723,7 @@
             "from": "VISIBLE",
             "differentCells": false,
             "quantity": [
-              1,
+              4,
               4
             ],
             "distance": [
@@ -1842,12 +1733,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              1,
-              1,
-              1,
-              1
-            ]
+            "value": 1
           }
         ]
       }
@@ -1879,9 +1765,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              2
-            ]
+            "value": 2
           }
         ]
       },
@@ -1909,17 +1793,25 @@
           },
           {
             "type": "DAMAGE",
-            "value": [
-              3
-            ]
+            "value": 3
           },
           {
-            "type": "MOVE",
-            "direction": "ONE",
+            "type": "SELECT",
+            "ID": -1,
+            "target": "CELL",
+            "from": "DIRECTION_VISIBLE",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
             "distance": [
               0,
               2
             ]
+          },
+          {
+            "type": "MOVE"
           }
         ]
       }

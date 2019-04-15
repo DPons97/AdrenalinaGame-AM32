@@ -8,7 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -57,19 +57,14 @@ public class Action {
 	private List<Cell> targetCells;
 
 	/**
-	 * direction to apply action (may not be needed in some actions)
+	 * True if action requires base effect to be executed
 	 */
-	private Direction targetDirection;
+	private String requires;
 
 	/**
-	 * max distace for action
+	 * True if action was executed in this turn.
 	 */
-	private int maxDistance;
-
-	/**
-	 * min distace for action
-	 */
-	private int minDistance;
+	private boolean executed;
 
 	/**
 	 * @param name action name
@@ -79,10 +74,18 @@ public class Action {
 		this.name = name;
 		this.actions = new ArrayList<>();
 		this.targetCells = new ArrayList<>();
-		this.targetDirection = null;
 		this.targetPlayers = new ArrayList<>();
 		this.cost = new ArrayList<>();
+		executed = false;
 		parseEffect(effect);
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	/**
@@ -105,6 +108,16 @@ public class Action {
 	public void parseEffect(JSONObject effect) {
 		try {
 			this.description = effect.get("description").toString();
+
+			if(name.equals("base effect") || name.contains("mode")) requires = null;
+			else {
+				Object jsonGet = effect.get("requires");
+				if(jsonGet == null) this.requires = "base effect";
+				else if(jsonGet.toString().equals("null")) requires = null;
+				else this.requires = jsonGet.toString();
+			}
+
+
 			JSONArray costJSON = (JSONArray) effect.get("cost");
 			for(Object res: costJSON){
 				this.cost.add(AdrenalinaMatch.stringToResource(res.toString()));
@@ -121,29 +134,17 @@ public class Action {
 						break;
 					case "DAMAGE":
 						actions.add(caller -> {
-							if(targetPlayers.isEmpty()){
-								targetCells.stream().map(Cell::getPlayers).flatMap(List::stream).forEach(p-> {
-									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(0).toString());
-									IntStream.range(0,dmg).forEach(a-> {
-										try {
-											p.takeDamage(caller);
-										} catch (DeadPlayerException e) {
-											e.printStackTrace();
-										}
-									});
+							List<Player> toApply = selectTargets();
+							toApply.forEach(p-> {
+								int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
+								IntStream.range(0,dmg).forEach(a-> {
+									try {
+										p.takeDamage(caller);
+									} catch (DeadPlayerException e) {
+										e.printStackTrace();
+									}
 								});
-							} else {
-								AtomicInteger i = new AtomicInteger();
-								targetPlayers.forEach(p-> {
-									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(i.getAndIncrement()).toString());
-									IntStream.range(0,dmg).forEach(a-> {
-										try {
-											p.takeDamage(caller);
-										} catch (DeadPlayerException e) {
-											e.printStackTrace();
-										}
-									});});
-							}
+							});
 						});
 						break;
 					case "MOVE":
@@ -154,17 +155,11 @@ public class Action {
 						break;
 					case "MARK":
 						actions.add(caller -> {
-							if(targetPlayers.isEmpty()){
-								targetCells.stream().map(Cell::getPlayers).flatMap(List::stream).forEach(p-> {
-									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(0).toString());
-									IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
-								});
-							} else {
-								AtomicInteger i = new AtomicInteger();
-								targetPlayers.forEach(p-> {
-									int dmg = Integer.parseInt(((JSONArray)baseActionJSON.get("value")).get(i.getAndIncrement()).toString());
-									IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));});
-							}
+							List<Player> toApply = selectTargets();
+							toApply.forEach(p-> {
+								int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
+								IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
+							});
 						});
 						break;
 					default:
@@ -174,6 +169,16 @@ public class Action {
 		} catch (InvalidJSONException | InvalidStringException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private List<Player> selectTargets() {
+		List<Player> toApply = new ArrayList<>();
+		if (targetPlayers.isEmpty()) {
+			toApply.addAll(targetCells.stream().map(Cell::getPlayers).flatMap(List::stream).collect(Collectors.toList()));
+		} else {
+			toApply.addAll(targetPlayers);
+		}
+		return toApply;
 	}
 
 	/**
@@ -190,11 +195,16 @@ public class Action {
 		return new ArrayList<>(targetCells);
 	}
 
-	/**
-	 * @return target direction
-	 */
-	public Direction getTargetDirection() {
-		return targetDirection;
+	public String getRequires() {
+		return requires;
+	}
+
+	public boolean isExecuted() {
+		return executed;
+	}
+
+	public void setExecuted(boolean executed) {
+		this.executed = executed;
 	}
 
 	/**
@@ -211,11 +221,6 @@ public class Action {
 		this.targetCells.addAll(newC);
 	}
 
-	/**
-	 * @param dir new direction for action
-	 */
-	public void setTargetDirection(Direction dir) {
-		this.targetDirection = dir;
-	}
+
 
 }
