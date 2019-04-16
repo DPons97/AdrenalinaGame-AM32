@@ -508,8 +508,8 @@ public class AdrenalinaMatch {
 	public List<Player> getSelectablePlayers(Player caller, String from, int notID, int minDistance,
 											  int maxDistance, List<Player> players) throws InvalidStringException {
 		List<Player> toReturn = new ArrayList<>();
-		int pX = caller.getPosition().getCoordX();
-		int pY = caller.getPosition().getCoordY();
+		int pX;
+		int pY;
 		switch (from){
 			case "VISIBLE":
 				for(Cell c: caller.getVisibleCellsAtDistance(minDistance, maxDistance))
@@ -620,6 +620,8 @@ public class AdrenalinaMatch {
 	public List<Cell> getSelectableCells(Player caller, String from, int notID, int minDistance,
 										 int maxDistance, List<Player> players) throws InvalidStringException {
 		List<Cell> toReturn = new ArrayList<>();
+		int pX;
+		int pY;
 		switch (from){
 			case "VISIBLE":
 				toReturn.addAll(caller.getVisibleCellsAtDistance(minDistance,maxDistance));
@@ -633,8 +635,8 @@ public class AdrenalinaMatch {
 				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
 			case "DIRECTION":
-				int pX = caller.getPosition().getCoordX();
-				int pY = caller.getPosition().getCoordY();
+				pX = caller.getPosition().getCoordX();
+				pY = caller.getPosition().getCoordY();
 				toReturn.addAll(Arrays.asList(map.getMap()[pX]));
 				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.add(c[pY]);
