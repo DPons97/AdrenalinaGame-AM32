@@ -173,6 +173,13 @@ public class Player {
 	}
 
 	/**
+	 * @return player's match reference
+	 */
+	public AdrenalinaMatch getMatch() {
+		return match;
+	}
+
+	/**
 	 * @return List of kill rewards during frenzy
 	 */
 	public static List<Integer> getFrenzyRewards() {

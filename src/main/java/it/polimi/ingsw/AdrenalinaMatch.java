@@ -7,10 +7,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -515,13 +512,12 @@ public class AdrenalinaMatch {
 				for(Cell c: caller.getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
-			case "NOT-VISIBLE":
-				List<Cell> validCells = caller.getCellAtDistance(minDistance,maxDistance);
-				validCells.removeAll(caller.getVisibleCellsAtDistance(minDistance, maxDistance));
+			case "NOT_VISIBLE":
+				List<Cell> validCells = caller.getOutOfSightCells(minDistance,maxDistance);
 				for(Cell c: validCells)
 					toReturn.addAll(c.getPlayers());
 				break;
-			case "TARGET-VISIBLE":
+			case "TARGET_VISIBLE":
 				for(Cell c: players.get(0).getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
@@ -575,6 +571,10 @@ public class AdrenalinaMatch {
 			case "DAMAGED":
 				// TODO: implement here
 				break;
+			case "ANY":
+				toReturn.addAll(caller.getCellAtDistance(minDistance,maxDistance).stream().map(Cell::getPlayers)
+						.flatMap(List::stream).collect(Collectors.toList()));
+				break;
 			default:
 				// from is an integer id
 				int id = Integer.parseInt(from);
@@ -587,7 +587,7 @@ public class AdrenalinaMatch {
 				if(toReturn.isEmpty()){
 					//look for cells with id
 					List<Cell> foundCells = Arrays.stream(map.getMap()).flatMap(Arrays::stream)
-							.filter(c -> c.getID() == id).collect(Collectors.toList());
+							.filter(c ->c != null && c.getID() == id).collect(Collectors.toList());
 
 					for(Cell c: foundCells){
 						for(Cell pC: map.getCellAtDistance(c,minDistance,maxDistance)){
@@ -626,12 +626,10 @@ public class AdrenalinaMatch {
 			case "VISIBLE":
 				toReturn.addAll(caller.getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
-			case "NOT-VISIBLE":
-				List<Cell> validCells = caller.getCellAtDistance(minDistance,maxDistance);
-				validCells.removeAll(caller.getVisibleCellsAtDistance(minDistance,maxDistance));
-				toReturn.addAll(validCells);
+			case "NOT_VISIBLE":
+				toReturn.addAll(caller.getOutOfSightCells(minDistance,maxDistance));
 				break;
-			case "TARGET-VISIBLE":
+			case "TARGET_VISIBLE":
 				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
 			case "DIRECTION":
@@ -676,14 +674,17 @@ public class AdrenalinaMatch {
 				// from is an integer id
 				int id = Integer.parseInt(from);
 				// we are selecting cells -> first control if there are cells with requested id
-				toReturn.addAll(Arrays.stream(map.getMap()).flatMap(Arrays::stream)
-						.filter(c -> c.getID() == id).collect(Collectors.toList()));
+				toReturn.addAll(Arrays.stream(map.getMap())
+						.flatMap(Arrays::stream)
+						.filter(c -> c != null && c.getID() == id)
+						.collect(Collectors.toList()));
 
 				// if none were found, the id should be a player id
 				if(toReturn.isEmpty()){
 					//look for players with id
-					List<Player> foundPlayers = Arrays.stream(map.getMap()).flatMap(Arrays::stream).
-							map(Cell::getPlayers).flatMap(List::stream).filter(p -> p.getID() == id).collect(Collectors.toList());
+					List<Player> foundPlayers = Arrays.stream(map.getMap()).flatMap(Arrays::stream).filter(Objects::nonNull).
+							map(Cell::getPlayers).flatMap(List::stream).
+							filter(p -> p.getID() == id).collect(Collectors.toList());
 
 					for(Player p: foundPlayers){
 						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
@@ -699,6 +700,29 @@ public class AdrenalinaMatch {
 		toReturn.removeIf(p -> p.getID() == notID);
 		return toReturn;
 	}
+
+
+	/**
+	 * @param caller player requesting the selection
+	 * @return List with cells that satisfy query
+	 */
+	public List<List<Cell>> getSelectableRooms(Player caller) {
+		List<List<Cell>> toReturn = new ArrayList<>();
+		for (Direction dir : Direction.values()) {
+			// Player has a door nearby
+			if (caller.getPosition().getSide(dir) == Side.DOOR) {
+				toReturn.add(
+					map.getRoomCells(
+						map.getCell( map.getAdjacentCell(caller.getPosition(), dir).getCoordX(),
+								     map.getAdjacentCell(caller.getPosition(), dir).getCoordY()
+						)
+					)
+				);
+			}
+		}
+		return toReturn;
+	}
+
 
 	/**
 	 * This was taken from stackoverflow

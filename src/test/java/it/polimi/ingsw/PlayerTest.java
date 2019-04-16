@@ -54,7 +54,7 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeapon = testMatch.getWeaponDeck().drawCard();
         Player testPlayer = new Player(testMatch, testName);
-
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
         List<Resource> testCost = new ArrayList<>();
 
         testCost.add(Resource.RED_BOX);
@@ -332,7 +332,7 @@ class PlayerTest {
     void usePowerupEffect() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
-
+        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
         // Try to use powerup that player doesn't own
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.usePowerupEffect(testMatch.getPowerupDeck().drawCard()));
 

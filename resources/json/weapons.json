@@ -13,11 +13,10 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "PLAYER",
             "from": "VISIBLE",
             "differentCells": false,
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -51,7 +50,7 @@
             "ID": -1,
             "target": "PLAYER",
             "from": "VISIBLE",
-            "differentSelection": true,
+            "notID": 1,
             "differentCells": false,
             "quantity": [
               1,
@@ -116,7 +115,6 @@
             "ID": 4,
             "target": "PLAYER",
             "from": "3",
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -144,7 +142,6 @@
             "target": "PLAYER",
             "from": "VISIBLE",
             "notID": 4,
-            "differentSelection": false,
             "quantity": [
               1,
               2
@@ -209,7 +206,6 @@
             "target": "PLAYER",
             "from": "TARGET_VISIBLE",
             "notID": 1,
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -238,7 +234,6 @@
             "target": "PLAYER",
             "from": "TARGET_VISIBLE",
             "notID": 1,
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -342,7 +337,6 @@
             "ID": -1,
             "target": "PLAYER",
             "from": "1",
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -1126,7 +1120,6 @@
             "ID": -1,
             "target": "SELF",
             "from": "ANY",
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -1141,7 +1134,6 @@
             "ID": -1,
             "target": "CELL",
             "from": "ANY",
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -1168,7 +1160,6 @@
             "target": "PLAYER",
             "from": 10,
             "notID": 1,
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -1187,7 +1178,6 @@
             "ID": -1,
             "target": "PLAYER",
             "from": 1,
-            "differentSelection": false,
             "quantity": [
               0,
               1
@@ -1327,7 +1317,6 @@
             "ID": -1,
             "target": "CELL",
             "from": "TARGET",
-            "differentSelection": false,
             "quantity": [
               1,
               1
@@ -1471,7 +1460,6 @@
             "ID": -1,
             "target": "CELL",
             "from": "1",
-            "differentSelection": false,
             "quantity": [
               1,
               1

@@ -18,7 +18,7 @@
             "notID": "id to exclude",
             "target": "PLAYER / CELL / ROOM / SELF",
             "from": "VISIBLE / NOT_VISIBLE / TARGET_VISIBLE / DIRECTION / DIRECTION_VISIBLE/ PREV_TARGET / [int selectID] / ANY",
-            "differentSelection": true,
+            "differentCells":true,
             "quantity": [
               "[MIN_QTY]",
               "[MAX_QTY]"

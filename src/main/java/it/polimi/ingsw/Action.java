@@ -131,6 +131,86 @@ public class Action {
 						// TODO implement here
 						// might be controller work
 
+						Object notID = baseActionJSON.get("notID");
+						JSONArray distance = (JSONArray) baseActionJSON.get("distance");
+						JSONArray qty = (JSONArray) baseActionJSON.get("quantity");
+						Object diffCellsObj =  baseActionJSON.get("differentCells");
+						boolean diffCells = diffCellsObj != null && Boolean.parseBoolean(diffCellsObj.toString());
+						int minQty = Integer.parseInt(qty.get(0).toString());
+						int maxQty = Integer.parseInt(qty.get(1).toString());
+						// check what needs to be selected (cell/player/room/self)
+						switch(baseActionJSON.get("target").toString()){
+							case "CELL":
+								actions.add(caller -> {
+									try {
+										List<Cell> couldBeAdded = caller.getMatch().
+												getSelectableCells(caller,
+														baseActionJSON.get("from").toString(),
+														notID != null ? Integer.parseInt(notID.toString()) : -10,
+														Integer.parseInt(distance.get(0).toString()),
+														Integer.parseInt(distance.get(1).toString()),
+														targetPlayers
+												);
+
+										if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+											// if there is no choice -> add all you could add
+											targetCells.addAll(couldBeAdded);
+										else{
+											// TODO make controller select something
+										}
+									} catch (InvalidStringException e) {
+										e.printStackTrace();
+									}
+								});
+								break;
+							case "PLAYER":
+								actions.add(caller -> {
+									try {
+										List<Player> couldBeAdded = caller.getMatch().
+												getSelectablePlayers(caller,
+														baseActionJSON.get("from").toString(),
+														notID != null ? Integer.parseInt(notID.toString()) : -10,
+														Integer.parseInt(distance.get(0).toString()),
+														Integer.parseInt(distance.get(1).toString()),
+														targetPlayers
+												);
+
+										if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+											// if there is no choice -> add all you could add
+											targetPlayers.addAll(couldBeAdded);
+										else{
+											// TODO make controller select something
+										}
+									} catch (InvalidStringException e) {
+										e.printStackTrace();
+									}
+								});
+								break;
+							case "SELF":
+								actions.add(caller -> {
+									targetPlayers.clear();
+									targetPlayers.add(caller);
+								});
+								break;
+							case "ROOM":
+								actions.add(caller -> {
+									List<List<Cell>> couldBeAdded = caller.getMatch().getSelectableRooms(caller);
+									if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+										// if there is no choice -> add all you could add
+										targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
+									else{
+										// TODO make controller select something
+									}
+								});
+								break;
+							default:
+								try {
+									throw new InvalidJSONException();
+								} catch (InvalidJSONException e) {
+									e.printStackTrace();
+								}
+						}
+
 						break;
 					case "DAMAGE":
 						actions.add(caller -> {
@@ -166,7 +246,7 @@ public class Action {
 						throw new InvalidJSONException();
 				}
 			}
-		} catch (InvalidJSONException | InvalidStringException e) {
+		} catch (InvalidJSONException | InvalidStringException  e) {
 			e.printStackTrace();
 		}
 	}
