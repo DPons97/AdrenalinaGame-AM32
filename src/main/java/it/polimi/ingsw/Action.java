@@ -278,14 +278,23 @@ public class Action {
 		return new ArrayList<>(targetCells);
 	}
 
+	/**
+	 * @return required action to execute this
+	 */
 	public String getRequires() {
 		return requires;
 	}
 
+	/**
+	 * @return true if this action is executed during current turn
+	 */
 	public boolean isExecuted() {
 		return executed;
 	}
 
+	/**
+	 * @param executed new executed value
+	 */
 	public void setExecuted(boolean executed) {
 		this.executed = executed;
 	}

@@ -1,7 +1,9 @@
 package it.polimi.ingsw;
 
-import java.util.ArrayList;
-import java.util.List;
+import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Map {
     /**
@@ -20,18 +22,14 @@ public class Map {
     private int xSize;
     private int ySize;
 
-    public Map(Cell[][] map, List<SpawnCell> spawnPoints, int xSize, int ySize) {
+    public Map(Cell[][] map, List<SpawnCell> spawnPoints, int xSize, int ySize, Deck<Ammo> ammoDeck) {
         this.map = map;
         this.spawnPoints = spawnPoints;
         this.xSize = xSize;
         this.ySize = ySize;
-    }
 
-    /**
-     *
-     * @return
-     */
-    public Cell[][] getMap() { return map; }
+        initAmmoCells(ammoDeck);
+    }
 
     /**
      * @return X size of map
@@ -54,7 +52,40 @@ public class Map {
      * @return cell at (x,y) coordinates
      */
     public Cell getCell(int x, int y) {
-        return getMap()[x][y];
+        return map[x][y];
+    }
+
+    /**
+     * @param x Coordinate of column (X)
+     * @return List of cells in this column
+     */
+    public List<Cell> getRow(int x) {
+        List<Cell> column = new ArrayList<>();
+        Collections.addAll(column, map[x]);
+        return column;
+    }
+
+    /**
+     * @param y Coordinate of row (Y)
+     * @return List of cells in this row.
+     */
+    public List<Cell> getColumn(int y) {
+        List<Cell> row = new ArrayList<>();
+        for (Cell[] c : map) { row.add(c[y]); }
+        return row;
+    }
+
+    /**
+     * @return list of all cells in map. Nulls are excluded
+     */
+    public List<Cell> getMap() {
+        List<Cell> toReturn = new ArrayList<>();
+
+        for (int i=0; i < getXSize(); i++) {
+            toReturn.addAll(getRow(i));
+        }
+        toReturn.removeIf(Objects::isNull);
+        return toReturn;
     }
 
     /**
@@ -67,13 +98,13 @@ public class Map {
         if (getCell(x,y).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
-                    return getMap()[x-1][y];
+                    return map[x-1][y];
                 case EAST:
-                    return getMap()[x][y+1];
+                    return map[x][y+1];
                 case WEST:
-                    return getMap()[x+1][y];
+                    return map[x+1][y];
                 case SOUTH:
-                    return getMap()[x][y-1];
+                    return map[x][y-1];
                 default:
                     return null;
             }
@@ -89,13 +120,13 @@ public class Map {
         if (getCell(position.getCoordX(),position.getCoordY()).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
-                    return getMap()[position.getCoordX() - 1][position.getCoordY()];
+                    return map[position.getCoordX() - 1][position.getCoordY()];
                 case EAST:
-                    return getMap()[position.getCoordX()][position.getCoordY()+1];
+                    return map[position.getCoordX()][position.getCoordY()+1];
                 case WEST:
-                    return getMap()[position.getCoordX()][position.getCoordY() -  1];
+                    return map[position.getCoordX()][position.getCoordY() -  1];
                 case SOUTH:
-                    return getMap()[position.getCoordX() + 1][position.getCoordY()-1];
+                    return map[position.getCoordX() + 1][position.getCoordY()-1];
                 default:
                     return null;
             }
@@ -132,9 +163,9 @@ public class Map {
     }
 
     /**
+     * @param relativeCell cell from which calculate distance
      * @param minDist Minimum distance
      * @param maxDist Maximum distance. -1 is equal to INFINITE
-     * @param relativeCell cell from which calculate distance
      * @return List of all cells between [minDist] and [maxDist] distance
      * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
      */
@@ -148,8 +179,7 @@ public class Map {
             maxDist = Math.max(this.getXSize(), this.getYSize());
         }
 
-        for (Cell[] cols : this.getMap()) {
-            // it's duplicated but in different classes ... what do we do?
+        for (Cell[] cols : map) {
             for (Cell cell : cols) {
                 if (cell != null) {
                     // Calculate X and Y distances
@@ -161,7 +191,33 @@ public class Map {
                 }
             }
         }
-
         return cellAtDistance;
+    }
+
+    /**
+     * @param id to search
+     * @return list of cells with specified id
+     */
+    public List<Cell> getCellsByID(int id) {
+        return Arrays.stream(map).flatMap(Arrays::stream)
+                .filter(c ->c != null && c.getID() == id).collect(Collectors.toList());
+    }
+
+    /**
+     * private method to initialize ammo cells with an ammo card
+     */
+    private void initAmmoCells(Deck<Ammo> ammoDeck) {
+        for (Cell[] cells : map) {
+            for (Cell cell : cells) {
+                if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
+                    // safe cast to Ammo Cell and set ammo drawing a card from ammo deck
+                    try {
+                        ((AmmoCell) cell).setAmmo(ammoDeck.drawCard());
+                    } catch (AmmoAlreadyOnCellException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

@@ -61,7 +61,8 @@ class PlayerTest {
         testCost.add(Resource.RED_BOX);
         testCost.add(Resource.RED_BOX);
         testWeapon.setCost(testCost);
-        testWeapon.shoot(0, testPlayer);   // Set weapon ready to reload
+
+        testWeapon.loaded = false;
 
         // Check player cannot reload weapons he doesn't have
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeapon));
@@ -82,7 +83,7 @@ class PlayerTest {
         assertTrue(testWeapon.isLoaded());
         assertTrue(testPlayer.getAmmos().isEmpty());
 
-        testWeapon.shoot(0, testPlayer);
+        testWeapon.loaded = false;
 
         // Try to reload only with powerups
         Powerup newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
@@ -97,7 +98,7 @@ class PlayerTest {
         assertTrue(testPlayer.getAmmos().isEmpty());
         assertTrue(testPlayer.getPowerups().isEmpty());
 
-        testWeapon.shoot(0, testPlayer);
+        testWeapon.loaded = false;
 
         // Try to reload with both ammos and powerups
         newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
@@ -200,27 +201,21 @@ class PlayerTest {
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(0, -2));
 
         List<Cell> mapCells = testPlayer.getCellAtDistance(0, -1);
-        Cell[][] matchMap = testMatch.getMap().getMap();
+        List<Cell> matchMap = testMatch.getMap().getMap();
 
         // Check every map's cell exists in mapCells
-        for (Cell[] col : matchMap) {
-            for (Cell cell : col) {
-                if (cell != null) assertTrue(mapCells.contains(cell));
-            }
+        for (Cell cell : matchMap) {
+            assertTrue(mapCells.contains(cell));
         }
         // Number of not null cells = 10 (see Map1.json)
         assertEquals(10, mapCells.size());
 
         mapCells = testPlayer.getCellAtDistance(1, 3);
         // Check every map's cell that is inside 1 and 3 distance exists in mapCells
-        for (Cell[] col : matchMap) {
-            for (Cell cell : col) {
-                if (cell != null) {
-                    int dist = Math.abs(cell.getCoordX()-testPlayer.getPosition().getCoordX()) + Math.abs(cell.getCoordY()-testPlayer.getPosition().getCoordY());
-                    if (dist <= 3 && dist >= 1) {
-                        assertTrue(mapCells.contains(cell));
-                    }
-                }
+        for (Cell cell : matchMap) {
+            int dist = Math.abs(cell.getCoordX()-testPlayer.getPosition().getCoordX()) + Math.abs(cell.getCoordY()-testPlayer.getPosition().getCoordY());
+            if (dist <= 3 && dist >= 1) {
+                assertTrue(mapCells.contains(cell));
             }
         }
     }

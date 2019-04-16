@@ -3,9 +3,7 @@ package it.polimi.ingsw;
 import it.polimi.ingsw.custom_exceptions.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 
 /**
@@ -146,13 +144,6 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-	}
-
-	/**
-	 * Start this player's turn
-	 */
-	public void beginPlay() {
-		// TODO implement here
 	}
 
 	/**
@@ -386,34 +377,11 @@ public class Player {
 	/**
 	 * @param minDist Minimum distance
 	 * @param maxDist Maximum distance. -1 is equal to INFINITE
-	 * @return List of all cells between [minDist] and [maxDist] distance
+	 * @return List of all cells between [minDist] and [maxDist] distance from player
 	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
 	 */
 	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
-		if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
-
-		Map matchMap = match.getMap();
-		List<Cell> cellAtDistance = new ArrayList<>();
-
-		if (maxDist == -1) {
-			// Set min/max distances to get all cells from minDist to end of map
-			maxDist = Math.max(matchMap.getXSize(), matchMap.getYSize());
-		}
-
-		for (Cell[] cols : matchMap.getMap()) {
-			for (Cell cell : cols) {
-				if (cell != null) {
-					// Calculate X and Y distances
-					int xDist = Math.abs(cell.getCoordX() - position.getCoordX());
-					int yDist = Math.abs(cell.getCoordY() - position.getCoordY());
-
-					// Add cell in case distance between minDist and maxDist
-					if (xDist + yDist >= minDist && xDist + yDist <= maxDist) cellAtDistance.add(cell);
-				}
-			}
-		}
-
-		return cellAtDistance;
+		return match.getMap().getCellAtDistance(position, minDist, maxDist);
 	}
 
 	/**
@@ -477,14 +445,9 @@ public class Player {
 	 */
 	public List<Cell> getOutOfSightCells(int minDist, int maxDist) {
 		List<Cell> visible = getVisibleCellsAtDistance(minDist, maxDist);
-		List<Cell> map = new ArrayList<>();
-
-		for (Cell[] row : match.getMap().getMap()) {
-			map.addAll(Arrays.asList(row));
-		}
+		List<Cell> map = match.getMap().getMap();
 
 		map.removeIf(visible::contains);
-		map.removeIf(Objects::isNull);
 		return map;
 	}
 
@@ -576,11 +539,11 @@ public class Player {
 	 * @param weapon Weapon to use
 	 * @param effectID
 	 */
-	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, DeadPlayerException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
+	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
 		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
 		List<Resource> shootCost = weapon.getShootActions().get(effectID).getCost();
-		// Apply discount from powerups used
 
+		// Apply discount from powerups used
 		for (Powerup pow : discountPowerups) {
 			shootCost.remove(pow.getBonusResource());
 			usePowerupResource(pow);

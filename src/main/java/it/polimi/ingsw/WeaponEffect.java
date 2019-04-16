@@ -149,9 +149,9 @@ public class WeaponEffect extends Weapon {
 	}
 
 
-		/**
-         * @param caller player that excecute the effect
-         */
+	/**
+	 * @param caller player that excecute the effect
+	 */
 	private void executePrimaryEffect(Player caller) {
 		for(Action.BaseAction e: primaryEffect.getActions()){
 			e.applyOn(caller);

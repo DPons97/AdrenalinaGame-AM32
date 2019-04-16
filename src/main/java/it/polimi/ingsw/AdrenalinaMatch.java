@@ -105,10 +105,13 @@ public class AdrenalinaMatch {
 		this.initAmmoDeck();
 		this.initPowerupDeck();
 		this.initWeaponDeck();
+
+		// Map initialization
 		this.buildMap(mapID);
-		this.initAmmoCells();
+
 		this.matchID = -1; // will be given a unique value from controller when match starts
 	}
+
 	/**
 	 *	create map from a json file mapid.json (eg. map1.json)
 	 * @param mapID identifies map to build from json file
@@ -164,7 +167,7 @@ public class AdrenalinaMatch {
 			}
 
 			// Generate Map object
-			map = new Map(newMap, spawnPoints, xSize, ySize);
+			map = new Map(newMap, spawnPoints, xSize, ySize, ammoDeck);
 
 		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
@@ -214,7 +217,6 @@ public class AdrenalinaMatch {
 	 * parses powerup.json file
 	 */
 	private void initPowerupDeck() {
-		// TODO implement here
 		powerupDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
 		String name;
@@ -276,24 +278,6 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * private method to initialize ammo cells with an ammo card
-	 */
-	private void initAmmoCells() {
-		for (Cell[] cells : map.getMap()) {
-			for (Cell cell : cells) {
-				if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
-					// safe cast to Ammo Cell and set ammo drawing a card from ammo deck
-					try {
-						((AmmoCell) cell).setAmmo(ammoDeck.drawCard());
-					} catch (AmmoAlreadyOnCellException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		}
-	}
-
-	/**
 	 *	Add  new player to the game, only possible before the match starts
 	 */
 	public void addPlayer(Player toAdd) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
@@ -325,6 +309,15 @@ public class AdrenalinaMatch {
 	 */
 	public List<Player> getPlayers() {
 		return players;
+	}
+
+	/**
+	 * @param id of players to search
+	 * @return list of players with defined id
+	 */
+	public List<Player> getPlayersByID(int id) {
+		return players.stream().filter(Objects::nonNull)
+				.filter(p -> p.getID() == id).collect(Collectors.toList());
 	}
 
 	/**
@@ -524,12 +517,10 @@ public class AdrenalinaMatch {
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				for (Cell c: map.getMap()[pX]) {
-					if(c != null)
-						toReturn.addAll(c.getPlayers());
-				}
-				for (Cell[] c: map.getMap())
-					if(c[pY].getCoordX() != pX)toReturn.addAll(c[pY].getPlayers());
+				for (Cell c: map.getRow(pX))
+					if (c != null && c.getCoordY() != pY) toReturn.addAll(c.getPlayers());
+				for (Cell c: map.getColumn(pY))
+					if(c != null && c.getCoordX() != pX) toReturn.addAll(c.getPlayers());
 				toReturn = intersection(toReturn,
 										caller.getCellAtDistance(minDistance,maxDistance).stream().
 										map(Cell::getPlayers).
@@ -539,25 +530,30 @@ public class AdrenalinaMatch {
 			case "DIRECTION_VISIBLE":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				Cell[][] mapCopy = map.getMap();
+
 				// start from caller cell go in the four cardinal direction one at a time,
 				// stop when current cell has border or wall on the direction you are exploring
 
+				int i;
 				// exploring east -> right
-				for(int i = pX; mapCopy[i][pY].getEast()!= Side.BORDER || mapCopy[i][pY].getEast()!= Side.WALL; i ++)
-					toReturn.addAll(mapCopy[i][pY].getPlayers());
+				for(i = pX; map.getCell(pX, i).getEast()!= Side.BORDER && map.getCell(pX, i).getEast()!= Side.WALL; i++)
+					toReturn.addAll(map.getCell(pX, i).getPlayers());
+				toReturn.addAll(map.getCell(pX, i).getPlayers());
 
 				// exploring west -> left
-				for(int i = pX; mapCopy[i][pY].getWest()!= Side.BORDER || mapCopy[i][pY].getWest()!= Side.WALL; i --)
-					toReturn.addAll(mapCopy[i][pY].getPlayers());
+				for(i = pX; map.getCell(pX, i).getWest()!= Side.BORDER && map.getCell(pX, i).getWest()!= Side.WALL; i--)
+					toReturn.addAll(map.getCell(pX, i).getPlayers());
+				toReturn.addAll(map.getCell(pX, i).getPlayers());
 
 				// exploring north -> up
-				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i --)
-					toReturn.addAll(mapCopy[pX][i].getPlayers());
+				for(i = pY; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i--)
+					toReturn.addAll(map.getCell(i,pY).getPlayers());
+				toReturn.addAll(map.getCell(i,pY).getPlayers());
 
 				// exploring south -> down
-				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i ++)
-					toReturn.addAll(mapCopy[pX][i].getPlayers());
+				for(i = pY; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i++)
+					toReturn.addAll(map.getCell(i,pY).getPlayers());
+				toReturn.addAll(map.getCell(i,pY).getPlayers());
 
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn,
@@ -588,8 +584,7 @@ public class AdrenalinaMatch {
 				// if none were found, the id should be a cell id
 				if(toReturn.isEmpty()){
 					//look for cells with id
-					List<Cell> foundCells = Arrays.stream(map.getMap()).flatMap(Arrays::stream)
-							.filter(c ->c != null && c.getID() == id).collect(Collectors.toList());
+					List<Cell> foundCells = map.getCellsByID(id);
 
 					for(Cell c: foundCells){
 						for(Cell pC: map.getCellAtDistance(c,minDistance,maxDistance)){
@@ -639,35 +634,35 @@ public class AdrenalinaMatch {
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				toReturn.addAll(Arrays.asList(map.getMap()[pX]));
-				for (Cell[] c: map.getMap())
-					if(c[pY].getCoordX() != pX)toReturn.add(c[pY]);
+				for (Cell c: map.getRow(pX))
+					if(c!=null && c.getCoordY() != pY)toReturn.add(c);
+				for (Cell c: map.getColumn(pY))
+					if(c!=null && c.getCoordX() != pX)toReturn.add(c);
 				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 				break;
 			case "DIRECTION_VISIBLE":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				Cell[][] mapCopy = map.getMap();
 				// start from caller cell go in the four cardinal direction one at a time,
 				// stop when current cell has border or wall on the direction you are exploring
 
 				int i;
 				// exploring east -> right
-				for(i = pY; mapCopy[pX][i].getEast()!= Side.BORDER && mapCopy[pX][i].getEast()!= Side.WALL; i ++)
-					toReturn.add(mapCopy[pX][i]);
-				toReturn.add(mapCopy[pX][i]);
+				for(i = pY; map.getCell(pX, i).getEast()!= Side.BORDER && map.getCell(pX, i).getEast()!= Side.WALL; i++)
+					toReturn.add(map.getCell(pX, i));
+				toReturn.add(map.getCell(pX, i));
 				// exploring west -> left
-				for(i = pY; mapCopy[pX][i].getWest()!= Side.BORDER && mapCopy[pX][i].getWest()!= Side.WALL; i --)
-					toReturn.add(mapCopy[i][pY]);
-				toReturn.add(mapCopy[pX][i]);
+				for(i = pY; map.getCell(pX, i).getWest()!= Side.BORDER && map.getCell(pX, i).getWest()!= Side.WALL; i--)
+					toReturn.add(map.getCell(pX, i));
+				toReturn.add(map.getCell(pX, i));
 				// exploring north -> up
-				for(i = pX; mapCopy[i][pY].getNorth()!= Side.BORDER && mapCopy[i][pY].getNorth()!= Side.WALL; i --)
-					toReturn.add(mapCopy[pX][i]);
-				toReturn.add(mapCopy[pX][i]);
+				for(i = pX; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i--)
+					toReturn.add(map.getCell(i,pY));
+				toReturn.add(map.getCell(i, pY));
 				// exploring south -> down
-				for(i = pX; mapCopy[i][pY].getNorth()!= Side.BORDER && mapCopy[i][pY].getNorth()!= Side.WALL; i ++)
-					toReturn.add(mapCopy[i][pY]);
-				toReturn.add(mapCopy[pX][i]);
+				for(i = pX; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i++)
+					toReturn.add(map.getCell(i,pY));
+				toReturn.add(map.getCell(i, pY));
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 
@@ -679,17 +674,12 @@ public class AdrenalinaMatch {
 				// from is an integer id
 				int id = Integer.parseInt(from);
 				// we are selecting cells -> first control if there are cells with requested id
-				toReturn.addAll(Arrays.stream(map.getMap())
-						.flatMap(Arrays::stream)
-						.filter(c -> c != null && c.getID() == id)
-						.collect(Collectors.toList()));
+				toReturn.addAll(map.getCellsByID(id));
 
 				// if none were found, the id should be a player id
 				if(toReturn.isEmpty()){
 					//look for players with id
-					List<Player> foundPlayers = Arrays.stream(map.getMap()).flatMap(Arrays::stream).filter(Objects::nonNull).
-							map(Cell::getPlayers).flatMap(List::stream).
-							filter(p -> p.getID() == id).collect(Collectors.toList());
+					List<Player> foundPlayers = getPlayersByID(id);
 
 					for(Player p: foundPlayers){
 						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
