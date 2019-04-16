@@ -220,7 +220,8 @@ public class AdrenalinaMatch {
 		// TODO implement here
 		powerupDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
-		String name, description;
+		String name;
+		String description;
 		Resource bRes;
 		try {
 			Object obj = parser.parse(new FileReader("././././././resources/json/powerups.json"));
@@ -498,40 +499,76 @@ public class AdrenalinaMatch {
 	 * @param caller player requesting the selection
 	 * @param from string code identifying type of selecatble players: (VISIBLE, NOT_VISIBLE, TARGET_VISIBLE, DIRECTION,
 	 *                PREV_TARGET, #[playerid], ATTACKER, DAMAGED
+	 * @param notID id to exclude
 	 * @param minDistance minimum distance between caller and target
 	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
 	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
 	 * @return List with players that satisfy query
 	 */
-	public List<Player> getSelectablePlayers(Player caller, String from, int minDistance,
+	public List<Player> getSelectablePlayers(Player caller, String from, int notID, int minDistance,
 											  int maxDistance, List<Player> players) throws InvalidStringException {
 		List<Player> toReturn = new ArrayList<>();
+		int pX = caller.getPosition().getCoordX();
+		int pY = caller.getPosition().getCoordY();
 		switch (from){
 			case "VISIBLE":
-				for(Cell c: caller.getVisibleCellsAtDistance(0, -1))
+				for(Cell c: caller.getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "NOT-VISIBLE":
-				List<Cell> validCells = caller.getCellAtDistance(0,-1);
-				validCells.removeAll(caller.getVisibleCellsAtDistance(0, -1));
+				List<Cell> validCells = caller.getCellAtDistance(minDistance,maxDistance);
+				validCells.removeAll(caller.getVisibleCellsAtDistance(minDistance, maxDistance));
 				for(Cell c: validCells)
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "TARGET-VISIBLE":
-				for(Cell c: players.get(0).getVisibleCellsAtDistance(0, -1))
+				for(Cell c: players.get(0).getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "DIRECTION":
-				int pX = caller.getPosition().getCoordX();
-				int pY = caller.getPosition().getCoordY();
+				pX = caller.getPosition().getCoordX();
+				pY = caller.getPosition().getCoordY();
 				for (Cell c: map.getMap()[pX])
 					toReturn.addAll(c.getPlayers());
 				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.addAll(c[pY].getPlayers());
+				toReturn = intersection(toReturn,
+										caller.getCellAtDistance(minDistance,maxDistance).stream().
+										map(Cell::getPlayers).
+										flatMap(List::stream).
+										collect(Collectors.toList()));
 				break;
-			case "PREV_TARGET":
-				toReturn.addAll(players);
-				break;
+			case "DIRECTION_VISIBLE":
+				pX = caller.getPosition().getCoordX();
+				pY = caller.getPosition().getCoordY();
+				Cell[][] mapCopy = map.getMap();
+				// start from caller cell go in the four cardinal direction one at a time,
+				// stop when current cell has border or wall on the direction you are exploring
+
+				// exploring east -> right
+				for(int i = pX; mapCopy[i][pY].getEast()!= Side.BORDER || mapCopy[i][pY].getEast()!= Side.WALL; i ++)
+					toReturn.addAll(mapCopy[i][pY].getPlayers());
+
+				// exploring west -> left
+				for(int i = pX; mapCopy[i][pY].getWest()!= Side.BORDER || mapCopy[i][pY].getWest()!= Side.WALL; i --)
+					toReturn.addAll(mapCopy[i][pY].getPlayers());
+
+				// exploring north -> up
+				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i --)
+					toReturn.addAll(mapCopy[pX][i].getPlayers());
+
+				// exploring south -> down
+				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i ++)
+					toReturn.addAll(mapCopy[pX][i].getPlayers());
+
+				// keep only the ones at right distance
+				toReturn = intersection(toReturn,
+						caller.getCellAtDistance(minDistance,maxDistance).stream().
+								map(Cell::getPlayers).
+								flatMap(List::stream).
+								collect(Collectors.toList()));
+
+			break;
 			case "ATTACKER":
 				// TODO: implement here
 				break;
@@ -539,37 +576,61 @@ public class AdrenalinaMatch {
 				// TODO: implement here
 				break;
 			default:
+				// from is an integer id
 				int id = Integer.parseInt(from);
+
+				// we are selecting players-> first control if there are players with requested id
 				toReturn.addAll(players.stream()
 						.filter(p -> p.getID() == id).collect(Collectors.toList()));
 
+				// if none were found, the id should be a cell id
+				if(toReturn.isEmpty()){
+					//look for cells with id
+					List<Cell> foundCells = Arrays.stream(map.getMap()).flatMap(Arrays::stream)
+							.filter(c -> c.getID() == id).collect(Collectors.toList());
+
+					for(Cell c: foundCells){
+						for(Cell pC: map.getCellAtDistance(c,minDistance,maxDistance)){
+							toReturn.addAll(pC.getPlayers());
+						}
+					}
+				} else {
+					toReturn = intersection(toReturn,
+							caller.getCellAtDistance(minDistance,maxDistance).stream().
+									map(Cell::getPlayers).
+									flatMap(List::stream).
+									collect(Collectors.toList()));
+				}
 		}
+		// filter notID
+		toReturn.removeIf(p -> p.getID() == notID);
 		return toReturn;
 	}
 
 	/**
 	 * @param caller player requesting the selection
 	 * @param from string code identifying type of selecatble players: (VISIBLE, NOT_VISIBLE, TARGET_VISIBLE, DIRECTION,
-	 *                PREV_TARGET, #[playerid], ATTACKER, DAMAGED
+	 *                DIRECTION_VISIBLE, #[playerid], ATTACKER, DAMAGED
+	 * @param notID id to exclude
 	 * @param minDistance minimum distance between caller and target
 	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
 	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
 	 * @return List with cells that satisfy query
 	 */
-	public List<Cell> getSelectableCells(Player caller, String from, int minDistance,
+	public List<Cell> getSelectableCells(Player caller, String from, int notID, int minDistance,
 										 int maxDistance, List<Player> players) throws InvalidStringException {
 		List<Cell> toReturn = new ArrayList<>();
 		switch (from){
 			case "VISIBLE":
-				toReturn.addAll(caller.getVisibleCellsAtDistance(0, -1));
+				toReturn.addAll(caller.getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
 			case "NOT-VISIBLE":
-				List<Cell> validCells = caller.getCellAtDistance(0,-1);
-				validCells.removeAll(caller.getVisibleCellsAtDistance(0, -1));
+				List<Cell> validCells = caller.getCellAtDistance(minDistance,maxDistance);
+				validCells.removeAll(caller.getVisibleCellsAtDistance(minDistance,maxDistance));
 				toReturn.addAll(validCells);
 				break;
 			case "TARGET-VISIBLE":
-				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(0, -1));
+				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
 			case "DIRECTION":
 				int pX = caller.getPosition().getCoordX();
@@ -577,23 +638,82 @@ public class AdrenalinaMatch {
 				toReturn.addAll(Arrays.asList(map.getMap()[pX]));
 				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.add(c[pY]);
+				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 				break;
-			case "PREV_TARGET":
-				// TODO implement here
-				// serve?
+			case "DIRECTION_VISIBLE":
+				pX = caller.getPosition().getCoordX();
+				pY = caller.getPosition().getCoordY();
+				Cell[][] mapCopy = map.getMap();
+				// start from caller cell go in the four cardinal direction one at a time,
+				// stop when current cell has border or wall on the direction you are exploring
+
+				// exploring east -> right
+				for(int i = pX; mapCopy[i][pY].getEast()!= Side.BORDER || mapCopy[i][pY].getEast()!= Side.WALL; i ++)
+					toReturn.add(mapCopy[i][pY]);
+
+				// exploring west -> left
+				for(int i = pX; mapCopy[i][pY].getWest()!= Side.BORDER || mapCopy[i][pY].getWest()!= Side.WALL; i --)
+					toReturn.add(mapCopy[i][pY]);
+
+				// exploring north -> up
+				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i --)
+					toReturn.add(mapCopy[pX][i]);
+
+				// exploring south -> down
+				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i ++)
+					toReturn.add(mapCopy[pX][i]);
+
+				// keep only the ones at right distance
+				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
+
 				break;
 			case "ANY":
-				toReturn.addAll(caller.getCellAtDistance(0,-1));
+				toReturn.addAll(caller.getCellAtDistance(minDistance,maxDistance));
 				break;
 			default:
+				// from is an integer id
 				int id = Integer.parseInt(from);
+				// we are selecting cells -> first control if there are cells with requested id
 				toReturn.addAll(Arrays.stream(map.getMap()).flatMap(Arrays::stream)
 						.filter(c -> c.getID() == id).collect(Collectors.toList()));
 
+				// if none were found, the id should be a player id
+				if(toReturn.isEmpty()){
+					//look for players with id
+					List<Player> foundPlayers = Arrays.stream(map.getMap()).flatMap(Arrays::stream).
+							map(Cell::getPlayers).flatMap(List::stream).filter(p -> p.getID() == id).collect(Collectors.toList());
+
+					for(Player p: foundPlayers){
+						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
+					}
+				} else {
+					toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
+				}
+
+
+
 		}
+		// filter notID
+		toReturn.removeIf(p -> p.getID() == notID);
 		return toReturn;
 	}
 
+	/**
+	 * This was taken from stackoverflow
+	 * @param list1 first list
+	 * @param list2 second list
+	 * @return List with intersection of first list and second list
+	 **/
+	private <T> List<T> intersection(List<T> list1, List<T> list2) {
+		List<T> list = new ArrayList<>();
 
+		for (T t : list1) {
+			if(list2.contains(t)) {
+				list.add(t);
+			}
+		}
+
+		return list;
+	}
 
 }

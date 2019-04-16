@@ -130,4 +130,38 @@ public class Map {
         }
         return roomCells;
     }
+
+    /**
+     * @param minDist Minimum distance
+     * @param maxDist Maximum distance. -1 is equal to INFINITE
+     * @param relativeCell cell from which calculate distance
+     * @return List of all cells between [minDist] and [maxDist] distance
+     * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
+     */
+    public List<Cell> getCellAtDistance(Cell relativeCell, int minDist, int maxDist) {
+        if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
+
+        List<Cell> cellAtDistance = new ArrayList<>();
+
+        if (maxDist == -1) {
+            // Set min/max distances to get all cells from minDist to end of map
+            maxDist = Math.max(this.getXSize(), this.getYSize());
+        }
+
+        for (Cell[] cols : this.getMap()) {
+            // it's duplicated but in different classes ... what do we do?
+            for (Cell cell : cols) {
+                if (cell != null) {
+                    // Calculate X and Y distances
+                    int xDist = Math.abs(cell.getCoordX() - relativeCell.getCoordX());
+                    int yDist = Math.abs(cell.getCoordY() - relativeCell.getCoordY());
+
+                    // Add cell in case distance between minDist and maxDist
+                    if (xDist + yDist >= minDist && xDist + yDist <= maxDist) cellAtDistance.add(cell);
+                }
+            }
+        }
+
+        return cellAtDistance;
+    }
 }

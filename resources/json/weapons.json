@@ -602,7 +602,6 @@
           {
             "type": "DAMAGE",
             "value": 2
-
           }
         ]
       },
@@ -1073,6 +1072,21 @@
             ]
           },
           {
+            "type": "SELECT",
+            "ID": 10,
+            "target": "CELL",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
             "type": "DAMAGE",
             "value": 2
           },
@@ -1150,9 +1164,9 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": 2,
+            "ID": 3,
             "target": "PLAYER",
-            "from": 1,
+            "from": 10,
             "notID": 1,
             "differentSelection": false,
             "quantity": [
