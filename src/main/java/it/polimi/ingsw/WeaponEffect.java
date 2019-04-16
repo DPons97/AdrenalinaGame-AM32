@@ -89,6 +89,7 @@ public class WeaponEffect extends Weapon {
 				primaryEffect.setExecuted(true);
 				break;
 			case 1:
+				if(firstOptional == null) throw new IllegalArgumentException();
 				requirement = firstOptional.getRequires();
 				if ( (primaryEffect.getName().equals(requirement) && !primaryEffect.isExecuted()) ||
 					 (secondOptional.getName().equals(requirement) && !secondOptional.isExecuted()) ) throw new RequirementsNotMetException();
@@ -97,6 +98,7 @@ public class WeaponEffect extends Weapon {
 				firstOptional.setExecuted(true);
 				break;
 			case 2:
+				if(firstOptional == null) throw new IllegalArgumentException();
 				requirement = secondOptional.getRequires();
 				if ( (primaryEffect.getName().equals(requirement) && !primaryEffect.isExecuted()) ||
 						(firstOptional.getName().equals(requirement) && !firstOptional.isExecuted()) ) throw new RequirementsNotMetException();

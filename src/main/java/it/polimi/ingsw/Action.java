@@ -143,6 +143,7 @@ public class Action {
 							case "CELL":
 								actions.add(caller -> {
 									try {
+										targetCells.clear();
 										List<Cell> couldBeAdded = caller.getMatch().
 												getSelectableCells(caller,
 														baseActionJSON.get("from").toString(),
@@ -165,6 +166,7 @@ public class Action {
 								break;
 							case "PLAYER":
 								actions.add(caller -> {
+									targetPlayers.clear();
 									try {
 										List<Player> couldBeAdded = caller.getMatch().
 												getSelectablePlayers(caller,
@@ -194,6 +196,7 @@ public class Action {
 								break;
 							case "ROOM":
 								actions.add(caller -> {
+									targetCells.clear();
 									List<List<Cell>> couldBeAdded = caller.getMatch().getSelectableRooms(caller);
 									if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
 										// if there is no choice -> add all you could add

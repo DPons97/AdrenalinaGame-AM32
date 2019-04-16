@@ -524,8 +524,10 @@ public class AdrenalinaMatch {
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				for (Cell c: map.getMap()[pX])
-					toReturn.addAll(c.getPlayers());
+				for (Cell c: map.getMap()[pX]) {
+					if(c != null)
+						toReturn.addAll(c.getPlayers());
+				}
 				for (Cell[] c: map.getMap())
 					if(c[pY].getCoordX() != pX)toReturn.addAll(c[pY].getPlayers());
 				toReturn = intersection(toReturn,
@@ -604,6 +606,8 @@ public class AdrenalinaMatch {
 		}
 		// filter notID
 		toReturn.removeIf(p -> p.getID() == notID);
+		//there is an apposite call to get yourself
+		toReturn.remove(caller);
 		return toReturn;
 	}
 
@@ -647,22 +651,23 @@ public class AdrenalinaMatch {
 				// start from caller cell go in the four cardinal direction one at a time,
 				// stop when current cell has border or wall on the direction you are exploring
 
+				int i;
 				// exploring east -> right
-				for(int i = pX; mapCopy[i][pY].getEast()!= Side.BORDER || mapCopy[i][pY].getEast()!= Side.WALL; i ++)
-					toReturn.add(mapCopy[i][pY]);
-
+				for(i = pY; mapCopy[pX][i].getEast()!= Side.BORDER && mapCopy[pX][i].getEast()!= Side.WALL; i ++)
+					toReturn.add(mapCopy[pX][i]);
+				toReturn.add(mapCopy[pX][i]);
 				// exploring west -> left
-				for(int i = pX; mapCopy[i][pY].getWest()!= Side.BORDER || mapCopy[i][pY].getWest()!= Side.WALL; i --)
+				for(i = pY; mapCopy[pX][i].getWest()!= Side.BORDER && mapCopy[pX][i].getWest()!= Side.WALL; i --)
 					toReturn.add(mapCopy[i][pY]);
-
+				toReturn.add(mapCopy[pX][i]);
 				// exploring north -> up
-				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i --)
+				for(i = pX; mapCopy[i][pY].getNorth()!= Side.BORDER && mapCopy[i][pY].getNorth()!= Side.WALL; i --)
 					toReturn.add(mapCopy[pX][i]);
-
+				toReturn.add(mapCopy[pX][i]);
 				// exploring south -> down
-				for(int i = pY; mapCopy[pX][i].getNorth()!= Side.BORDER || mapCopy[pX][i].getNorth()!= Side.WALL; i ++)
-					toReturn.add(mapCopy[pX][i]);
-
+				for(i = pX; mapCopy[i][pY].getNorth()!= Side.BORDER && mapCopy[i][pY].getNorth()!= Side.WALL; i ++)
+					toReturn.add(mapCopy[i][pY]);
+				toReturn.add(mapCopy[pX][i]);
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 
