@@ -123,12 +123,10 @@ public class Player {
 
 	/**
 	 * Default Constructor
-	 * @param 	match Reference to match this player is playing
-	 * @param	nickname This player's nickname
-	 * @param	spawnPosition Cell in which this player is spawning for the first time
+	 * @param nickname This player's nickname
 	 */
-	public Player(AdrenalinaMatch match, String nickname, Cell spawnPosition) {
-		this.match = match;
+	public Player(String nickname) {
+		this.match = null;
 		this.nickname = nickname;
 		score = 0;
 
@@ -139,7 +137,6 @@ public class Player {
 		dead = true;
 		deaths = 0;
 		givenMarks = 0;
-		position = spawnPosition;
 
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
@@ -537,7 +534,7 @@ public class Player {
 	/**
 	 *  Shoot at another player
 	 * @param weapon Weapon to use
-	 * @param effectID
+	 * @param effectID effect's ID to shoot
 	 */
 	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
 		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();

@@ -423,6 +423,7 @@ class PlayerTest {
 
     @Test
     void shoot() {
+        // TODO: Implement after getSelectable()
     }
 
     @Test
