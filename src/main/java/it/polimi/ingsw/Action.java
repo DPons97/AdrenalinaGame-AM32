@@ -105,7 +105,7 @@ public class Action {
 	/**
 	 * @param effect json effect to parse
 	 */
-	public void parseEffect(JSONObject effect) {
+	public void  parseEffect(JSONObject effect) {
 		try {
 			this.description = effect.get("description").toString();
 
@@ -207,11 +207,8 @@ public class Action {
 								});
 								break;
 							default:
-								try {
-									throw new InvalidJSONException();
-								} catch (InvalidJSONException e) {
-									e.printStackTrace();
-								}
+								throw new InvalidJSONException();
+
 						}
 
 						break;

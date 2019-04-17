@@ -1,4 +1,5 @@
 package it.polimi.ingsw;
+
 import it.polimi.ingsw.custom_exceptions.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -7,7 +8,10 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 
@@ -79,6 +83,11 @@ public class AdrenalinaMatch {
 	 * 	duration of a turn in seconds.
 	 */
 	private int turnDuration;
+
+	/**
+	 * 	duration of a turn in seconds.
+	 */
+	private int turn;
 
 	/**
 	 * 	false before first turn takes place.
@@ -385,6 +394,13 @@ public class AdrenalinaMatch {
 	 */
 	public int getTurnDuration() {
 		return turnDuration;
+	}
+
+	/**
+	 * @return this turn's player.
+	 */
+	public Player getTurnPlayer() {
+		return players.get((turn+players.indexOf(firstPlayer))%players.size());
 	}
 
 	/**
