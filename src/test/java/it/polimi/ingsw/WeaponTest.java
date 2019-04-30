@@ -10,7 +10,7 @@ class WeaponTest {
     void weaponTest(){
         AdrenalinaMatch tMatch = new AdrenalinaMatch(3,8, 120,1);
         Player p = new Player(tMatch,"Aldo");
-        p.respawn(tMatch.getMap().getSpawnPoints().get(0));
+        p.respawn(tMatch.getBoardMap().getSpawnPoints().get(0));
         do{
             Weapon w = tMatch.getWeaponDeck().drawCard();
             int i = 0;

@@ -27,7 +27,7 @@ public class AdrenalinaMatch {
 	/**
 	 * Reference to map
 	 */
-	private Map map;
+	private Map boardMap;
 
 	/**
 	 * Number of deaths in the match before the frenzy.
@@ -176,7 +176,7 @@ public class AdrenalinaMatch {
 			}
 
 			// Generate Map object
-			map = new Map(newMap, spawnPoints, xSize, ySize, ammoDeck);
+			boardMap = new Map(newMap, spawnPoints, xSize, ySize, ammoDeck);
 
 		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
@@ -360,7 +360,7 @@ public class AdrenalinaMatch {
 	/**
 	 * @return current map
 	 */
-	public Map getMap() { return map; }
+	public Map getBoardMap() { return boardMap; }
 
 	/**
 	 * @return the number of maximun deaths, usually 8 for a standard match.
@@ -512,7 +512,7 @@ public class AdrenalinaMatch {
 	 * @return List with players that satisfy query
 	 */
 	public List<Player> getSelectablePlayers(Player caller, String from, int notID, int minDistance,
-											  int maxDistance, List<Player> players) throws InvalidStringException {
+											  int maxDistance, List<Player> players) {
 		List<Player> toReturn = new ArrayList<>();
 		int pX;
 		int pY;
@@ -533,9 +533,9 @@ public class AdrenalinaMatch {
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				for (Cell c: map.getRow(pX))
+				for (Cell c: boardMap.getRow(pX))
 					if (c != null && c.getCoordY() != pY) toReturn.addAll(c.getPlayers());
-				for (Cell c: map.getColumn(pY))
+				for (Cell c: boardMap.getColumn(pY))
 					if(c != null && c.getCoordX() != pX) toReturn.addAll(c.getPlayers());
 				toReturn = intersection(toReturn,
 										caller.getCellAtDistance(minDistance,maxDistance).stream().
@@ -552,24 +552,24 @@ public class AdrenalinaMatch {
 
 				int i;
 				// exploring east -> right
-				for(i = pX; map.getCell(pX, i).getEast()!= Side.BORDER && map.getCell(pX, i).getEast()!= Side.WALL; i++)
-					toReturn.addAll(map.getCell(pX, i).getPlayers());
-				toReturn.addAll(map.getCell(pX, i).getPlayers());
+				for(i = pX; boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
+					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
+				toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
 				// exploring west -> left
-				for(i = pX; map.getCell(pX, i).getWest()!= Side.BORDER && map.getCell(pX, i).getWest()!= Side.WALL; i--)
-					toReturn.addAll(map.getCell(pX, i).getPlayers());
-				toReturn.addAll(map.getCell(pX, i).getPlayers());
+				for(i = pX; boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
+					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
+				toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
 				// exploring north -> up
-				for(i = pY; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i--)
-					toReturn.addAll(map.getCell(i,pY).getPlayers());
-				toReturn.addAll(map.getCell(i,pY).getPlayers());
+				for(i = pY; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
+					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
+				toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
 
 				// exploring south -> down
-				for(i = pY; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i++)
-					toReturn.addAll(map.getCell(i,pY).getPlayers());
-				toReturn.addAll(map.getCell(i,pY).getPlayers());
+				for(i = pY; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
+					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
+				toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
 
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn,
@@ -600,10 +600,10 @@ public class AdrenalinaMatch {
 				// if none were found, the id should be a cell id
 				if(toReturn.isEmpty()){
 					//look for cells with id
-					List<Cell> foundCells = map.getCellsByID(id);
+					List<Cell> foundCells = boardMap.getCellsByID(id);
 
 					for(Cell c: foundCells){
-						for(Cell pC: map.getCellAtDistance(c,minDistance,maxDistance)){
+						for(Cell pC: boardMap.getCellAtDistance(c,minDistance,maxDistance)){
 							toReturn.addAll(pC.getPlayers());
 						}
 					}
@@ -650,9 +650,9 @@ public class AdrenalinaMatch {
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
 				pY = caller.getPosition().getCoordY();
-				for (Cell c: map.getRow(pX))
+				for (Cell c: boardMap.getRow(pX))
 					if(c!=null && c.getCoordY() != pY)toReturn.add(c);
-				for (Cell c: map.getColumn(pY))
+				for (Cell c: boardMap.getColumn(pY))
 					if(c!=null && c.getCoordX() != pX)toReturn.add(c);
 				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 				break;
@@ -664,21 +664,21 @@ public class AdrenalinaMatch {
 
 				int i;
 				// exploring east -> right
-				for(i = pY; map.getCell(pX, i).getEast()!= Side.BORDER && map.getCell(pX, i).getEast()!= Side.WALL; i++)
-					toReturn.add(map.getCell(pX, i));
-				toReturn.add(map.getCell(pX, i));
+				for(i = pY; boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
+					toReturn.add(boardMap.getCell(pX, i));
+				toReturn.add(boardMap.getCell(pX, i));
 				// exploring west -> left
-				for(i = pY; map.getCell(pX, i).getWest()!= Side.BORDER && map.getCell(pX, i).getWest()!= Side.WALL; i--)
-					toReturn.add(map.getCell(pX, i));
-				toReturn.add(map.getCell(pX, i));
+				for(i = pY; boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
+					toReturn.add(boardMap.getCell(pX, i));
+				toReturn.add(boardMap.getCell(pX, i));
 				// exploring north -> up
-				for(i = pX; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i--)
-					toReturn.add(map.getCell(i,pY));
-				toReturn.add(map.getCell(i, pY));
+				for(i = pX; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
+					toReturn.add(boardMap.getCell(i,pY));
+				toReturn.add(boardMap.getCell(i, pY));
 				// exploring south -> down
-				for(i = pX; map.getCell(i,pY).getNorth()!= Side.BORDER && map.getCell(i,pY).getNorth()!= Side.WALL; i++)
-					toReturn.add(map.getCell(i,pY));
-				toReturn.add(map.getCell(i, pY));
+				for(i = pX; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
+					toReturn.add(boardMap.getCell(i,pY));
+				toReturn.add(boardMap.getCell(i, pY));
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
 
@@ -690,7 +690,7 @@ public class AdrenalinaMatch {
 				// from is an integer id
 				int id = Integer.parseInt(from);
 				// we are selecting cells -> first control if there are cells with requested id
-				toReturn.addAll(map.getCellsByID(id));
+				toReturn.addAll(boardMap.getCellsByID(id));
 
 				// if none were found, the id should be a player id
 				if(toReturn.isEmpty()){
@@ -723,9 +723,9 @@ public class AdrenalinaMatch {
 			// Player has a door nearby
 			if (caller.getPosition().getSide(dir) == Side.DOOR) {
 				toReturn.add(
-					map.getRoomCells(
-						map.getCell( map.getAdjacentCell(caller.getPosition(), dir).getCoordX(),
-								     map.getAdjacentCell(caller.getPosition(), dir).getCoordY()
+					boardMap.getRoomCells(
+						boardMap.getCell( boardMap.getAdjacentCell(caller.getPosition(), dir).getCoordX(),
+								     boardMap.getAdjacentCell(caller.getPosition(), dir).getCoordY()
 						)
 					)
 				);

@@ -1,6 +1,6 @@
 package it.polimi.ingsw.custom_exceptions;
 
-public class MatchAlreadyStartedException extends Throwable{
+public class MatchAlreadyStartedException extends Exception {
     public MatchAlreadyStartedException() {
         super();
     }

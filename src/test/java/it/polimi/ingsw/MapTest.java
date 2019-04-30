@@ -8,20 +8,20 @@ class MapTest {
     @Test
     void checkMaps(){
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
-        checkMapTopology(testMatch.getMap());
-        assertEquals(3, testMatch.getMap().getSpawnPoints().size());
+        checkMapTopology(testMatch.getBoardMap());
+        assertEquals(3, testMatch.getBoardMap().getSpawnPoints().size());
 
         testMatch = new AdrenalinaMatch(3, 5,120, 2);
-        assertEquals(3, testMatch.getMap().getSpawnPoints().size());
-        checkMapTopology(testMatch.getMap());
+        assertEquals(3, testMatch.getBoardMap().getSpawnPoints().size());
+        checkMapTopology(testMatch.getBoardMap());
 
         testMatch = new AdrenalinaMatch(3, 5,120, 3);
-        assertEquals(3, testMatch.getMap().getSpawnPoints().size());
-        checkMapTopology(testMatch.getMap());
+        assertEquals(3, testMatch.getBoardMap().getSpawnPoints().size());
+        checkMapTopology(testMatch.getBoardMap());
 
         testMatch = new AdrenalinaMatch(3, 5,120, 4);
-        assertEquals(3, testMatch.getMap().getSpawnPoints().size());
-        checkMapTopology(testMatch.getMap());
+        assertEquals(3, testMatch.getBoardMap().getSpawnPoints().size());
+        checkMapTopology(testMatch.getBoardMap());
     }
 
     private void checkMapTopology(Map map){

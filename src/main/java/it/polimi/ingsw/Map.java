@@ -9,7 +9,7 @@ public class Map {
     /**
      * Representation of the map, bidemensional array of cells.
      */
-    private Cell[][] map;
+    private Cell[][] mapMatrix;
 
     /**
      * List to trace spawn cells, not necessary but convenient
@@ -22,8 +22,8 @@ public class Map {
     private int xSize;
     private int ySize;
 
-    public Map(Cell[][] map, List<SpawnCell> spawnPoints, int xSize, int ySize, Deck<Ammo> ammoDeck) {
-        this.map = map;
+    public Map(Cell[][] mapMatrix, List<SpawnCell> spawnPoints, int xSize, int ySize, Deck<Ammo> ammoDeck) {
+        this.mapMatrix = mapMatrix;
         this.spawnPoints = spawnPoints;
         this.xSize = xSize;
         this.ySize = ySize;
@@ -52,7 +52,7 @@ public class Map {
      * @return cell at (x,y) coordinates
      */
     public Cell getCell(int x, int y) {
-        return map[x][y];
+        return mapMatrix[x][y];
     }
 
     /**
@@ -61,7 +61,7 @@ public class Map {
      */
     public List<Cell> getRow(int x) {
         List<Cell> column = new ArrayList<>();
-        Collections.addAll(column, map[x]);
+        Collections.addAll(column, mapMatrix[x]);
         return column;
     }
 
@@ -71,7 +71,7 @@ public class Map {
      */
     public List<Cell> getColumn(int y) {
         List<Cell> row = new ArrayList<>();
-        for (Cell[] c : map) { row.add(c[y]); }
+        for (Cell[] c : mapMatrix) { row.add(c[y]); }
         return row;
     }
 
@@ -98,13 +98,13 @@ public class Map {
         if (getCell(x,y).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
-                    return map[x-1][y];
+                    return mapMatrix[x-1][y];
                 case EAST:
-                    return map[x][y+1];
+                    return mapMatrix[x][y+1];
                 case WEST:
-                    return map[x+1][y];
+                    return mapMatrix[x+1][y];
                 case SOUTH:
-                    return map[x][y-1];
+                    return mapMatrix[x][y-1];
                 default:
                     return null;
             }
@@ -120,13 +120,13 @@ public class Map {
         if (getCell(position.getCoordX(),position.getCoordY()).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
-                    return map[position.getCoordX() - 1][position.getCoordY()];
+                    return mapMatrix[position.getCoordX() - 1][position.getCoordY()];
                 case EAST:
-                    return map[position.getCoordX()][position.getCoordY()+1];
+                    return mapMatrix[position.getCoordX()][position.getCoordY()+1];
                 case WEST:
-                    return map[position.getCoordX()][position.getCoordY() -  1];
+                    return mapMatrix[position.getCoordX()][position.getCoordY() -  1];
                 case SOUTH:
-                    return map[position.getCoordX() + 1][position.getCoordY()-1];
+                    return mapMatrix[position.getCoordX() + 1][position.getCoordY()-1];
                 default:
                     return null;
             }
@@ -179,7 +179,7 @@ public class Map {
             maxDist = Math.max(this.getXSize(), this.getYSize());
         }
 
-        for (Cell[] cols : map) {
+        for (Cell[] cols : mapMatrix) {
             for (Cell cell : cols) {
                 if (cell != null) {
                     // Calculate X and Y distances
@@ -199,7 +199,7 @@ public class Map {
      * @return list of cells with specified id
      */
     public List<Cell> getCellsByID(int id) {
-        return Arrays.stream(map).flatMap(Arrays::stream)
+        return Arrays.stream(mapMatrix).flatMap(Arrays::stream)
                 .filter(c ->c != null && c.getID() == id).collect(Collectors.toList());
     }
 
@@ -207,7 +207,7 @@ public class Map {
      * private method to initialize ammo cells with an ammo card
      */
     private void initAmmoCells(Deck<Ammo> ammoDeck) {
-        for (Cell[] cells : map) {
+        for (Cell[] cells : mapMatrix) {
             for (Cell cell : cells) {
                 if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
                     // safe cast to Ammo Cell and set ammo drawing a card from ammo deck

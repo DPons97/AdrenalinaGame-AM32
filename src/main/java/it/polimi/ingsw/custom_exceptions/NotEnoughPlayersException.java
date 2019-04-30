@@ -1,6 +1,6 @@
 package it.polimi.ingsw.custom_exceptions;
 
-public class NotEnoughPlayersException extends Throwable{
+public class NotEnoughPlayersException extends Exception {
     public NotEnoughPlayersException() {
         super();
     }

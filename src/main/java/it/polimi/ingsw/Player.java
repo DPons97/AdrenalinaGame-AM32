@@ -378,7 +378,7 @@ public class Player {
 	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
 	 */
 	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
-		return match.getMap().getCellAtDistance(position, minDist, maxDist);
+		return match.getBoardMap().getCellAtDistance(position, minDist, maxDist);
 	}
 
 	/**
@@ -388,7 +388,7 @@ public class Player {
 	 * @return List of all visible cells from this player between distance minDist and maxDist
 	 */
 	public List<Cell> getVisibleCellsAtDistance(int minDist, int maxDist) {
-		Map matchMap = match.getMap();
+		Map matchMap = match.getBoardMap();
 		List<Cell> visibleCells = new ArrayList<>();
 		List<Cell> visitedCells = new ArrayList<>();
 		List<Cell> cellsAtDistance = getCellAtDistance(minDist, maxDist);
@@ -422,7 +422,7 @@ public class Player {
 	private List<Cell> getVisibleCell(Cell currCell, List<Cell> visited) {
 		if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
 
-		Map matchMap = match.getMap();
+		Map matchMap = match.getBoardMap();
 		List<Cell> visibleCells = new ArrayList<>();
 
 		visited.add(currCell);
@@ -442,7 +442,7 @@ public class Player {
 	 */
 	public List<Cell> getOutOfSightCells(int minDist, int maxDist) {
 		List<Cell> visible = getVisibleCellsAtDistance(minDist, maxDist);
-		List<Cell> map = match.getMap().getMap();
+		List<Cell> map = match.getBoardMap().getMap();
 
 		map.removeIf(visible::contains);
 		return map;

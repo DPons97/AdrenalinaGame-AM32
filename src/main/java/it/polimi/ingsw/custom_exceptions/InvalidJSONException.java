@@ -1,6 +1,6 @@
 package it.polimi.ingsw.custom_exceptions;
 
-public class InvalidJSONException extends Throwable {
+public class InvalidJSONException extends Exception {
     public InvalidJSONException(){
         super();
     }

@@ -54,7 +54,7 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeapon = testMatch.getWeaponDeck().drawCard();
         Player testPlayer = new Player(testMatch, testName);
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
         List<Resource> testCost = new ArrayList<>();
 
         testCost.add(Resource.RED_BOX);
@@ -196,12 +196,12 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
 
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(-1, -1));
         assertThrows(IllegalArgumentException.class, () -> testPlayer.getCellAtDistance(0, -2));
 
         List<Cell> mapCells = testPlayer.getCellAtDistance(0, -1);
-        List<Cell> matchMap = testMatch.getMap().getMap();
+        List<Cell> matchMap = testMatch.getBoardMap().getMap();
 
         // Check every map's cell exists in mapCells
         for (Cell cell : matchMap) {
@@ -225,17 +225,17 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
 
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
 
         // All cells of same room as player's are visible
-        for (Cell cell : testMatch.getMap().getRoomCells(testPlayer.getPosition())) {
+        for (Cell cell : testMatch.getBoardMap().getRoomCells(testPlayer.getPosition())) {
             assertTrue(testPlayer.getVisibleCellsAtDistance(0, -1).contains(cell));
         }
 
         // All room's cells behind adjacent doors are visible
         for (Direction dir : Direction.values()) {
             if (testPlayer.getPosition().getSide(dir) == Side.DOOR) {
-                for (Cell cell : testMatch.getMap().getRoomCells(testMatch.getMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
+                for (Cell cell : testMatch.getBoardMap().getRoomCells(testMatch.getBoardMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
                     assertTrue(testPlayer.getVisibleCellsAtDistance(0, -1).contains(cell));
                 }
             }
@@ -247,17 +247,17 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
 
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
 
         // All cells of same room as player's are visible
-        for (Cell cell : testMatch.getMap().getRoomCells(testPlayer.getPosition())) {
+        for (Cell cell : testMatch.getBoardMap().getRoomCells(testPlayer.getPosition())) {
             assertFalse(testPlayer.getOutOfSightCells(0, -1).contains(cell));
         }
 
         // All room's cells behind adjacent doors are visible
         for (Direction dir : Direction.values()) {
             if (testPlayer.getPosition().getSide(dir) == Side.DOOR) {
-                for (Cell cell : testMatch.getMap().getRoomCells(testMatch.getMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
+                for (Cell cell : testMatch.getBoardMap().getRoomCells(testMatch.getBoardMap().getAdjacentCell(testPlayer.getPosition(), dir))) {
                     assertFalse(testPlayer.getOutOfSightCells(0, -1).contains(cell));
                 }
             }
@@ -268,7 +268,7 @@ class PlayerTest {
     void pickAmmo() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
 
         // Get first ammo cell
         AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
@@ -299,7 +299,7 @@ class PlayerTest {
         assertEquals(3, i);
 
         // Check powerup has been added
-        assertEquals(testPlayer.getPowerups().size(), 1);
+        assertEquals(1, testPlayer.getPowerups().size());
 
         // Try to add more than 3 powerups
         newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX));
@@ -327,7 +327,7 @@ class PlayerTest {
     void usePowerupEffect() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);
-        testPlayer.respawn(testMatch.getMap().getSpawnPoints().get(0));
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
         // Try to use powerup that player doesn't own
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.usePowerupEffect(testMatch.getPowerupDeck().drawCard()));
 

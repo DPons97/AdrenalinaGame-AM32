@@ -70,7 +70,7 @@ public abstract class Cell {
 		players = new ArrayList<>();
 		this.coordX = x;
 		this.coordY = y;
-		this.id =-1;
+		this.id = -1;
 	}
 
 	/**

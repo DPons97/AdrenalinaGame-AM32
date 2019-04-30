@@ -1,6 +1,6 @@
 package it.polimi.ingsw.custom_exceptions;
 
-public class WeaponNotLoadedException extends Throwable {
+public class WeaponNotLoadedException extends Exception {
     public WeaponNotLoadedException(){
         super();
     }

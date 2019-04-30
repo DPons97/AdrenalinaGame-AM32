@@ -1,6 +1,6 @@
 package it.polimi.ingsw.custom_exceptions;
 
-public class PlayerAlreadyExistsException extends Throwable{
+public class PlayerAlreadyExistsException extends Exception {
     public PlayerAlreadyExistsException() {
         super();
     }
