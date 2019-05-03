@@ -224,10 +224,14 @@ public class Action {
 						});
 						break;
 					case "MOVE":
-						for(int j = 0; j < targetPlayers.size(); j++){
-							int finalJ = j;
-							actions.add(caller -> targetPlayers.get(finalJ).move(targetCells.get(0)));
-						}
+
+							actions.add(caller -> {
+								List<Player> toApply = selectTargets();
+								if(!targetCells.isEmpty())
+									//TODO: THIS CONDITION SHOULD ALWAYS BE TRUE ONCE SELECTION IS IMPLEMENTED
+									toApply.forEach(p->p.move(targetCells.get(0)));
+							});
+
 						break;
 					case "MARK":
 						actions.add(caller -> {
