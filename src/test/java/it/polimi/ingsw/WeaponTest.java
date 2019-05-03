@@ -1,5 +1,9 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.Server.Model.Action;
+import it.polimi.ingsw.Server.Model.AdrenalinaMatch;
+import it.polimi.ingsw.Server.Model.Player;
+import it.polimi.ingsw.Server.Model.Weapon;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

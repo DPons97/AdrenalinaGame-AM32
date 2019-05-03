@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.Server.Model.*;
 import it.polimi.ingsw.custom_exceptions.*;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ class PlayerTest {
             for (int j = 0; j < Player.getMaxDamage() + 1; j++) {
                 victimPlayer.takeDamage(killerPlayer);
             }
-            victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));
+            victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE, Color.BLUE,0,0));
 
             // Check that reward is equal to player's default kill reward from i to end
             assertEquals(Player.getKillRewards().subList(i, Player.getKillRewards().size()), victimPlayer.getReward());

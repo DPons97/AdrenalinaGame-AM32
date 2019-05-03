@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Server.Model;
 
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 
@@ -94,7 +94,7 @@ public class Map {
      * @param direction where to look
      * @return cell in [direction] side
      */
-    public Cell getAdjacentCell(int x, int y, Direction direction) {
+    protected Cell getAdjacentCell(int x, int y, Direction direction) {
         if (getCell(x,y).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
@@ -116,7 +116,7 @@ public class Map {
      * @param direction where to look
      * @return cell in [direction] side
      */
-    public Cell getAdjacentCell(Cell position, Direction direction) {
+    protected Cell getAdjacentCell(Cell position, Direction direction) {
         if (getCell(position.getCoordX(),position.getCoordY()).getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
@@ -137,7 +137,7 @@ public class Map {
      * @param cell cell to get room
      * @return all cells that are in the same room as [cell]
      */
-    public List<Cell> getRoomCells(Cell cell) {
+    protected List<Cell> getRoomCells(Cell cell) {
         return getCellsInRoom(cell, new ArrayList<>());
     }
 
@@ -169,7 +169,7 @@ public class Map {
      * @return List of all cells between [minDist] and [maxDist] distance
      * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
      */
-    public List<Cell> getCellAtDistance(Cell relativeCell, int minDist, int maxDist) {
+    protected List<Cell> getCellAtDistance(Cell relativeCell, int minDist, int maxDist) {
         if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();
 
         List<Cell> cellAtDistance = new ArrayList<>();
@@ -198,7 +198,7 @@ public class Map {
      * @param id to search
      * @return list of cells with specified id
      */
-    public List<Cell> getCellsByID(int id) {
+    protected List<Cell> getCellsByID(int id) {
         return Arrays.stream(mapMatrix).flatMap(Arrays::stream)
                 .filter(c ->c != null && c.getID() == id).collect(Collectors.toList());
     }

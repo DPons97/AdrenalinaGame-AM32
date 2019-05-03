@@ -1,5 +1,4 @@
-package it.polimi.ingsw;
-
+package it.polimi.ingsw.Server.Model;
 import it.polimi.ingsw.custom_exceptions.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;

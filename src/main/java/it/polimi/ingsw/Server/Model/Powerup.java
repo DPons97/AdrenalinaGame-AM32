@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Server.Model;
 
 import org.json.simple.JSONObject;
 

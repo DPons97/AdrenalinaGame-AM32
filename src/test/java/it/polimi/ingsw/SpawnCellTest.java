@@ -1,5 +1,6 @@
 package it.polimi.ingsw;
 
+import it.polimi.ingsw.Server.Model.*;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.junit.jupiter.api.Test;
 

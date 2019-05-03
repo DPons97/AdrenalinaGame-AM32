@@ -1,6 +1,6 @@
 package it.polimi.ingsw;
 
-import org.junit.jupiter.api.BeforeEach;
+import it.polimi.ingsw.Server.Model.Deck;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
