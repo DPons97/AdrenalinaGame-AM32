@@ -167,24 +167,20 @@ public class Action {
 							case "PLAYER":
 								actions.add(caller -> {
 									targetPlayers.clear();
-									try {
-										List<Player> couldBeAdded = caller.getMatch().
-												getSelectablePlayers(caller,
-														baseActionJSON.get("from").toString(),
-														notID != null ? Integer.parseInt(notID.toString()) : -10,
-														Integer.parseInt(distance.get(0).toString()),
-														Integer.parseInt(distance.get(1).toString()),
-														targetPlayers
-												);
+									List<Player> couldBeAdded = caller.getMatch().
+											getSelectablePlayers(caller,
+													baseActionJSON.get("from").toString(),
+													notID != null ? Integer.parseInt(notID.toString()) : -10,
+													Integer.parseInt(distance.get(0).toString()),
+													Integer.parseInt(distance.get(1).toString()),
+													targetPlayers
+											);
 
-										if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
-											// if there is no choice -> add all you could add
-											targetPlayers.addAll(couldBeAdded);
-										else{
-											// TODO make controller select something
-										}
-									} catch (InvalidStringException e) {
-										e.printStackTrace();
+									if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+										// if there is no choice -> add all you could add
+										targetPlayers.addAll(couldBeAdded);
+									else{
+										// TODO make controller select something
 									}
 								});
 								break;

@@ -59,9 +59,9 @@ public class AdrenalinaMatch {
 	private Deck<Ammo> ammoDeck;
 
 	/**
-	 * Number of players
+	 * Max number of players of this match
 	 */
-	private int nPlayers;
+	private int maxPlayers;
 
 	/**
 	 * List of players in the match
@@ -94,15 +94,15 @@ public class AdrenalinaMatch {
 	private boolean started;
 
 	/**
-	 * @param nPlayers number of players [3,5].
+	 * @param maxPlayers number of players [3,5].
 	 * @param maxDeaths maximum number of deaths befor frenzy.
 	 * 					the same as skulls in the manual
 	 * @param turnDuration max duration of a turn in seconds.
 	 * @param mapID id of map to play [1,4].
 	 *
 	 */
-	public AdrenalinaMatch(int nPlayers, int maxDeaths, int turnDuration, int mapID) {
-		this.nPlayers = nPlayers;
+	public AdrenalinaMatch(int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+		this.maxPlayers = maxPlayers;
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
 		this.players = new ArrayList<>();
@@ -290,7 +290,7 @@ public class AdrenalinaMatch {
 	 */
 	public void addPlayer(Player toAdd) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
 		if(!started){
-			if(players.size() < nPlayers) {
+			if(players.size() < maxPlayers) {
 				for(Player p: players){
 					if(p.getNickname().equals(toAdd.getNickname())){
 						throw new PlayerAlreadyExistsException();
@@ -318,6 +318,17 @@ public class AdrenalinaMatch {
 	public List<Player> getPlayers() {
 		return players;
 	}
+
+	/**
+	 * Set max players of this match
+	 * @param maxPlayers that can join and play this match
+	 */
+	protected void setMaxPlayers(int maxPlayers) { this.maxPlayers = maxPlayers; }
+
+	/**
+	 * @return max players in this match
+	 */
+	public int getMaxPlayers() { return maxPlayers; }
 
 	/**
 	 * @param id of players to search
@@ -419,9 +430,9 @@ public class AdrenalinaMatch {
 	 * Sets attributes to start the match
 	 */
 	public void startMatch(int matchID) throws NotEnoughPlayersException, MatchAlreadyStartedException {
-		if(nPlayers == players.size()) {
+		if(maxPlayers == players.size()) {
 			if(!started) {
-				int luckyFirstPlayerNumber = new Random().nextInt(nPlayers);
+				int luckyFirstPlayerNumber = new Random().nextInt(maxPlayers);
 				this.matchID = matchID;
 				this.started = true;
 				this.firstPlayer = players.get(luckyFirstPlayerNumber);

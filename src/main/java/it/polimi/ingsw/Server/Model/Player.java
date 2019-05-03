@@ -169,6 +169,12 @@ public class Player {
 	}
 
 	/**
+	 * Make this player to join match
+	 * @param newMatch to join
+	 */
+	protected void setMatch(AdrenalinaMatch newMatch) { match = newMatch; }
+
+	/**
 	 * @return List of kill rewards during frenzy
 	 */
 	public static List<Integer> getFrenzyRewards() {

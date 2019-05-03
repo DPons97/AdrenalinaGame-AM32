@@ -1,4 +1,4 @@
-package it.polimi.ingsw;
+package it.polimi.ingsw.Server.Model;
 
 import it.polimi.ingsw.Server.Model.Action;
 import it.polimi.ingsw.Server.Model.AdrenalinaMatch;
