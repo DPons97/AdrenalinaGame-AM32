@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * 
  */
-public class MatchController implements Observer {
+public class MatchController {
 
 	/**
 	 * Default constructor
@@ -32,10 +32,5 @@ public class MatchController implements Observer {
 	 */
 	public void beginTurn() {
 		// TODO implement here
-	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-
 	}
 }

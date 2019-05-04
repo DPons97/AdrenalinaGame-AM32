@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * 
  */
-public class LobbyController implements Observer {
+public class LobbyController {
 
 	/**
 	 * Default constructor
@@ -46,10 +46,5 @@ public class LobbyController implements Observer {
 	 */
 	public void addPlayer(PlayerConnection player) {
 		// TODO implement here
-	}
-
-	@Override
-	public void update(Observable o, Object arg) {
-
 	}
 }

@@ -657,7 +657,7 @@ public class AdrenalinaMatch {
 	 * @return List with cells that satisfy query
 	 */
 	public List<Cell> getSelectableCells(Player caller, String from, int notID, int minDistance,
-										 int maxDistance, List<Player> players) throws InvalidStringException {
+										 int maxDistance, List<Player> players) {
 		List<Cell> toReturn = new ArrayList<>();
 		int pX;
 		int pY;

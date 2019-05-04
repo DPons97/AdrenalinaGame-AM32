@@ -1,4 +1,4 @@
-package it.polimi.ingsw.client.model;
+package it.polimi.ingsw.server.model;
 
 public enum MatchState {
     NOT_STARTED,

@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.model;
 
 import java.util.*;
 import it.polimi.ingsw.server.model.Map;
+import it.polimi.ingsw.server.model.MatchState;
 import it.polimi.ingsw.server.model.SpawnCell;
 
 /**

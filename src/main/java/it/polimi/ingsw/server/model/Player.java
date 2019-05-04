@@ -541,6 +541,7 @@ public class Player {
 	 *  Shoot at another player
 	 * @param weapon Weapon to use
 	 * @param effectID effect's ID to shoot
+	 * @param discountPowerups Powerups to use as discount on reload price
 	 */
 	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
 		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
@@ -553,6 +554,15 @@ public class Player {
 		}
 		pay(shootCost);
 		weapon.shoot(effectID, this);
+	}
+
+	/**
+	 *  Shoot at another player
+	 * @param weapon Weapon to use
+	 * @param effectID effect's ID to shoot
+	 */
+	public void shoot(Weapon weapon, int effectID) throws NoItemInInventoryException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
+		shoot(weapon, effectID, new ArrayList<>());
 	}
 
 	/**

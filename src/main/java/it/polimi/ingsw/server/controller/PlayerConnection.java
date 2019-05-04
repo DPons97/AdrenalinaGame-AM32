@@ -2,13 +2,18 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.server.model.Cell;
+import it.polimi.ingsw.server.model.Weapon;
 
 import java.util.*;
 
 /**
  * 
  */
-public abstract class PlayerConnection extends Observable {
+public abstract class PlayerConnection {
+	/**
+	 * Player's name
+	 */
+	private String name;
 
 	/**
 	 * Default constructor
@@ -17,42 +22,28 @@ public abstract class PlayerConnection extends Observable {
 	}
 
 	/**
-	 * 
-	 */
-	private String name;
-
-	/**
 	 * @param selectable
 	 * @return
 	 */
-	public Player selectPlayer(List<Player> selectable) {
-		// TODO implement here
-		return null;
-	}
-
+	public abstract Player selectPlayer(List<Player> selectable);
 	/**
 	 * @param selectable 
 	 * @return
 	 */
-	public Cell selectCell(List<Cell> selectable) {
-		// TODO implement here
-		return null;
-	}
+	public abstract Cell selectCell(List<Cell> selectable);
 
 	/**
 	 * @return
 	 */
-	public TurnAction selectAction() {
-		// TODO implement here
-		return null;
-	}
+	public abstract WeaponSelection reload(List<Weapon> canLoad);
 
 	/**
 	 * @return
 	 */
-	public boolean reload() {
-		// TODO implement here
-		return false;
-	}
+	public abstract WeaponSelection shoot(List<Weapon> loaded);
 
+	/**
+	 * @return
+	 */
+	public abstract TurnAction selectAction();
 }
