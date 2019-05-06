@@ -112,13 +112,6 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	}
 
-	/**
-	 *
-	 */
-	public static void main(String[] args) {
-
-	}
-
 	@Override
 	public void login(String name, ClientFunctionalities client) {
 		lobby.addPlayer(new PlayerRemote(name, client));
@@ -128,4 +121,18 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	public void logout() {
 
 	}
+
+    /**
+     *
+     */
+    public static void main(String[] args) {
+        LoginHandler loginHandler = null;
+        try {
+            loginHandler = new LoginHandler();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+            exit(1);
+        }
+        loginHandler.listenSocketConnection();
+    }
 }
