@@ -4,7 +4,7 @@ import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 
-import java.util.*;
+import java.util.List;
 
 /**
  * 
@@ -13,7 +13,7 @@ public abstract class PlayerConnection {
 	/**
 	 * Player's name
 	 */
-	private String name;
+	protected String name;
 
 	/**
 	 * Default constructor

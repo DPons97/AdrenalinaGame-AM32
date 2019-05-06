@@ -16,7 +16,7 @@ public class Lobby {
 
     private List<AdrenalinaMatch> matches;
 
-    protected Lobby(int maxMatches) {
+    public Lobby(int maxMatches) {
         this.players = new ArrayList<>();
         this.matches = new ArrayList<>();
         this.maxMatches = maxMatches;

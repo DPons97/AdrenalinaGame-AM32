@@ -2,7 +2,8 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.server.model.Lobby;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 
@@ -10,20 +11,24 @@ import java.util.*;
 public class LobbyController {
 
 	/**
+	 *
+	 */
+	public Lobby lobby;
+	private int maxMatches = 10;
+	/**
+	 *
+	 */
+	public List<PlayerConnection> players;
+
+	/**
 	 * Default constructor
 	 */
 	public LobbyController() {
+		this.lobby = new Lobby(maxMatches);
+		this.players = new ArrayList<>();
 	}
 
-	/**
-	 * 
-	 */
-	public Lobby lobby;
 
-	/**
-	 * 
-	 */
-	public List<PlayerConnection> players;
 
 
 
@@ -45,6 +50,6 @@ public class LobbyController {
 	 * @param player
 	 */
 	public void addPlayer(PlayerConnection player) {
-		// TODO implement here
+		players.add(player);
 	}
 }

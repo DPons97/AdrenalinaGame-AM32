@@ -1,25 +1,34 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.client.controller.ClientFunctionalities;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 
 import static java.lang.System.exit;
 
 /**
- * 
+ * Handles incoming connection from both rmi and socket registering the new client accordingly
  */
-public abstract class LoginHandler extends UnicastRemoteObject implements ServerFunctionalities{
+public class LoginHandler extends UnicastRemoteObject implements ServerFunctionalities{
 
-    /**
-     *  max connections number
-     */
-    private int maxConnections;
+	private static String address;
+	private static Registry registry;
+	private ClientFunctionalities client;
+
+	/**
+	 *  max connections number
+	 */
+	private int maxConnections;
 
     /**
      * ip address
@@ -36,18 +45,22 @@ public abstract class LoginHandler extends UnicastRemoteObject implements Server
      */
     private final int rmiPort=52297;
 
-    /**
-     * controller of the lobby
-     */
-    private LobbyController lobby;
-
-    private ServerSocket serverSocket;
-
+	/**
+	 * controller of the lobby
+	 */
+	private LobbyController lobby;
 	/**
 	 * Default constructor
 	 */
-	public LoginHandler() throws RemoteException {
+
+    private ServerSocket serverSocket;
+
+
+    public LoginHandler() throws RemoteException {
 		super();
+
+		this.lobby = new LobbyController();
+
         try {
             serverSocket= new ServerSocket(socketPort);
         } catch (IOException e) {
@@ -55,14 +68,29 @@ public abstract class LoginHandler extends UnicastRemoteObject implements Server
             exit(1);
         }
 
-    }
+		try
+		{
+			address = (InetAddress.getLocalHost()).toString();
+		}
+		catch (Exception e)
+		{
+			System.out.println("can't get inet address.");
+		}
+		int port = 3232;
+		System.out.println("this address=" + address + ",port=" + port);
+		try
+		{
+			registry = LocateRegistry.createRegistry(port);
+			registry.rebind("rmiServer", this);
+		}
+		catch (RemoteException e)
+		{
+			System.out.println("remote exception" + e);
+		}
+	}
 
 
 
-	/**
-	 * 
-	 */
-	public abstract void main();
 
 	/**
 	 * listen socket connection
@@ -81,6 +109,23 @@ public abstract class LoginHandler extends UnicastRemoteObject implements Server
 
         }
         exit(1);
+
 	}
 
+	/**
+	 *
+	 */
+	public static void main(String[] args) {
+
+	}
+
+	@Override
+	public void login(String name, ClientFunctionalities client) {
+		lobby.addPlayer(new PlayerRemote(name, client));
+	}
+
+	@Override
+	public void logout() {
+
+	}
 }

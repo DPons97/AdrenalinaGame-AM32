@@ -6,25 +6,18 @@ package it.polimi.ingsw.client.controller;
 public abstract class ServerConnection {
 
 	/**
+	 *
+	 */
+	protected ClientPlayer player;
+
+	/**
 	 * Default constructor
 	 */
-	public ServerConnection() {
+	public ServerConnection(ClientPlayer player) {
+		this.player = player;
 	}
 
-	/**
-	 * 
-	 */
-	private String ip;
 
-	/**
-	 * 
-	 */
-	private int port;
-
-	/**
-	 * 
-	 */
-	private ClientPlayer player;
 
 
 

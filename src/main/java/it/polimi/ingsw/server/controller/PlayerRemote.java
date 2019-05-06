@@ -19,7 +19,9 @@ public class PlayerRemote extends PlayerConnection {
 	/**
 	 * Default constructor
 	 */
-	public PlayerRemote() {
+	public PlayerRemote(String name, ClientFunctionalities remoteClient) {
+		super(name);
+		this.remotePlayer = remoteClient;
 	}
 
 	@Override

@@ -24,7 +24,8 @@ public class SocketClient extends ServerConnection {
 	/**
 	 * Default constructor
 	 */
-	public SocketClient() {
+	public SocketClient(ClientPlayer player) {
+		super(player);
 	}
 
 	@Override

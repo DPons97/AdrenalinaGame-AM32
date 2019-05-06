@@ -11,26 +11,27 @@ import java.rmi.server.UnicastRemoteObject;
 public abstract class ClientPlayer extends UnicastRemoteObject implements ClientFunctionalities{
 
 	/**
-	 * Default constructor
-	 */
-	public ClientPlayer() throws RemoteException {
-		super();
-	}
-
-	/**
-	 * 
+	 *
 	 */
 	private String nickname;
 
 	/**
-	 * 
+	 *
 	 */
 	private AdrenalinaMatch match;
 
 	/**
-	 * 
+	 *
 	 */
 	private ServerConnection server;
+
+	/**
+	 * Default constructor
+	 */
+	public ClientPlayer(String nickname) throws RemoteException {
+		super();
+		this.nickname = nickname;
+	}
 
 
 
