@@ -15,8 +15,6 @@ import static java.lang.System.exit;
 public class RemoteClient extends ServerConnection {
 	ServerFunctionalities server;
 	Registry registry;
-	String serverAddress = "192.168.56.1";
-	String serverPort = "3232";
 
 	/**
 	 * Default constructor
@@ -28,7 +26,7 @@ public class RemoteClient extends ServerConnection {
 	@Override
 	public void connect(String ip, int port) {
 		try {
-			registry = LocateRegistry.getRegistry(serverAddress, (new Integer(serverPort)).intValue());
+			registry = LocateRegistry.getRegistry(ip, port);
 			server = (ServerFunctionalities) (registry.lookup("rmiServer"));
 			server.login(player.getNickname(),this.player);
 

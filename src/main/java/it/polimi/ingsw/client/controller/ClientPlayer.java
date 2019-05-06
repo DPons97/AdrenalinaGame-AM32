@@ -71,11 +71,12 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 */
 	public static void main(String[] args) {
 		String ip = args[0];
+		System.out.println(ip);
 		int port= Integer.parseInt(args[1]);
 		Scanner in= new Scanner(System.in);
 		System.out.println("Insert nickname: ");
 		String nickname= in.next();
-		System.out.println("Select connection type [0: RMI, 1: SOCKET]: ");
+		System.out.println("Select connection type [0: SOCKET, 1: RMI]: ");
 		ConnectionType connectionType = (Integer.parseInt(in.next()) == 0) ? ConnectionType.SOCKET : ConnectionType.RMI;
 
 		try {
