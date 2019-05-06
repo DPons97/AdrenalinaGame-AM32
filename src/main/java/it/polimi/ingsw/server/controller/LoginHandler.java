@@ -76,11 +76,10 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		{
 			System.out.println("can't get inet address.");
 		}
-		int port = 3232;
-		System.out.println("this address=" + address + ",port=" + port);
+		System.out.println("this address=" + address + ",port=" + rmiPort);
 		try
 		{
-			registry = LocateRegistry.createRegistry(port);
+			registry = LocateRegistry.createRegistry(rmiPort);
 			registry.rebind("rmiServer", this);
 		}
 		catch (RemoteException e)
@@ -113,7 +112,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	}
 
 	@Override
-	public void login(String name, ClientFunctionalities client) {
+	public void login(String name, ClientFunctionalities client){
 		lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
