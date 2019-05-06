@@ -18,7 +18,9 @@ public abstract class PlayerConnection {
 	/**
 	 * Default constructor
 	 */
-	public PlayerConnection() {
+	public PlayerConnection(String name) {
+		this.name=name;
+
 	}
 
 	/**

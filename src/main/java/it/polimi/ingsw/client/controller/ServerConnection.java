@@ -34,15 +34,11 @@ public abstract class ServerConnection {
 	 * @param port 
 	 * @param nickname
 	 */
-	public void connect(String ip, int port, String nickname) {
-		// TODO implement here
-	}
+	public abstract void connect(String ip, int port, String nickname);
 
 	/**
 	 * 
 	 */
-	public void disconnect() {
-		// TODO implement here
-	}
+	public abstract void disconnect();
 
 }

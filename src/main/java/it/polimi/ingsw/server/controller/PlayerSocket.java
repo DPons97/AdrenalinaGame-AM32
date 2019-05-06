@@ -5,6 +5,7 @@ import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 import org.json.simple.JSONObject;
 
+import java.io.*;
 import java.util.List;
 
 /**
@@ -13,15 +14,19 @@ import java.util.List;
 public class PlayerSocket extends PlayerConnection {
 
 	/**
-	 * Default constructor
-	 */
-	public PlayerSocket() {
-	}
-
-	/**
 	 * Socket to communicate with player
 	 */
-	private int socket;
+	private PrintWriter output;
+	private BufferedReader input;
+
+	/**
+	 * Default constructor
+	 */
+	public PlayerSocket(PrintWriter output, BufferedReader input) throws IOException {
+		super(input.readLine());
+		this.input= input;
+		this.output= output;
+	}
 
 	/**
 	 * 
