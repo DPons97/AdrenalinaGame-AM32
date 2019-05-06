@@ -51,5 +51,6 @@ public class LobbyController {
 	 */
 	public void addPlayer(PlayerConnection player) {
 		players.add(player);
+		System.out.println(player.getName());
 	}
 }

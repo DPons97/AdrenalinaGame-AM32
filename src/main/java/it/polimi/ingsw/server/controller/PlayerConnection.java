@@ -23,6 +23,9 @@ public abstract class PlayerConnection {
 
 	}
 
+	public String getName(){
+	    return name;
+    }
 	/**
 	 * @param selectable
 	 * @return
@@ -48,4 +51,5 @@ public abstract class PlayerConnection {
 	 * @return
 	 */
 	public abstract TurnAction selectAction();
+
 }

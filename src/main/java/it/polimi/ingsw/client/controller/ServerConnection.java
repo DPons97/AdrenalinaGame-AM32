@@ -25,9 +25,8 @@ public abstract class ServerConnection {
 	/**
 	 * @param ip 
 	 * @param port 
-	 * @param nickname
 	 */
-	public abstract void connect(String ip, int port, String nickname);
+	public abstract void connect(String ip, int port);
 
 	/**
 	 * 

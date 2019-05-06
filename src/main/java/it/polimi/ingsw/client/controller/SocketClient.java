@@ -29,12 +29,12 @@ public class SocketClient extends ServerConnection {
 	}
 
 	@Override
-	public void connect(String ip, int port, String nickname) {
+	public void connect(String ip, int port) {
 		try {
 			socket= new Socket(ip, port);
 			this.output = new PrintWriter(socket.getOutputStream(), true);
 			this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			output.println(nickname);
+			output.println(player.getNickname());
 		} catch (IOException e) {
 			e.printStackTrace();
 			exit(1);

@@ -26,11 +26,11 @@ public class RemoteClient extends ServerConnection {
 	}
 
 	@Override
-	public void connect(String ip, int port, String nickname) {
+	public void connect(String ip, int port) {
 		try {
 			registry = LocateRegistry.getRegistry(serverAddress, (new Integer(serverPort)).intValue());
 			server = (ServerFunctionalities) (registry.lookup("rmiServer"));
-			server.login(nickname,this.player);
+			server.login(player.getNickname(),this.player);
 
 		} catch (RemoteException e)
 		{
