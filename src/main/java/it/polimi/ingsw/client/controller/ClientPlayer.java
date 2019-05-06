@@ -18,6 +18,9 @@ import static java.lang.System.exit;
  */
 public class ClientPlayer extends UnicastRemoteObject implements ClientFunctionalities{
 
+	private static final int rmiPort = 52297;
+	private static final int socketPort = 52298;
+
 	/**
 	 *
 	 */
@@ -70,14 +73,21 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * 
 	 */
 	public static void main(String[] args) {
+		ConnectionType connectionType;
+		int port;
 		String ip = args[0];
 		System.out.println(ip);
-		int port= Integer.parseInt(args[1]);
 		Scanner in= new Scanner(System.in);
 		System.out.println("Insert nickname: ");
 		String nickname= in.next();
 		System.out.println("Select connection type [0: SOCKET, 1: RMI]: ");
-		ConnectionType connectionType = (Integer.parseInt(in.next()) == 0) ? ConnectionType.SOCKET : ConnectionType.RMI;
+		if (Integer.parseInt(in.next()) == 0) {
+			connectionType = ConnectionType.SOCKET;
+			port = socketPort;
+		} else {
+			connectionType = ConnectionType.RMI;
+			port = rmiPort;
+		}
 
 		try {
 			ClientPlayer clientPlayer = new ClientPlayer(nickname, connectionType, ip, port);
