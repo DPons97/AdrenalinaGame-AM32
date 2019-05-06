@@ -1,14 +1,14 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.controller.ClientFunctionalities;
-import it.polimi.ingsw.client.model.Player;
+import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.util.List;
 
 /**
- * 
+ *
  */
 public class PlayerRemote extends PlayerConnection {
 	/**
@@ -33,6 +33,9 @@ public class PlayerRemote extends PlayerConnection {
 	public Cell selectCell(List<Cell> selectable) {
 		return null;
 	}
+
+	@Override
+	public List<Cell> selectRoom(List<List<Cell>> selectable) { return null; }
 
 	@Override
 	public WeaponSelection reload(List<Weapon> canLoad) {

@@ -1,6 +1,9 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
+import it.polimi.ingsw.server.controller.MatchController;
+import it.polimi.ingsw.server.controller.PlayerRemote;
+import it.polimi.ingsw.server.controller.PlayerSocket;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.Assert.*;
@@ -10,7 +13,7 @@ public class LobbyTest {
     @Test
     public void createMatch() throws TooManyPlayersException, TooManyMatchesException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer");
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
 
         // Check right init of class
         assertTrue(testLobby.getLobbyMatches().isEmpty());
@@ -20,7 +23,7 @@ public class LobbyTest {
         testLobby.addPlayer(testPlayer);
 
         // testPlayer creates new match
-        AdrenalinaMatch newMatch = testLobby.createMatch(testPlayer, 5, 8, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer, 5, 8, 120, 1);
 
         // Match successfully created
         assertNotNull(newMatch);
@@ -32,15 +35,15 @@ public class LobbyTest {
         // New match is joinable
         assertEquals(newMatch, testLobby.getJoinableMatches().get(0));
         // New match not started yet
-        assertFalse(testLobby.getLobbyMatches().get(0).isStarted());
+        assertFalse(testLobby.getLobbyMatches().get(0).getMatch().isStarted());
         // Test player joined new match he created
-        assertTrue(newMatch.getPlayers().contains(testPlayer));
+        assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer));
         // Host player is indexed as 0 in match
-        assertEquals(testPlayer, newMatch.getPlayers().get(0));
+        assertEquals(testPlayer, newMatch.getMatch().getPlayers().get(0));
 
         // Add more matches than allowed
         for (int i = 0; i < testLobby.getMaxMatches() - 1; i++) {
-            Player newMatchPlayer = new Player("Stormtrooper");
+            Player newMatchPlayer = new Player("Stormtrooper", new PlayerRemote("player", null));
             testLobby.addPlayer(newMatchPlayer);
             testLobby.createMatch(newMatchPlayer, 5, 8, 120, 1);
         }
@@ -51,18 +54,18 @@ public class LobbyTest {
     @Test
     public void getJoinableMatches() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException, NotEnoughPlayersException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer");
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
 
         assertTrue(testLobby.getJoinableMatches().isEmpty());
 
         testLobby.addPlayer(testPlayer);
-        AdrenalinaMatch newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
 
         assertEquals(newMatch, testLobby.getJoinableMatches().get(0));
 
         // Add enough players to match
-        Player testPlayer1 = new Player("testPlayer1");
-        Player testPlayer2 = new Player("testPlayer2");
+        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("player", null));
+        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("player", null));
         testLobby.addPlayer(testPlayer1);
         testLobby.addPlayer(testPlayer2);
         testLobby.joinMatch(testPlayer1, newMatch);
@@ -74,28 +77,28 @@ public class LobbyTest {
     @Test
     public void joinMatch() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer");
-        Player testPlayer1 = new Player("testPlayer1");
-        Player testPlayer2 = new Player("testPlayer2");
-        Player testPlayer3 = new Player("testPlayer3");
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
+        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("player", null));
+        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("player", null));
+        Player testPlayer3 = new Player("testPlayer3", new PlayerRemote("player", null));
 
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer1);
         testLobby.addPlayer(testPlayer2);
         testLobby.addPlayer(testPlayer3);
 
-        AdrenalinaMatch newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
 
         assertEquals(3, testLobby.getLobbyPlayers().size());
-        assertTrue(newMatch.getPlayers().contains(testPlayer));
+        assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer));
 
         testLobby.joinMatch(testPlayer1, newMatch);
         assertEquals(2, testLobby.getLobbyPlayers().size());
-        assertTrue(newMatch.getPlayers().contains(testPlayer1));
+        assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer1));
 
         testLobby.joinMatch(testPlayer2, newMatch);
         assertEquals(1, testLobby.getLobbyPlayers().size());
-        assertTrue(newMatch.getPlayers().contains(testPlayer2));
+        assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer2));
 
         // Try to add more players than allowed
         assertThrows(TooManyPlayersException.class, () -> testLobby.joinMatch(testPlayer3, newMatch));

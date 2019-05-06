@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
+import it.polimi.ingsw.server.controller.MatchController;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +15,7 @@ public class Lobby {
 
     private List<Player> players;
 
-    private List<AdrenalinaMatch> matches;
+    private List<MatchController> matches;
 
     public Lobby(int maxMatches) {
         this.players = new ArrayList<>();
@@ -30,7 +31,7 @@ public class Lobby {
     /**
      * @return list of all current matches inside lobby (joinable, full and begun)
      */
-    public List<AdrenalinaMatch> getLobbyMatches() { return new ArrayList<>(matches); }
+    public List<MatchController> getLobbyMatches() { return new ArrayList<>(matches); }
 
     /**
      * @return max number of matches that can be played on same server
@@ -40,10 +41,10 @@ public class Lobby {
     /**
      * @return all matches that can be joined by a player
      */
-    protected List<AdrenalinaMatch> getJoinableMatches() {
-        List<AdrenalinaMatch> toReturn = new ArrayList<>();
-        for (AdrenalinaMatch match : matches) {
-            if (match.getPlayers().size() < match.getnPlayers()) toReturn.add(match);
+    public List<MatchController> getJoinableMatches() {
+        List<MatchController> toReturn = new ArrayList<>();
+        for (MatchController match : matches) {
+            if (match.getMatch().getPlayers().size() < match.getMatch().getPlayerNumber()) toReturn.add(match);
         }
 
         return toReturn;
@@ -51,23 +52,29 @@ public class Lobby {
 
     /**
      * Create and add a new match to the lobby
+     * @return Controller to new match
      */
-    protected AdrenalinaMatch createMatch(Player host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
+    public MatchController createMatch(Player host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
         if (matches.size() >= maxMatches) throw new TooManyMatchesException();
         if (!players.contains(host)) throw new PlayerNotExistsException();
 
-        AdrenalinaMatch newMatch = new AdrenalinaMatch(maxPlayers, maxDeaths, turnDuration, mapID);
-        joinMatch(host, newMatch);
-        matches.add(newMatch);
+        // Create model of new match for controller
+        AdrenalinaMatch newMatchModel = new AdrenalinaMatch(maxPlayers, maxDeaths, turnDuration, mapID);
 
-        return newMatch;
+        // Returns controller for new match
+        MatchController newMatchController = new MatchController(newMatchModel, this);
+
+        joinMatch(host, newMatchController);
+        matches.add(newMatchController);
+
+        return newMatchController;
     }
 
     /**
      * Add new client to lobby
      * @param toAdd
      */
-    protected void addPlayer(Player toAdd) {
+    public void addPlayer(Player toAdd) {
         players.add(toAdd);
     }
 
@@ -80,11 +87,12 @@ public class Lobby {
      * @throws PlayerAlreadyExistsException if player already inside toJoin
      * @throws PlayerNotExistsException if player is not in lobby
      */
-    protected void joinMatch(Player player, AdrenalinaMatch toJoin) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
+    protected void joinMatch(Player player, MatchController toJoin) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
         if (!players.contains(player)) throw new PlayerNotExistsException();
 
-        toJoin.addPlayer(player);
-        player.setMatch(toJoin);
+        toJoin.getMatch().addPlayer(player);
+        player.setMatch(toJoin.getMatch());
+        player.getConnection().setCurrentMatch(toJoin);
         players.remove(player);
     }
 }

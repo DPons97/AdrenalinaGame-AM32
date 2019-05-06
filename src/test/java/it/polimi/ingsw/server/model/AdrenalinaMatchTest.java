@@ -45,11 +45,11 @@ class AdrenalinaMatchTest {
         assertFalse(testMatch.isStarted());
         testMatch.addPlayer(new Player(testMatch, "testPlayer1"));
         testMatch.addPlayer(new Player(testMatch, "testPlayer2"));
-        assertThrows(NotEnoughPlayersException.class, () -> testMatch.startMatch(41));
+        assertThrows(NotEnoughPlayersException.class, testMatch::startMatch);
         testMatch.addPlayer(new Player(testMatch, "testPlayer3"));
-        testMatch.startMatch(14);
+        testMatch.startMatch();
         assertTrue(testMatch.isStarted());
-        assertThrows(MatchAlreadyStartedException.class, () -> testMatch.startMatch(1));
+        assertThrows(MatchAlreadyStartedException.class, testMatch::startMatch);
     }
 
     @Test
@@ -63,8 +63,32 @@ class AdrenalinaMatchTest {
         assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer2")));
         assertDoesNotThrow(()->testMatch.addPlayer(new Player(testMatch, "testPlayer3")));
         assertThrows(TooManyPlayersException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer4")));
-        assertDoesNotThrow(()->testMatch.startMatch(77));
+        assertDoesNotThrow(testMatch::startMatch);
         assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer5")));
+    }
+
+    @Test
+    public void kickPlayer() throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 5,120, 1);
+        Player p1 = new Player(testMatch, "testPlayer1");
+        Player p2 = new Player(testMatch, "testPlayer2");
+        Player p3 = new Player(testMatch, "testPlayer3");
+        Player p4 = new Player(testMatch, "testPlayer4");
+
+        testMatch.addPlayer(p1);
+        assertThrows(NotEnoughPlayersException.class,()->testMatch.kickPlayer(p2));
+
+        testMatch.addPlayer(p2);
+        testMatch.addPlayer(p3);
+        testMatch.addPlayer(p4);
+        assertDoesNotThrow(()->testMatch.kickPlayer(p1));
+
+        assertThrows(NotEnoughPlayersException.class, ()-> testMatch.kickPlayer(p2));
+
+        testMatch.addPlayer(p1);
+        assertDoesNotThrow(testMatch::startMatch);
+
+        assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.kickPlayer(p2));
     }
 
 

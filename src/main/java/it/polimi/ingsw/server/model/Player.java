@@ -1,13 +1,14 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
+import it.polimi.ingsw.server.controller.PlayerConnection;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 /**
- * 
+ *
  */
 public class Player {
 	/**
@@ -36,6 +37,11 @@ public class Player {
 	private AdrenalinaMatch match;
 
 	/**
+	 * Connection equivalent of player
+	 */
+	private PlayerConnection connection;
+
+	/**
 	 *  player's unique id
 	 */
 	private int id;
@@ -44,6 +50,11 @@ public class Player {
 	 *  This player's nickname
 	 */
 	private String nickname;
+
+	/**
+	 * True if this player is ready to start the match
+	 */
+	private boolean readyToStart;
 
 	/**
 	 *  Current player's score
@@ -98,13 +109,39 @@ public class Player {
 	private List<Resource> ammos;
 
 	/**
-	 * Default constructor
+	 * TESTING PURPOSE: Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
 	 */
 	public Player(AdrenalinaMatch match, String nickname) {
 		this.match = match;
 		this.nickname = nickname;
+		this.readyToStart = false;
+		this.connection = null;
+		score = 0;
+
+		dmgPoints = new ArrayList<>();
+		marks = new ArrayList<>();
+
+		id = -1;
+		dead = true;
+		deaths = 0;
+		givenMarks = 0;
+		position = null;
+
+		weapons = new ArrayList<>();
+		powerups = new ArrayList<>();
+		ammos = new ArrayList<>();
+	}
+
+	/**
+	 * Default constructor
+	 * @param	nickname This player's nickname
+	 */
+	public Player(String nickname, PlayerConnection playerConnection) {
+		this.nickname = nickname;
+		this.readyToStart = false;
+		this.connection = playerConnection;
 		score = 0;
 
 		dmgPoints = new ArrayList<>();
@@ -128,6 +165,8 @@ public class Player {
 	public Player(String nickname) {
 		this.match = null;
 		this.nickname = nickname;
+		this.readyToStart = false;
+		this.connection = null;
 		score = 0;
 
 		dmgPoints = new ArrayList<>();
@@ -160,6 +199,11 @@ public class Player {
 	public String getNickname(){
 		return nickname;
 	}
+
+	/**
+	 * @return player's connection handler
+	 */
+	public PlayerConnection getConnection() { return connection; }
 
 	/**
 	 * @return player's match reference
@@ -255,6 +299,11 @@ public class Player {
 	 * @return current Player's score
 	 */
 	public int getScore() { return score; }
+
+	/**
+	 * @return True if player's ready to start the match
+	 */
+	public boolean isReadyToStart() { return readyToStart; }
 
 	/**
 	 * @return player id

@@ -29,11 +29,6 @@ public class AdrenalinaMatch {
 	private static int minPlayers = 3;
 
 	/**
-	 * Unique match identifier
-	 */
-	private int matchID;
-
-	/**
 	 * Reference to map
 	 */
 	private Map boardMap;
@@ -99,9 +94,9 @@ public class AdrenalinaMatch {
 	private int turn;
 
 	/**
-	 * 	false before first turn takes place.
+	 * Current match's state
 	 */
-	private boolean started;
+	private MatchState state;
 
 	/**
 	 * @param nPlayers number of players [3,5].
@@ -120,7 +115,7 @@ public class AdrenalinaMatch {
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
 		this.players = new ArrayList<>();
-		this.started = false;
+		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
 		this.frenzyEnabled = false;
@@ -130,8 +125,6 @@ public class AdrenalinaMatch {
 
 		// Map initialization
 		this.buildMap(mapID);
-
-		this.matchID = -1; // will be given a unique value from controller when match starts
 	}
 
 	/**
@@ -303,7 +296,7 @@ public class AdrenalinaMatch {
 	 *	Add  new player to the game, only possible before the match starts
 	 */
 	public void addPlayer(Player toAdd) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
-		if(!started){
+		if(state == MatchState.NOT_STARTED){
 			if(players.size() < nPlayers) {
 				for(Player p: players){
 					if(p.getNickname().equals(toAdd.getNickname())){
@@ -317,6 +310,26 @@ public class AdrenalinaMatch {
 		} else {
 			throw new MatchAlreadyStartedException();
 		}
+	}
+
+	/**
+	 * Kick a player from match
+	 * @param toKick player that wants to leave
+	 */
+	public void kickPlayer(Player toKick) throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
+		if(state == MatchState.NOT_STARTED){
+			if (players.size() > minPlayers) {
+				boolean playerNotExists = true;
+				for (Player p : players) {
+					if (p.getNickname().equals(toKick.getNickname())) {
+						playerNotExists = false;
+						break;
+					}
+				}
+				if (playerNotExists) throw new PlayerNotExistsException();
+				players.remove(toKick);
+			} else throw new NotEnoughPlayersException();
+		} else throw new MatchAlreadyStartedException();
 	}
 
 	/**
@@ -337,12 +350,12 @@ public class AdrenalinaMatch {
 	 * Set max players of this match
 	 * @param nPlayers that can join and play this match
 	 */
-	protected void setnPlayers(int nPlayers) { this.nPlayers = nPlayers; }
+	protected void setPlayerNumber(int nPlayers) { this.nPlayers = nPlayers; }
 
 	/**
 	 * @return max players in this match
 	 */
-	public int getnPlayers() { return nPlayers; }
+	public int getPlayerNumber() { return nPlayers; }
 
 	/**
 	 * @param id of players to search
@@ -372,13 +385,6 @@ public class AdrenalinaMatch {
 	 */
 	public Deck<Powerup> getPowerupDeck() {
 		return powerupDeck;
-	}
-
-	/**
-	 * @return the match Id as an int.
-	 */
-	public int getMatchID() {
-		return matchID;
 	}
 
 	/**
@@ -428,6 +434,16 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @return current match's state
+	 */
+	public MatchState getMatchState() { return state; }
+
+	/**
+	 * @return True if match's state is not equal to NOT_STARTED
+	 */
+	public boolean isStarted() { return state != MatchState.NOT_STARTED; }
+
+	/**
 	 * Insert new death in the game board, updates # of deaths and death track
 	 */
 	public void addDeath(Player killer, boolean isOverkill) throws PlayerNotExistsException {
@@ -443,12 +459,11 @@ public class AdrenalinaMatch {
 	/**
 	 * Sets attributes to start the match
 	 */
-	public void startMatch(int matchID) throws NotEnoughPlayersException, MatchAlreadyStartedException {
+	public void startMatch() throws NotEnoughPlayersException, MatchAlreadyStartedException {
 		if(nPlayers == players.size()) {
-			if(!started) {
+			if(state == MatchState.NOT_STARTED) {
 				int luckyFirstPlayerNumber = new Random().nextInt(nPlayers);
-				this.matchID = matchID;
-				this.started = true;
+				this.state = MatchState.PLAYER_TURN;
 				this.firstPlayer = players.get(luckyFirstPlayerNumber);
 			}else {
 				throw new MatchAlreadyStartedException();
@@ -457,13 +472,6 @@ public class AdrenalinaMatch {
 		} else {
 			throw new NotEnoughPlayersException();
 		}
-	}
-
-	/**
-	 * started getter
-	 */
-	public boolean isStarted (){
-		return started;
 	}
 
 	/**
