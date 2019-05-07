@@ -1,6 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
-import it.polimi.ingsw.client.model.Player;
+import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 import org.json.simple.JSONObject;
@@ -9,7 +9,7 @@ import java.io.*;
 import java.util.List;
 
 /**
- * 
+ *
  */
 public class PlayerSocket extends PlayerConnection {
 
@@ -29,7 +29,7 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void listen() {
 		// TODO implement here
@@ -43,7 +43,7 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	private void disconnect() {
 		// TODO implement here
@@ -58,6 +58,9 @@ public class PlayerSocket extends PlayerConnection {
 	public Cell selectCell(List<Cell> selectable) {
 		return null;
 	}
+
+	@Override
+	public List<Cell> selectRoom(List<List<Cell>> selectable) { return null; }
 
 	@Override
 	public WeaponSelection reload(List<Weapon> canLoad) {

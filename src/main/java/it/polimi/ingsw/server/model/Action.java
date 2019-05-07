@@ -128,9 +128,6 @@ public class Action {
 				JSONObject baseActionJSON = (JSONObject) baseActionObj;
 				switch(baseActionJSON.get("type").toString()){
 					case "SELECT":
-						// TODO implement here
-						// might be controller work
-
 						Object notID = baseActionJSON.get("notID");
 						JSONArray distance = (JSONArray) baseActionJSON.get("distance");
 						JSONArray qty = (JSONArray) baseActionJSON.get("quantity");
@@ -156,7 +153,7 @@ public class Action {
 										// if there is no choice -> add all you could add
 										targetCells.addAll(couldBeAdded);
 									else{
-										// TODO make controller select something
+										if (caller.getConnection() != null) caller.getConnection().selectCell(couldBeAdded);
 									}
 								});
 								break;
@@ -176,7 +173,7 @@ public class Action {
 										// if there is no choice -> add all you could add
 										targetPlayers.addAll(couldBeAdded);
 									else{
-										// TODO make controller select something
+										if (caller.getConnection() != null) caller.getConnection().selectPlayer(couldBeAdded);
 									}
 								});
 								break;
@@ -194,7 +191,7 @@ public class Action {
 										// if there is no choice -> add all you could add
 										targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
 									else{
-										// TODO make controller select something
+										if (caller.getConnection() != null) caller.getConnection().selectRoom(couldBeAdded);
 									}
 								});
 								break;
@@ -224,7 +221,6 @@ public class Action {
 							actions.add(caller -> {
 								List<Player> toApply = selectTargets();
 								if(!targetCells.isEmpty())
-									//TODO: THIS CONDITION SHOULD ALWAYS BE TRUE ONCE SELECTION IS IMPLEMENTED
 									toApply.forEach(p->p.move(targetCells.get(0)));
 							});
 
