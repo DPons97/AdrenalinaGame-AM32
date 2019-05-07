@@ -14,7 +14,8 @@ public interface ServerFunctionalities extends Remote {
 	 * Allow user to connect to server.
 	 * Register remote client in Player remote
 	 * and adds it to Lobby Controller
-	 * @param client
+	 * @param client remote reference to client connecting
+	 * @param name client name
 	 */
 	public void login(String name, ClientFunctionalities client) throws RemoteException;
 

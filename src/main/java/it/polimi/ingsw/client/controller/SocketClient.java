@@ -16,18 +16,33 @@ import static java.lang.System.exit;
 public class SocketClient extends ServerConnection {
 
 	/**
-	 *
+	 * Socket connected to server
 	 */
 	private Socket socket;
-	private PrintWriter output;
-	private BufferedReader input;
+
 	/**
-	 * Default constructor
+	 * Writer for socket stream out
+	 */
+	private PrintWriter output;
+
+	/**
+	 * Reader for socket stream in
+	 */
+	private BufferedReader input;
+
+	/**
+	 * Constructor
 	 */
 	public SocketClient(ClientPlayer player) {
+
 		super(player);
 	}
 
+	/**
+	 * Connect client to a server at ip and port passed
+	 * @param ip server ip
+	 * @param port server port
+	 */
 	@Override
 	public void connect(String ip, int port) {
 		try {
@@ -42,21 +57,23 @@ public class SocketClient extends ServerConnection {
 
 	}
 
+	/**
+	 * Disconnect client from server
+	 */
 	@Override
 	public void disconnect() {
 
 	}
 
-
-
 	/**
-	 * 
+	 * listen for instructions from server
 	 */
 	private void listen() {
 		// TODO implement here
 	}
 
 	/**
+	 * Send message to server
 	 * @param message to send
 	 */
 	private void sendAnswer(JSONObject message) {

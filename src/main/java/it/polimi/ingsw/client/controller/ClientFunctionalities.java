@@ -6,7 +6,7 @@ import it.polimi.ingsw.server.model.Cell;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.*;
+import java.util.List;
 
 /**
  * 
@@ -14,19 +14,22 @@ import java.util.*;
 public interface ClientFunctionalities extends Remote {
 
 	/**
-	 * @param selectable
-	 * @return
+	 * Select a player from a given list
+	 * @param selectable list of players
+	 * @return player from selectable
 	 */
-	public Cell playerSelection(List<Player> selectable) throws RemoteException;
+	public Player playerSelection(List<Player> selectable) throws RemoteException;
 
 	/**
-	 * @param selectable 
-	 * @return
+	 * Select a Cell from a given list
+	 * @param selectable list of cells
+	 * @return cell from selectable
 	 */
 	public Cell cellSelection(List<Cell> selectable) throws RemoteException;
 
 	/**
-	 * @return
+	 * Select an action to make
+	 * @return action to make
 	 */
 	public TurnAction actionSelection() throws RemoteException;
 

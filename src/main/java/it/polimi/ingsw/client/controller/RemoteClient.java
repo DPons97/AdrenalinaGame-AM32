@@ -13,16 +13,29 @@ import static java.lang.System.exit;
  * 
  */
 public class RemoteClient extends ServerConnection {
+
+	/**
+	 * Remote reference to server
+	 */
 	ServerFunctionalities server;
+
+	/**
+	 * RMI registry
+	 */
 	Registry registry;
 
 	/**
-	 * Default constructor
+	 * Constructor
 	 */
 	public RemoteClient(ClientPlayer player) {
 		super(player);
 	}
 
+	/**
+	 * Connect client to a server at ip and port passed
+	 * @param ip server ip
+	 * @param port server port
+	 */
 	@Override
 	public void connect(String ip, int port) {
 		try {
@@ -42,6 +55,9 @@ public class RemoteClient extends ServerConnection {
 		}
 	}
 
+	/**
+	 * Disconnect client from server
+	 */
 	@Override
 	public void disconnect() {
 

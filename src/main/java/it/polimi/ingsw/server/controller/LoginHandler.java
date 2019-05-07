@@ -49,14 +49,17 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * controller of the lobby
 	 */
 	private LobbyController lobby;
+
+	/**
+	 * socket opened by the server
+	 */
+	private ServerSocket serverSocket;
+
 	/**
 	 * Default constructor
+	 * Registers self in rmi register and opens socket
 	 */
-
-    private ServerSocket serverSocket;
-
-
-    public LoginHandler() throws RemoteException {
+	public LoginHandler() throws RemoteException {
 		super();
 
 		this.lobby = new LobbyController();
@@ -99,7 +102,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
         while (true) {
             try {
                 clientSocket= serverSocket.accept();
-                System.out.println("Socket connection requested.");
+                System.out.println("Received socket connection request.");
                 lobby.addPlayer(new PlayerSocket(new PrintWriter(clientSocket.getOutputStream(), true),
                                                  new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))));
             } catch (IOException e) {
@@ -113,7 +116,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	@Override
 	public void login(String name, ClientFunctionalities client){
-		System.out.println("RMI connection requested");
+		System.out.println("Received RMI connection request");
 		lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
@@ -126,15 +129,17 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
      *
      */
     public static void main(String[] args) {
-        try {
-            LoginHandler loginHandler = new LoginHandler();
-			Thread t1 = new Thread(loginHandler::listenSocketConnection);
-			t1.start();
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            exit(1);
-        }
+		LoginHandler loginHandler;
+    	try {
+            loginHandler = new LoginHandler();
 
+        } catch (RemoteException e) {
+
+            e.printStackTrace();
+			return;
+    	}
+		Thread t1 = new Thread(loginHandler::listenSocketConnection);
+		t1.start();
     }
 
 
