@@ -46,8 +46,9 @@ public class LobbyController {
 	/**
 	 * @param player
 	 */
-	public void addPlayer(PlayerConnection player) {
+	public synchronized void addPlayer(PlayerConnection player) {
 		players.add(player);
 		System.out.println(player.getName());
+		System.out.print(" connected.");
 	}
 }

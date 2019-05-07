@@ -99,13 +99,13 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
         while (true) {
             try {
                 clientSocket= serverSocket.accept();
+                System.out.println("Socket connection requested.");
                 lobby.addPlayer(new PlayerSocket(new PrintWriter(clientSocket.getOutputStream(), true),
                                                  new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))));
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
             }
-
         }
         exit(1);
 
@@ -113,6 +113,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	@Override
 	public void login(String name, ClientFunctionalities client){
+		System.out.println("RMI connection requested");
 		lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
@@ -125,13 +126,16 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
      *
      */
     public static void main(String[] args) {
-        LoginHandler loginHandler = null;
         try {
-            loginHandler = new LoginHandler();
+            LoginHandler loginHandler = new LoginHandler();
+			Thread t1 = new Thread(loginHandler::listenSocketConnection);
+			t1.start();
         } catch (RemoteException e) {
             e.printStackTrace();
             exit(1);
         }
-        loginHandler.listenSocketConnection();
+
     }
+
+
 }
