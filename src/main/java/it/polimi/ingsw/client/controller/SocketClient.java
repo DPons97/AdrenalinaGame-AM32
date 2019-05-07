@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.controller;
 
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -69,7 +70,16 @@ public class SocketClient extends ServerConnection {
 	 * listen for instructions from server
 	 */
 	private void listen() {
-		// TODO implement here
+		String msg;
+		while(true){
+			try {
+				msg = input.readLine();
+				parseMessage((JSONObject) JSONValue.parse(msg));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return;
+			}
+		}
 	}
 
 	/**
@@ -78,6 +88,30 @@ public class SocketClient extends ServerConnection {
 	 */
 	private void sendAnswer(JSONObject message) {
 		// TODO implement here
+	}
+
+	private void parseMessage(JSONObject message){
+		switch (message.get("function").toString()){
+			//TODO implement toJSON and fromJSON in weason selection then complete this
+			case "select":
+				switch (message.get("type").toString()){
+					case "player":
+
+					case "cell":
+
+					case "load":
+
+					case "shoot":
+
+					default:
+
+				}
+				break;
+			case "update":
+
+			default:
+
+		}
 	}
 
 }

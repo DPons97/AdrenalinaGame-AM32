@@ -3,7 +3,6 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Weapon;
-import netscape.javascript.JSObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -11,18 +10,26 @@ import org.json.simple.JSONValue;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- *
+ * Socket implementation of PlayerConnection
+ * Builds a JSON formatted string with instructions for client which executes ClientPlayer functions
+ * and responds with json formatted string
  */
 public class PlayerSocket extends PlayerConnection {
 
 	/**
-	 * Socket to communicate with player
+	 * Printer to write on socket stream out
 	 */
 	private PrintWriter output;
+
+	/**
+	 * BufferReader to read from socket stream out
+	 */
 	private BufferedReader input;
 
 	/**
@@ -85,14 +92,8 @@ public class PlayerSocket extends PlayerConnection {
         JSONObject message = new JSONObject();
         message.put("function", "select");
         message.put("type", "cell");
-        JSONArray jArray = new JSONArray();
-        selectable.forEach(s-> {
-            JSONObject coords = new JSONObject();
-            coords.put("x", s.getCoordX());
-            coords.put("y", s.getCoordY());
-            jArray.add(coords);
-        });
-        message.put("list", jArray);
+		JSONArray jArray = createJSONCoordinateList(selectable);
+		message.put("list", jArray);
         this.sendInstruction(message);
         JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
         return selectable.stream().filter(c->c.getCoordX() == Integer.parseInt(selected.get("x").toString()) &&
@@ -112,14 +113,8 @@ public class PlayerSocket extends PlayerConnection {
         message.put("type", "room");
         JSONArray jArray = new JSONArray();
         selectable.forEach(r -> {
-            JSONArray room = new JSONArray();
-            r.forEach(s->{
-                JSONObject coords = new JSONObject();
-                coords.put("x", s.getCoordX());
-                coords.put("y", s.getCoordY());
-                room.add(coords);
-            });
-            jArray.add(room);
+			JSONArray room = createJSONCoordinateList(r);
+			jArray.add(room);
         });
         message.put("list", jArray);
         this.sendInstruction(message);
@@ -136,6 +131,17 @@ public class PlayerSocket extends PlayerConnection {
         return null;
     }
 
+	private JSONArray createJSONCoordinateList(List<Cell> r) {
+		JSONArray room = new JSONArray();
+		r.forEach(s -> {
+			JSONObject coords = new JSONObject();
+			coords.put("x", s.getCoordX());
+			coords.put("y", s.getCoordY());
+			room.add(coords);
+		});
+		return room;
+	}
+
 
 	/**
 	 * select a weapon to reload
@@ -144,7 +150,24 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public WeaponSelection reload(List<Weapon> canLoad) {
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "load");
+		JSONArray jArray = createJSONWeaponList(canLoad);
+		message.put("list", jArray);
+		this.sendInstruction(message);
+
+		JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+
+		// TODO parse weapon selection json and return
+
 		return null;
+	}
+
+	private JSONArray createJSONWeaponList(List<Weapon> canLoad) {
+		JSONArray jArray = new JSONArray();
+		canLoad.forEach(s -> jArray.add(s.getName()));
+		return jArray;
 	}
 
 	/**
@@ -154,6 +177,17 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public WeaponSelection shoot(List<Weapon> loaded) {
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "shoot");
+		JSONArray jArray = createJSONWeaponList(loaded);
+		message.put("list", jArray);
+		this.sendInstruction(message);
+
+		JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+
+		// TODO parse weapon selection json and return
+
 		return null;
 	}
 
@@ -163,6 +197,16 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public TurnAction selectAction() {
-		return null;
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "action");
+		JSONArray jArray = new JSONArray();
+		List<TurnAction> actions = new ArrayList<>(Arrays.asList(TurnAction.values()));
+		actions.forEach(a -> jArray.add(a.toString()));
+		message.put("list", jArray);
+		this.sendInstruction(message);
+		String selected = this.listen();
+		return actions.stream().filter(a->a.toString().equals(selected))
+				.collect(Collectors.toList()).get(0);
 	}
 }

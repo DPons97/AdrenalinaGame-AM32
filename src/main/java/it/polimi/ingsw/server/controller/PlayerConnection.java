@@ -3,15 +3,15 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.NotEnoughPlayersException;
 import it.polimi.ingsw.custom_exceptions.PlayerNotExistsException;
+import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Lobby;
 import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.util.List;
 
 /**
- *
+ *	Allows server to send request to client without knowing connection method
  */
 public abstract class PlayerConnection {
 	/**

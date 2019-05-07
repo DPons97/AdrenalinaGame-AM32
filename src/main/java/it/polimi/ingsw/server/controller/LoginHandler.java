@@ -114,19 +114,30 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	}
 
+	/**
+	 * Allow user to connect to server.
+	 * Register remote client in Player remote
+	 * and adds it to Lobby Controller
+	 * @param client remote reference to client connecting
+	 * @param name client name
+	 */
 	@Override
 	public void login(String name, ClientFunctionalities client){
 		System.out.println("Received RMI connection request");
 		lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
+	/**
+	 * Allow user to disconnect from server
+	 * Removes remote client in Player remote
+	 */
 	@Override
 	public void logout() {
 
 	}
 
     /**
-     *
+     * Main method to test connections
      */
     public static void main(String[] args) {
 		LoginHandler loginHandler;

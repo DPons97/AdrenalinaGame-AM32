@@ -5,10 +5,12 @@ import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Weapon;
 
+import java.rmi.RemoteException;
 import java.util.List;
 
 /**
- *
+ *	RMI implementation of player connection
+ *	calls clientPlayer methods directly
  */
 public class PlayerRemote extends PlayerConnection {
 	/**
@@ -31,6 +33,11 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public Player selectPlayer(List<Player> selectable) {
+		try {
+			return remotePlayer.playerSelection(selectable);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -41,6 +48,11 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public Cell selectCell(List<Cell> selectable) {
+		try {
+			return remotePlayer.cellSelection(selectable);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -50,7 +62,14 @@ public class PlayerRemote extends PlayerConnection {
 	 * @return a room from selectable
 	 */
 	@Override
-	public List<Cell> selectRoom(List<List<Cell>> selectable) { return null; }
+	public List<Cell> selectRoom(List<List<Cell>> selectable) {
+		try {
+			return remotePlayer.roomSelection(selectable);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/**
 	 * select a weapon to reload
@@ -59,6 +78,11 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public WeaponSelection reload(List<Weapon> canLoad) {
+		try {
+			return remotePlayer.reloadSelection(canLoad);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -69,6 +93,11 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public WeaponSelection shoot(List<Weapon> loaded) {
+		try {
+			return remotePlayer.shootSelection(loaded);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -78,6 +107,11 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public TurnAction selectAction() {
+		try {
+			return remotePlayer.actionSelection();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 }

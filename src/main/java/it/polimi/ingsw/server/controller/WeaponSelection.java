@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Manages communications about shoot/reload weapon selections
  */
-class WeaponSelection {
+public class WeaponSelection {
     /**
      * Weapon that was chosen
      */
