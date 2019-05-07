@@ -3,12 +3,16 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Weapon;
+import netscape.javascript.JSObject;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,8 +37,9 @@ public class PlayerSocket extends PlayerConnection {
 	/**
 	 *
 	 */
-	private void listen() {
+	private String listen() {
 		// TODO implement here
+        return null;
 	}
 
 	/**
@@ -58,7 +63,16 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public Player selectPlayer(List<Player> selectable) {
-		return null;
+	    JSONObject message = new JSONObject();
+	    message.put("function", "select");
+	    message.put("type", "player");
+        JSONArray jArray = new JSONArray();
+        selectable.forEach(s->jArray.add(s.getNickname()));
+	    message.put("list", jArray);
+	    this.sendInstruction(message);
+	    String selected = this.listen();
+	    return selectable.stream().filter(p->p.getNickname().equals(selected))
+                            .collect(Collectors.toList()).get(0);
 	}
 
 	/**
@@ -68,7 +82,22 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public Cell selectCell(List<Cell> selectable) {
-		return null;
+        JSONObject message = new JSONObject();
+        message.put("function", "select");
+        message.put("type", "cell");
+        JSONArray jArray = new JSONArray();
+        selectable.forEach(s-> {
+            JSONObject coords = new JSONObject();
+            coords.put("x", s.getCoordX());
+            coords.put("y", s.getCoordY());
+            jArray.add(coords);
+        });
+        message.put("list", jArray);
+        this.sendInstruction(message);
+        JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+        return selectable.stream().filter(c->c.getCoordX() == Integer.parseInt(selected.get("x").toString()) &&
+                c.getCoordY() == Integer.parseInt(selected.get("y").toString()))
+                .collect(Collectors.toList()).get(0);
 	}
 
 	/**
@@ -77,7 +106,36 @@ public class PlayerSocket extends PlayerConnection {
 	 * @return a room from selectable
 	 */
 	@Override
-	public List<Cell> selectRoom(List<List<Cell>> selectable) { return null; }
+	public List<Cell> selectRoom(List<List<Cell>> selectable) {
+        JSONObject message = new JSONObject();
+        message.put("function", "select");
+        message.put("type", "room");
+        JSONArray jArray = new JSONArray();
+        selectable.forEach(r -> {
+            JSONArray room = new JSONArray();
+            r.forEach(s->{
+                JSONObject coords = new JSONObject();
+                coords.put("x", s.getCoordX());
+                coords.put("y", s.getCoordY());
+                room.add(coords);
+            });
+            jArray.add(room);
+        });
+        message.put("list", jArray);
+        this.sendInstruction(message);
+
+        JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+        JSONArray room = (JSONArray) selected.get("room");
+        for(List<Cell> r : selectable){
+            for(Cell c : r){
+                if(c.getCoordX() == Integer.parseInt((((JSONObject) room.get(0)).get("x").toString())) &&
+						c.getCoordY() == Integer.parseInt((((JSONObject) room.get(0)).get("y").toString())))
+                	return r;
+            }
+        }
+        return null;
+    }
+
 
 	/**
 	 * select a weapon to reload
