@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.server.model.Powerup;
 import it.polimi.ingsw.server.model.Weapon;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -142,6 +143,16 @@ public class PlayerSocket extends PlayerConnection {
 		return room;
 	}
 
+
+	/**
+	 * select a powerup card from a given list
+	 * @param selectable list of powerups
+	 * @return a powerup from selectable
+	 */
+	@Override
+	public Powerup choosePowerup(List<Powerup> selectable) {
+		return null;
+	}
 
 	/**
 	 * select a weapon to reload

@@ -13,17 +13,17 @@ public class LobbyTest {
     @Test
     public void createMatch() throws TooManyPlayersException, TooManyMatchesException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("testPlayer", null));
 
         // Check right init of class
         assertTrue(testLobby.getLobbyMatches().isEmpty());
-        assertThrows(PlayerNotExistsException.class, () -> testLobby.createMatch(testPlayer, 5, 8, 60, 2));
+        assertThrows(PlayerNotExistsException.class, () -> testLobby.createMatch(testPlayer.getConnection(), 5, 8, 60, 2));
 
         // Add player to lobby
         testLobby.addPlayer(testPlayer);
 
         // testPlayer creates new match
-        MatchController newMatch = testLobby.createMatch(testPlayer, 5, 8, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 5, 8, 120, 1);
 
         // Match successfully created
         assertNotNull(newMatch);
@@ -43,29 +43,29 @@ public class LobbyTest {
 
         // Add more matches than allowed
         for (int i = 0; i < testLobby.getMaxMatches() - 1; i++) {
-            Player newMatchPlayer = new Player("Stormtrooper", new PlayerRemote("player", null));
+            Player newMatchPlayer = new Player("Stormtrooper", new PlayerRemote("Stormtrooper", null));
             testLobby.addPlayer(newMatchPlayer);
-            testLobby.createMatch(newMatchPlayer, 5, 8, 120, 1);
+            testLobby.createMatch(newMatchPlayer.getConnection(), 5, 8, 120, 1);
         }
-        Player newMatchPlayer = new Player("Stormtrooper");
-        assertThrows(TooManyMatchesException.class, () -> testLobby.createMatch(newMatchPlayer, 5, 8, 60, 1));
+        Player newMatchPlayer = new Player("ObiWan", new PlayerRemote("ObiWan", null));
+        assertThrows(TooManyMatchesException.class, () -> testLobby.createMatch(newMatchPlayer.getConnection(), 5, 8, 60, 1));
     }
 
     @Test
     public void getJoinableMatches() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException, NotEnoughPlayersException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("testPlayer", null));
 
         assertTrue(testLobby.getJoinableMatches().isEmpty());
 
         testLobby.addPlayer(testPlayer);
-        MatchController newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 3, 5, 120, 1);
 
         assertEquals(newMatch, testLobby.getJoinableMatches().get(0));
 
         // Add enough players to match
-        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("player", null));
-        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("player", null));
+        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("testPlayer1", null));
+        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("testPlayer2", null));
         testLobby.addPlayer(testPlayer1);
         testLobby.addPlayer(testPlayer2);
         testLobby.joinMatch(testPlayer1, newMatch);
@@ -77,17 +77,17 @@ public class LobbyTest {
     @Test
     public void joinMatch() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
         Lobby testLobby = new Lobby(3);
-        Player testPlayer = new Player("testPlayer", new PlayerRemote("player", null));
-        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("player", null));
-        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("player", null));
-        Player testPlayer3 = new Player("testPlayer3", new PlayerRemote("player", null));
+        Player testPlayer = new Player("testPlayer", new PlayerRemote("testPlayer", null));
+        Player testPlayer1 = new Player("testPlayer1", new PlayerRemote("testPlayer1", null));
+        Player testPlayer2 = new Player("testPlayer2", new PlayerRemote("testPlayer2", null));
+        Player testPlayer3 = new Player("testPlayer3", new PlayerRemote("testPlayer3", null));
 
         testLobby.addPlayer(testPlayer);
         testLobby.addPlayer(testPlayer1);
         testLobby.addPlayer(testPlayer2);
         testLobby.addPlayer(testPlayer3);
 
-        MatchController newMatch = testLobby.createMatch(testPlayer, 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 3, 5, 120, 1);
 
         assertEquals(3, testLobby.getLobbyPlayers().size());
         assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer));
