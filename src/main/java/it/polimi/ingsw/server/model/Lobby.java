@@ -71,6 +71,14 @@ public class Lobby {
     }
 
     /**
+     * Destroy one of server's match
+     * @param toDestroy match to destroy
+     */
+    public void destroyMatch(MatchController toDestroy) {
+        matches.remove(toDestroy);
+    }
+
+    /**
      * Add new client to lobby
      * @param toAdd
      */

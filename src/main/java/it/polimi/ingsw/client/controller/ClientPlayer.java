@@ -91,9 +91,13 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	public static void main(String[] args) {
 		ConnectionType connectionType;
 		int port;
+
 		String ip = args[0];
 		System.out.println(ip);
 		Scanner in= new Scanner(System.in);
+
+		System.setProperty("java.rmi.server.hostname",ip);
+
 		System.out.println("Insert nickname: ");
 		String nickname= in.next();
 		System.out.println("Select connection type [0: SOCKET, 1: RMI]: ");

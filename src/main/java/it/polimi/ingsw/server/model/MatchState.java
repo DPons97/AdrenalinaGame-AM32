@@ -5,5 +5,6 @@ public enum MatchState {
     PLAYER_TURN,
     SCORING,
     FRENZY_TURN,
-    FINAL_SCORING
+    FINAL_SCORING,
+    ENDED
 }

@@ -313,7 +313,7 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * Kick a player from match
+	 * Kick a player from match and set his match to null
 	 * @param toKick player that wants to leave
 	 */
 	public void kickPlayer(Player toKick) throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
@@ -327,6 +327,7 @@ public class AdrenalinaMatch {
 					}
 				}
 				if (playerNotExists) throw new PlayerNotExistsException();
+				toKick.setMatch(null);
 				players.remove(toKick);
 			} else throw new NotEnoughPlayersException();
 		} else throw new MatchAlreadyStartedException();
@@ -432,6 +433,11 @@ public class AdrenalinaMatch {
 	public Player getTurnPlayer() {
 		return players.get((turn+players.indexOf(firstPlayer))%players.size());
 	}
+
+	/**
+	 * @param nextState of match
+	 */
+	public void setMatchState(MatchState nextState) { state = nextState;}
 
 	/**
 	 * @return current match's state

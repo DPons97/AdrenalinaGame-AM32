@@ -6,6 +6,7 @@ import it.polimi.ingsw.custom_exceptions.PlayerNotExistsException;
 import it.polimi.ingsw.custom_exceptions.PlayerNotReadyException;
 import it.polimi.ingsw.server.model.AdrenalinaMatch;
 import it.polimi.ingsw.server.model.Lobby;
+import it.polimi.ingsw.server.model.MatchState;
 import it.polimi.ingsw.server.model.Player;
 
 /**
@@ -49,6 +50,11 @@ public class MatchController {
 	}
 
 	/**
+	 * @return this match's host's nickname
+	 */
+	public String getHostName() { return match.getPlayers().get(0).getNickname(); }
+
+	/**
 	 * Start controlling match
 	 * @throws PlayerNotReadyException if there is at least one player that is not ready to start match
 	 */
@@ -73,20 +79,24 @@ public class MatchController {
 	 */
 	public void backToLobby(PlayerConnection playerLeaving) throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
 		if (playerLeaving == match.getPlayers().get(0).getConnection()) {
-			// Destroy match
+			//  Move all players in lobby
 			for (Player p : match.getPlayers()) {
-				if (p.getNickname().equals(playerLeaving.getName())) {
-					match.kickPlayer(p);
-					serverLobby.addPlayer(p);
-				}
+				match.kickPlayer(p);
+				serverLobby.addPlayer(p);
+				p.getConnection().setCurrentMatch(null);
 			}
-			// TODO: Destroy AdrenalinaMatch
+
+			// All players kicked from match. Destroying
+			match.setMatchState(MatchState.ENDED);
+			match = null;
+			serverLobby.destroyMatch(this);
 		} else {
 			// Make player leave match without destroying it
 			for (Player p : match.getPlayers()) {
 				if (p.getNickname().equals(playerLeaving.getName())) {
 					match.kickPlayer(p);
 					serverLobby.addPlayer(p);
+					p.getConnection().setCurrentMatch(null);
 				}
 			}
 		}

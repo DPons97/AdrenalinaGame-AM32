@@ -1,7 +1,11 @@
 package it.polimi.ingsw.server.controller;
 
-import it.polimi.ingsw.server.model.Cell;
+import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
+import it.polimi.ingsw.custom_exceptions.NotEnoughPlayersException;
+import it.polimi.ingsw.custom_exceptions.PlayerNotExistsException;
+import it.polimi.ingsw.server.model.Lobby;
 import it.polimi.ingsw.server.model.Player;
+import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.util.List;
@@ -21,10 +25,16 @@ public abstract class PlayerConnection {
 	private MatchController currentMatch;
 
 	/**
+	 * Current server's lobby
+	 */
+	private Lobby serverLobby;
+
+	/**
 	 * Default constructor
 	 */
 	public PlayerConnection(String name) {
 		this.name=name;
+		this.serverLobby = null;
 		currentMatch = null;
 	}
 
@@ -36,7 +46,7 @@ public abstract class PlayerConnection {
 	 * select a player in a given list
 	 * @param selectable list of players
 	 * @return a player from selectable
-	 */
+    **/
 	public abstract Player selectPlayer(List<Player> selectable);
 
 	/**
@@ -88,18 +98,31 @@ public abstract class PlayerConnection {
 	}
 
 	/**
+	 * @return current server's lobby
+	 */
+	protected Lobby getServerLobby() {
+		return serverLobby;
+	}
+
+	/**
+	 * @param serverLobby new server lobby
+	 */
+	protected void setServerLobby(Lobby serverLobby) {
+		this.serverLobby = serverLobby;
+	}
+
+	/**
 	 * Start this player's match, only if he's the host
 	 */
 	public void startMatch() {
-		if (name.equals(currentMatch.getMatch().getPlayers().get(0).getNickname())) {
+		if (name.equals(currentMatch.getHostName()))
 			currentMatch.beginTurn();
-		}
 	}
 
 	/**
 	 * Go back to lobby
 	 */
-	public void backToLobby() {
-		// TODO: implement here
+	public void backToLobby() throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
+		currentMatch.backToLobby(this);
 	}
 }
