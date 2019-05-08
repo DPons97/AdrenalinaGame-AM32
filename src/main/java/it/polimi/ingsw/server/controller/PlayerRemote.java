@@ -1,13 +1,16 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.controller.ClientFunctionalities;
+import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.model.Cell;
 import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Powerup;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *	RMI implementation of player connection
@@ -27,6 +30,11 @@ public class PlayerRemote extends PlayerConnection {
 		this.remotePlayer = remoteClient;
 	}
 
+	private Player getPlayerByName(String name){
+		return getCurrentMatch().getMatch().getPlayers().stream().
+				filter(p->p.getNickname().equals(name)).collect(Collectors.toList()).get(0);
+	}
+
 	/**
 	 * select a player in a given list
 	 * @param selectable list of players
@@ -35,7 +43,11 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public Player selectPlayer(List<Player> selectable) {
 		try {
-			return remotePlayer.playerSelection(selectable);
+			return getPlayerByName(
+					remotePlayer.playerSelection(
+						selectable.stream().map(Player::getNickname).collect(Collectors.toList())
+					)
+			);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -50,7 +62,11 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public Cell selectCell(List<Cell> selectable) {
 		try {
-			return remotePlayer.cellSelection(selectable);
+			Point p =  remotePlayer.cellSelection(
+				selectable.stream().map(c->new Point(c.getCoordX(), c.getCoordY())).collect(Collectors.toList())
+			);
+			return selectable.stream().filter(c->c.getCoordX() == p.getX() && c.getCoordY() == p.getY()).
+					collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -65,7 +81,16 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public List<Cell> selectRoom(List<List<Cell>> selectable) {
 		try {
-			return remotePlayer.roomSelection(selectable);
+			List<List<Point>> points = new ArrayList<>();
+			selectable.forEach(list -> points.add(list.stream().map(c->new Point(c.getCoordX(), c.getCoordY())).collect(Collectors.toList())));
+			List<Point> selected =  remotePlayer.roomSelection(points);
+			for(List<Cell> r : selectable){
+				for(Cell c : r){
+					if(c.getCoordX() ==  selected.get(0).getX()&&
+							c.getCoordY() == selected.get(0).getY() )
+						return r;
+				}
+			}
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

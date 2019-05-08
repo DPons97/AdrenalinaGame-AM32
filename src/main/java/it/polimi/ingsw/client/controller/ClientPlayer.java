@@ -1,10 +1,9 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.rmi.RemoteException;
@@ -51,6 +50,14 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 		server.connect(ip, port);
 
 	}
+
+	/**
+	 * @return string with nickname
+	 */
+	public AdrenalinaMatch getMatch(){
+		return match;
+	}
+
 	/**
 	 * @return string with nickname
 	 */
@@ -64,7 +71,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return player from selectable
 	 */
     @Override
-    public Player playerSelection(List<Player> selectable) throws RemoteException {
+    public String playerSelection(List<String> selectable) throws RemoteException {
         return null;
     }
 
@@ -74,7 +81,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return cell from selectable
 	 */
     @Override
-    public Cell cellSelection(List<Cell> selectable) throws RemoteException {
+    public Point cellSelection(List<Point> selectable) throws RemoteException {
         return null;
     }
 
@@ -84,7 +91,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return a room from selectable
 	 */
 	@Override
-	public List<Cell> roomSelection(List<List<Cell>> selectable) throws RemoteException {
+	public List<Point> roomSelection(List<List<Point>> selectable) throws RemoteException {
 		return null;
 	}
 

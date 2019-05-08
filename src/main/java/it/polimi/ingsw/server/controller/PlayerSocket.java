@@ -1,9 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.Powerup;
-import it.polimi.ingsw.server.model.Weapon;
+import it.polimi.ingsw.server.model.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -132,6 +129,11 @@ public class PlayerSocket extends PlayerConnection {
         return null;
     }
 
+    /**
+     * builds a JSONArray of coordinates
+     * @param r list of cells
+	 * @return JSONArray of coordinates
+     */
 	private JSONArray createJSONCoordinateList(List<Cell> r) {
 		JSONArray room = new JSONArray();
 		r.forEach(s -> {
@@ -164,21 +166,7 @@ public class PlayerSocket extends PlayerConnection {
 		JSONObject message = new JSONObject();
 		message.put("function", "select");
 		message.put("type", "load");
-		JSONArray jArray = createJSONWeaponList(canLoad);
-		message.put("list", jArray);
-		this.sendInstruction(message);
-
-		JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
-
-		// TODO parse weapon selection json and return
-
-		return null;
-	}
-
-	private JSONArray createJSONWeaponList(List<Weapon> canLoad) {
-		JSONArray jArray = new JSONArray();
-		canLoad.forEach(s -> jArray.add(s.getName()));
-		return jArray;
+		return getWeaponSelection(canLoad, message);
 	}
 
 	/**
@@ -191,15 +179,33 @@ public class PlayerSocket extends PlayerConnection {
 		JSONObject message = new JSONObject();
 		message.put("function", "select");
 		message.put("type", "shoot");
-		JSONArray jArray = createJSONWeaponList(loaded);
+		return getWeaponSelection(loaded, message);
+	}
+
+	/**
+	 * Completes the message and parses client response
+	 * @param weapons list of weapons to put in the message
+	 * @return WeaponSelection parsed from JSON received from client
+	 */
+	private WeaponSelection getWeaponSelection(List<Weapon> weapons, JSONObject message) {
+		JSONArray jArray = createJSONWeaponList(weapons);
 		message.put("list", jArray);
 		this.sendInstruction(message);
 
 		JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
 
-		// TODO parse weapon selection json and return
+		return parseWeaponSelection(selected);
+	}
 
-		return null;
+	/**
+	 * creats a JSONArray with weapons in a given list
+	 * @param weapons list of weapons
+	 * @return JSONArray with weapons in weapons
+	 */
+	private JSONArray createJSONWeaponList(List<Weapon> weapons) {
+		JSONArray jArray = new JSONArray();
+		weapons.forEach(s -> jArray.add(s.getName()));
+		return jArray;
 	}
 
 	/**
@@ -219,5 +225,33 @@ public class PlayerSocket extends PlayerConnection {
 		String selected = this.listen();
 		return actions.stream().filter(a->a.toString().equals(selected))
 				.collect(Collectors.toList()).get(0);
+	}
+
+	private Weapon getWeapon(String weaponName){
+		return getCurrentMatch().getMatch().getPlayers().stream().
+				filter(p-> p.getNickname().equals(getName())).map(Player::getWeapons).
+				flatMap(List::stream).filter(w->w.getName().equals(weaponName)).
+				collect(Collectors.toList()).get(0);
+	}
+
+	private Powerup getPowerup(String name, Resource r){
+		return  getCurrentMatch().getMatch().getPlayers().stream().
+				filter(p-> p.getNickname().equals(getName())).map(Player::getPowerups).
+				flatMap(List::stream).filter(powerup->powerup.getName().equals(name) && powerup.getBonusResource() == r).
+				collect(Collectors.toList()).get(0);
+	}
+
+	private WeaponSelection parseWeaponSelection(JSONObject weaponJSON){
+		Weapon  weapon = getWeapon(weaponJSON.get("weapon").toString());
+		int effectID = Integer.parseInt(weaponJSON.get("effectID").toString());
+		List<Powerup> powerups = new ArrayList<>();
+
+		JSONArray powerupsArray = (JSONArray) weaponJSON.get("discount");
+		for(Object o: powerupsArray){
+			JSONObject item = (JSONObject) o;
+			powerups.add(getPowerup(item.get("name").toString(), Resource.valueOf(item.get("resource").toString())));
+		}
+
+		return new WeaponSelection(weapon, effectID, powerups);
 	}
 }

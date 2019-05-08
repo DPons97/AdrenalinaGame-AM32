@@ -1,9 +1,8 @@
 package it.polimi.ingsw.client.controller;
 
+import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Player;
 import it.polimi.ingsw.server.model.Weapon;
 
 import java.rmi.Remote;
@@ -20,21 +19,21 @@ public interface ClientFunctionalities extends Remote {
 	 * @param selectable list of players
 	 * @return player from selectable
 	 */
-	Player playerSelection(List<Player> selectable) throws RemoteException;
+	String playerSelection(List<String> selectable) throws RemoteException;
 
 	/**
 	 * Select a Cell from a given list
 	 * @param selectable list of cells
 	 * @return cell from selectable
 	 */
-	Cell cellSelection(List<Cell> selectable) throws RemoteException;
+	Point cellSelection(List<Point> selectable) throws RemoteException;
 
 	/**
 	 * select a room in a given list
 	 * @param selectable list of rooms
 	 * @return a room from selectable
 	 */
-	List<Cell> roomSelection(List<List<Cell>> selectable) throws RemoteException;
+	List<Point> roomSelection(List<List<Point>> selectable) throws RemoteException;
 
 	/**
 	 * select a weapon to reload
