@@ -7,6 +7,7 @@ import it.polimi.ingsw.custom_exceptions.PlayerNotReadyException;
 import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public class MatchController {
 	 * Start controlling match
 	 * @throws PlayerNotReadyException if there is at least one player that is not ready to start match
 	 */
-	public void startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException {
+	public void startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException, PlayerNotExistsException {
 		for (Player player : match.getPlayers()) {
 			if (!player.isReadyToStart()) throw new PlayerNotReadyException();
 		}
@@ -99,70 +100,14 @@ public class MatchController {
 
 				// Start usual turn
 				beginTurn(currentPlayer);
-
-				// TODO: Resolve deaths
-				int deadPlayers = 0;
-				for (Player p : match.getPlayers()) {
-					if (p.isDead()) {
-						// First to damage deadPlayer gets 1 point (First Blood)
-						p.getDmgPoints().get(0).addScore(1);
-
-						// Distribute victory points to those who damaged deadPlayer (Damage)
-						List<Integer> killRewards = p.getReward();
-						List<List<Player>> toReward = new ArrayList<>();
-
-						for (Player matchPlayer : match.getPlayers()) {
-							if(toReward.get(p.getDamageFromPlayer(matchPlayer)) == null)
-								toReward.set(p.getDamageFromPlayer(matchPlayer), new ArrayList<>());
-
-							toReward.get(p.getDamageFromPlayer(matchPlayer)).add(matchPlayer);
-						}
-
-						int reward = 0;
-						for (int i = toReward.size()-1; i > 0; i-- ) {
-							List<Player> damagers = toReward.get(i);
-
-							if (damagers != null) {
-								if (damagers.size() == 1) {
-									damagers.get(0).addScore(killRewards.get(reward));
-								} else {
-									for (Player damager : p.getDmgPoints()) {
-										if (damagers.contains(damager)) {
-											damager.addScore(killRewards.get(reward));
-											damagers.remove(damager);
-											i++;
-											break;
-										}
-									}
-								}
-								reward++;
-							}
-						}
-
-						for (int i=0; i < toReward.size(); i++) {
-							if (i < killRewards.size()) p.getDmgPoints().get(i).addScore(killRewards.get(i));
-							else p.getDmgPoints().get(i).addScore(killRewards.get(killRewards.size()-1));
-						}
-
-						// Resolve killshots (last player who dealt damage to deadPlayer) (Killshot)
-
-						// Add death to match, counting overkill if present (Death and Overkill)
-
-						// Mark player who overkilled deadPlayer (Revenge mark)
-
-						deadPlayers++;
-					}
-				}
-
-				// Manage double kill
+				resolveDeaths(currentPlayer);
 
 				// TODO: Repopulate Map
 
 				match.nextTurn();
 			} else {
 				beginTurn(currentPlayer);
-
-				// TODO: Resolve deaths
+				resolveDeaths(currentPlayer);
 
 				// TODO: Repopulate Map
 
@@ -203,6 +148,33 @@ public class MatchController {
 	}
 
 	/**
+	 * Resolve deaths occurred during current turn
+	 * @param currentPlayer player who has just finished his turn
+	 * @throws PlayerNotExistsException if player doesn't exists inside match
+	 */
+	private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
+		int deadPlayers = 0;
+		for (Player p : match.getPlayers()) {
+			if (p.isDead()) {
+				// First to damage deadPlayer gets 1 point (First Blood)
+				p.getDmgPoints().get(0).addScore(1);
+				rewardPlayers(p.getDmgPoints(), p.getReward());
+
+				// Add death to match, counting overkill if present (Killshot, Death and Overkill)
+				match.addDeath(p.getDmgPoints().get(p.getDmgPoints().size()-1), p.isOverkilled());
+
+				// Mark player who overkilled deadPlayer (Revenge mark)
+				if (p.isOverkilled()) p.getDmgPoints().get(p.getDmgPoints().size() - 1).takeMark(p);
+
+				deadPlayers++;
+			}
+		}
+
+		// Manage double kill: give +1 additional point to killer
+		if (deadPlayers > 1)  currentPlayer.addScore(1);
+	}
+
+	/**
 	 * Make player leave match and go back to server lobby
 	 * @param playerLeaving player that leaves
 	 */
@@ -227,6 +199,46 @@ public class MatchController {
 					serverLobby.addPlayer(p);
 					p.getConnection().setCurrentMatch(null);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Distribution of victory points based on a defined reward list
+	 * @param track to an analyze
+	 * @param rewards current reward
+	 */
+	private void rewardPlayers(List<Player> track, List<Integer> rewards) {
+		/* This list contains a reference to every player in match.
+			Every player's index is equal to the number of damage he dealt to the dead player
+			Multiple players can share the same index */
+		List<List<Player>> toReward = new ArrayList<>();
+
+		for (Player matchPlayer : match.getPlayers()) {
+			if(toReward.get(Collections.frequency(track, matchPlayer)) == null)
+				toReward.set(Collections.frequency(track, matchPlayer), new ArrayList<>());
+
+			toReward.get(Collections.frequency(track, matchPlayer)).add(matchPlayer);
+		}
+
+		int reward = 0;
+		for (int i = toReward.size()-1; i > 0; i-- ) {
+			List<Player> damagers = toReward.get(i);
+
+			if (damagers != null) {
+				if (damagers.size() == 1) {
+					damagers.get(0).addScore(rewards.get(reward));
+				} else {
+					for (Player damager : track) {
+						if (damagers.contains(damager)) {
+							damager.addScore(rewards.get(reward));
+							damagers.remove(damager);
+							i++;
+							break;
+						}
+					}
+				}
+				reward++;
 			}
 		}
 	}

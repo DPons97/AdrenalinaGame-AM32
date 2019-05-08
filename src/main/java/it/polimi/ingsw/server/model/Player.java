@@ -79,6 +79,11 @@ public class Player {
 	private boolean dead;
 
 	/**
+	 * True if player is dead and overkilled
+	 */
+	private boolean overkilled;
+
+	/**
 	 *  Number of times this player has been killed
 	 */
 	private int deaths;
@@ -125,6 +130,7 @@ public class Player {
 
 		id = -1;
 		dead = true;
+		overkilled = false;
 		deaths = 0;
 		givenMarks = 0;
 		position = null;
@@ -149,6 +155,7 @@ public class Player {
 
 		id = -1;
 		dead = true;
+		overkilled = false;
 		deaths = 0;
 		givenMarks = 0;
 		position = null;
@@ -174,6 +181,7 @@ public class Player {
 
 		id = -1;
 		dead = true;
+		overkilled = false;
 		deaths = 0;
 		givenMarks = 0;
 
@@ -247,19 +255,6 @@ public class Player {
 	public List<Player> getDmgPoints() { return new ArrayList<>(dmgPoints); }
 
 	/**
-	 * Get number of damage dealt by a defined player
-	 * @param player
-	 * @return damage quantity
-	 */
-	public int getDamageFromPlayer(Player player) {
-		int counter = 0;
-		for (Player p : dmgPoints) {
-			if (p.equals(player)) counter++;
-		}
-		return counter;
-	}
-
-	/**
 	 * @return current Player's taken marks
 	 */
 	public List<Player> getMarks() { return new ArrayList<>(marks); }
@@ -283,6 +278,11 @@ public class Player {
 	 * @return true if player is dead
 	 */
 	public boolean isDead() { return dead; }
+
+	/**
+	 * @return if player is dead and overkilled
+	 */
+	public boolean isOverkilled() { return (overkilled && dead); }
 
 	/**
 	 * @return get current Player's position (Cell)
@@ -418,11 +418,13 @@ public class Player {
 
 		if (dmgPoints.size() > maxDamage) {
 			// Player is overkilled
+			overkilled = true;
 			return true;
 		} else if (dmgPoints.size() == maxDamage) {
 			// Player is dead, but not overkilled
 			deaths++;
 			dead = true;
+			overkilled = false;
 			return true;
 		}  else return false;
 	}
@@ -695,6 +697,7 @@ public class Player {
 		if (dead) {
 			dmgPoints.clear();
 			dead = false;
+			overkilled = false;
 			move(respawnPosition);
 		}
 	}

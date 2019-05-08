@@ -407,6 +407,7 @@ public class AdrenalinaMatch {
 	public int getCurrentDeaths() {
 		return currentDeaths;
 	}
+
 	/**
 	 * @return the death track as a list of players.
 	 */
