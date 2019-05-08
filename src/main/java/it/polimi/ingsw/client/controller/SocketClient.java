@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.Point;
+import it.polimi.ingsw.custom_exceptions.InvalidSelectionTypeException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -10,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +80,7 @@ public class SocketClient extends ServerConnection {
 			try {
 				msg = input.readLine();
 				parseMessage((JSONObject) JSONValue.parse(msg));
-			} catch (IOException e) {
+			} catch (IOException | InvalidSelectionTypeException e) {
 				e.printStackTrace();
 				return;
 			}
@@ -103,35 +103,26 @@ public class SocketClient extends ServerConnection {
 		// TODO implement here
 	}
 
-	private void parseMessage(JSONObject message){
+	private void parseMessage(JSONObject message) throws InvalidSelectionTypeException {
 		switch (message.get("function").toString()){
 			//TODO implement toJSON and fromJSON in weapon selection then complete this
 			case "select":
 				switch (message.get("type").toString()){
 					case "player":
-						List<String> selectblePlayers = new ArrayList<>();
+						List<String> selectablePlayers = new ArrayList<>();
 						JSONArray jsonArray= (JSONArray) message.get("list");
 						for(Object o: jsonArray){
-							selectblePlayers.add(o.toString());
+							selectablePlayers.add(o.toString());
 						}
-						try {
-							sendAnswer(player.playerSelection(selectblePlayers));
+						sendAnswer(player.playerSelection(selectablePlayers));
 
-						} catch (RemoteException e) {
-							e.printStackTrace();
-							return;
-						}
 						break;
 					case "cell":
-						try {
-							Point selected= player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
-							JSONObject msg = new JSONObject();
-							msg.put("x", selected.getX());
-							msg.put("y", selected.getY());
-							sendAnswer(msg);
-						} catch (RemoteException e) {
-							e.printStackTrace();
-						}
+						Point selected= player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
+						JSONObject msg = new JSONObject();
+						msg.put("x", selected.getX());
+						msg.put("y", selected.getY());
+						sendAnswer(msg);
 
 						break;
 					case "room":
@@ -141,29 +132,44 @@ public class SocketClient extends ServerConnection {
 							rooms.add(parseCoordinates((JSONArray) o));
 						}
 
-						try {
-							List<Point> selected = player.roomSelection(rooms);
-							JSONObject msg = new JSONObject();
-							JSONArray room = new JSONArray();
+						List<Point> selectedRoom = player.roomSelection(rooms);
+						JSONObject response = new JSONObject();
+						JSONArray room = new JSONArray();
 
-							selected.forEach(p-> {
-								JSONObject item = new JSONObject();
-								item.put("x",p.getX());
-								item.put("y",p.getY());
-								room.add(item);
-							});
+						selectedRoom.forEach(p-> {
+							JSONObject item = new JSONObject();
+							item.put("x",p.getX());
+							item.put("y",p.getY());
+							room.add(item);
+						});
 
-							msg.put("room", room);
-						} catch (RemoteException e) {
-							e.printStackTrace();
+						response.put("room", room);
+						break;
+					case "load":
+						List<String> reloadableWeapons = new ArrayList<>();
+						JSONArray reloadableArray = (JSONArray) message.get("list");
+
+						for(Object o: reloadableArray){
+							reloadableWeapons.add(o.toString());
 						}
 
-					case "load":
-
+						sendAnswer(player.reloadSelection(reloadableWeapons).toJSON());
+						break;
 					case "shoot":
+						List<String> shootableWeapons = new ArrayList<>();
+						JSONArray shootableArray = (JSONArray) message.get("list");
 
+						for(Object o: shootableArray){
+							shootableWeapons.add(o.toString());
+						}
+
+						sendAnswer(player.reloadSelection(shootableWeapons).toJSON());
+						break;
+					case "action":
+						sendAnswer(player.actionSelection().toString());
+						break;
 					default:
-
+						throw new InvalidSelectionTypeException();
 				}
 				break;
 			case "update":
@@ -176,7 +182,8 @@ public class SocketClient extends ServerConnection {
 	private List<Point> parseCoordinates(JSONArray coords){
 		List<Point> toRet = new ArrayList<>();
 		JSONObject item;
-		int x, y;
+		int x;
+		int y;
 		for(Object o: coords){
 			item = (JSONObject) o;
 			x = Integer.parseInt(item.get("x").toString());

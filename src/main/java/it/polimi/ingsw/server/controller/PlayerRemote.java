@@ -115,7 +115,8 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public WeaponSelection reload(List<Weapon> canLoad) {
 		try {
-			return remotePlayer.reloadSelection(canLoad);
+			return remotePlayer.reloadSelection(
+					canLoad.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}
@@ -130,7 +131,8 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public WeaponSelection shoot(List<Weapon> loaded) {
 		try {
-			return remotePlayer.shootSelection(loaded);
+			return remotePlayer.shootSelection(
+					loaded.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

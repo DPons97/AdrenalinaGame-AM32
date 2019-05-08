@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -217,14 +216,10 @@ public class PlayerSocket extends PlayerConnection {
 		JSONObject message = new JSONObject();
 		message.put("function", "select");
 		message.put("type", "action");
-		JSONArray jArray = new JSONArray();
-		List<TurnAction> actions = new ArrayList<>(Arrays.asList(TurnAction.values()));
-		actions.forEach(a -> jArray.add(a.toString()));
-		message.put("list", jArray);
+
 		this.sendInstruction(message);
 		String selected = this.listen();
-		return actions.stream().filter(a->a.toString().equals(selected))
-				.collect(Collectors.toList()).get(0);
+		return TurnAction.valueOf(selected);
 	}
 
 	private Weapon getWeapon(String weaponName){

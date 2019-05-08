@@ -3,7 +3,6 @@ package it.polimi.ingsw.client.controller;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.Weapon;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -40,14 +39,14 @@ public interface ClientFunctionalities extends Remote {
 	 * @param canLoad list of weapons to load
 	 * @return WeaponSelection with weapon to reload
 	 */
-	WeaponSelection reloadSelection(List<Weapon> canLoad) throws RemoteException;
+	WeaponSelection reloadSelection(List<String> canLoad) throws RemoteException;
 
 	/**
 	 * select a weapon and effect to shoot with
 	 * @param loaded list of loaded weapons
 	 * @return WeaponSelection with weapon to shoot with
 	 */
-	WeaponSelection shootSelection(List<Weapon> loaded) throws RemoteException;
+	WeaponSelection shootSelection(List<String> loaded) throws RemoteException;
 
 	/**
 	 * Select an action to make

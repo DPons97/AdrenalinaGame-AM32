@@ -4,7 +4,6 @@ import it.polimi.ingsw.client.model.AdrenalinaMatch;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.Weapon;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -71,7 +70,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return player from selectable
 	 */
     @Override
-    public String playerSelection(List<String> selectable) throws RemoteException {
+    public String playerSelection(List<String> selectable) {
         return null;
     }
 
@@ -81,7 +80,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return cell from selectable
 	 */
     @Override
-    public Point cellSelection(List<Point> selectable) throws RemoteException {
+    public Point cellSelection(List<Point> selectable) {
         return null;
     }
 
@@ -91,7 +90,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return a room from selectable
 	 */
 	@Override
-	public List<Point> roomSelection(List<List<Point>> selectable) throws RemoteException {
+	public List<Point> roomSelection(List<List<Point>> selectable){
 		return null;
 	}
 
@@ -101,7 +100,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return WeaponSelection with weapon to reload
 	 */
 	@Override
-	public WeaponSelection reloadSelection(List<Weapon> canLoad) throws RemoteException {
+	public WeaponSelection reloadSelection(List<String> canLoad){
 		return null;
 	}
 
@@ -111,7 +110,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return WeaponSelection with weapon to shoot with
 	 */
 	@Override
-	public WeaponSelection shootSelection(List<Weapon> loaded) throws RemoteException {
+	public WeaponSelection shootSelection(List<String> loaded){
 		return null;
 	}
 
@@ -120,7 +119,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @return action to make
 	 */
     @Override
-    public TurnAction actionSelection() throws RemoteException {
+    public TurnAction actionSelection(){
         return null;
     }
 
