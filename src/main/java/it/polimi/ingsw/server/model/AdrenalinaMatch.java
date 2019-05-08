@@ -89,7 +89,7 @@ public class AdrenalinaMatch {
 	private int turnDuration;
 
 	/**
-	 * 	duration of a turn in seconds.
+	 * 	turn number
 	 */
 	private int turn;
 
@@ -114,6 +114,7 @@ public class AdrenalinaMatch {
 
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
+		this.turn = 0;
 		this.players = new ArrayList<>();
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
@@ -431,8 +432,18 @@ public class AdrenalinaMatch {
 	 * @return this turn's player.
 	 */
 	public Player getTurnPlayer() {
-		return players.get((turn+players.indexOf(firstPlayer))%players.size());
+		return players.get((turn + players.indexOf(firstPlayer))%players.size());
 	}
+
+	/**
+	 * @return match's current round.
+	 */
+	public int getTurn() { return turn; }
+
+	/**
+	 * Increment turn number by +1
+	 */
+	public void nextTurn() { turn++; }
 
 	/**
 	 * @param nextState of match
@@ -466,12 +477,12 @@ public class AdrenalinaMatch {
 	 * Sets attributes to start the match
 	 */
 	public void startMatch() throws NotEnoughPlayersException, MatchAlreadyStartedException {
-		if(nPlayers == players.size()) {
+		if (nPlayers == players.size()) {
 			if(state == MatchState.NOT_STARTED) {
 				int luckyFirstPlayerNumber = new Random().nextInt(nPlayers);
 				this.state = MatchState.PLAYER_TURN;
 				this.firstPlayer = players.get(luckyFirstPlayerNumber);
-			}else {
+			} else {
 				throw new MatchAlreadyStartedException();
 			}
 

@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.controller.MatchController;
+import it.polimi.ingsw.server.controller.PlayerConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,18 @@ public class Lobby {
     public int getMaxMatches() { return maxMatches; }
 
     /**
+     * Get reference to player that has defined nickname
+     * @param connection of player to find
+     * @return reference to player found
+     */
+    public Player getPlayer(PlayerConnection connection) {
+        for (Player p : players) {
+            if (p.getConnection().equals(connection)) return p;
+        }
+        return null;
+    }
+
+    /**
      * @return all matches that can be joined by a player
      */
     public List<MatchController> getJoinableMatches() {
@@ -54,9 +67,9 @@ public class Lobby {
      * Create and add a new match to the lobby
      * @return Controller to new match
      */
-    public MatchController createMatch(Player host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
+    public MatchController createMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
         if (matches.size() >= maxMatches) throw new TooManyMatchesException();
-        if (!players.contains(host)) throw new PlayerNotExistsException();
+        if (!players.contains(getPlayer(host))) throw new PlayerNotExistsException();
 
         // Create model of new match for controller
         AdrenalinaMatch newMatchModel = new AdrenalinaMatch(maxPlayers, maxDeaths, turnDuration, mapID);
@@ -64,7 +77,7 @@ public class Lobby {
         // Returns controller for new match
         MatchController newMatchController = new MatchController(newMatchModel, this);
 
-        joinMatch(host, newMatchController);
+        joinMatch(getPlayer(host), newMatchController);
         matches.add(newMatchController);
 
         return newMatchController;

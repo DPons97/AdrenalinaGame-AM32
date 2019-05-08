@@ -3,10 +3,8 @@ package it.polimi.ingsw.server.controller;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.NotEnoughPlayersException;
 import it.polimi.ingsw.custom_exceptions.PlayerNotExistsException;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Lobby;
-import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.Weapon;
+import it.polimi.ingsw.custom_exceptions.PlayerNotReadyException;
+import it.polimi.ingsw.server.model.*;
 
 import java.util.List;
 
@@ -63,6 +61,13 @@ public abstract class PlayerConnection {
 	 */
 	public abstract List<Cell> selectRoom(List<List<Cell>> selectable);
 
+    /**
+     * select a powerup card from a given list
+     * @param selectable list of powerups
+     * @return a powerup from selectable
+     */
+	public abstract Powerup choosePowerup(List<Powerup> selectable);
+
 	/**
 	 * select a weapon to reload
 	 * @param canLoad list of weapons to load
@@ -114,9 +119,9 @@ public abstract class PlayerConnection {
 	/**
 	 * Start this player's match, only if he's the host
 	 */
-	public void startMatch() {
+	public void startMatch() throws PlayerNotReadyException, MatchAlreadyStartedException, NotEnoughPlayersException {
 		if (name.equals(currentMatch.getHostName()))
-			currentMatch.beginTurn();
+			currentMatch.startMatch();
 	}
 
 	/**

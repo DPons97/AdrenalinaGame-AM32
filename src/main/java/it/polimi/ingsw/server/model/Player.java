@@ -247,6 +247,19 @@ public class Player {
 	public List<Player> getDmgPoints() { return new ArrayList<>(dmgPoints); }
 
 	/**
+	 * Get number of damage dealt by a defined player
+	 * @param player
+	 * @return damage quantity
+	 */
+	public int getDamageFromPlayer(Player player) {
+		int counter = 0;
+		for (Player p : dmgPoints) {
+			if (p.equals(player)) counter++;
+		}
+		return counter;
+	}
+
+	/**
 	 * @return current Player's taken marks
 	 */
 	public List<Player> getMarks() { return new ArrayList<>(marks); }
@@ -299,6 +312,12 @@ public class Player {
 	 * @return current Player's score
 	 */
 	public int getScore() { return score; }
+
+	/**
+	 * Add score to player
+	 * @param increment to apply
+	 */
+	public void addScore(int increment) { score += increment; }
 
 	/**
 	 * @return True if player's ready to start the match
