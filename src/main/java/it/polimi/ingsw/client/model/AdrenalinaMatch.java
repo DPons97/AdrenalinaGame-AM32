@@ -1,9 +1,10 @@
 package it.polimi.ingsw.client.model;
 
-import java.util.*;
 import it.polimi.ingsw.server.model.Map;
 import it.polimi.ingsw.server.model.MatchState;
 import it.polimi.ingsw.server.model.SpawnCell;
+
+import java.util.List;
 
 /**
  * 
@@ -84,7 +85,6 @@ public class AdrenalinaMatch {
     /**
      * @return state of the match
      */
-
     public MatchState getState() {
         return state;
     }
@@ -92,7 +92,6 @@ public class AdrenalinaMatch {
     /**
      * @param state state to set
      */
-
     public void setState(MatchState state) {
         this.state = state;
     }
@@ -100,7 +99,6 @@ public class AdrenalinaMatch {
     /**
      * @return the spawnpoints cells
      */
-
     public List<SpawnCell> getSpawnPoints() {
         return spawnPoints;
     }
@@ -108,7 +106,6 @@ public class AdrenalinaMatch {
     /**
      * @param spawnPoints spawnPoints to set
      */
-
     public void setSpawnPoints(List<SpawnCell> spawnPoints) {
         this.spawnPoints = spawnPoints;
     }
@@ -116,7 +113,6 @@ public class AdrenalinaMatch {
     /**
      * @return the currentDeaths of the players
      */
-
     public int getCurrentDeaths() {
         return currentDeaths;
     }
@@ -131,7 +127,6 @@ public class AdrenalinaMatch {
     /**
      * @return the DeathTrack of the player
      */
-
     public List<Player> getDeathTrack() {
         return deathTrack;
     }
@@ -139,7 +134,6 @@ public class AdrenalinaMatch {
     /**
      * @param deathTrack deathTrack to set
      */
-
     public void setDeathTrack(List<Player> deathTrack) {
         this.deathTrack = deathTrack;
     }
@@ -147,7 +141,6 @@ public class AdrenalinaMatch {
     /**
      @return the number of players
      */
-
     public int getnPlayers() {
         return nPlayers;
     }
@@ -155,7 +148,6 @@ public class AdrenalinaMatch {
     /**
      * @param nPlayers nPlayers to set
      */
-
     public void setnPlayers(int nPlayers) {
         this.nPlayers = nPlayers;
     }
@@ -163,7 +155,6 @@ public class AdrenalinaMatch {
     /**
      * @return players
      */
-
     public List<Player> getPlayers() {
         return players;
     }
@@ -171,7 +162,6 @@ public class AdrenalinaMatch {
     /**
      * @param players players to set
      */
-
     public void setPlayers(List<Player> players) {
         this.players = players;
     }
@@ -179,7 +169,6 @@ public class AdrenalinaMatch {
     /**
      * @return true if is enabled
      */
-
     public boolean isFrenzyEnabled() {
         return frenzyEnabled;
     }
@@ -201,7 +190,6 @@ public class AdrenalinaMatch {
     /**
      * @param turnDuration turnDuration to set
      */
-
     public void setTurnDuration(int turnDuration) {
         this.turnDuration = turnDuration;
     }
@@ -209,7 +197,6 @@ public class AdrenalinaMatch {
     /**
      * @return the turn
      */
-
     public int getTurn() {
         return turn;
     }
@@ -217,7 +204,6 @@ public class AdrenalinaMatch {
     /**
      * @param turn turn to set
      */
-
     public void setTurn(int turn) {
         this.turn = turn;
     }

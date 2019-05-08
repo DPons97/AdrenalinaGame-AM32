@@ -40,6 +40,10 @@ public class Powerup {
 		if (effect != null) parseEffect(effect);
 	}
 
+	public  String getName(){
+		return name;
+	}
+
 	/**
 	 * @param effect powerup effect to parse
 	 */
