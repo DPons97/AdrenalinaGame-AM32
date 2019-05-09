@@ -4,6 +4,7 @@ import it.polimi.ingsw.client.model.AdrenalinaMatch;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import org.json.simple.JSONObject;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -122,6 +123,24 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
     public TurnAction actionSelection(){
         return null;
     }
+
+	/**
+	 * Updates the lobby view
+	 * @param toGetUpdateFrom JSON lobby representation to get update from
+	 */
+	@Override
+	public void updateLobby(JSONObject toGetUpdateFrom) throws RemoteException {
+
+	}
+
+	/**
+	 * Updates the lobby view
+	 * @param toGetUpdateFrom JSON match representation to get update from
+	 */
+	@Override
+	public void updateMatch(JSONObject toGetUpdateFrom) throws RemoteException {
+
+	}
 
 	/**
 	 * Main method to test connection

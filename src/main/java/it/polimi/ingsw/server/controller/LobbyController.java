@@ -15,9 +15,9 @@ public class LobbyController {
 	 */
 	public Lobby lobby;
 
-    /**
-     * Maximum number of matches in the lobby
-     */
+	/**
+	 * Maximum number of matches in the lobby
+	 */
 	private int maxMatches = 10;
 	/**
 	 * List of players connected
@@ -26,7 +26,7 @@ public class LobbyController {
 
 	/**
 	 * Default constructor
-     * initializes new lobby and new list of players
+	 * initializes new lobby and new list of players
 	 */
 	public LobbyController() {
 		this.lobby = new Lobby(maxMatches);
@@ -42,14 +42,14 @@ public class LobbyController {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public void hostMatch() {
 		// TODO implement here
 	}
 
 	/**
-     * Add a new player to connected players
+	 * Add a new player to connected players
 	 * @param player player to add
 	 */
 	public synchronized void addPlayer(PlayerConnection player) {
@@ -61,4 +61,9 @@ public class LobbyController {
 		System.out.print(player.getName());
 		System.out.println(" connected.");
 	}
+
+	private void updatePlayers() {
+		players.forEach(p -> p.updateLobby(lobby));
+	}
+
 }

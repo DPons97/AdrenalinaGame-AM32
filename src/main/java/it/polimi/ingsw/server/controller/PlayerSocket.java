@@ -18,7 +18,6 @@ import java.util.stream.Collectors;
  * and responds with json formatted string
  */
 public class PlayerSocket extends PlayerConnection {
-
 	/**
 	 * Printer to write on socket stream out
 	 */
@@ -30,20 +29,68 @@ public class PlayerSocket extends PlayerConnection {
 	private BufferedReader input;
 
 	/**
+	 * String with last response received from client
+	 */
+	private String response;
+
+	private boolean validResponse;
+
+
+	/**
 	 * Default constructor
 	 */
 	public PlayerSocket(PrintWriter output, BufferedReader input) throws IOException {
 		super(input.readLine());
 		this.input= input;
 		this.output= output;
+		validResponse = false;
+		Thread t = new Thread(this::listen);
+		t.start();
 	}
 
 	/**
-	 *
+	 *	listens for communications from client.
+	 *  Intercepts disconnection requests.
 	 */
-	private String listen() {
-		// TODO implement here
-        return null;
+	private void listen() {
+		String message;
+		while(true){
+			try {
+				message = input.readLine();
+				if(message.equals("disconnect")){
+					// TODO disconnect client
+				} else if(!validResponse){
+					synchronized (this) {
+						response = message;
+						validResponse = true;
+						notifyAll();
+					}
+				}
+
+			} catch (IOException e) {
+				e.printStackTrace();
+				//TODO disconnect client
+				return;
+			}
+		}
+	}
+
+	private String getResponse(){
+		String msg;
+		synchronized (this){
+			while(!validResponse) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+			msg = response;
+			validResponse = false;
+			notifyAll();
+		}
+		return msg;
 	}
 
 	/**
@@ -74,7 +121,7 @@ public class PlayerSocket extends PlayerConnection {
         selectable.forEach(s->jArray.add(s.getNickname()));
 	    message.put("list", jArray);
 	    this.sendInstruction(message);
-	    String selected = this.listen();
+	    String selected = this.getResponse();
 	    return selectable.stream().filter(p->p.getNickname().equals(selected))
                             .collect(Collectors.toList()).get(0);
 	}
@@ -92,7 +139,7 @@ public class PlayerSocket extends PlayerConnection {
 		JSONArray jArray = createJSONCoordinateList(selectable);
 		message.put("list", jArray);
         this.sendInstruction(message);
-        JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+        JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
         return selectable.stream().filter(c->c.getCoordX() == Integer.parseInt(selected.get("x").toString()) &&
                 c.getCoordY() == Integer.parseInt(selected.get("y").toString()))
                 .collect(Collectors.toList()).get(0);
@@ -116,7 +163,7 @@ public class PlayerSocket extends PlayerConnection {
         message.put("list", jArray);
         this.sendInstruction(message);
 
-        JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+        JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
         JSONArray room = (JSONArray) selected.get("room");
         for(List<Cell> r : selectable){
             for(Cell c : r){
@@ -191,7 +238,7 @@ public class PlayerSocket extends PlayerConnection {
 		message.put("list", jArray);
 		this.sendInstruction(message);
 
-		JSONObject selected = (JSONObject) JSONValue.parse(this.listen());
+		JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
 
 		return parseWeaponSelection(selected);
 	}
@@ -218,8 +265,34 @@ public class PlayerSocket extends PlayerConnection {
 		message.put("type", "action");
 
 		this.sendInstruction(message);
-		String selected = this.listen();
+		String selected = this.getResponse();
 		return TurnAction.valueOf(selected);
+	}
+
+	/**
+	 * Updates the client match view
+	 * @param toGetUpdateFrom  match to get update from
+	 */
+	@Override
+	public void updateMatch(AdrenalinaMatch toGetUpdateFrom) {
+		JSONObject message = new JSONObject();
+		message.put("function", "update");
+		message.put("type", "match");
+		message.put("match", toGetUpdateFrom.toJSON());
+		this.sendInstruction(message);
+	}
+
+	/**
+	 * Updates the client lobby view
+	 * @param toGetUpdateFrom  lobby to get update from
+	 */
+	@Override
+	public void updateLobby(Lobby toGetUpdateFrom) {
+		JSONObject message = new JSONObject();
+		message.put("function", "update");
+		message.put("type", "lobby");
+		message.put("lobby", toGetUpdateFrom.toJSON());
+		this.sendInstruction(message);
 	}
 
 	private Weapon getWeapon(String weaponName){

@@ -803,4 +803,12 @@ public class AdrenalinaMatch {
 		return list;
 	}
 
+	/**
+	 * @return JSON representation of this
+	 * */
+	public JSONObject toJSON(){
+		//TODO: implement json representation
+		return null;
+	}
+
 }

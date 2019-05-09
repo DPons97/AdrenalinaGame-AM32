@@ -64,7 +64,11 @@ public class RemoteClient extends ServerConnection {
 	 */
 	@Override
 	public void disconnect() {
-
+		try {
+			server.logout();
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 
 

@@ -68,7 +68,7 @@ public class SocketClient extends ServerConnection {
 	 */
 	@Override
 	public void disconnect() {
-
+		output.println("disconnect");
 	}
 
 	/**
@@ -173,7 +173,16 @@ public class SocketClient extends ServerConnection {
 				}
 				break;
 			case "update":
+				switch (message.get("type").toString()){
+					case "match":
 
+						break;
+					case "lobby":
+
+						break;
+
+					default:
+				}
 			default:
 
 		}

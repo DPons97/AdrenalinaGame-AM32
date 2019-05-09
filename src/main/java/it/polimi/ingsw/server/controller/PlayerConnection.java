@@ -89,6 +89,18 @@ public abstract class PlayerConnection {
 	public abstract TurnAction selectAction();
 
 	/**
+	 * Updates the client match view
+	 * @param toGetUpdateFrom  match to get update from
+	 */
+	public abstract void updateMatch(AdrenalinaMatch toGetUpdateFrom);
+
+	/**
+	 * Updates the client lobby view
+	 * @param toGetUpdateFrom  lobby to get update from
+	 */
+	public abstract void updateLobby(Lobby toGetUpdateFrom);
+
+	/**
 	 * @return reference to current match's controller
 	 */
 	public MatchController getCurrentMatch() {

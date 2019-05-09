@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.controller.MatchController;
 import it.polimi.ingsw.server.controller.PlayerConnection;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -115,5 +116,13 @@ public class Lobby {
         player.setMatch(toJoin.getMatch());
         player.getConnection().setCurrentMatch(toJoin);
         players.remove(player);
+    }
+
+    /**
+     * @return JSON representation of this
+     * */
+    public JSONObject toJSON(){
+        //TODO: implement json representation
+        return null;
     }
 }

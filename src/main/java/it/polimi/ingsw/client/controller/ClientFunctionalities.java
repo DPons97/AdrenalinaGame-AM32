@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.controller;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import org.json.simple.JSONObject;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -53,5 +54,17 @@ public interface ClientFunctionalities extends Remote {
 	 * @return action to make
 	 */
 	TurnAction actionSelection() throws RemoteException;
+
+	/**
+	 * Updates the lobby view
+	 * @param toGetUpdateFrom JSON lobby representation to get update from
+	 */
+	void updateLobby(JSONObject toGetUpdateFrom) throws  RemoteException;
+
+	/**
+	 * Updates the match view
+	 * @param toGetUpdateFrom JSON match representation to get update from
+	 */
+	void updateMatch(JSONObject toGetUpdateFrom) throws  RemoteException;
 
 }

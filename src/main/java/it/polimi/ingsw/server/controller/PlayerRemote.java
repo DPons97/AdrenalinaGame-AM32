@@ -2,10 +2,7 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.controller.ClientFunctionalities;
 import it.polimi.ingsw.client.model.Point;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Player;
-import it.polimi.ingsw.server.model.Powerup;
-import it.polimi.ingsw.server.model.Weapon;
+import it.polimi.ingsw.server.model.*;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -151,5 +148,31 @@ public class PlayerRemote extends PlayerConnection {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Updates the client match view
+	 * @param toGetUpdateFrom  match to get update from
+	 */
+	@Override
+	public void updateMatch(AdrenalinaMatch toGetUpdateFrom) {
+		try {
+			remotePlayer.updateMatch(toGetUpdateFrom.toJSON());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Updates the client lobby view
+	 * @param toGetUpdateFrom  lobby to get update from
+	 */
+	@Override
+	public void updateLobby(Lobby toGetUpdateFrom) {
+		try {
+			remotePlayer.updateLobby(toGetUpdateFrom.toJSON());
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
 	}
 }
