@@ -8,7 +8,6 @@ import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -66,54 +65,47 @@ public class MatchController {
 		}
 		match.startMatch();
 
-		int currentTurn;
-		Player currentPlayer;
+		Player currentPlayer = match.getTurnPlayer();
 
 		while (match.getMatchState() != MatchState.ENDED) {
+			if (match.getMatchState() == MatchState.FRENZY_TURN) break;
+
 			// Start round logic
-			currentTurn = match.getTurn();
 			currentPlayer = match.getTurnPlayer();
 
-			if (currentTurn/match.getPlayers().size() == 0) {
-				// Manage first turn
+			// Manage first turn
+			if (match.getTurn()/match.getPlayers().size() == 0) respawnPlayer(currentPlayer);
 
-				// First spawn:
-				// Draw 2 powerups from deck
-				List<Powerup> spawnCards = new ArrayList<>();
-				spawnCards.add(match.getPowerupDeck().drawCard());
-				spawnCards.add(match.getPowerupDeck().drawCard());
+			// Start usual turn, or manage frenzy
+			beginTurn(currentPlayer);
 
-				// Make player choose one to keep
-				Powerup toKeep = currentPlayer.getConnection().choosePowerup(spawnCards);
-				currentPlayer.addPowerup(toKeep);
-				spawnCards.remove(toKeep);
+			resolveDeaths(currentPlayer);
+			repopulateMap();
 
-				// Spawn player in right cell
-				Color spawnColor;
-				spawnColor = resourceToColor(spawnCards.get(0).getBonusResource());
-				for (SpawnCell spawn : match.getBoardMap().getSpawnPoints()) {
-					if (spawn.getColor() == spawnColor) currentPlayer.respawn(spawn);
-				}
-
-				// Discard other card
-				match.getPowerupDeck().discardCard(spawnCards.get(0));
-
-				// Start usual turn
-				beginTurn(currentPlayer);
-				resolveDeaths(currentPlayer);
-
-				// TODO: Repopulate Map
-
-				match.nextTurn();
-			} else {
-				beginTurn(currentPlayer);
-				resolveDeaths(currentPlayer);
-
-				// TODO: Repopulate Map
-
-				match.nextTurn();
-			}
+			match.nextTurn();
 		}
+
+		// Frenzy initialization
+		Player lastFrenzyPlayer = currentPlayer;
+		currentPlayer = match.getTurnPlayer();
+
+		// All players without damage change their rewards to frenzy, and reset their deaths to 0
+		for (Player p : match.getPlayers()) {
+			if (p.getDmgPoints().isEmpty()) p.enableFrenzy();
+		}
+
+		// Frenzy turns
+		while (currentPlayer != lastFrenzyPlayer) {
+			currentPlayer = match.getTurnPlayer();
+
+			frenzyTurn(currentPlayer);
+			resolveDeaths(currentPlayer);
+			repopulateMap();
+
+			match.nextTurn();
+		}
+
+		// TODO Do last frenzy turn (last player has to play)
 
 
 	}
@@ -138,40 +130,6 @@ public class MatchController {
 				spawnColor = null;
 		}
 		return spawnColor;
-	}
-
-	/**
-	 *	Game turn logic (Run/Pick/Shoot + reloading)
-	 */
-	public void beginTurn(Player playing) {
-
-	}
-
-	/**
-	 * Resolve deaths occurred during current turn
-	 * @param currentPlayer player who has just finished his turn
-	 * @throws PlayerNotExistsException if player doesn't exists inside match
-	 */
-	private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
-		int deadPlayers = 0;
-		for (Player p : match.getPlayers()) {
-			if (p.isDead()) {
-				// First to damage deadPlayer gets 1 point (First Blood)
-				p.getDmgPoints().get(0).addScore(1);
-				rewardPlayers(p.getDmgPoints(), p.getReward());
-
-				// Add death to match, counting overkill if present (Killshot, Death and Overkill)
-				match.addDeath(p.getDmgPoints().get(p.getDmgPoints().size()-1), p.isOverkilled());
-
-				// Mark player who overkilled deadPlayer (Revenge mark)
-				if (p.isOverkilled()) p.getDmgPoints().get(p.getDmgPoints().size() - 1).takeMark(p);
-
-				deadPlayers++;
-			}
-		}
-
-		// Manage double kill: give +1 additional point to killer
-		if (deadPlayers > 1)  currentPlayer.addScore(1);
 	}
 
 	/**
@@ -201,6 +159,85 @@ public class MatchController {
 				}
 			}
 		}
+	}
+
+	/**
+	 *	Game turn logic (Run/Pick/Shoot + reloading)
+	 */
+	public void beginTurn(Player playing) {
+		// TODO Manage turn as usual
+	}
+
+	/**
+	 *	Game turn logic during frenzy (Run/Pick/Shoot + reloading)
+	 */
+	public void frenzyTurn(Player playing) {
+		// TODO Manage turn during frenzy
+	}
+
+	/**
+	 * Resolve deaths occurred during current turn
+	 * @param currentPlayer player who has just finished his turn
+	 * @throws PlayerNotExistsException if player doesn't exists inside match
+	 */
+	private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
+		int deadPlayers = 0;
+		for (Player p : match.getPlayers()) {
+			if (p.isDead()) {
+				// First to damage deadPlayer gets 1 point (First Blood)
+				p.getDmgPoints().get(0).addScore(1);
+				rewardPlayers(p.getDmgPoints(), p.getReward());
+
+				// Add death to match, counting overkill if present (Killshot, Death and Overkill)
+				match.addDeath(p.getDmgPoints().get(p.getDmgPoints().size()-1), p.isOverkilled());
+
+				// Mark player who overkilled deadPlayer (Revenge mark)
+				if (p.isOverkilled()) p.getDmgPoints().get(p.getDmgPoints().size() - 1).takeMark(p);
+
+				// Respawn player
+				respawnPlayer(currentPlayer);
+
+				deadPlayers++;
+			}
+		}
+
+		// Manage double kill: give +1 additional point to killer
+		if (deadPlayers > 1)  currentPlayer.addScore(1);
+	}
+
+	/**
+	 * Respawn mechanics
+	 * @param currentPlayer that is playing
+	 */
+	private void respawnPlayer(Player currentPlayer) {
+		// Draw a powerups from deck. Draw 2 if it's first player's turn
+		List<Powerup> spawnCards = new ArrayList<>();
+
+		if (match.getTurn()/match.getPlayers().size() == 0 && currentPlayer.getDeaths() == 0) spawnCards.add(match.getPowerupDeck().drawCard());
+		spawnCards.add(match.getPowerupDeck().drawCard());
+
+		// Add cards that player have. During first turn this will add nothing
+		spawnCards.addAll(currentPlayer.getPowerups());
+
+		// Make player choose one to discard. This card's color is the spawn's cell color
+		Powerup toDiscard = currentPlayer.getConnection().choosePowerup(spawnCards);
+		spawnCards.remove(toDiscard);
+
+		// Update player's powerups
+		for (Powerup powerup : spawnCards) {
+			if (!currentPlayer.getPowerups().contains(powerup)) currentPlayer.addPowerup(powerup);
+		}
+
+
+		// Spawn player in right cell
+		Color spawnColor;
+		spawnColor = resourceToColor(toDiscard.getBonusResource());
+		for (SpawnCell spawn : match.getBoardMap().getSpawnPoints()) {
+			if (spawn.getColor() == spawnColor) currentPlayer.respawn(spawn);
+		}
+
+		// Discard chosen card
+		match.getPowerupDeck().discardCard(toDiscard);
 	}
 
 	/**
@@ -241,5 +278,16 @@ public class MatchController {
 				reward++;
 			}
 		}
+	}
+
+	/**
+	 * Replace ammos and weapons in map
+	 */
+	private void repopulateMap() {
+		// Replace taken ammo in map
+		match.getBoardMap().initAmmoCells(match.getAmmoDeck());
+
+		// Replace taken weapons in map
+		match.getBoardMap().initSpawnCells(match.getWeaponDeck());
 	}
 }

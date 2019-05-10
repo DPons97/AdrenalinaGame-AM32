@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.custom_exceptions.*;
+import jdk.nashorn.internal.runtime.regexp.joni.MatcherFactory;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -79,11 +80,6 @@ public class AdrenalinaMatch {
 	private Player firstPlayer;
 
 	/**
-	 * True when frenzy is on
-	 */
-	private Boolean frenzyEnabled;
-
-	/**
 	 * 	duration of a turn in seconds.
 	 */
 	private int turnDuration;
@@ -119,7 +115,6 @@ public class AdrenalinaMatch {
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
-		this.frenzyEnabled = false;
 		this.initAmmoDeck();
 		this.initPowerupDeck();
 		this.initWeaponDeck();
@@ -150,6 +145,7 @@ public class AdrenalinaMatch {
 			ySize = Integer.parseInt(mapSize.get(1).toString());
 			Cell[][] newMap = new Cell[xSize][ySize];
 			ArrayList<SpawnCell> spawnPoints = new ArrayList<>();
+			ArrayList<AmmoCell> ammoPoints = new ArrayList<>();
 
 			// get the array of cells
 			JSONArray mapCells = (JSONArray) jsonObject.get("Cells");
@@ -159,7 +155,7 @@ public class AdrenalinaMatch {
 				JSONObject currCell = (JSONObject) mapCell;
 				Side[] cords = new Side[4];
 				String color = currCell.get("color").toString();
-				Color c = null;
+				Color c;
 				// if color is X then is a corner empyt cell
 				if (color.equals("X")) {
 					newMap[(i / ySize) % xSize][i % ySize] = null;
@@ -172,18 +168,21 @@ public class AdrenalinaMatch {
 					// create the right kind of cell
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
-						newMap[(i / 4) % 3][i % 4] = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
-						spawnPoints.add((SpawnCell) newMap[(i / ySize) % xSize][i % ySize]);
+                        SpawnCell newCell = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+                        newMap[(i / 4) % 3][i % 4] = newCell;
+                        spawnPoints.add(newCell);
 					} else {
 						// create AmmoCell
-						newMap[(i / 4) % 3][i % 4] = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+                        AmmoCell newCell = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
+						newMap[(i / 4) % 3][i % 4] = newCell;
+						ammoPoints.add(newCell);
 					}
 				}
 				i++;
 			}
 
 			// Generate Map object
-			boardMap = new Map(newMap, spawnPoints, xSize, ySize, ammoDeck);
+			boardMap = new Map(newMap, spawnPoints, ammoPoints, xSize, ySize, ammoDeck, weaponDeck);
 
 		} catch (ParseException | IOException | InvalidStringException e) {
 			e.printStackTrace();
@@ -416,13 +415,6 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * @return true if the frenzy is on, otherwise returns false
-	 */
-	public Boolean isFrenzyEnabled() {
-		return frenzyEnabled;
-	}
-
-	/**
 	 * @return the maximum time for a turn.
 	 */
 	public int getTurnDuration() {
@@ -442,9 +434,12 @@ public class AdrenalinaMatch {
 	public int getTurn() { return turn; }
 
 	/**
-	 * Increment turn number by +1
+	 * Increment turn number by +1 and update match state
 	 */
-	public void nextTurn() { turn++; }
+	public void nextTurn() {
+	    turn++;
+	    if (state != MatchState.FRENZY_TURN) setMatchState(MatchState.PLAYER_TURN);
+	}
 
 	/**
 	 * @param nextState of match
@@ -469,7 +464,7 @@ public class AdrenalinaMatch {
 			currentDeaths++;
 			deathTrack.add(killer);
 			if (isOverkill) deathTrack.add(killer);
-			if (currentDeaths>= maxDeaths) frenzyEnabled = true;
+			if (currentDeaths>= maxDeaths) state = MatchState.FRENZY_TURN;
 		} else throw new PlayerNotExistsException("Error, player not in game");
 	}
 
