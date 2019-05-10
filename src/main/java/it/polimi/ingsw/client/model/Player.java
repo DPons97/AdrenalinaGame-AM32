@@ -13,62 +13,62 @@ import it.polimi.ingsw.server.model.Weapon;
 public class Player {
 
 	/**
-	 * 
+	 * nickname
 	 */
 	private String nickname;
 
 	/**
-	 * 
+	 * score
 	 */
 	private int score;
 
 	/**
-	 * 
+	 * damage points
 	 */
 	private List<Player> dmgPoints;
 
 	/**
-	 * 
+	 * marks
 	 */
 	private List<Player> marks;
 
 	/**
-	 * 
+	 * true if is death
 	 */
 	private boolean dead;
 
 	/**
-	 * 
+	 * number of deaths
 	 */
 	private int deaths;
 
 	/**
-	 * 
+	 * number of given marks
 	 */
 	private int givenMarks;
 
 	/**
-	 * 
+	 * position
 	 */
 	private Cell position;
 
 	/**
-	 * 
+	 * weapons
 	 */
 	private List<Weapon> weapons;
 
 	/**
-	 * 
+	 * powerups
 	 */
 	private List<Powerup> powerups;
 
 	/**
-	 * 
+	 * ammos
 	 */
 	private List<Ammo> ammons;
 
 	/**
-	 * 
+	 * match
 	 */
 	private AdrenalinaMatch match;
 

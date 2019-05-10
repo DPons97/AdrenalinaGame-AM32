@@ -5,6 +5,7 @@ import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -129,8 +130,9 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @param toGetUpdateFrom JSON lobby representation to get update from
 	 */
 	@Override
-	public void updateLobby(JSONObject toGetUpdateFrom) throws RemoteException {
-
+	public void updateLobby(String toGetUpdateFrom) throws RemoteException {
+		JSONObject o = (JSONObject) JSONValue.parse(toGetUpdateFrom);
+		System.out.println("Players connected: " + o.get("n_players").toString());
 	}
 
 	/**

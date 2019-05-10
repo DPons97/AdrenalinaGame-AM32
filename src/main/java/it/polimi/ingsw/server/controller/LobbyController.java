@@ -60,8 +60,12 @@ public class LobbyController {
 
 		System.out.print(player.getName());
 		System.out.println(" connected.");
+		updatePlayers();
 	}
 
+	/**
+	 * Sends a broadcast message to all players to update their model
+	 */
 	private void updatePlayers() {
 		players.forEach(p -> p.updateLobby(lobby));
 	}

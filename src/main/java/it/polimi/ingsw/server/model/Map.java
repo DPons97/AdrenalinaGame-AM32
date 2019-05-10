@@ -2,6 +2,8 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -245,5 +247,40 @@ public class Map {
                 }
             }
         }
+    }
+
+    /**
+     * @return JSON representation of this
+     */
+    public JSONArray toJSON(){
+        JSONArray map = new JSONArray();
+
+        for (Cell[] cells : mapMatrix) {
+            for (Cell cell : cells) {
+                if(cell != null){
+                    JSONObject currCell = new JSONObject();
+
+                    if(cell.isSpawn()){
+                        currCell.put("type", "spawn");
+                        JSONArray weapons = new JSONArray();
+
+                        ((SpawnCell) cell).getWeapons().forEach(w -> weapons.add(w.getName()));
+
+                        currCell.put("weapons", weapons);
+                    }else {
+                        currCell.put("ammo", ((AmmoCell) cell).getResource().toJSON());
+
+                    }
+                    JSONArray players = new JSONArray();
+                    cell.getPlayers().forEach(p -> players.add(p.getNickname()));
+                    currCell.put("players", players);
+
+                    map.add(currCell);
+
+                }
+            }
+        }
+
+        return map;
     }
 }

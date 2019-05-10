@@ -27,8 +27,8 @@ public abstract class Weapon {
 	private List<Resource> cost;
 
 	/**
-	 * @param name weapon name
-	 * @param cost weapon cost
+	 * @param name    weapon name
+	 * @param cost    weapon cost
 	 * @param actions json object with effects description
 	 */
 	public Weapon(String name, List<Resource> cost, JSONObject actions) {
@@ -61,6 +61,7 @@ public abstract class Weapon {
 
 	/**
 	 * testing purposes
+	 *
 	 * @param cost weapon cost
 	 */
 	public void setCost(List<Resource> cost) {
@@ -76,8 +77,9 @@ public abstract class Weapon {
 
 	/**
 	 * Shoot with this weapon
+	 *
 	 * @param effectID effect identifier
-	 * @param shooter player shooting
+	 * @param shooter  player shooting
 	 */
 	public abstract void shoot(int effectID, Player shooter) throws WeaponNotLoadedException, RequirementsNotMetException;
 
@@ -95,6 +97,5 @@ public abstract class Weapon {
 	 * @param actions json object read from weapon file
 	 * @return
 	 */
-	 protected abstract void parseEffects(JSONObject actions);
-
+	protected abstract void parseEffects(JSONObject actions);
 }

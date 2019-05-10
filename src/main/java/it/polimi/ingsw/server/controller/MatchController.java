@@ -290,4 +290,11 @@ public class MatchController {
 		// Replace taken weapons in map
 		match.getBoardMap().initSpawnCells(match.getWeaponDeck());
 	}
+
+	/**
+	 * Sends a broadcast message to all players to update their model
+	 */
+	private void updatePlayers() {
+		match.getPlayers().forEach(p-> p.getConnection().updateMatch(match));
+	}
 }

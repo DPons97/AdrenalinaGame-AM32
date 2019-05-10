@@ -1,5 +1,8 @@
 package it.polimi.ingsw.server.model;
 
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +53,21 @@ public class Ammo {
 	 */
 	public boolean hasPowerup() {
 		return powerup;
+	}
+
+	/**
+	 * @return JSON representation of this
+	 * */
+	public JSONObject toJSON(){
+		JSONObject toRet = new JSONObject();
+		JSONArray res = new JSONArray();
+
+		resources.forEach(r -> res.add(r.toString()));
+
+		toRet.put("powerup", powerup);
+		toRet.put("resources", res);
+
+		return toRet;
 	}
 
 }

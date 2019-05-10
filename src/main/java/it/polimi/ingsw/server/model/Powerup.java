@@ -69,4 +69,14 @@ public class Powerup {
 	 * @return bonus resource
 	 */
 	public Resource getBonusResource() { return bonusResource;	}
+
+	/**
+	 * @return JSON representation of this
+	 */
+	public JSONObject toJSON(){
+		JSONObject p = new JSONObject();
+		p.put("name", name);
+		p.put("bonusResource", bonusResource.toString());
+		return p;
+	}
 }

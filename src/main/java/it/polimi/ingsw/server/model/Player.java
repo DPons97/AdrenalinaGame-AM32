@@ -2,6 +2,8 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.controller.PlayerConnection;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -723,5 +725,36 @@ public class Player {
 			overkilled = false;
 			move(respawnPosition);
 		}
+	}
+
+	/**
+	 * @return JSON representation of this
+	 */
+	public JSONObject toJSON(){
+		JSONObject player = new JSONObject();
+		player.put("name", nickname);
+		player.put("ready", readyToStart);
+		player.put("deaths", deaths);
+
+		JSONArray weaponsArray = new JSONArray();
+		JSONArray powerupsArray = new JSONArray();
+		JSONArray marksArray = new JSONArray();
+		JSONArray dmgpointsArray = new JSONArray();
+		JSONArray resourcesArray = new JSONArray();
+
+		weapons.forEach(w -> weaponsArray.add(w.getName()));
+		powerups.forEach(p -> powerupsArray.add(p.toJSON()));
+		marks.forEach(m -> marksArray.add(m.getNickname()));
+		dmgPoints.forEach(d -> dmgpointsArray.add(d.getNickname()));
+		ammos.forEach(a -> resourcesArray.add(a.toString()));
+
+
+		player.put("weapons", weaponsArray);
+		player.put("powerups", powerupsArray);
+		player.put("marks", marksArray);
+		player.put("dmgpoints", dmgpointsArray);
+		player.put("resources", resourcesArray);
+
+		return player;
 	}
 }
