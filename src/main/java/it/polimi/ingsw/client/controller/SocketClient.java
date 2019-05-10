@@ -182,7 +182,7 @@ public class SocketClient extends ServerConnection {
 
 						break;
 					case "lobby":
-
+							player.updateLobby(message.get("lobby").toString());
 						break;
 
 					default:
