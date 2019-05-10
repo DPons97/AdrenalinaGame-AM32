@@ -8,7 +8,6 @@ import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -241,5 +240,12 @@ public class MatchController {
 				reward++;
 			}
 		}
+	}
+
+	/**
+	 * Sends a broadcast message to all players to update their model
+	 */
+	private void updatePlayers() {
+		match.getPlayers().forEach(p-> p.getConnection().updateMatch(match));
 	}
 }

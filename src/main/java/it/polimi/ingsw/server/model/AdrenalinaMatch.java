@@ -69,6 +69,11 @@ public class AdrenalinaMatch {
 	private int nPlayers;
 
 	/**
+	 * Number of players of this match (Max and Min)
+	 */
+	private int mapID;
+
+	/**
 	 * List of players in the match
 	 */
 	private List<Player> players;
@@ -100,7 +105,7 @@ public class AdrenalinaMatch {
 
 	/**
 	 * @param nPlayers number of players [3,5].
-	 * @param maxDeaths maximum number of deaths befor frenzy.
+	 * @param maxDeaths maximum number of deaths before frenzy.
 	 * 					the same as skulls in the manual
 	 * @param turnDuration max duration of a turn in seconds.
 	 * @param mapID id of map to play [1,4].
@@ -115,6 +120,7 @@ public class AdrenalinaMatch {
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
 		this.turn = 0;
+		this.mapID = mapID;
 		this.players = new ArrayList<>();
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
@@ -160,7 +166,7 @@ public class AdrenalinaMatch {
 				Side[] cords = new Side[4];
 				String color = currCell.get("color").toString();
 				Color c = null;
-				// if color is X then is a corner empyt cell
+				// if color is X then is a corner empty cell
 				if (color.equals("X")) {
 					newMap[(i / ySize) % xSize][i % ySize] = null;
 				} else { // otherwise is a valid cell
@@ -339,6 +345,13 @@ public class AdrenalinaMatch {
 	 */
 	public Player getFirstPlayer() {
 		return firstPlayer;
+	}
+
+	/**
+	 * @return the first player.
+	 */
+	public int getMapID() {
+		return mapID;
 	}
 
 	/**
@@ -807,8 +820,23 @@ public class AdrenalinaMatch {
 	 * @return JSON representation of this
 	 * */
 	public JSONObject toJSON(){
-		//TODO: implement json representation
-		return null;
+		JSONObject toRet = new JSONObject();
+		toRet.put("max_deaths", this.maxDeaths);
+		toRet.put("mapID", this.mapID);
+		toRet.put("state", this.state);
+		toRet.put("map", this.boardMap.toJSON());
+		JSONArray playersArray = new JSONArray();
+		players.forEach(p -> {
+			JSONObject player = new JSONObject();
+			toRet.put("name", p.getNickname());
+			toRet.put("ready", p.isReadyToStart());
+			toRet.put("name", p.getNickname());
+
+		});
+
+		toRet.put("players", playersArray);
+
+		return toRet;
 	}
 
 }

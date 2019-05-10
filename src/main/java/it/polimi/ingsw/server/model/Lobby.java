@@ -3,6 +3,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.controller.MatchController;
 import it.polimi.ingsw.server.controller.PlayerConnection;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -122,7 +123,21 @@ public class Lobby {
      * @return JSON representation of this
      * */
     public JSONObject toJSON(){
-        //TODO: implement json representation
-        return null;
+        JSONObject toRet = new JSONObject();
+        toRet.put("n_players", players.size());
+
+        JSONArray matches = new JSONArray();
+        this.matches.forEach(m -> {
+            JSONObject match = new JSONObject();
+            match.put("n_players", m.getMatch().getPlayerNumber());
+            match.put("mapID", m.getMatch().getMapID());
+            match.put("max_deaths", m.getMatch().getMaxDeaths());
+            JSONArray players = new JSONArray();
+            m.getMatch().getPlayers().forEach(p-> players.add(p.getNickname()));
+            match.put("players", players);
+            matches.add(match);
+        });
+        toRet.put("matches", matches);
+        return toRet;
     }
 }
