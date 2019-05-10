@@ -550,6 +550,38 @@ public class Player {
 	}
 
 	/**
+	 * @return List of cells in which player can move (1, 2 or 3 distance)
+	 */
+	public List<Cell> getCellsToMove() {
+		// TODO testing
+		return getCellsWithoutWalls(position, new ArrayList<>(), 3);
+	}
+
+	/**
+	 * Support function that retreives all cells in which the player can move
+	 */
+	private List<Cell> getCellsWithoutWalls(Cell currCell, List<Cell> visited, int distance) {
+		if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
+		if (distance == 0) {
+			List<Cell> lastCell = new ArrayList<>();
+			lastCell.add(currCell);
+			return lastCell;
+		}
+
+		Map matchMap = match.getBoardMap();
+		List<Cell> canMove = new ArrayList<>();
+
+		visited.add(currCell);
+		for (Direction dir : Direction.values()) {
+			// Player has no wall/door in this direction
+			if (position.getSide(dir) != Side.WALL && position.getSide(dir) != Side.BORDER) {
+				canMove.addAll(getCellsWithoutWalls(matchMap.getAdjacentCell(currCell, dir), visited, distance - 1));
+			}
+		}
+		return canMove;
+	}
+
+	/**
 	 * Pick ammo and add resources + powerups to player's inventory
 	 * @param location Cell from which this player take monitions
 	 */

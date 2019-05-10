@@ -166,6 +166,25 @@ public class MatchController {
 	 */
 	public void beginTurn(Player playing) {
 		// TODO Manage turn as usual
+        // Ask player what to do (RUN, PICK, SHOOT)
+        TurnAction currentAcion = playing.getConnection().selectAction();
+
+        switch (currentAcion) {
+            case MOVE:
+                // MOVE management
+                // Select one of cells at 1, 2 or 3 distance
+                List<Cell> selectable = playing.getCellsToMove();
+                playing.move(playing.getConnection().selectCell(selectable));
+                break;
+            case PICK:
+                // PICK management
+
+                break;
+            case SHOOT:
+                // SHOOT management
+
+                break;
+        }
 	}
 
 	/**
