@@ -56,6 +56,8 @@ public class SocketClient extends ServerConnection {
 			this.output = new PrintWriter(socket.getOutputStream(), true);
 			this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			output.println(player.getNickname());
+			Thread t = new Thread(this::listen);
+			t.start();
 		} catch (IOException e) {
 			e.printStackTrace();
 			exit(1);
@@ -79,6 +81,7 @@ public class SocketClient extends ServerConnection {
 		while(true){
 			try {
 				msg = input.readLine();
+
 				parseMessage((JSONObject) JSONValue.parse(msg));
 			} catch (IOException | InvalidSelectionTypeException e) {
 				e.printStackTrace();

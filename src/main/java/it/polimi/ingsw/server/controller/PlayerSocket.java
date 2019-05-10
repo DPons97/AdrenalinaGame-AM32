@@ -97,7 +97,9 @@ public class PlayerSocket extends PlayerConnection {
 	 * @param message to send
 	 */
 	public void sendInstruction(JSONObject message) {
-		// TODO implement here
+		//System.out.println("Sending "+ message.toString());
+		output.println(message.toString());
+
 	}
 
 	/**
