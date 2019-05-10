@@ -64,6 +64,11 @@ public class Player {
 	private int score;
 
 	/**
+	 * True if this player is using frenzy rewards
+	 */
+	private boolean isFrenzyPlayer;
+
+	/**
 	 *	Damage dealt to this player during the game (Every Player is a damage point)
 	 *	Players in this list are those who damaged this
 	 */
@@ -134,6 +139,7 @@ public class Player {
 		dead = true;
 		overkilled = false;
 		deaths = 0;
+		isFrenzyPlayer = false;
 		givenMarks = 0;
 		position = null;
 
@@ -159,6 +165,7 @@ public class Player {
 		dead = true;
 		overkilled = false;
 		deaths = 0;
+		isFrenzyPlayer = false;
 		givenMarks = 0;
 		position = null;
 
@@ -185,6 +192,7 @@ public class Player {
 		dead = true;
 		overkilled = false;
 		deaths = 0;
+		isFrenzyPlayer = false;
 		givenMarks = 0;
 
 		weapons = new ArrayList<>();
@@ -198,6 +206,17 @@ public class Player {
 	public static List<Integer> getKillRewards() {
 		List<Integer> returnReward = new ArrayList<>();
 		for (int i : killRewards) {
+			returnReward.add(i);
+		}
+		return returnReward;
+	}
+
+	/**
+	 * @return List of kill rewards during frenzy
+	 */
+	public static List<Integer> getFrenzyRewards() {
+		List<Integer> returnReward = new ArrayList<>();
+		for (int i : frenzyRewards) {
 			returnReward.add(i);
 		}
 		return returnReward;
@@ -229,17 +248,6 @@ public class Player {
 	protected void setMatch(AdrenalinaMatch newMatch) { match = newMatch; }
 
 	/**
-	 * @return List of kill rewards during frenzy
-	 */
-	public static List<Integer> getFrenzyRewards() {
-		List<Integer> returnReward = new ArrayList<>();
-		for (int i : frenzyRewards) {
-			returnReward.add(i);
-		}
-		return returnReward;
-	}
-
-	/**
 	 *
 	 * @return max damage a player can take before he's considered dead
 	 */
@@ -250,6 +258,19 @@ public class Player {
 	 * @return max marks a player can have
 	 */
 	public static int getMaxMarks() { return maxMarks; }
+
+	/**
+	 * @return current player's deaths
+	 */
+	public int getDeaths() { return deaths; }
+
+	/**
+	 * Init this player's rewards and deaths for frenzy
+	 */
+	public void enableFrenzy() {
+		deaths = 0;
+		isFrenzyPlayer = true;
+	}
 
 	/**
 	 * @return current Player's taken damage ponints
@@ -298,14 +319,16 @@ public class Player {
 		// Player never died
 		if (deaths <= 0) return new ArrayList<>();
 
+		int[] currentRewards = (isFrenzyPlayer) ? frenzyRewards : killRewards;
+
 		// Player died at least once
 		List<Integer> returnList = new ArrayList<>();
-		if (deaths <= killRewards.length) {
-			for (int i = deaths-1; i < killRewards.length; i++) {
-				returnList.add(killRewards[i]);
+		if (deaths <= currentRewards.length) {
+			for (int i = deaths-1; i < currentRewards.length; i++) {
+				returnList.add(currentRewards[i]);
 			}
 		} else {
-			returnList.add(killRewards[killRewards.length - 1]);
+			returnList.add(currentRewards[currentRewards.length - 1]);
 		}
 		return returnList;
 	}

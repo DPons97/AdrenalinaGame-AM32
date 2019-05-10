@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
+import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -14,9 +15,14 @@ public class Map {
     private Cell[][] mapMatrix;
 
     /**
-     * List to trace spawn cells, not necessary but convenient
+     * List to trace spawn cells
      */
     private List<SpawnCell> spawnPoints;
+
+    /**
+     * List of ammo cells
+     */
+    private List<AmmoCell> ammoPoints;
 
     /**
      * Size of Map
@@ -24,13 +30,16 @@ public class Map {
     private int xSize;
     private int ySize;
 
-    public Map(Cell[][] mapMatrix, List<SpawnCell> spawnPoints, int xSize, int ySize, Deck<Ammo> ammoDeck) {
+    public Map(Cell[][] mapMatrix, List<SpawnCell> spawnPoints, List<AmmoCell> ammoPoints,
+               int xSize, int ySize, Deck<Ammo> ammoDeck, Deck<Weapon> weaponDeck) {
         this.mapMatrix = mapMatrix;
         this.spawnPoints = spawnPoints;
+        this.ammoPoints = ammoPoints;
         this.xSize = xSize;
         this.ySize = ySize;
 
         initAmmoCells(ammoDeck);
+        initSpawnCells(weaponDeck);
     }
 
     /**
@@ -47,6 +56,11 @@ public class Map {
      * @return list of spawn points in map
      */
     public List<SpawnCell> getSpawnPoints() { return new ArrayList<>(spawnPoints); }
+
+    /**
+     * @return list of ammo points in map
+     */
+    public List<AmmoCell> getAmmoPoints() { return new ArrayList<>(ammoPoints); }
 
     /**
      * @param x coordinate of desired cell
@@ -206,18 +220,30 @@ public class Map {
     }
 
     /**
-     * private method to initialize ammo cells with an ammo card
+     * initialize all empty ammo cells with an ammo card
      */
-    private void initAmmoCells(Deck<Ammo> ammoDeck) {
-        for (Cell[] cells : mapMatrix) {
-            for (Cell cell : cells) {
-                if (cell != null && !cell.isSpawn()) { //if not empty cell and not a spawn cell
-                    // safe cast to Ammo Cell and set ammo drawing a card from ammo deck
-                    try {
-                        ((AmmoCell) cell).setAmmo(ammoDeck.drawCard());
-                    } catch (AmmoAlreadyOnCellException e) {
-                        e.printStackTrace();
-                    }
+    public void initAmmoCells(Deck<Ammo> ammoDeck) {
+        for (AmmoCell cell : ammoPoints) {
+            if (cell.getResource() == null) {
+                try {
+                    cell.setAmmo(ammoDeck.drawCard());
+                } catch (AmmoAlreadyOnCellException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     * initialize all non-full spawn cells with a weapon card
+     */
+    public void initSpawnCells(Deck<Weapon> weaponDeck) {
+        for (SpawnCell cell : spawnPoints) {
+            if (cell.getWeapons().size() < 3) {
+                try {
+                    cell.addWeapon(weaponDeck.drawCard());
+                } catch (InventoryFullException e) {
+                    e.printStackTrace();
                 }
             }
         }

@@ -38,6 +38,7 @@ public class AmmoCell extends Cell {
 	public Ammo getResource() {
 		if (resource == null) return null;
 
+		// Returns a copy of this cell's resource
 		Ammo toReturn;
 		if (resource.hasPowerup()) toReturn = new Ammo(resource.getResources().get(0), resource.getResources().get(1));
 		else toReturn = new Ammo(resource.getResources().get(0), resource.getResources().get(1), resource.getResources().get(2));

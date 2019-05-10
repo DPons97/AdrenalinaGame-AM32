@@ -36,7 +36,7 @@ class AdrenalinaMatchTest {
         assertEquals(5, testMatch.getCurrentDeaths());
         assertEquals(5, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(1)));
         assertEquals(3, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(0)));
-        assertTrue(testMatch.isFrenzyEnabled());
+        assertSame(MatchState.FRENZY_TURN, testMatch.getMatchState());
     }
 
     @Test
