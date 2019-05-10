@@ -130,7 +130,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @param toGetUpdateFrom JSON lobby representation to get update from
 	 */
 	@Override
-	public void updateLobby(String toGetUpdateFrom) throws RemoteException {
+	public void updateLobby(String toGetUpdateFrom) {
 		JSONObject o = (JSONObject) JSONValue.parse(toGetUpdateFrom);
 		System.out.println("Players connected: " + o.get("n_players").toString());
 	}
@@ -140,7 +140,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 * @param toGetUpdateFrom JSON match representation to get update from
 	 */
 	@Override
-	public void updateMatch(JSONObject toGetUpdateFrom) throws RemoteException {
+	public void updateMatch(JSONObject toGetUpdateFrom) {
 
 	}
 
