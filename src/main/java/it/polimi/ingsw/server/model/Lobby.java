@@ -13,11 +13,27 @@ import java.util.List;
  */
 public class Lobby {
 
+    /**
+     * max number of the matches
+     */
+
     private int maxMatches;
+
+    /**
+     * players
+     */
 
     private List<Player> players;
 
+    /**
+     * matches
+     */
+
     private List<MatchController> matches;
+
+    /**
+     * @param maxMatches maxMatches to set
+     */
 
     public Lobby(int maxMatches) {
         this.players = new ArrayList<>();

@@ -12,52 +12,52 @@ import java.util.List;
 public class AdrenalinaMatch {
 
 	/**
-	 * 
+	 * match map
 	 */
 	private Map map;
 
 	/**
-	 * 
+	 * state of the match
 	 */
 	private MatchState state;
 
 	/**
-	 * 
+	 * points of the spawn
 	 */
 	private List<SpawnCell> spawnPoints;
 
 	/**
-	 * 
+	 * current Deaths
 	 */
 	private int currentDeaths;
 
 	/**
-	 * 
+	 * track of the player's death
 	 */
 	private List<Player> deathTrack;
 
 	/**
-	 * 
+	 * number of the players
 	 */
 	private int nPlayers;
 
 	/**
-	 * 
+	 * players
 	 */
 	private List<Player> players;
 
 	/**
-	 * 
+	 * true if is frenzy
 	 */
 	private boolean frenzyEnabled;
 
 	/**
-	 * 
+	 * duration of the turn
 	 */
 	private int turnDuration;
 
 	/**
-	 * 
+	 * turn
 	 */
 	private int turn;
 
