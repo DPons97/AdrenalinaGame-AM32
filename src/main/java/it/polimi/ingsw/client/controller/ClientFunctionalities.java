@@ -59,7 +59,7 @@ public interface ClientFunctionalities extends Remote {
 	 * Updates the lobby view
 	 * @param toGetUpdateFrom JSON lobby representation to get update from
 	 */
-	void updateLobby(JSONObject toGetUpdateFrom) throws  RemoteException;
+	void updateLobby(String toGetUpdateFrom) throws  RemoteException;
 
 	/**
 	 * Updates the match view

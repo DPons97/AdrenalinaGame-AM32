@@ -170,7 +170,7 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public void updateLobby(Lobby toGetUpdateFrom) {
 		try {
-			remotePlayer.updateLobby(toGetUpdateFrom.toJSON());
+			remotePlayer.updateLobby(toGetUpdateFrom.toJSON().toString());
 		} catch (RemoteException e) {
 			e.printStackTrace();
 		}

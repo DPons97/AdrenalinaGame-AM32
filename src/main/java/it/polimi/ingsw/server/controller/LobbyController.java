@@ -60,6 +60,7 @@ public class LobbyController {
 
 		System.out.print(player.getName());
 		System.out.println(" connected.");
+		updatePlayers();
 	}
 
 	/**
