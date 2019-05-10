@@ -103,6 +103,10 @@ public class SocketClient extends ServerConnection {
 		// TODO implement here
 	}
 
+	/**
+	 * Parses a JSONObject received from the server
+	 * @param message to parse
+	 */
 	private void parseMessage(JSONObject message) throws InvalidSelectionTypeException {
 		switch (message.get("function").toString()){
 			//TODO implement toJSON and fromJSON in weapon selection then complete this
@@ -188,6 +192,10 @@ public class SocketClient extends ServerConnection {
 		}
 	}
 
+	/**
+	 * Parses coordinates from a JSONObject
+	 * @param coords to send
+	 */
 	private List<Point> parseCoordinates(JSONArray coords){
 		List<Point> toRet = new ArrayList<>();
 		JSONObject item;
