@@ -217,7 +217,7 @@ public class SocketClient extends ServerConnection {
 	 * Handles accidental disconnection from server
 	 */
 	public void lostConnection(){
-
+		System.out.println("Connection lost.");
 	}
 
 }

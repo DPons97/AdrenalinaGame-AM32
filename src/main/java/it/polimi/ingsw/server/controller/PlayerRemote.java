@@ -46,7 +46,7 @@ public class PlayerRemote extends PlayerConnection {
 					)
 			);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -65,7 +65,7 @@ public class PlayerRemote extends PlayerConnection {
 			return selectable.stream().filter(c->c.getCoordX() == p.getX() && c.getCoordY() == p.getY()).
 					collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -89,7 +89,7 @@ public class PlayerRemote extends PlayerConnection {
 				}
 			}
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -120,7 +120,7 @@ public class PlayerRemote extends PlayerConnection {
 			return remotePlayer.reloadSelection(
 					canLoad.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -136,7 +136,7 @@ public class PlayerRemote extends PlayerConnection {
 			return remotePlayer.shootSelection(
 					loaded.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -150,7 +150,7 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			return remotePlayer.actionSelection();
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 		return null;
 	}
@@ -164,7 +164,7 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			remotePlayer.updateMatch(toGetUpdateFrom.toJSON());
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
 	}
 
@@ -177,7 +177,11 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			remotePlayer.updateLobby(toGetUpdateFrom.toJSON().toString());
 		} catch (RemoteException e) {
-			e.printStackTrace();
+			disconnectPlayer();
 		}
+	}
+	
+	private void disconnectPlayer(){
+		System.out.println(name+" disconnected");
 	}
 }

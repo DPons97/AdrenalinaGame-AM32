@@ -133,7 +133,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 */
 	@Override
 	public void logout() {
-
+		System.out.println("player disconnected");
 	}
 
     /**
