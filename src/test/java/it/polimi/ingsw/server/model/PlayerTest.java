@@ -264,6 +264,36 @@ class PlayerTest {
     }
 
     @Test
+    void getCellsToMove() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
+        Player testPlayer = new Player(testMatch, testName);
+
+        testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
+
+        List<Cell> canMoveTo = testPlayer.getCellsToMove();
+
+        Cell playerPos = testPlayer.getPosition();
+        for (Direction dir : Direction.values()) {
+            // Check all cells from 1 to 3 distance until wall or border
+            if (playerPos.getSide(dir) != Side.BORDER  && playerPos.getSide(dir) != Side.WALL) {
+                Cell currCell = playerPos;
+
+                for (int distance = 0; distance < 3; distance++) {
+                    if (currCell.getSide(dir) == Side.BORDER || currCell.getSide(dir) == Side.WALL) break;
+
+                    currCell = testMatch.getBoardMap().getAdjacentCell(currCell, dir);
+                    assertTrue(canMoveTo.contains(currCell));
+                }
+            }
+        }
+
+        // Check all cells above distance = 3
+        for (Cell c : testPlayer.getCellAtDistance(4, -1)) {
+            assertFalse(canMoveTo.contains(c));
+        }
+    }
+
+    @Test
     void pickAmmo() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player testPlayer = new Player(testMatch, testName);

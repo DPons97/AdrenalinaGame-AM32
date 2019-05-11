@@ -490,50 +490,22 @@ public class Player {
 	 */
 	public List<Cell> getVisibleCellsAtDistance(int minDist, int maxDist) {
 		Map matchMap = match.getBoardMap();
-		List<Cell> visibleCells = new ArrayList<>();
-		List<Cell> visitedCells = new ArrayList<>();
 		List<Cell> cellsAtDistance = getCellAtDistance(minDist, maxDist);
 
-		// This player's position is visited
-		visitedCells.add(position);
-		visibleCells.add(position);
+		// This player's room is visible
+		List<Cell> visibleCells = new ArrayList<>(matchMap.getRoomCells(position));
 
 		// Iterate for every possible direction
 		for (Direction dir : Direction.values()) {
 			// Player has a door nearby
 			if (position.getSide(dir) == Side.DOOR) {
 				visibleCells.addAll(matchMap.getRoomCells(matchMap.getAdjacentCell(position, dir)));
-			} else if (position.getSide(dir) == Side.FREE) {
-				// Player has no wall/door in this direction
-				visibleCells.addAll(getVisibleCell(matchMap.getAdjacentCell(position, dir), visitedCells));
 			}
 		}
 
 		// Remove all cells that are not visible between minDist, maxDist
 		cellsAtDistance.removeIf(cell -> !visibleCells.contains(cell));
 		return cellsAtDistance;
-	}
-
-	/**
-	 * Support function to getVisibleCellsAtDistance. Recursively find all visible cells inside same room as the player's
-	 * @param currCell cell to check
-	 * @param visited cells already visited
-	 * @return list of visible cells
-	 */
-	private List<Cell> getVisibleCell(Cell currCell, List<Cell> visited) {
-		if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
-
-		Map matchMap = match.getBoardMap();
-		List<Cell> visibleCells = new ArrayList<>();
-
-		visited.add(currCell);
-		for (Direction dir : Direction.values()) {
-			// Player has no wall/door in this direction
-			if (position.getSide(dir) == Side.FREE) {
-				visibleCells.addAll(getVisibleCell(matchMap.getAdjacentCell(position, dir), visited));
-			}
-		}
-		return visibleCells;
 	}
 
 	/**
@@ -553,8 +525,9 @@ public class Player {
 	 * @return List of cells in which player can move (1, 2 or 3 distance)
 	 */
 	public List<Cell> getCellsToMove() {
-		// TODO testing
-		return getCellsWithoutWalls(position, new ArrayList<>(), 3);
+		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), 3);
+		canMoveTo.remove(position);
+		return canMoveTo;
 	}
 
 	/**
@@ -565,16 +538,18 @@ public class Player {
 		if (distance == 0) {
 			List<Cell> lastCell = new ArrayList<>();
 			lastCell.add(currCell);
+			visited.add(currCell);
 			return lastCell;
 		}
 
 		Map matchMap = match.getBoardMap();
 		List<Cell> canMove = new ArrayList<>();
+		canMove.add(currCell);
 
 		visited.add(currCell);
 		for (Direction dir : Direction.values()) {
 			// Player has no wall/door in this direction
-			if (position.getSide(dir) != Side.WALL && position.getSide(dir) != Side.BORDER) {
+			if (currCell.getSide(dir) != Side.WALL && currCell.getSide(dir) != Side.BORDER) {
 				canMove.addAll(getCellsWithoutWalls(matchMap.getAdjacentCell(currCell, dir), visited, distance - 1));
 			}
 		}

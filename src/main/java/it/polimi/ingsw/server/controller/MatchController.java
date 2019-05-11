@@ -207,11 +207,12 @@ public class MatchController {
 				p.getDmgPoints().get(0).addScore(1);
 				rewardPlayers(p.getDmgPoints(), p.getReward());
 
+				Player killshot = p.getDmgPoints().get(p.getDmgPoints().size()-1);
 				// Add death to match, counting overkill if present (Killshot, Death and Overkill)
-				match.addDeath(p.getDmgPoints().get(p.getDmgPoints().size()-1), p.isOverkilled());
+				match.addDeath(killshot, p.isOverkilled());
 
 				// Mark player who overkilled deadPlayer (Revenge mark)
-				if (p.isOverkilled()) p.getDmgPoints().get(p.getDmgPoints().size() - 1).takeMark(p);
+				if (p.isOverkilled()) killshot.takeMark(p);
 
 				// Respawn player
 				respawnPlayer(currentPlayer);

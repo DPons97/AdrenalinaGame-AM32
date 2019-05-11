@@ -118,9 +118,9 @@ public class Map {
                 case EAST:
                     return mapMatrix[x][y+1];
                 case WEST:
-                    return mapMatrix[x+1][y];
-                case SOUTH:
                     return mapMatrix[x][y-1];
+                case SOUTH:
+                    return mapMatrix[x+1][y];
                 default:
                     return null;
             }
@@ -133,16 +133,16 @@ public class Map {
      * @return cell in [direction] side
      */
     protected Cell getAdjacentCell(Cell position, Direction direction) {
-        if (getCell(position.getCoordX(),position.getCoordY()).getSide(direction) != Side.BORDER) {
+        if (position.getSide(direction) != Side.BORDER) {
             switch (direction) {
                 case NORTH:
                     return mapMatrix[position.getCoordX() - 1][position.getCoordY()];
                 case EAST:
                     return mapMatrix[position.getCoordX()][position.getCoordY()+1];
                 case WEST:
-                    return mapMatrix[position.getCoordX()][position.getCoordY() -  1];
+                    return mapMatrix[position.getCoordX()][position.getCoordY() - 1];
                 case SOUTH:
-                    return mapMatrix[position.getCoordX() + 1][position.getCoordY()-1];
+                    return mapMatrix[position.getCoordX() + 1][position.getCoordY()];
                 default:
                     return null;
             }
@@ -153,9 +153,7 @@ public class Map {
      * @param cell cell to get room
      * @return all cells that are in the same room as [cell]
      */
-    protected List<Cell> getRoomCells(Cell cell) {
-        return getCellsInRoom(cell, new ArrayList<>());
-    }
+    protected List<Cell> getRoomCells(Cell cell) { return getCellsInRoom(cell, new ArrayList<>()); }
 
     /**
      * Support function to getRoomCells. Recursively find all cells inside same room as this
@@ -167,6 +165,7 @@ public class Map {
         if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
 
         List<Cell> roomCells = new ArrayList<>();
+        roomCells.add(currCell);
 
         visited.add(currCell);
         for (Direction dir : Direction.values()) {
