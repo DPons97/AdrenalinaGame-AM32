@@ -81,10 +81,10 @@ public class SocketClient extends ServerConnection {
 		while(true){
 			try {
 				msg = input.readLine();
-
+				//System.out.println(msg);
 				parseMessage((JSONObject) JSONValue.parse(msg));
 			} catch (IOException | InvalidSelectionTypeException e) {
-				e.printStackTrace();
+				lostConnection();
 				return;
 			}
 		}
@@ -211,6 +211,13 @@ public class SocketClient extends ServerConnection {
 			toRet.add(new Point(x,y));
 		}
 		return toRet;
+	}
+
+	/**
+	 * Handles accidental disconnection from server
+	 */
+	public void lostConnection(){
+
 	}
 
 }

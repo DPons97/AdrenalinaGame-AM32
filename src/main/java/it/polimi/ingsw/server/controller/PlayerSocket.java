@@ -68,8 +68,7 @@ public class PlayerSocket extends PlayerConnection {
 				}
 
 			} catch (IOException e) {
-				e.printStackTrace();
-				//TODO disconnect client
+				disconnect();
 				return;
 			}
 		}
@@ -106,7 +105,7 @@ public class PlayerSocket extends PlayerConnection {
 	 *
 	 */
 	private void disconnect() {
-		// TODO implement here
+		System.out.println(name + " disconnected.");
 	}
 
 	/**
