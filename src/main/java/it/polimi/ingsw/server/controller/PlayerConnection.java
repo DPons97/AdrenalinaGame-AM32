@@ -69,6 +69,13 @@ public abstract class PlayerConnection {
 	public abstract Powerup choosePowerup(List<Powerup> selectable);
 
 	/**
+	 * select a weapon card from a given list
+	 * @param selectable list of weapons
+	 * @return a weapon from selectable
+	 */
+	public abstract Weapon chooseWeapon(List<Weapon> selectable);
+
+	/**
 	 * select a weapon to reload
 	 * @param canLoad list of weapons to load
 	 * @return WeaponSelection with weapon to reload

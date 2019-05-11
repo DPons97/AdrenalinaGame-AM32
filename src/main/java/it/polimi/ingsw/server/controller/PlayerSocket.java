@@ -204,6 +204,11 @@ public class PlayerSocket extends PlayerConnection {
 		return null;
 	}
 
+	@Override
+	public Weapon chooseWeapon(List<Weapon> selectable) {
+		return null;
+	}
+
 	/**
 	 * select a weapon to reload
 	 * @param canLoad list of weapons to load

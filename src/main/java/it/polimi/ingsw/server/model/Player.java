@@ -524,8 +524,8 @@ public class Player {
 	/**
 	 * @return List of cells in which player can move (1, 2 or 3 distance)
 	 */
-	public List<Cell> getCellsToMove() {
-		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), 3);
+	public List<Cell> getCellsToMove(int maxMovement) {
+		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), maxMovement);
 		canMoveTo.remove(position);
 		return canMoveTo;
 	}
@@ -636,6 +636,19 @@ public class Player {
 		else {
 			// Add weapon only if it's not already in inventory
 			if(!weapons.contains(toPick)) weapons.add(toPick);
+		}
+	}
+
+	/**
+	 * Remove [toDrop] weapon from inventory
+	 * @param toDrop weapon to drop
+	 * @throws NoItemInInventoryException if weapon is not in player's inventory
+	 */
+	public void dropWeapon(Weapon toDrop) throws NoItemInInventoryException {
+		if (!weapons.contains(toDrop)) throw new NoItemInInventoryException();
+		else {
+			// Remove weapon
+			weapons.remove(toDrop);
 		}
 	}
 

@@ -64,6 +64,4 @@ public class AmmoCell extends Cell {
 		else throw new AmmoAlreadyOnCellException();
 
 	}
-
-
 }

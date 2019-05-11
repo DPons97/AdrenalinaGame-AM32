@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
+import it.polimi.ingsw.custom_exceptions.NoItemInInventoryException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,7 +39,7 @@ public class SpawnCell extends Cell {
 	}
 
 	/**
-	 * @return the weapons in the spowned cell
+	 * @return the weapons in the spawned cell
 	 */
 	public List<Weapon> getWeapons() {
 		return weapons;
@@ -53,5 +54,17 @@ public class SpawnCell extends Cell {
 			throw new InventoryFullException();
 		}
 		weapons.add(toAdd);
+	}
+
+	/**
+	 * @param toRemove weapon to remove from cell
+	 * @throws NoItemInInventoryException
+	 */
+	public void removeWeapon(Weapon toRemove) throws NoItemInInventoryException {
+		if (!weapons.contains(toRemove)) throw new NoItemInInventoryException();
+		else {
+			// Remove weapon
+			weapons.remove(toRemove);
+		}
 	}
 }

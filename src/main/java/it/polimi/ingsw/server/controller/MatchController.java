@@ -1,9 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
-import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
-import it.polimi.ingsw.custom_exceptions.NotEnoughPlayersException;
-import it.polimi.ingsw.custom_exceptions.PlayerNotExistsException;
-import it.polimi.ingsw.custom_exceptions.PlayerNotReadyException;
+import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
@@ -166,25 +163,46 @@ public class MatchController {
 	 */
 	public void beginTurn(Player playing) {
 		// TODO Manage turn as usual
-        // Ask player what to do (RUN, PICK, SHOOT)
-        TurnAction currentAcion = playing.getConnection().selectAction();
+		int remainingActions = 2;
 
-        switch (currentAcion) {
-            case MOVE:
-                // MOVE management
-                // Select one of cells at 1, 2 or 3 distance
-                List<Cell> selectable = playing.getCellsToMove();
-                playing.move(playing.getConnection().selectCell(selectable));
-                break;
-            case PICK:
-                // PICK management
+		while (remainingActions > 0) {
+			// Ask player what to do (RUN, PICK, SHOOT)
+			TurnAction currentAcion = playing.getConnection().selectAction();
 
-                break;
-            case SHOOT:
-                // SHOOT management
+			switch (currentAcion) {
+				case MOVE:
+					// MOVE management
+					// Select one of cells at 1, 2 or 3 distance
+					List<Cell> selectable = playing.getCellsToMove(3);
+					Cell destination = playing.getConnection().selectCell(selectable);
+					if (destination != null) {
+						playing.move(destination);
+						remainingActions--;
+					}
+					break;
+				case PICK:
+					// PICK management
 
-                break;
-        }
+					// Get cells that can be picked doing from 0 to 1 or 2 movements
+					List<Cell> canPick = (playing.getDmgPoints().size() >= 3) ?
+							playing.getCellsToMove(2) :
+							playing.getCellsToMove(1);
+					canPick.add(playing.getPosition());
+					removeEmptyCells(canPick);
+
+					// Player choosing and grabbing
+					Cell picked = playing.getConnection().selectCell(canPick);
+					remainingActions = grabStuff(playing, remainingActions, picked);
+
+					// Move player to picked cell
+					playing.move(picked);
+					break;
+				case SHOOT:
+					// SHOOT management
+
+					break;
+			}
+		}
 	}
 
 	/**
@@ -192,6 +210,75 @@ public class MatchController {
 	 */
 	public void frenzyTurn(Player playing) {
 		// TODO Manage turn during frenzy
+	}
+
+	/**
+	 * Remove cells that have no weapons or ammos from a given list
+	 * @param canPick list of cells to filter
+	 */
+	private void removeEmptyCells(List<Cell> canPick) {
+		// Remove cells that are empty (ammo and weapons)
+		List<Cell> emptyCells = new ArrayList<>();
+		for (Cell pickable : canPick) {
+			if (pickable.isSpawn()) {
+				for (SpawnCell cell : match.getBoardMap().getSpawnPoints()) {
+					if (cell.getCoordX() == pickable.getCoordX() && cell.getCoordY() == pickable.getCoordY() && cell.getWeapons().isEmpty()) emptyCells.add(pickable);
+				}
+			} else {
+				for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
+					if (cell.getCoordX() == pickable.getCoordX() && cell.getCoordY() == pickable.getCoordY() && cell.getResource() == null) emptyCells.add(pickable);
+				}
+			}
+		}
+		canPick.removeAll(emptyCells);
+	}
+
+	/**
+	 * Grab weapon or ammo from a cell
+	 * @param playing player
+	 * @param remainingActions number of actions this player still has during this turn
+	 * @param picked cell
+	 * @return new remaining actions
+	 */
+	private int grabStuff(Player playing, int remainingActions, Cell picked) {
+		if (picked.isSpawn()) {
+			// Search for right SpawnCell and check it has weapon
+			for (SpawnCell cell : match.getBoardMap().getSpawnPoints()) {
+				if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) {
+					// Pick weapon
+					Weapon toPick = playing.getConnection().chooseWeapon(cell.getWeapons());
+					try {
+						playing.pickWeapon(toPick);
+						cell.removeWeapon(toPick);
+						remainingActions--;
+					} catch (InventoryFullException invFullE) {
+						// Player has too many weapons. Ask for one to change
+						Weapon toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
+
+						if (toChange != null) {
+							try {
+								// Change chosen weapons
+								playing.dropWeapon(toChange);
+								playing.pickWeapon(toPick);
+								cell.removeWeapon(toChange);
+								cell.addWeapon(toChange);
+								remainingActions--;
+							} catch (NoItemInInventoryException | InventoryFullException noItemE) {
+								noItemE.printStackTrace();
+							}
+						}
+					} catch (NoItemInInventoryException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		} else {
+			// Pick ammo
+			for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
+				if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) playing.pickAmmo(cell);
+			}
+		}
+		return remainingActions;
 	}
 
 	/**

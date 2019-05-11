@@ -270,7 +270,7 @@ class PlayerTest {
 
         testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
 
-        List<Cell> canMoveTo = testPlayer.getCellsToMove();
+        List<Cell> canMoveTo = testPlayer.getCellsToMove(3);
 
         Cell playerPos = testPlayer.getPosition();
         for (Direction dir : Direction.values()) {
