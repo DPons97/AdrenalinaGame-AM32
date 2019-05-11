@@ -6,6 +6,7 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
 
 import static java.lang.System.exit;
 
@@ -17,12 +18,16 @@ public class RemoteClient extends ServerConnection {
 	/**
 	 * Remote reference to server
 	 */
-	ServerFunctionalities server;
+	private ServerFunctionalities server;
 
 	/**
 	 * RMI registry
 	 */
-	Registry registry;
+	private Registry registry;
+
+
+	private Registry localRegistry;
+
 
 	/**
 	 * Constructor
@@ -44,7 +49,7 @@ public class RemoteClient extends ServerConnection {
 			System.out.println("Connection OK. Looking up registry...");
 			server = (ServerFunctionalities) (registry.lookup("rmiServer"));
 			System.out.println("Registry OK. Logging in...");
-			server.login(player.getNickname(),this.player);
+			server.login(player.getNickname(), (ClientFunctionalities) UnicastRemoteObject.exportObject(this.player,0));
 			System.out.println("Logged");
 
 		} catch (RemoteException e)

@@ -8,7 +8,6 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,7 +16,7 @@ import static java.lang.System.exit;
 /**
  *
  */
-public class ClientPlayer extends UnicastRemoteObject implements ClientFunctionalities{
+public class ClientPlayer implements ClientFunctionalities{
 
 	private static final int rmiPort = 52297;
 	private static final int socketPort = 52298;
@@ -37,12 +36,12 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 	 */
 	private ServerConnection server;
 
+
 	/**
 	 * Constructor
 	 * Initializes nickname and server connection
 	 */
 	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port) throws RemoteException {
-		super();
 		this.nickname = nickname;
 
 		if(connectionType == ConnectionType.RMI) this.server = new RemoteClient(this);
@@ -155,7 +154,7 @@ public class ClientPlayer extends UnicastRemoteObject implements ClientFunctiona
 		System.out.println(ip);
 		Scanner in= new Scanner(System.in);
 
-		System.setProperty("java.rmi.server.hostname",ip);
+		//System.setProperty("java.rmi.server.hostname",ip);
 
 		System.out.println("Insert nickname: ");
 		String nickname= in.next();
