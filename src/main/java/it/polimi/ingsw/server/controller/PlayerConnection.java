@@ -25,7 +25,7 @@ public abstract class PlayerConnection {
 	/**
 	 * Current server's lobby
 	 */
-	private Lobby serverLobby;
+	private LobbyController serverLobby;
 
 	/**
 	 * Default constructor
@@ -124,14 +124,14 @@ public abstract class PlayerConnection {
 	/**
 	 * @return current server's lobby
 	 */
-	protected Lobby getServerLobby() {
+	protected LobbyController getServerLobby() {
 		return serverLobby;
 	}
 
 	/**
 	 * @param serverLobby new server lobby
 	 */
-	protected void setServerLobby(Lobby serverLobby) {
+	protected void setServerLobby(LobbyController serverLobby) {
 		this.serverLobby = serverLobby;
 	}
 

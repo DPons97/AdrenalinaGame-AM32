@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.server.model.Lobby;
+import it.polimi.ingsw.server.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +34,7 @@ public class LobbyController {
 		this.players = new ArrayList<>();
 	}
 
+	private static final Object lock = new Object();
 
 	/**
 	 *
@@ -52,14 +54,29 @@ public class LobbyController {
 	 * Add a new player to connected players
 	 * @param player player to add
 	 */
-	public synchronized void addPlayer(PlayerConnection player) {
-		players.add(player);
-		// TODO set reference to lobby in player
-
-		// TODO create new Player and add to lobby
-
+	public void addPlayer(PlayerConnection player) {
+		synchronized (lock) {
+			players.add(player);
+		}
+		player.setServerLobby(this);
+		synchronized (lobby) {
+			lobby.addPlayer(new Player(player.getName(), player));
+		}
 		System.out.print(player.getName());
 		System.out.println(" connected.");
+
+
+		updatePlayers();
+
+	}
+
+	public void removePlayer(PlayerConnection player){
+		synchronized (lock) {
+			players.remove(player);
+		}
+		synchronized (lobby) {
+			lobby.removePlayer(lobby.getPlayer(player));
+		}
 		updatePlayers();
 	}
 
@@ -67,7 +84,8 @@ public class LobbyController {
 	 * Sends a broadcast message to all players to update their model
 	 */
 	private void updatePlayers() {
-		players.forEach(p -> p.updateLobby(lobby));
+		synchronized (lock) {
+			players.stream().forEach(p -> p.updateLobby(lobby));
+		}
 	}
-
 }

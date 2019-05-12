@@ -175,6 +175,22 @@ public class SocketClient extends ServerConnection {
 					case "action":
 						sendAnswer(player.actionSelection().toString());
 						break;
+					case "powerup":
+						List<String> selectablePowerup = new ArrayList<>();
+						JSONArray pArray= (JSONArray) message.get("list");
+						for(Object o: pArray){
+							selectablePowerup.add(o.toString());
+						}
+						sendAnswer(player.powerupSelection(selectablePowerup));
+						break;
+					case "weapon":
+						List<String> selectableWeapon = new ArrayList<>();
+						JSONArray wArray= (JSONArray) message.get("list");
+						for(Object o: wArray){
+							selectableWeapon.add(o.toString());
+						}
+						sendAnswer(player.weaponSelection(selectableWeapon));
+						break;
 					default:
 						throw new InvalidSelectionTypeException();
 				}

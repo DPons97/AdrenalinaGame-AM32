@@ -106,6 +106,7 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	private void disconnect() {
 		System.out.println(name + " disconnected.");
+		getServerLobby().removePlayer(this);
 	}
 
 	/**
@@ -200,12 +201,35 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	@Override
 	public Powerup choosePowerup(List<Powerup> selectable) {
-		return null;
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "powerup");
+		JSONArray jArray = new JSONArray();
+		selectable.forEach(s->jArray.add(s.toJSON()));
+		message.put("list", jArray);
+		this.sendInstruction(message);
+		String selected = this.getResponse();
+		return selectable.stream().filter(p->p.toJSON().toString().equals(selected))
+				.collect(Collectors.toList()).get(0);
 	}
 
+	/**
+	 * select a weapon card from a given list
+	 * @param selectable list of weapon
+	 * @return a powerup from selectable
+	 */
 	@Override
 	public Weapon chooseWeapon(List<Weapon> selectable) {
-		return null;
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "weapon");
+		JSONArray jArray = new JSONArray();
+		selectable.forEach(s->jArray.add(s.getName()));
+		message.put("list", jArray);
+		this.sendInstruction(message);
+		String selected = this.getResponse();
+		return selectable.stream().filter(p->p.getName().equals(selected))
+				.collect(Collectors.toList()).get(0);
 	}
 
 	/**

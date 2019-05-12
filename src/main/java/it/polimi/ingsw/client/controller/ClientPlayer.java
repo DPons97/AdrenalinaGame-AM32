@@ -116,6 +116,26 @@ public class ClientPlayer implements ClientFunctionalities{
 	}
 
 	/**
+	 * select a weapon from a list
+	 * @param weapon list of selectable weapons
+	 * @return WeaponSelection with weapon to shoot with
+	 */
+	@Override
+	public String weaponSelection(List<String> weapon) {
+		return null;
+	}
+
+	/**
+	 * select a weapon from a list
+	 * @param powerup list of selectable weapons
+	 * @return WeaponSelection with weapon to shoot with
+	 */
+	@Override
+	public String powerupSelection(List<String> powerup) {
+		return null;
+	}
+
+	/**
 	 * Select an action to make
 	 * @return action to make
 	 */

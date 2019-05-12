@@ -50,6 +50,20 @@ public interface ClientFunctionalities extends Remote {
 	WeaponSelection shootSelection(List<String> loaded) throws RemoteException;
 
 	/**
+	 * select a weapon from a list
+	 * @param weapon list of selectable weapons
+	 * @return WeaponSelection with weapon to shoot with
+	 */
+	String weaponSelection(List<String> weapon) throws RemoteException;
+
+	/**
+	 * select a weapon from a list
+	 * @param powerup list of selectable weapons
+	 * @return WeaponSelection with weapon to shoot with
+	 */
+	String powerupSelection(List<String> powerup) throws RemoteException;
+
+	/**
 	 * Select an action to make
 	 * @return action to make
 	 */

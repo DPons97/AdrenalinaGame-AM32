@@ -118,6 +118,15 @@ public class Lobby {
     }
 
     /**
+     * Removes new client from lobby
+     * @param toRemove
+     */
+    public void removePlayer(Player toRemove) {
+        players.remove(toRemove);
+    }
+
+
+    /**
      * Add player to match
      * @param player that joins
      * @param toJoin match that is joined

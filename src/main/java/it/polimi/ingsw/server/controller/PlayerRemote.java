@@ -101,11 +101,23 @@ public class PlayerRemote extends PlayerConnection {
 	 */
 	@Override
 	public Powerup choosePowerup(List<Powerup> selectable) {
+		try {
+			String selection = remotePlayer.powerupSelection(selectable.stream().map(p->p.toJSON().toString()).collect(Collectors.toList()));
+			return selectable.stream().filter(s->selection.equals(s.toJSON().toString())).collect(Collectors.toList()).get(0);
+		} catch (RemoteException e) {
+			disconnectPlayer();
+		}
 		return null;
 	}
 
 	@Override
 	public Weapon chooseWeapon(List<Weapon> selectable) {
+		try {
+			String selection = remotePlayer.weaponSelection(selectable.stream().map(Weapon::getName).collect(Collectors.toList()));
+			return selectable.stream().filter(w-> w.getName().equals(selection)).collect(Collectors.toList()).get(0);
+		} catch (RemoteException e) {
+			disconnectPlayer();
+		}
 		return null;
 	}
 
@@ -183,5 +195,6 @@ public class PlayerRemote extends PlayerConnection {
 	
 	private void disconnectPlayer(){
 		System.out.println(name+" disconnected");
+		getServerLobby().removePlayer(this);
 	}
 }
