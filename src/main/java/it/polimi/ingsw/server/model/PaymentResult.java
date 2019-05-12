@@ -6,7 +6,7 @@ import java.util.List;
 /**
  * Class that stores the result of a payment request from the controller to a player
  */
-class PaymentResult {
+public class PaymentResult {
     private boolean canPay;
     private List<Powerup> powerupAsResources;
 
@@ -15,11 +15,11 @@ class PaymentResult {
         powerupAsResources = new ArrayList<>();
     }
 
-    void setCanPay(boolean canPay) { this.canPay = canPay; }
+    public void setCanPay(boolean canPay) { this.canPay = canPay; }
 
-    void setPowerupAsResources(List<Powerup> powerupAsResources) { this.powerupAsResources = powerupAsResources; }
+    public void setPowerupAsResources(List<Powerup> powerupAsResources) { this.powerupAsResources = powerupAsResources; }
 
-    boolean isCanPay() { return canPay; }
+    public boolean isCanPay() { return canPay; }
 
-    List<Powerup> getPowerupAsResources() { return new ArrayList<>(powerupAsResources); }
+    public List<Powerup> getPowerupAsResources() { return new ArrayList<>(powerupAsResources); }
 }

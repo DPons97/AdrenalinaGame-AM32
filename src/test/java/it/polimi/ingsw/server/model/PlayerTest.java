@@ -481,7 +481,6 @@ class PlayerTest {
         testPayment.add(Resource.BLUE_BOX);
         testPayment.add(Resource.YELLOW_BOX);
         testPayment.add(Resource.BLUE_BOX);
-        testPayment.add(Resource.RED_BOX);
 
         // Add not enough resources to player's inventory, but powerups
         Powerup newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.BLUE_BOX, null);

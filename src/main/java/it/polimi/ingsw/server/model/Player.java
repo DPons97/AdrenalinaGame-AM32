@@ -661,12 +661,20 @@ public class Player {
 	public void shoot(Weapon weapon, int effectID, List<Powerup> discountPowerups) throws NoItemInInventoryException, WeaponNotLoadedException, InsufficientResourcesException, RequirementsNotMetException {
 		if (!weapons.contains(weapon)) throw new NoItemInInventoryException();
 		List<Resource> shootCost = weapon.getShootActions().get(effectID).getCost();
+		List<Powerup> usedResources = new ArrayList<>();
 
 		// Apply discount from powerups used
 		for (Powerup pow : discountPowerups) {
-			shootCost.remove(pow.getBonusResource());
-			usePowerupResource(pow);
+			if (shootCost.contains(pow.getBonusResource())) {
+				usePowerupResource(pow);
+				shootCost.remove(pow.getBonusResource());
+				usedResources.add(pow);
+			}
 		}
+
+		// Remove used powerups from discountPowerups
+		discountPowerups.removeAll(usedResources);
+
 		pay(shootCost);
 		weapon.shoot(effectID, this);
 	}
@@ -709,18 +717,20 @@ public class Player {
 		List<Powerup> usablePowerups = new ArrayList<>();
 		List<Resource> resourcesToPay = new ArrayList<>(toPay);
 
-		for (Resource res : toPay) {
-			List<Powerup> thisPowerupRes = getAllPowerupByResource(res);
+		// Remove resources that can be payed with player's powerup
+		for (Powerup pow : powerups) {
+			if (resourcesToPay.contains(pow.getBonusResource())) {
+				resourcesToPay.remove(pow.getBonusResource());
 
-			// If player has at least one powerup that can be used as this resource, count as ammo
-			if (!thisPowerupRes.isEmpty()) {
-				usablePowerups.addAll(thisPowerupRes);
-				resourcesToPay.remove(res);
+				// Add all usable resources
+				if (!usablePowerups.contains(pow)) usablePowerups.addAll(getAllPowerupByResource(pow.getBonusResource()));
 			}
 		}
 
 		// Remove resources that can be payed with player's ammos
-		resourcesToPay.removeIf(resource -> ammos.contains(resource));
+		for (Resource res : ammos) {
+			resourcesToPay.remove(res);
+		}
 
 		if (resourcesToPay.isEmpty()) {
 			// Return that player can pay the whole amount, and set which powerups can be used as resources
