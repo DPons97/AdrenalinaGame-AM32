@@ -317,9 +317,17 @@ public class PlayerSocket extends PlayerConnection {
 
 	private WeaponSelection parseWeaponSelection(JSONObject weaponJSON){
 		Weapon  weapon = getWeapon(weaponJSON.get("weapon").toString());
-		int effectID = Integer.parseInt(weaponJSON.get("effectID").toString());
-		List<Powerup> powerups = new ArrayList<>();
 
+		// Parse effect ids
+		List<Integer> effectID = new ArrayList<>();
+		JSONArray effectIDArray = (JSONArray) weaponJSON.get("effectID");
+		for (Object o : effectIDArray) {
+			Integer id = (Integer) o;
+			effectID.add(id);
+		}
+
+		// Parse powerups
+		List<Powerup> powerups = new ArrayList<>();
 		JSONArray powerupsArray = (JSONArray) weaponJSON.get("discount");
 		for(Object o: powerupsArray){
 			JSONObject item = (JSONObject) o;

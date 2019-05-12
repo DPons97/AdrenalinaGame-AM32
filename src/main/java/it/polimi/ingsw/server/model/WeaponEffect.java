@@ -115,6 +115,24 @@ public class WeaponEffect extends Weapon {
 	}
 
 	/**
+	 * @param id of effect to get name
+	 * @return name of effect
+	 */
+	@Override
+	public Action getAction(int id) {
+		switch (id) {
+			case 0:
+				return primaryEffect;
+			case 1:
+				return firstOptional;
+			case 2:
+				return secondOptional;
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	/**
 	 * @return list of possible shoot actions
 	 */
 	@Override
@@ -134,6 +152,33 @@ public class WeaponEffect extends Weapon {
 		return getShootActions().stream().
 				filter(a -> a.getRequires() == null || canExecute(a.getRequires())).
 				collect(Collectors.toList());
+	}
+
+	/**
+	 * @param sequence list of effect IDs to evaluate execution
+	 * @return True if given sequence can be executed
+	 */
+	@Override
+	public boolean isValidActionSequence(List<Integer> sequence) {
+		boolean canBeExecuted = true;
+
+		// Convert integer sequence to action sequence
+		List<Action> actionSequence = new ArrayList<>();
+		for (Integer id : sequence) {
+			actionSequence.add(getAction(id));
+		}
+
+		// Check sequence contains primary effect
+		if (!actionSequence.contains(primaryEffect)) canBeExecuted = false;
+		else {
+			for (Action action : actionSequence) {
+				// Get require
+				for(Action a: getShootActions()){
+					if(a.getName().equals(action.getRequires()) && !actionSequence.contains(a)) canBeExecuted = false;
+				}
+			}
+		}
+		return canBeExecuted;
 	}
 
 	/**

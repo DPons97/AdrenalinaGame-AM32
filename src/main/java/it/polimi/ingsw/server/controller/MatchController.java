@@ -6,6 +6,7 @@ import it.polimi.ingsw.server.model.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -191,14 +192,20 @@ public class MatchController {
 					removeEmptyCells(canPick);
 
 					// Player choosing and grabbing
-					Cell picked = playing.getConnection().selectCell(canPick);
-					remainingActions = grabStuff(playing, remainingActions, picked);
+					Cell pickedCell = playing.getConnection().selectCell(canPick);
+					remainingActions = grabStuff(playing, remainingActions, pickedCell);
 
 					// Move player to picked cell
-					playing.move(picked);
+					playing.move(pickedCell);
 					break;
 				case SHOOT:
 					// SHOOT management
+
+					// Get all loaded weapons and pick one
+					List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+					WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
+
+					remainingActions = executeShooting(playing, remainingActions, pickedWeapon);
 
 					break;
 			}
@@ -276,6 +283,32 @@ public class MatchController {
 			// Pick ammo
 			for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
 				if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) playing.pickAmmo(cell);
+			}
+		}
+		return remainingActions;
+	}
+
+	/**
+	 * Try to execute shooting
+	 * @param playing player
+	 * @param remainingActions during current turn
+	 * @param pickedWeapon weapon selection made by player
+	 * @return new actions remaining to player during this turn
+	 */
+	private int executeShooting(Player playing, int remainingActions, WeaponSelection pickedWeapon) {
+		List<Integer> effectIds = pickedWeapon.getEffectID();
+
+		// Check all chosen effects are valid
+		if (pickedWeapon.getWeapon().isValidActionSequence(effectIds)) {
+			// IDs' order matter. First one has to be primary effect (id=0), then secondary effects
+			Collections.sort(effectIds);
+			try {
+				for (Integer id : effectIds) {
+					playing.shoot(pickedWeapon.getWeapon(), id, pickedWeapon.getPowerups());
+				}
+				remainingActions--;
+			} catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
+				e.printStackTrace();
 			}
 		}
 		return remainingActions;

@@ -84,7 +84,16 @@ public abstract class Weapon {
 	public abstract void shoot(int effectID, Player shooter) throws WeaponNotLoadedException, RequirementsNotMetException;
 
 	/**
-	 * @return list of possible shoot actions
+	 * @param id of effect to get name
+	 * @return name of effect
+	 */
+	public abstract Action getAction(int id);
+
+	/**
+	 * @return list of possible shoot actions.
+	 * 			[0] -> Primary action / mode
+	 * 			[1] -> First optional / secondary mode
+	 * 			[2] -> Second optional / null
 	 */
 	public abstract List<Action> getShootActions();
 
@@ -92,6 +101,12 @@ public abstract class Weapon {
 	 * @return list of possible shoot actions
 	 */
 	public abstract List<Action> getValidActions();
+
+	/**
+	 * @param sequence list of effect IDs to evaluate execution
+	 * @return True if given sequence can be executed
+	 */
+	public abstract boolean isValidActionSequence(List<Integer> sequence);
 
 	/**
 	 * @param actions json object read from weapon file

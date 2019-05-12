@@ -18,9 +18,9 @@ public class WeaponSelection {
     private Weapon weapon;
 
     /**
-     * Effect chosen. -1 if reloading
+     * Effect chosen. empty list if reloading
      */
-    private int effectID;
+    private List<Integer> effectID;
 
     /**
      * List of powerups used as discount to reload/shoot
@@ -32,14 +32,14 @@ public class WeaponSelection {
      */
     WeaponSelection() {
         weapon = null;
-        effectID = -1;
+        effectID = new ArrayList<>();
         powerups = new ArrayList<>();
     }
 
     /**
      * constructor for JSON parsing
      */
-    public WeaponSelection(Weapon weapon, int effectID, List<Powerup> powerups) {
+    public WeaponSelection(Weapon weapon, List<Integer> effectID, List<Powerup> powerups) {
         this.weapon = weapon;
         this.effectID = effectID;
         this.powerups = powerups;
@@ -62,14 +62,14 @@ public class WeaponSelection {
     /**
      * @return index of selected id, -1 if reloading
      */
-    public int getEffectID() {
+    public List<Integer> getEffectID() {
         return effectID;
     }
 
     /**
      * @param effectID index of effect to set as selected
      */
-    public void setEffectID(int effectID) {
+    public void setEffectID(List<Integer> effectID) {
         this.effectID = effectID;
     }
 
@@ -94,11 +94,14 @@ public class WeaponSelection {
     public JSONObject toJSON(){
         JSONObject repr = new JSONObject();
         repr.put("weapon", this.weapon);
-        repr.put("effectID", this.effectID);
+
+        JSONArray effectArray = new JSONArray();
+        effectArray.addAll(effectID);
+        repr.put("effectID", effectArray);
 
         JSONArray discArray = new JSONArray();
 
-        for(int i = 0; i < powerups.size(); i ++){
+        for(int i = 0; i < powerups.size(); i++){
             JSONObject item = new JSONObject();
             item.put("name", powerups.get(i));
             item.put("resource", powerups.get(i).getBonusResource().toString());

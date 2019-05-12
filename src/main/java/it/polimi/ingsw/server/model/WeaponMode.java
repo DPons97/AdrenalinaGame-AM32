@@ -54,6 +54,22 @@ public class WeaponMode extends Weapon {
 	}
 
 	/**
+	 * @param id of effect to get name
+	 * @return name of effect
+	 */
+	@Override
+	public Action getAction(int id) {
+		switch (id) {
+			case 0:
+				return primaryMode;
+			case 1:
+				return secondaryMode;
+			default:
+				throw new IllegalArgumentException();
+		}
+	}
+
+	/**
 	 * @return list of possible shoot actions
 	 */
 	@Override
@@ -70,6 +86,14 @@ public class WeaponMode extends Weapon {
 	@Override
 	public List<Action> getValidActions() {
 		return getShootActions();
+	}
+
+	/**
+	 * @param sequence list of effect IDs to evaluate execution
+	 * @return True if given sequence can be executed
+	 */
+	public boolean isValidActionSequence(List<Integer> sequence) {
+		return true;
 	}
 
 	/**

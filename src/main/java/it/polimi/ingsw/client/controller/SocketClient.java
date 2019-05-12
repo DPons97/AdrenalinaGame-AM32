@@ -170,7 +170,7 @@ public class SocketClient extends ServerConnection {
 							shootableWeapons.add(o.toString());
 						}
 
-						sendAnswer(player.reloadSelection(shootableWeapons).toJSON());
+						sendAnswer(player.shootSelection(shootableWeapons).toJSON());
 						break;
 					case "action":
 						sendAnswer(player.actionSelection().toString());
