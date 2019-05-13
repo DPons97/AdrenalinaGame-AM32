@@ -108,6 +108,12 @@ public abstract class PlayerConnection {
 	public abstract void updateLobby(Lobby toGetUpdateFrom);
 
 	/**
+	 * Pings client to check connection
+	 * @return Thread removing player
+	 */
+	public abstract Thread ping();
+
+	/**
 	 * @return reference to current match's controller
 	 */
 	public MatchController getCurrentMatch() {

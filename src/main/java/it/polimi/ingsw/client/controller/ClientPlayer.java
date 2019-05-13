@@ -65,6 +65,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	    return nickname;
     }
 
+	@Override
+	public void ping() throws RemoteException {
+
+	}
+
 	/**
 	 * Select a player from a given list
 	 * @param selectable list of players

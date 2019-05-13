@@ -46,7 +46,8 @@ public class PlayerRemote extends PlayerConnection {
 					)
 			);
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -65,7 +66,8 @@ public class PlayerRemote extends PlayerConnection {
 			return selectable.stream().filter(c->c.getCoordX() == p.getX() && c.getCoordY() == p.getY()).
 					collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -89,7 +91,8 @@ public class PlayerRemote extends PlayerConnection {
 				}
 			}
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -105,8 +108,8 @@ public class PlayerRemote extends PlayerConnection {
 			String selection = remotePlayer.powerupSelection(selectable.stream().map(p->p.toJSON().toString()).collect(Collectors.toList()));
 			return selectable.stream().filter(s->selection.equals(s.toJSON().toString())).collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
-			disconnectPlayer();
-		}
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();		}
 		return null;
 	}
 
@@ -118,7 +121,8 @@ public class PlayerRemote extends PlayerConnection {
 			return new WeaponSelection();
 			//return selectable.stream().filter(w-> w.getName().equals(selection)).collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -134,7 +138,8 @@ public class PlayerRemote extends PlayerConnection {
 			return remotePlayer.reloadSelection(
 					canLoad.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -150,7 +155,8 @@ public class PlayerRemote extends PlayerConnection {
 			return remotePlayer.shootSelection(
 					loaded.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -164,7 +170,8 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			return remotePlayer.actionSelection();
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 		return null;
 	}
@@ -178,7 +185,8 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			remotePlayer.updateMatch(toGetUpdateFrom.toJSON());
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 	}
 
@@ -191,12 +199,25 @@ public class PlayerRemote extends PlayerConnection {
 		try {
 			remotePlayer.updateLobby(toGetUpdateFrom.toJSON().toString());
 		} catch (RemoteException e) {
-			disconnectPlayer();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
 		}
 	}
-	
+
+	@Override
+	public Thread ping() {
+		try {
+			remotePlayer.ping();
+		} catch (RemoteException e) {
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
+			return t;
+		}
+		return null;
+	}
+
 	private void disconnectPlayer(){
 		System.out.println(name+" disconnected");
-		getServerLobby().removePlayer(this);
+		this.getServerLobby().removePlayer(this);
 	}
 }

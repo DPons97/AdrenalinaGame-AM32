@@ -13,6 +13,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
 
@@ -30,6 +31,16 @@ public class SocketClient extends ServerConnection {
 	 * Writer for socket stream out
 	 */
 	private PrintWriter output;
+
+	/**
+	 * Stores ip for reconnections
+	 */
+	private String ip;
+
+	/**
+	 * Stores port for reconnections
+	 */
+	private int port;
 
 	/**
 	 * Reader for socket stream in
@@ -53,6 +64,8 @@ public class SocketClient extends ServerConnection {
 	public void connect(String ip, int port) {
 		try {
 			socket= new Socket(ip, port);
+			this.ip = ip;
+			this. port = port;
 			this.output = new PrintWriter(socket.getOutputStream(), true);
 			this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			output.println(player.getNickname());
@@ -81,8 +94,9 @@ public class SocketClient extends ServerConnection {
 		while(true){
 			try {
 				msg = input.readLine();
-				//System.out.println(msg);
-				parseMessage((JSONObject) JSONValue.parse(msg));
+				// System.out.println(msg);
+				if(!msg.equals("ping"))
+					parseMessage((JSONObject) JSONValue.parse(msg));
 			} catch (IOException | InvalidSelectionTypeException e) {
 				lostConnection();
 				return;
@@ -234,6 +248,21 @@ public class SocketClient extends ServerConnection {
 	 */
 	public void lostConnection(){
 		System.out.println("Connection lost.");
+		while(true){
+			try{
+				socket= new Socket(ip, port);
+				this.output = new PrintWriter(socket.getOutputStream(), true);
+				this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+				output.println(player.getNickname());
+				return;
+			} catch (IOException e) {
+				try {
+					TimeUnit.SECONDS.sleep(1);
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 	}
 
 }

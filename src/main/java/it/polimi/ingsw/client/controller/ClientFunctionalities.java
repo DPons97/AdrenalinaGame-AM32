@@ -15,6 +15,11 @@ import java.util.List;
 public interface ClientFunctionalities extends Remote {
 
 	/**
+	 * Ping client to check connection status
+	 */
+	public void ping() throws RemoteException;
+
+	/**
 	 * Select a player from a given list
 	 * @param selectable list of players
 	 * @return player from selectable

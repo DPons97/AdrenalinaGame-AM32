@@ -13,6 +13,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Objects;
 
 import static java.lang.System.exit;
 
@@ -99,12 +100,26 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 */
 	public void listenSocketConnection() {
         Socket clientSocket;
+        BufferedReader input;
+        String name;
         while (true) {
             try {
                 clientSocket= serverSocket.accept();
                 System.out.println("Received socket connection request.");
-                lobby.addPlayer(new PlayerSocket(new PrintWriter(clientSocket.getOutputStream(), true),
-                                                 new BufferedReader(new InputStreamReader(clientSocket.getInputStream()))));
+                lobby.pingALl();
+                input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                name = input.readLine();
+                if(lobby.getDisconnectedPlayers().contains(name))
+                	lobby.reconnectPlayer(new PlayerSocket(name,
+							new PrintWriter(clientSocket.getOutputStream(), true),
+							input)
+					);
+                else
+                	lobby.addPlayer(new PlayerSocket(name,
+							new PrintWriter(clientSocket.getOutputStream(), true),
+							input)
+					);
+
             } catch (IOException e) {
                 e.printStackTrace();
                 break;
@@ -124,7 +139,17 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	@Override
 	public void login(String name, ClientFunctionalities client){
 		System.out.println("Received RMI connection request");
-		lobby.addPlayer(new PlayerRemote(name, client));
+		lobby.pingALl().stream().filter(Objects::nonNull).forEach(thread -> {
+			try {
+				thread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
+		if(lobby.getDisconnectedPlayers().contains(name))
+			lobby.reconnectPlayer(new PlayerRemote(name, client));
+		else //TODO ADD CASE IN WHICH PLAYER WAS IN A MATCH
+			lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
 	/**

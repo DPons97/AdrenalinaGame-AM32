@@ -39,8 +39,8 @@ public class PlayerSocket extends PlayerConnection {
 	/**
 	 * Default constructor
 	 */
-	public PlayerSocket(PrintWriter output, BufferedReader input) throws IOException {
-		super(input.readLine());
+	public PlayerSocket(String name, PrintWriter output, BufferedReader input) throws IOException {
+		super(name);
 		this.input= input;
 		this.output= output;
 		validResponse = false;
@@ -68,7 +68,8 @@ public class PlayerSocket extends PlayerConnection {
 				}
 
 			} catch (IOException e) {
-				disconnect();
+				Thread t = new Thread(this::disconnect);
+				t.start();
 				return;
 			}
 		}
@@ -227,12 +228,9 @@ public class PlayerSocket extends PlayerConnection {
 		selectable.forEach(s->jArray.add(s.getName()));
 		message.put("list", jArray);
 		this.sendInstruction(message);
-		String selected = this.getResponse();
+		JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
 
-		// TODO fix this
-		return new WeaponSelection();
-		/*return selectable.stream().filter(p->p.getName().equals(selected))
-				.collect(Collectors.toList()).get(0);*/
+		return parseWeaponSelection(selected);
 	}
 
 	/**
@@ -326,6 +324,23 @@ public class PlayerSocket extends PlayerConnection {
 		message.put("type", "lobby");
 		message.put("lobby", toGetUpdateFrom.toJSON());
 		this.sendInstruction(message);
+	}
+
+	@Override
+	public Thread ping() {
+		output.println("ping");
+		try {
+			if(!input.readLine().equals("pong")) {
+				Thread t = new Thread(this::disconnect);
+				t.start();
+				return t;
+			}
+		} catch (IOException e) {
+			Thread t = new Thread(this::disconnect);
+			t.start();
+			return t;
+		}
+		return null;
 	}
 
 	private Weapon getWeapon(String weaponName){

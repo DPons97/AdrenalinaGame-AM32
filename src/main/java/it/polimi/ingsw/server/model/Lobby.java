@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Waiting lobby in which players are put before entering in a match (or create one)
@@ -17,27 +18,29 @@ public class Lobby {
     /**
      * max number of the matches
      */
-
     private int maxMatches;
 
     /**
      * players
      */
-
     private List<Player> players;
+
+    /**
+     * players
+     */
+    private List<Player> disconnectedPlayers;
 
     /**
      * matches
      */
-
     private List<MatchController> matches;
 
     /**
      * @param maxMatches maxMatches to set
      */
-
     public Lobby(int maxMatches) {
         this.players = new ArrayList<>();
+        this.disconnectedPlayers = new ArrayList<>();
         this.matches = new ArrayList<>();
         this.maxMatches = maxMatches;
     }
@@ -118,11 +121,22 @@ public class Lobby {
     }
 
     /**
+     * Add new client to lobby
+     * @param toAdd
+     */
+    public void reconnect(PlayerConnection toAdd) {
+        Player pl = disconnectedPlayers.stream().filter(p-> p.getNickname().equals(toAdd.getName())).collect(Collectors.toList()).get(0);
+        players.add(pl);
+        disconnectedPlayers.remove(pl);
+    }
+
+    /**
      * Removes new client from lobby
      * @param toRemove
      */
     public void removePlayer(Player toRemove) {
         players.remove(toRemove);
+        disconnectedPlayers.add(toRemove);
     }
 
 
