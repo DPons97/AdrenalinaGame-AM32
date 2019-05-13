@@ -55,12 +55,36 @@ public class Map {
     /**
      * @return list of spawn points in map
      */
-    public List<SpawnCell> getSpawnPoints() { return new ArrayList<>(spawnPoints); }
+    public List<SpawnCell> getSpawnPoints() { return spawnPoints; }
+
+    /**
+     * Get spawn cell from given Cell
+     * @param toSearch cell to search
+     * @return right SpawnCell
+     */
+    public SpawnCell getSpawnCell(Cell toSearch) {
+        for (SpawnCell cell : spawnPoints) {
+            if (cell.getCoordX() == toSearch.getCoordX() && cell.getCoordY() == toSearch.getCoordY()) return cell;
+        }
+        return null;
+    }
+
+    /**
+     * Get ammo cell from given Cell
+     * @param toSearch cell to search
+     * @return right AmmoCell
+     */
+    public AmmoCell getAmmoCell(Cell toSearch) {
+        for (AmmoCell cell : ammoPoints) {
+            if (cell.getCoordX() == toSearch.getCoordX() && cell.getCoordY() == toSearch.getCoordY()) return cell;
+        }
+        return null;
+    }
 
     /**
      * @return list of ammo points in map
      */
-    public List<AmmoCell> getAmmoPoints() { return new ArrayList<>(ammoPoints); }
+    public List<AmmoCell> getAmmoPoints() { return ammoPoints; }
 
     /**
      * @param x coordinate of desired cell

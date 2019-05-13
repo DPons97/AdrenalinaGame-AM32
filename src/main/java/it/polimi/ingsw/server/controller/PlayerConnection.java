@@ -73,7 +73,7 @@ public abstract class PlayerConnection {
 	 * @param selectable list of weapons
 	 * @return a weapon from selectable
 	 */
-	public abstract Weapon chooseWeapon(List<Weapon> selectable);
+	public abstract WeaponSelection chooseWeapon(List<Weapon> selectable);
 
 	/**
 	 * select a weapon to reload

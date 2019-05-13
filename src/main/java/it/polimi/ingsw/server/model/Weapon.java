@@ -53,10 +53,15 @@ public abstract class Weapon {
 	}
 
 	/**
-	 * @return weapon cost
+	 * @return weapon effective cost. If weapon's loaded, cost is reduced
 	 */
 	public List<Resource> getCost() {
-		return new ArrayList<>(cost);
+		if (isLoaded()) {
+			// Cost is reduced if weapon is loaded or partially loaded
+			List<Resource> newCost = new ArrayList<>(cost);
+			newCost.remove(0);
+			return newCost;
+		} else return new ArrayList<>(cost);
 	}
 
 	/**

@@ -46,7 +46,7 @@ public class SpawnCell extends Cell {
 	}
 
 	/**
-	 * add one weapon
+	 * add one weapon and reload it
 	 * @param toAdd weapon to add
 	 */
 	public void addWeapon(Weapon toAdd) throws InventoryFullException {
@@ -54,6 +54,7 @@ public class SpawnCell extends Cell {
 			throw new InventoryFullException();
 		}
 		weapons.add(toAdd);
+		toAdd.reload();
 	}
 
 	/**

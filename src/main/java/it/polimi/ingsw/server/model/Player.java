@@ -298,6 +298,12 @@ public class Player {
 	public List<Resource> getAmmos() { return new ArrayList<>(ammos); }
 
 	/**
+	 * Add ammo to player, if inventory not full
+	 * @param toAdd
+	 */
+	public void addAmmo(Resource toAdd) { if (ammos.size() < 3) ammos.add(toAdd); }
+
+	/**
 	 * @return true if player is dead
 	 */
 	public boolean isDead() { return dead; }
@@ -630,12 +636,15 @@ public class Player {
 	 * @param toPick Weapon to pick
 	 * @throws InventoryFullException if player has already 3 weapons
 	 */
-	public void pickWeapon(Weapon toPick) throws InventoryFullException {
+	public void pickWeapon(Weapon toPick) throws InventoryFullException, InsufficientResourcesException {
 		// Can't add weapons if inventory's full
 		if (weapons.size() >= 3) throw new InventoryFullException();
 		else {
 			// Add weapon only if it's not already in inventory
-			if(!weapons.contains(toPick)) weapons.add(toPick);
+			if(!weapons.contains(toPick)) {
+				weapons.add(toPick);
+				pay(toPick.getCost());
+			}
 		}
 	}
 
@@ -706,24 +715,21 @@ public class Player {
 	}
 
 	/**
-	 * Check if player can pay the whole toPay cost
+	 * Check if player can pay the whole toPay cost with given powerups as discount
 	 * @param toPay List of resources to pay.
-	 * @return PaymentResult:
-	 * 				canPay : True if player has enough resources to pay the whole amount, counting both ammos and powerups used as resources
-	 * 				powerupAsResources : List of powerups that can be used to reduce cost of payment
+	 * @param powerupsAsResource list of powerups used as discount
+	 * @return True if, using given powerups as resources, player can handle toPay cost
 	 */
-	public PaymentResult canPay(List<Resource> toPay) {
-		PaymentResult result = new PaymentResult();
-		List<Powerup> usablePowerups = new ArrayList<>();
+	public boolean canPay(List<Resource> toPay, List<Powerup> powerupsAsResource) {
 		List<Resource> resourcesToPay = new ArrayList<>(toPay);
+		List<Powerup> usedPowerups = new ArrayList<>();
 
-		// Remove resources that can be payed with player's powerup
-		for (Powerup pow : powerups) {
-			if (resourcesToPay.contains(pow.getBonusResource())) {
+		// Remove resources that player would pay through powerups
+		for (Powerup pow : powerupsAsResource) {
+			if (resourcesToPay.contains(pow.getBonusResource()) && !usedPowerups.contains(pow)) {
+				// Resource is still to be payed, and current powerup has not been used yet
 				resourcesToPay.remove(pow.getBonusResource());
-
-				// Add all usable resources
-				if (!usablePowerups.contains(pow)) usablePowerups.addAll(getAllPowerupByResource(pow.getBonusResource()));
+				usedPowerups.add(pow);
 			}
 		}
 
@@ -732,16 +738,17 @@ public class Player {
 			resourcesToPay.remove(res);
 		}
 
-		if (resourcesToPay.isEmpty()) {
-			// Return that player can pay the whole amount, and set which powerups can be used as resources
-			result.setCanPay(true);
-			result.setPowerupAsResources(usablePowerups);
-			return result;
-		}
+		// Return that player can pay the whole amount, and set which powerups can be used as resources
+		return resourcesToPay.isEmpty();
+	}
 
-		// Return that player can't pay the amount
-		result.setCanPay(false);
-		return result;
+	/**
+	 * Check if player can pay the whole toPay cost with given powerups as discount
+	 * @param toPay List of resources to pay.
+	 * @return True if, using given powerups as resources, player can handle toPay cost
+	 */
+	public boolean canPay(List<Resource> toPay) {
+		return canPay(toPay, new ArrayList<>());
 	}
 
 	/**

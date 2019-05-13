@@ -269,7 +269,6 @@ public class AdrenalinaMatch {
 		weaponDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
 		String name;
-		List<Resource> cost = new ArrayList<>();
 		try {
 			Object obj = parser.parse(new FileReader("././././././resources/json/weapons.json"));
 
@@ -278,6 +277,7 @@ public class AdrenalinaMatch {
 			JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");
 
 			for(Object weaponCard: weaponCards){
+				List<Resource> cost = new ArrayList<>();
 				JSONObject currWeapon = (JSONObject) weaponCard;
 				name = currWeapon.get("name").toString();
 				JSONArray cardCost = (JSONArray) currWeapon.get("cost");

@@ -219,7 +219,7 @@ public class PlayerSocket extends PlayerConnection {
 	 * @return a powerup from selectable
 	 */
 	@Override
-	public Weapon chooseWeapon(List<Weapon> selectable) {
+	public WeaponSelection chooseWeapon(List<Weapon> selectable) {
 		JSONObject message = new JSONObject();
 		message.put("function", "select");
 		message.put("type", "weapon");
@@ -228,8 +228,11 @@ public class PlayerSocket extends PlayerConnection {
 		message.put("list", jArray);
 		this.sendInstruction(message);
 		String selected = this.getResponse();
-		return selectable.stream().filter(p->p.getName().equals(selected))
-				.collect(Collectors.toList()).get(0);
+
+		// TODO fix this
+		return new WeaponSelection();
+		/*return selectable.stream().filter(p->p.getName().equals(selected))
+				.collect(Collectors.toList()).get(0);*/
 	}
 
 	/**

@@ -163,7 +163,6 @@ public class MatchController {
 	 *	Game turn logic (Run/Pick/Shoot + reloading)
 	 */
 	public void beginTurn(Player playing) {
-		// TODO Manage turn as usual
 		int remainingActions = 2;
 
 		while (remainingActions > 0) {
@@ -193,7 +192,9 @@ public class MatchController {
 
 					// Player choosing and grabbing
 					Cell pickedCell = playing.getConnection().selectCell(canPick);
-					remainingActions = grabStuff(playing, remainingActions, pickedCell);
+
+					if (pickedCell.isSpawn()) remainingActions = grabWeapon(playing, remainingActions, pickedCell);
+					else remainingActions = grabAmmo(playing, remainingActions, pickedCell);
 
 					// Move player to picked cell
 					playing.move(pickedCell);
@@ -206,10 +207,12 @@ public class MatchController {
 					WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
 
 					remainingActions = executeShooting(playing, remainingActions, pickedWeapon);
-
 					break;
 			}
 		}
+
+		// RELOAD management
+		reloadWeapon(playing);
 	}
 
 	/**
@@ -247,44 +250,51 @@ public class MatchController {
 	 * @param picked cell
 	 * @return new remaining actions
 	 */
-	private int grabStuff(Player playing, int remainingActions, Cell picked) {
-		if (picked.isSpawn()) {
-			// Search for right SpawnCell and check it has weapon
-			for (SpawnCell cell : match.getBoardMap().getSpawnPoints()) {
-				if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) {
-					// Pick weapon
-					Weapon toPick = playing.getConnection().chooseWeapon(cell.getWeapons());
-					try {
-						playing.pickWeapon(toPick);
-						cell.removeWeapon(toPick);
-						remainingActions--;
-					} catch (InventoryFullException invFullE) {
-						// Player has too many weapons. Ask for one to change
-						Weapon toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
-
-						if (toChange != null) {
-							try {
-								// Change chosen weapons
-								playing.dropWeapon(toChange);
-								playing.pickWeapon(toPick);
-								cell.removeWeapon(toChange);
-								cell.addWeapon(toChange);
-								remainingActions--;
-							} catch (NoItemInInventoryException | InventoryFullException noItemE) {
-								noItemE.printStackTrace();
-							}
-						}
-					} catch (NoItemInInventoryException e) {
-						e.printStackTrace();
-					}
-				}
-			}
-		} else {
-			// Pick ammo
-			for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
-				if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) playing.pickAmmo(cell);
+	private int grabAmmo(Player playing, int remainingActions, Cell picked) {
+		// Pick ammo
+		for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
+			if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) {
+				playing.pickAmmo(cell);
+				remainingActions--;
 			}
 		}
+		return remainingActions;
+	}
+
+	private int grabWeapon(Player playing, int remainingActions, Cell picked) {
+		// Find right spawn cell
+		SpawnCell pickedSpawn = match.getBoardMap().getSpawnCell(picked);
+		if (pickedSpawn == null) return remainingActions;
+
+		// Pick weapon
+		WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickedSpawn.getWeapons());
+
+		// Stop action if player can't pay weapon's cost with chosen powerups
+		if (!playing.canPay(pickedWeapon.getWeapon().getCost(), pickedWeapon.getPowerups())) return remainingActions;
+
+		try {
+			playing.pickWeapon(pickedWeapon.getWeapon());
+			pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
+			remainingActions--;
+		} catch (InventoryFullException invFullE) {
+			// Player has too many weapons. Ask for one to change
+			WeaponSelection toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
+			if (toChange == null) return remainingActions;
+
+			try {
+				// Change chosen weapons
+				playing.dropWeapon(toChange.getWeapon());
+				playing.pickWeapon(pickedWeapon.getWeapon());
+				pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
+				pickedSpawn.addWeapon(toChange.getWeapon());
+				remainingActions--;
+			} catch (NoItemInInventoryException | InventoryFullException | InsufficientResourcesException noItemE) {
+				noItemE.printStackTrace();
+			}
+		} catch (NoItemInInventoryException | InsufficientResourcesException e) {
+			e.printStackTrace();
+		}
+
 		return remainingActions;
 	}
 
@@ -306,9 +316,7 @@ public class MatchController {
 		for (Integer id : effectIds) {
 			totalCost.addAll(pickedWeapon.getWeapon().getAction(id).getCost());
 		}
-		PaymentResult paymentResult = playing.canPay(totalCost);
-		if (!paymentResult.isCanPay() || !paymentResult.getPowerupAsResources().containsAll(pickedWeapon.getPowerups()))
-			return remainingActions;
+		if (!playing.canPay(totalCost, pickedWeapon.getPowerups())) return remainingActions;
 
 		// IDs' order matter!
 		try {
@@ -320,6 +328,30 @@ public class MatchController {
 			e.printStackTrace();
 		}
 		return remainingActions;
+	}
+
+	/**
+	 * Reload logic
+	 * @param playing player
+	 */
+	private void reloadWeapon(Player playing) {
+		List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+		while (!canBeReloaded.isEmpty()) {
+			WeaponSelection toReload = playing.getConnection().reload(canBeReloaded);
+			if (toReload.getWeapon() == null) return;
+
+			// Stop action if player can't pay reload cost with chosen powerups
+			if (!playing.canPay( toReload.getWeapon().getCost(), toReload.getPowerups())) {
+				// Otherwise do reload
+				try {
+					playing.reload(toReload.getWeapon(), toReload.getPowerups());
+				} catch (NoItemInInventoryException | InsufficientResourcesException e) {
+					e.printStackTrace();
+				}
+			}
+
+			canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+		}
 	}
 
 	/**

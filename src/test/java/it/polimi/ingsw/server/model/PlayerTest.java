@@ -66,6 +66,9 @@ class PlayerTest {
         // Check player cannot reload weapons he doesn't have
         assertThrows(NoItemInInventoryException.class, () -> testPlayer.reload(testWeapon));
 
+        // Add enough resources to player's inventory to pick weapon
+        for (Resource res : testWeapon.getCost()) testPlayer.addAmmo(res);
+
         // Add weapons
         testPlayer.pickWeapon(testWeapon);
 
@@ -73,9 +76,9 @@ class PlayerTest {
         assertThrows(InsufficientResourcesException.class, () -> testPlayer.reload(testWeapon));
 
         // Add resources to player's inventory
-        AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
-        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.RED_BOX));
-        testPlayer.pickAmmo(newAmmoCell);
+        testPlayer.addAmmo(Resource.RED_BOX);
+        testPlayer.addAmmo(Resource.RED_BOX);
+        testPlayer.addAmmo(Resource.RED_BOX);
 
         // Check if weapon loads and check that player used his ammos
         testPlayer.reload(testWeapon);
@@ -105,8 +108,10 @@ class PlayerTest {
         newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.RED_BOX, null);
         testPlayer.addPowerup(newPowerup);
 
-        newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.RED_BOX, Resource.BLUE_BOX));
-        testPlayer.pickAmmo(newAmmoCell);
+        testPlayer.addAmmo(Resource.RED_BOX);
+        testPlayer.addAmmo(Resource.RED_BOX);
+        testPlayer.addAmmo(Resource.BLUE_BOX);
+
 
         // Pay with 1 RED ammo and 2 RED powerups
         testPlayer.reload(testWeapon, testPlayer.getAllPowerupByResource(Resource.RED_BOX));
@@ -424,19 +429,27 @@ class PlayerTest {
     }
 
     @Test
-    void pickWeapon() throws InventoryFullException {
+    void pickWeapon() throws InventoryFullException, InsufficientResourcesException, AmmoAlreadyOnCellException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
         Player testPlayer = new Player(newMatch, testName);
 
+        // Add enough resources to player's inventory to pick weapon
+        for (Resource res : testWeaponEffect.getCost()) testPlayer.addAmmo(res);
+
         // Add weapon (effect) and check successful add
         testPlayer.pickWeapon(testWeaponEffect);
         assertTrue(testPlayer.getWeapons().contains(testWeaponEffect));
 
+        // Add enough resources to player's inventory to pick weapon
+        for (Resource res : testWeaponMode.getCost()) testPlayer.addAmmo(res);
+
         // Add weapon (mode) and check successful add
         testPlayer.pickWeapon(testWeaponMode);
         assertTrue(testPlayer.getWeapons().contains(testWeaponMode));
+
+        for (Resource res : testWeaponEffect.getCost()) testPlayer.addAmmo(res);
 
         // Try to add 2 same weapons
         testPlayer.pickWeapon(testWeaponEffect);
@@ -446,7 +459,11 @@ class PlayerTest {
         Weapon testWeapon3 = newMatch.getWeaponDeck().drawCard();
         Weapon testWeapon4 = newMatch.getWeaponDeck().drawCard();
 
+        for (Resource res : testWeapon3.getCost()) testPlayer.addAmmo(res);
         testPlayer.pickWeapon(testWeapon3);
+
+        for (Resource res : testWeapon4.getCost()) testPlayer.addAmmo(res);
+
         assertThrows(InventoryFullException.class, () -> testPlayer.pickWeapon(testWeapon4));
     }
 
@@ -464,18 +481,14 @@ class PlayerTest {
         testPayment.add(Resource.RED_BOX);
 
         // Player's inventory is empty
-        PaymentResult result = testPlayer.canPay(testPayment);
-        assertFalse(result.isCanPay());
-        assertTrue(result.getPowerupAsResources().isEmpty());
+        assertFalse(testPlayer.canPay(testPayment));
 
         // Add enough resources to player's inventory, but no powerups
         AmmoCell newAmmoCell = new AmmoCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0);
         newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.YELLOW_BOX));
         testPlayer.pickAmmo(newAmmoCell);
 
-        result = testPlayer.canPay(testPayment);
-        assertTrue(result.isCanPay());
-        assertTrue(result.getPowerupAsResources().isEmpty());
+        assertTrue(testPlayer.canPay(testPayment));
 
         // Increase cost
         testPayment.add(Resource.BLUE_BOX);
@@ -485,18 +498,17 @@ class PlayerTest {
         // Add not enough resources to player's inventory, but powerups
         Powerup newPowerup = new Powerup("testPowerup",  "this is a test powerup", Resource.BLUE_BOX, null);
         testPlayer.addPowerup(newPowerup);
-        result = testPlayer.canPay(testPayment);
+        List<Powerup> toUseAsRes = new ArrayList<>();
+        toUseAsRes.add(newPowerup);
 
-        assertTrue(result.isCanPay());
-        assertTrue(result.getPowerupAsResources().contains(newPowerup));
+        assertTrue(testPlayer.canPay(testPayment, toUseAsRes));
 
-        // Add enough resources to player's inventory AND additional powerups
+        // Add enough resources to player's inventory
         newAmmoCell.setAmmo(new Ammo(Resource.RED_BOX, Resource.BLUE_BOX, Resource.YELLOW_BOX));
         testPlayer.pickAmmo(newAmmoCell);
-        result = testPlayer.canPay(testPayment);
 
-        assertTrue(result.isCanPay());
-        assertTrue(result.getPowerupAsResources().contains(newPowerup));
+        assertTrue(testPlayer.canPay(testPayment));
+        assertTrue(testPlayer.canPay(testPayment, toUseAsRes));
     }
 
     @Test
