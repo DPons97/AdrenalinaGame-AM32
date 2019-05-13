@@ -310,8 +310,7 @@ public class MatchController {
 		if (!paymentResult.isCanPay() || !paymentResult.getPowerupAsResources().containsAll(pickedWeapon.getPowerups()))
 			return remainingActions;
 
-		// IDs' order matter. First one has to be primary effect (id=0), then secondary effects
-		Collections.sort(effectIds);
+		// IDs' order matter!
 		try {
 			for (Integer id : effectIds) {
 				playing.shoot(pickedWeapon.getWeapon(), id, pickedWeapon.getPowerups());
