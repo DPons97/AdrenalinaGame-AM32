@@ -67,7 +67,7 @@ public class Lobby {
      */
     public Player getPlayer(PlayerConnection connection) {
         for (Player p : players) {
-            if (p.getConnection().equals(connection)) return p;
+            if (p.getConnection().getName().equals(connection.getName())) return p;
         }
         return null;
     }
