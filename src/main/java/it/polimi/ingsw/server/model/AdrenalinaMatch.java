@@ -136,12 +136,12 @@ public class AdrenalinaMatch {
 		JSONParser parser = new JSONParser();
 		int xSize;
 		int ySize;
-		String fileName = "././././././resources/json/map"+mapID+".json";
+		String fileName = "json/map"+mapID+".json";
 		String[] cardinals = {"north", "south", "west", "east"};
 		try {
 			int i = 0;
-			Object obj = parser.parse(new FileReader(fileName));
-
+			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource(fileName)
+					.getFile().replace("%20", " ")));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			//get map size
@@ -204,8 +204,8 @@ public class AdrenalinaMatch {
 		ammoDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
 		try {
-			Object obj = parser.parse(new FileReader("././././././resources/json/ammos.json"));
-
+			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/ammos.json")
+					.getFile().replace("%20", " ")));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			JSONArray ammoCards = (JSONArray) jsonObject.get("ammoCards");
@@ -243,10 +243,9 @@ public class AdrenalinaMatch {
 		String description;
 		Resource bRes;
 		try {
-			Object obj = parser.parse(new FileReader("././././././resources/json/powerups.json"));
-
+			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/powerups.json")
+					.getFile().replace("%20", " ")));
 			JSONObject jsonObject = (JSONObject) obj;
-
 			JSONArray pupCards = (JSONArray) jsonObject.get("Powerups");
 
 			for(Object pupCard: pupCards){
@@ -270,8 +269,8 @@ public class AdrenalinaMatch {
 		JSONParser parser = new JSONParser();
 		String name;
 		try {
-			Object obj = parser.parse(new FileReader("././././././resources/json/weapons.json"));
-
+			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/weapons.json")
+					.getFile().replace("%20", " ")));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");
