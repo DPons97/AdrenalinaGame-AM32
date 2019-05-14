@@ -161,7 +161,16 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		System.out.println("player disconnected");
 	}
 
-    /**
+	/**
+	 * Allow clients to ping server to check connection status
+	 */
+	@Override
+	public void ping() throws RemoteException {
+
+	}
+
+
+	/**
      * Main method to test connections
      */
     public static void main(String[] args) {

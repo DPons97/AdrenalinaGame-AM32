@@ -7,6 +7,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
 
@@ -51,7 +52,8 @@ public class RemoteClient extends ServerConnection {
 			System.out.println("Registry OK. Logging in...");
 			server.login(player.getNickname(), (ClientFunctionalities) UnicastRemoteObject.exportObject(this.player,0));
 			System.out.println("Logged");
-
+			Thread t = new Thread(this::checkConnection);
+			t.start();
 		} catch (RemoteException e)
 		{
 			e.printStackTrace();
@@ -76,5 +78,26 @@ public class RemoteClient extends ServerConnection {
 		}
 	}
 
+	private void checkConnection(){
+		while(true){
+			try {
+				server.ping();
+				TimeUnit.SECONDS.sleep(5);
+			} catch (RemoteException e) {
+				System.out.println("Connection lost");
+				while (true){
+					try {
+						server.login(player.getNickname(), player);
+						break;
+					} catch (RemoteException e1) {
+						break;
+					}
+				}
+
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 }
