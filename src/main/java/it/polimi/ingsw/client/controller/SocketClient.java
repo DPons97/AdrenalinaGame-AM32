@@ -95,11 +95,13 @@ public class SocketClient extends ServerConnection {
 			try {
 				msg = input.readLine();
 				// System.out.println(msg);
+				if(msg == null) {
+					lostConnection();
+				}
 				if(!msg.equals("ping"))
 					parseMessage((JSONObject) JSONValue.parse(msg));
 			} catch (IOException | InvalidSelectionTypeException e) {
 				lostConnection();
-				return;
 			}
 		}
 	}

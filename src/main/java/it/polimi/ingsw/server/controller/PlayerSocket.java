@@ -58,7 +58,9 @@ public class PlayerSocket extends PlayerConnection {
 			try {
 				message = input.readLine();
 				if(message.equals("disconnect")){
-					// TODO disconnect client
+					Thread t = new Thread(this::disconnect);
+					t.start();
+					return;
 				} else if(!validResponse){
 					synchronized (this) {
 						response = message;
