@@ -5,6 +5,8 @@ import it.polimi.ingsw.server.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Handles incoming players and put them in the lobby
@@ -31,6 +33,8 @@ public class LobbyController {
 	 */
 	private List<String> disconnectedPlayers;
 
+
+
 	/**
 	 * Default constructor
 	 * initializes new lobby and new list of players
@@ -41,7 +45,52 @@ public class LobbyController {
 		this.disconnectedPlayers = new ArrayList<>();
 	}
 
-	private static final Object lock = new Object();
+
+	/**
+	 * @return list of current players inside lobby and waiting to join
+	 */
+	public List<PlayerConnection> getPlayers() { return new ArrayList<>(players); }
+
+	/**
+	 * @return list of current players inside lobby and waiting to join
+	 */
+	public List<String> getPlayersNames() {
+		return getPlayers().stream().map(p->p.name).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param name of player to get
+	 * @return Player with given name
+	 */
+	public PlayerConnection getPlayerByName(String name) {
+		if(!getPlayersNames().contains(name))
+			return null;
+		return getPlayers().stream().filter(p-> p.name.equals(name)).collect(Collectors.toList()).get(0);
+	}
+
+	/**
+	 * @return list of current players inside a game
+	 */
+	public List<PlayerConnection> getPlayersInGame(){
+		return lobby.getPlayersInGame().stream().map(Player::getConnection).collect(Collectors.toList());
+	}
+
+	/**
+	 * @return list of current players inside a game
+	 */
+	public List<String> getPlayersNameInGame(){
+		return lobby.getPlayersInGame().stream().map(Player::getNickname).collect(Collectors.toList());
+	}
+
+	/**
+	 * @param name of player to get from a game
+	 * @return Player with given name
+	 */
+	public PlayerConnection getPlayerInGameByName(String name){
+		if(!getPlayersNames().contains(name))
+			return null;
+		return getPlayersInGame().stream().filter(p-> p.name.equals(name)).collect(Collectors.toList()).get(0);
+	}
 
 	/**
 	 *
@@ -99,9 +148,7 @@ public class LobbyController {
 	 */
 	public synchronized List<Thread> pingALl() {
 		List<Thread> toJoin= new ArrayList<>();
-		players.forEach(p->{
-			toJoin.add(p.ping());
-		});
+		players.forEach(p-> toJoin.add(p.ping()));
 
 		return toJoin;
 

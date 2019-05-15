@@ -331,7 +331,7 @@ public class PlayerSocket extends PlayerConnection {
 	@Override
 	public Thread ping() {
 		output.println("ping");
-		try {
+		/*try {
 			if(!input.readLine().equals("pong")) {
 				Thread t = new Thread(this::disconnect);
 				t.start();
@@ -341,8 +341,20 @@ public class PlayerSocket extends PlayerConnection {
 			Thread t = new Thread(this::disconnect);
 			t.start();
 			return t;
-		}
+		}*/
 		return null;
+	}
+
+	/**
+	 * Socket doesn't use ping to detect disconnections but methods are provided to prevent usless casts
+	 */
+	@Override
+	public boolean getPinged() {
+		return true;
+	}
+	@Override
+	public void setPinged(boolean ping) {
+
 	}
 
 	private Weapon getWeapon(String weaponName){

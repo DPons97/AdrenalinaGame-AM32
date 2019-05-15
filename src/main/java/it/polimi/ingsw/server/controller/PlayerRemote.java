@@ -20,11 +20,17 @@ public class PlayerRemote extends PlayerConnection {
 	public ClientFunctionalities remotePlayer;
 
 	/**
+	 *
+	 */
+	private boolean pinged;
+
+	/**
 	 * Default constructor
 	 */
 	public PlayerRemote(String name, ClientFunctionalities remoteClient) {
 		super(name);
 		this.remotePlayer = remoteClient;
+		pinged = true;
 	}
 
 	private Player getPlayerByName(String name){
@@ -214,6 +220,16 @@ public class PlayerRemote extends PlayerConnection {
 			return t;
 		}
 		return null;
+	}
+
+	@Override
+	public boolean getPinged() {
+		return pinged;
+	}
+
+	@Override
+	public void setPinged(boolean ping) {
+		pinged = ping;
 	}
 
 	private void disconnectPlayer(){

@@ -14,6 +14,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
 
@@ -98,7 +99,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	/**
 	 * listen socket connection
 	 */
-	public void listenSocketConnection() {
+	protected void listenSocketConnection() {
         Socket clientSocket;
         BufferedReader input;
         String name;
@@ -106,7 +107,13 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
             try {
                 clientSocket= serverSocket.accept();
                 System.out.println("Received socket connection request.");
-                lobby.pingALl();
+                lobby.pingALl().stream().filter(Objects::nonNull).forEach(thread -> {
+					try {
+						thread.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				});
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 name = input.readLine();
                 if(lobby.getDisconnectedPlayers().contains(name))
@@ -165,8 +172,39 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * Allow clients to ping server to check connection status
 	 */
 	@Override
-	public void ping() throws RemoteException {
+	public void ping(String name) throws RemoteException {
+		System.out.println("Got ping from "+ name);
+		if(lobby.getPlayersNames().contains(name)){
+			lobby.getPlayerByName(name).setPinged(true);
+		} else if(lobby.getPlayersNameInGame().contains(name)){
+			lobby.getPlayerInGameByName(name).setPinged(true);
+		}
+	}
 
+	protected void checkRMIConnections(){
+		while(true){
+			lobby.getPlayers().forEach(this::checkPlayerPingStatus);
+			lobby.getPlayersInGame().forEach(this::checkPlayerPingStatus);
+			try {
+				TimeUnit.SECONDS.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void checkPlayerPingStatus(PlayerConnection p) {
+		if (p.getPinged())
+			p.setPinged(false);
+		else
+		// if not received ping in last 10 seconds try to ping. if fails it automatically disconnects p
+		{
+			try {
+				p.ping().join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 
@@ -185,6 +223,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
     	}
 		Thread t1 = new Thread(loginHandler::listenSocketConnection);
 		t1.start();
+		Thread t2 = new Thread(loginHandler::checkRMIConnections);
+		t2.start();
     }
 
 

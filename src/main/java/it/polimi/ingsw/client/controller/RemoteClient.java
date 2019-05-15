@@ -26,8 +26,9 @@ public class RemoteClient extends ServerConnection {
 	 */
 	private Registry registry;
 
+	private int port;
 
-	private Registry localRegistry;
+	private String ip;
 
 
 	/**
@@ -44,6 +45,8 @@ public class RemoteClient extends ServerConnection {
 	 */
 	@Override
 	public void connect(String ip, int port) {
+		this.ip = ip;
+		this.port = port;
 		try {
 			System.out.println("Trying to connect via RMI");
 			registry = LocateRegistry.getRegistry(ip, port);
@@ -81,16 +84,22 @@ public class RemoteClient extends ServerConnection {
 	private void checkConnection(){
 		while(true){
 			try {
-				server.ping();
+				server.ping(player.getNickname());
 				TimeUnit.SECONDS.sleep(5);
 			} catch (RemoteException e) {
 				System.out.println("Connection lost");
 				while (true){
 					try {
-						server.login(player.getNickname(), player);
+						registry = LocateRegistry.getRegistry(ip, port);
+						server = (ServerFunctionalities) (registry.lookup("rmiServer"));
+						server.login(player.getNickname(), this.player);
 						break;
-					} catch (RemoteException e1) {
-						break;
+					} catch (RemoteException | NotBoundException e1) {
+						try {
+							TimeUnit.SECONDS.sleep(5);
+						} catch (InterruptedException e2) {
+							e2.printStackTrace();
+						}
 					}
 				}
 

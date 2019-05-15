@@ -99,6 +99,8 @@ public class SocketClient extends ServerConnection {
 					lostConnection();
 				}
 				if(!msg.equals("ping"))
+					//output.println("pong");
+				//else
 					parseMessage((JSONObject) JSONValue.parse(msg));
 			} catch (IOException | InvalidSelectionTypeException e) {
 				lostConnection();

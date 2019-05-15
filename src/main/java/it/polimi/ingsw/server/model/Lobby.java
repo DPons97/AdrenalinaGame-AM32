@@ -55,6 +55,10 @@ public class Lobby {
      */
     public List<MatchController> getLobbyMatches() { return new ArrayList<>(matches); }
 
+    public List<Player> getPlayersInGame(){
+        return matches.stream().map(m->m.getMatch().getPlayers()).flatMap(List::stream).collect(Collectors.toList());
+    }
+
     /**
      * @return max number of matches that can be played on same server
      */

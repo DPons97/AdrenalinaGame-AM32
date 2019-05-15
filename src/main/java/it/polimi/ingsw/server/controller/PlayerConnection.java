@@ -33,7 +33,7 @@ public abstract class PlayerConnection {
 	public PlayerConnection(String name) {
 		this.name=name;
 		this.serverLobby = null;
-		currentMatch = null;
+		this.currentMatch = null;
 	}
 
 	public String getName(){
@@ -155,4 +155,11 @@ public abstract class PlayerConnection {
 	public void backToLobby() throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
 		currentMatch.backToLobby(this);
 	}
+
+	/**
+	 * @return  pinged
+	 */
+	public abstract boolean getPinged();
+
+	public abstract void setPinged(boolean ping);
 }

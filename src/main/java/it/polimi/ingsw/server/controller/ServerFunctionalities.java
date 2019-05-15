@@ -28,5 +28,5 @@ public interface ServerFunctionalities extends Remote {
 	/**
 	 * Allow user that detects a network issue to reconnect to server
 	 */
-	public void ping()throws RemoteException;
+	public void ping(String name)throws RemoteException;
 }
