@@ -273,6 +273,11 @@ public class Player {
 	}
 
 	/**
+	 * @return true if this player is using frenzy board
+	 */
+	public boolean isFrenzyPlayer() { return isFrenzyPlayer; }
+
+	/**
 	 * @return current Player's taken damage ponints
 	 */
 	public List<Player> getDmgPoints() { return new ArrayList<>(dmgPoints); }
