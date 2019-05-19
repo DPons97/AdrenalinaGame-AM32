@@ -4,11 +4,13 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.ArcType;
 import javafx.stage.Stage;
 public class FXExample extends Application {
-    public static void main(String[] args) {
+    public FXExample(String[] args){
+        super();
         launch(args);
     }
     @Override
@@ -17,6 +19,8 @@ public class FXExample extends Application {
         Group root = new Group();
         Canvas canvas = new Canvas(300, 250);
         GraphicsContext gc = canvas.getGraphicsContext2D();
+        Label l = new Label();
+        l.setText("kek");
         drawShapes(gc);
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
