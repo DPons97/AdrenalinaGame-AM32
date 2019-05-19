@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
  */
 public class AdrenalinaMatch {
 	/**
+	 *  Point reward to give to players inside death track
+	 */
+	private static int[] killRewards = {8, 6, 4, 2, 1, 1};
+
+	/**
 	 * Maximum number of players in a game (as defined in rules)
 	 */
 	private static int maxPlayers = 5;
@@ -335,6 +340,15 @@ public class AdrenalinaMatch {
 				players.remove(toKick);
 			} else throw new NotEnoughPlayersException();
 		} else throw new MatchAlreadyStartedException();
+	}
+
+	/**
+	 * @return death track rewards
+	 */
+	public List<Integer> getRewards() {
+		List<Integer> returnVal = new ArrayList<>();
+		for (int reward : killRewards) returnVal.add(reward);
+		return returnVal;
 	}
 
 	/**

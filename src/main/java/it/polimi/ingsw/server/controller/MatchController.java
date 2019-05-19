@@ -5,6 +5,7 @@ import it.polimi.ingsw.server.model.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,9 +56,10 @@ public class MatchController {
 
 	/**
 	 * Start controlling match
+	 * @return List representing leaderboard
 	 * @throws PlayerNotReadyException if there is at least one player that is not ready to start match
 	 */
-	public void startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException, PlayerNotExistsException {
+	public List<Player> startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException, PlayerNotExistsException {
 		for (Player player : match.getPlayers()) {
 			if (!player.isReadyToStart()) throw new PlayerNotReadyException();
 		}
@@ -92,20 +94,34 @@ public class MatchController {
 			if (p.getDmgPoints().isEmpty()) p.enableFrenzy();
 		}
 
+		List<Player> playedFrenzy = new ArrayList<>();
 		// Frenzy turns
 		while (currentPlayer != lastFrenzyPlayer) {
 			currentPlayer = match.getTurnPlayer();
 
-			frenzyTurn(currentPlayer);
+			frenzyTurn(currentPlayer, playedFrenzy);
 			resolveDeaths(currentPlayer);
 			repopulateMap();
 
 			match.nextTurn();
 		}
 
-		// TODO Do last frenzy turn (last player has to play)
+		// Do last frenzy turn (last player has to play)
+		currentPlayer = match.getTurnPlayer();
+		frenzyTurn(currentPlayer, playedFrenzy);
+		resolveDeaths(currentPlayer);
 
+		// Final scoring
+		match.setMatchState(MatchState.FINAL_SCORING);
+		finalScore();
 
+		// Final leaderboard
+		List<Player> leaderBoard = new ArrayList<>(match.getPlayers());
+		leaderBoard.sort(Comparator.comparing(Player::getScore));
+
+		// TODO Manage player with same score
+
+		return leaderBoard;
 	}
 
 	/**
@@ -171,33 +187,13 @@ public class MatchController {
 
 			switch (currentAcion) {
 				case MOVE:
-					// MOVE management
-					// Select one of cells at 1, 2 or 3 distance
-					List<Cell> selectable = playing.getCellsToMove(3);
-					Cell destination = playing.getConnection().selectCell(selectable);
-					if (destination != null) {
-						playing.move(destination);
-						remainingActions--;
-					}
+					if (movePlayer(playing, 3)) remainingActions--;
 					break;
 				case PICK:
 					// PICK management
 
 					// Get cells that can be picked doing from 0 to 1 or 2 movements
-					List<Cell> canPick = (playing.getDmgPoints().size() >= 3) ?
-							playing.getCellsToMove(2) :
-							playing.getCellsToMove(1);
-					canPick.add(playing.getPosition());
-					removeEmptyCells(canPick);
-
-					// Player choosing and grabbing
-					Cell pickedCell = playing.getConnection().selectCell(canPick);
-
-					if (pickedCell.isSpawn()) remainingActions = grabWeapon(playing, remainingActions, pickedCell);
-					else remainingActions = grabAmmo(playing, remainingActions, pickedCell);
-
-					// Move player to picked cell
-					playing.move(pickedCell);
+					if (playerPick(playing)) remainingActions--;
 					break;
 				case SHOOT:
 					// SHOOT management
@@ -206,7 +202,7 @@ public class MatchController {
 					List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
 					WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
 
-					remainingActions = executeShooting(playing, remainingActions, pickedWeapon);
+					if (executeShooting(playing, pickedWeapon)) remainingActions--;
 					break;
 			}
 		}
@@ -217,9 +213,95 @@ public class MatchController {
 
 	/**
 	 *	Game turn logic during frenzy (Run/Pick/Shoot + reloading)
+	 * @param playing player
+	 * @param playedFrenzy players that already played their frenzy turn
 	 */
-	public void frenzyTurn(Player playing) {
-		// TODO Manage turn during frenzy
+	public void frenzyTurn(Player playing, List<Player> playedFrenzy) {
+		int remainingActions = 2;
+		boolean playingBeforeFirst = true;
+
+		// Calculate available actions
+		if (playing.equals(match.getFirstPlayer()) ||
+				playedFrenzy.contains(match.getFirstPlayer())) {
+			playingBeforeFirst = false;
+			remainingActions = 1;
+		}
+
+
+		while (remainingActions > 0) {
+			// Ask player what to do (RUN, PICK, SHOOT)
+			TurnAction currentAcion = playing.getConnection().selectAction();
+
+			if (playingBeforeFirst) {
+				switch (currentAcion) {
+					case MOVE:
+						if (movePlayer(playing, 4)) remainingActions--;
+						break;
+					case PICK:
+						if (frenzyPick(playing, true)) remainingActions--;
+						break;
+					case SHOOT:
+						// Move 0 or 1 cell
+						List<Cell> canMove = playing.getCellsToMove(1);
+						canMove.add(playing.getPosition());
+						playing.getConnection().selectCell(canMove);
+
+						// Ask reload
+						reloadWeapon(playing);
+
+						// Get all loaded weapons and pick one
+						List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+						WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
+
+						if (executeShooting(playing, pickedWeapon)) remainingActions--;
+						break;
+				}
+			} else {
+				switch (currentAcion) {
+					case PICK:
+						// (Useful only if turrets mode are implemented)
+						// Get cells that can be picked doing from 0 to 1 or 2 movements
+						if (frenzyPick(playing, false)) remainingActions--;
+						break;
+					case SHOOT:
+						// Move 0, 1 or 2 cell
+						List<Cell> canMove = playing.getCellsToMove(2);
+						canMove.add(playing.getPosition());
+						playing.getConnection().selectCell(canMove);
+
+						// Ask reload
+						reloadWeapon(playing);
+
+						// Get all loaded weapons and pick one
+						List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+						WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
+
+						if (executeShooting(playing, pickedWeapon)) remainingActions--;
+						break;
+					default:
+
+				}
+			}
+		}
+		playedFrenzy.add(playing);
+	}
+
+	/**
+	 * Player's movement logic
+	 * @param playing player
+	 * @param maxMoves maximum movements player can execute
+	 * @return True if movement is successful
+	 */
+	private boolean movePlayer(Player playing, int maxMoves) {
+		// MOVE management
+		// Select one of cells at 1, 2, 3 or 4 distance
+		List<Cell> selectable = playing.getCellsToMove(maxMoves);
+		Cell destination = playing.getConnection().selectCell(selectable);
+		if (destination != null) {
+			playing.move(destination);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -243,43 +325,76 @@ public class MatchController {
 		canPick.removeAll(emptyCells);
 	}
 
+	/** Player pick logic
+	 * @param playing player
+	 * @return true if pick was successful
+	 */
+	private boolean playerPick(Player playing) {
+		// Get cells that can be picked doing from 0 to 1 or 2 movements
+		List<Cell> canPick = playing.getCellsToMove((playing.getDmgPoints().size() >= 3) ? 2 : 1);
+
+		return grabSomething(playing, canPick);
+	}
+
+	/** Player pick logic during frenzy
+	 * @param playing player
+	 * @return true if pick was successful
+	 */
+	private boolean frenzyPick(Player playing, boolean playingBeforeFirst) {
+		// PICK management during frenzy
+
+		// Get cells that can be picked doing from 0 to 1 or 2 movements
+		List<Cell> canPick;
+		boolean bonusMovement = !playing.isFrenzyPlayer() && (playing.getDmgPoints().size() >= 3);
+
+		if (playingBeforeFirst) canPick = playing.getCellsToMove((bonusMovement) ? 3 : 2);
+		else canPick = playing.getCellsToMove((bonusMovement) ? 4 : 3);
+
+		return grabSomething(playing, canPick);
+	}
+
 	/**
 	 * Grab weapon or ammo from a cell
 	 * @param playing player
-	 * @param remainingActions number of actions this player still has during this turn
 	 * @param picked cell
-	 * @return new remaining actions
+	 * @return true if grab was successful
 	 */
-	private int grabAmmo(Player playing, int remainingActions, Cell picked) {
+	private boolean grabAmmo(Player playing, Cell picked) {
 		// Pick ammo
 		for (AmmoCell cell : match.getBoardMap().getAmmoPoints()) {
 			if (cell.getCoordX() == picked.getCoordX() && cell.getCoordY() == picked.getCoordY()) {
 				playing.pickAmmo(cell);
-				remainingActions--;
+				return true;
 			}
 		}
-		return remainingActions;
+		return false;
 	}
 
-	private int grabWeapon(Player playing, int remainingActions, Cell picked) {
+	/**
+	 * Grab a weapon
+	 * @param playing player
+	 * @param picked weapon
+	 * @return true if pick was successful
+	 */
+	private boolean grabWeapon(Player playing, Cell picked) {
 		// Find right spawn cell
 		SpawnCell pickedSpawn = match.getBoardMap().getSpawnCell(picked);
-		if (pickedSpawn == null) return remainingActions;
+		if (pickedSpawn == null) return false;
 
 		// Pick weapon
 		WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickedSpawn.getWeapons());
 
 		// Stop action if player can't pay weapon's cost with chosen powerups
-		if (!playing.canPay(pickedWeapon.getWeapon().getCost(), pickedWeapon.getPowerups())) return remainingActions;
+		if (!playing.canPay(pickedWeapon.getWeapon().getCost(), pickedWeapon.getPowerups())) return false;
 
 		try {
 			playing.pickWeapon(pickedWeapon.getWeapon());
 			pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
-			remainingActions--;
+			return true;
 		} catch (InventoryFullException invFullE) {
 			// Player has too many weapons. Ask for one to change
 			WeaponSelection toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
-			if (toChange == null) return remainingActions;
+			if (toChange == null) return false;
 
 			try {
 				// Change chosen weapons
@@ -287,47 +402,67 @@ public class MatchController {
 				playing.pickWeapon(pickedWeapon.getWeapon());
 				pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
 				pickedSpawn.addWeapon(toChange.getWeapon());
-				remainingActions--;
+				return true;
 			} catch (NoItemInInventoryException | InventoryFullException | InsufficientResourcesException noItemE) {
 				noItemE.printStackTrace();
 			}
 		} catch (NoItemInInventoryException | InsufficientResourcesException e) {
 			e.printStackTrace();
 		}
+		return false;
+	}
 
-		return remainingActions;
+	/**
+	 * Make player grab something
+	 * @param playing player
+	 * @param canPick list of cell player can reach
+	 * @return true if grab was successful
+	 */
+	private boolean grabSomething(Player playing, List<Cell> canPick) {
+		// PICK management
+		canPick.add(playing.getPosition());
+		removeEmptyCells(canPick);
+
+		// Player choosing and grabbing
+		Cell pickedCell = playing.getConnection().selectCell(canPick);
+
+		if ((pickedCell.isSpawn() && grabWeapon(playing, pickedCell)) || grabAmmo(playing, pickedCell)) {
+			// Move player to picked cell
+			playing.move(pickedCell);
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Try to execute shooting
 	 * @param playing player
-	 * @param remainingActions during current turn
 	 * @param pickedWeapon weapon selection made by player
-	 * @return new actions remaining to player during this turn
+	 * @return True if shooting was successful
 	 */
-	private int executeShooting(Player playing, int remainingActions, WeaponSelection pickedWeapon) {
+	private boolean executeShooting(Player playing, WeaponSelection pickedWeapon) {
 		List<Integer> effectIds = pickedWeapon.getEffectID();
 
 		// Check all chosen effects are valid
-		if (!pickedWeapon.getWeapon().isValidActionSequence(effectIds)) return remainingActions;
+		if (!pickedWeapon.getWeapon().isValidActionSequence(effectIds)) return false;
 
 		// Check player can pay all the effects' cost
 		List<Resource> totalCost = new ArrayList<>();
 		for (Integer id : effectIds) {
 			totalCost.addAll(pickedWeapon.getWeapon().getAction(id).getCost());
 		}
-		if (!playing.canPay(totalCost, pickedWeapon.getPowerups())) return remainingActions;
+		if (!playing.canPay(totalCost, pickedWeapon.getPowerups())) return false;
 
 		// IDs' order matter!
 		try {
 			for (Integer id : effectIds) {
 				playing.shoot(pickedWeapon.getWeapon(), id, pickedWeapon.getPowerups());
 			}
-			remainingActions--;
+			return true;
 		} catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
 			e.printStackTrace();
 		}
-		return remainingActions;
+		return false;
 	}
 
 	/**
@@ -341,8 +476,8 @@ public class MatchController {
 			if (toReload.getWeapon() == null) return;
 
 			// Stop action if player can't pay reload cost with chosen powerups
-			if (!playing.canPay( toReload.getWeapon().getCost(), toReload.getPowerups())) {
-				// Otherwise do reload
+			if (playing.canPay( toReload.getWeapon().getCost(), toReload.getPowerups())) {
+				// Do reload
 				try {
 					playing.reload(toReload.getWeapon(), toReload.getPowerups());
 				} catch (NoItemInInventoryException | InsufficientResourcesException e) {
@@ -364,10 +499,10 @@ public class MatchController {
 		for (Player p : match.getPlayers()) {
 			if (p.isDead()) {
 				// First to damage deadPlayer gets 1 point (First Blood)
-				p.getDmgPoints().get(0).addScore(1);
+				if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
 				rewardPlayers(p.getDmgPoints(), p.getReward());
 
-				Player killshot = p.getDmgPoints().get(p.getDmgPoints().size()-1);
+				Player killshot = p.getDmgPoints().get(p.getDmgPoints().size() - 1);
 				// Add death to match, counting overkill if present (Killshot, Death and Overkill)
 				match.addDeath(killshot, p.isOverkilled());
 
@@ -376,6 +511,9 @@ public class MatchController {
 
 				// Respawn player
 				respawnPlayer(currentPlayer);
+
+				// If frenzy enabled, flip dead player's board
+				if (match.getMatchState() == MatchState.FRENZY_TURN) p.enableFrenzy();
 
 				deadPlayers++;
 			}
@@ -458,6 +596,20 @@ public class MatchController {
 				reward++;
 			}
 		}
+	}
+
+	/**
+	 * Resolve final scoring of not dead players
+	 */
+	private void finalScore() {
+		for (Player p : match.getPlayers()) {
+			// First to damage deadPlayer gets 1 point (First Blood)
+			if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
+			rewardPlayers(p.getDmgPoints(), p.getReward());
+		}
+
+		// Give points to players in death track
+		rewardPlayers(match.getDeathTrack(), match.getRewards());
 	}
 
 	/**
