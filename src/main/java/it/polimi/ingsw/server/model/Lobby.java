@@ -131,6 +131,7 @@ public class Lobby {
     public void reconnect(PlayerConnection toAdd) {
         Player pl = disconnectedPlayers.stream().filter(p-> p.getNickname().equals(toAdd.getName())).collect(Collectors.toList()).get(0);
         players.add(pl);
+        pl.setConnection(toAdd);
         disconnectedPlayers.remove(pl);
     }
 
@@ -153,7 +154,7 @@ public class Lobby {
      * @throws PlayerAlreadyExistsException if player already inside toJoin
      * @throws PlayerNotExistsException if player is not in lobby
      */
-    protected void joinMatch(Player player, MatchController toJoin) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
+    public void joinMatch(Player player, MatchController toJoin) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
         if (!players.contains(player)) throw new PlayerNotExistsException();
 
         toJoin.getMatch().addPlayer(player);

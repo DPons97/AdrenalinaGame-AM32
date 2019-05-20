@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.model.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -61,7 +62,9 @@ public class PlayerSocket extends PlayerConnection {
 					Thread t = new Thread(this::disconnect);
 					t.start();
 					return;
-				} else if(!validResponse){
+				} else if(message.contains("PUSH")) {
+					parseMessage(message);
+				}else if(!validResponse){
 					synchronized (this) {
 						response = message;
 						validResponse = true;
@@ -77,6 +80,55 @@ public class PlayerSocket extends PlayerConnection {
 		}
 	}
 
+
+	/**
+	 *	parses message in case it's a push message from client
+	 */
+	private void parseMessage(String message) {
+		JSONObject msg  = (JSONObject) JSONValue.parse(message);
+		switch(msg.get("type").toString()){
+			case "join_match":
+				int id = Integer.parseInt(msg.get("match_id").toString());
+				try {
+					getServerLobby().joinMatch(this, id);
+				} catch (TooManyPlayersException e) {
+					this.allert("Cannot join match: match is full");
+				} catch (MatchAlreadyStartedException e) {
+					this.allert("Cannot join match: match already started");
+				} catch (PlayerAlreadyExistsException e) {
+					e.printStackTrace();
+				} catch (PlayerNotExistsException e) {
+					e.printStackTrace();
+				}
+				break;
+			case "create_match":
+				int maxPlayers = Integer.parseInt(msg.get("max_pleyers").toString());
+				int maxDeaths = Integer.parseInt(msg.get("max_deaths").toString());
+				int turnDuration = Integer.parseInt(msg.get("turn_duration").toString());
+				int mapID = Integer.parseInt(msg.get("map_id").toString());
+				try {
+					getServerLobby().hostMatch(this,maxPlayers,maxDeaths,turnDuration,mapID);
+				} catch (TooManyMatchesException e) {
+					this.allert("Cannot create match: server is full");
+				} catch (PlayerNotExistsException e) {
+					e.printStackTrace();
+				} catch (MatchAlreadyStartedException e) {
+					e.printStackTrace();
+				} catch (PlayerAlreadyExistsException e) {
+					e.printStackTrace();
+				} catch (TooManyPlayersException e) {
+					e.printStackTrace();
+				}
+				break;
+			case "ready":
+				getServerLobby().setPlayerReady(this);
+			default:
+		}
+	}
+
+	/**
+	 *	Gets last message sent from client or waits for it until it comes.
+	 */
 	private String getResponse(){
 		String msg;
 		synchronized (this){
@@ -105,7 +157,7 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	/**
-	 *
+	 * Disconnects this player
 	 */
 	private void disconnect() {
 		System.out.println(name + " disconnected.");
@@ -355,6 +407,14 @@ public class PlayerSocket extends PlayerConnection {
 	@Override
 	public void setPinged(boolean ping) {
 
+	}
+
+	@Override
+	public void allert(String s) {
+		JSONObject msg = new JSONObject();
+		msg.put("function", "allert");
+		msg.put("msg", s);
+		this.sendInstruction(msg);
 	}
 
 	private Weapon getWeapon(String weaponName){

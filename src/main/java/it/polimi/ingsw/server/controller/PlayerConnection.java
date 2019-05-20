@@ -162,4 +162,6 @@ public abstract class PlayerConnection {
 	public abstract boolean getPinged();
 
 	public abstract void setPinged(boolean ping);
+
+	public abstract void allert(String s);
 }

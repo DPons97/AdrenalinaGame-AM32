@@ -17,7 +17,7 @@ public interface ClientFunctionalities extends Remote {
 	/**
 	 * Ping client to check connection status
 	 */
-	public void ping() throws RemoteException;
+	void ping() throws RemoteException;
 
 	/**
 	 * Select a player from a given list
@@ -85,5 +85,7 @@ public interface ClientFunctionalities extends Remote {
 	 * @param toGetUpdateFrom JSON match representation to get update from
 	 */
 	void updateMatch(JSONObject toGetUpdateFrom) throws  RemoteException;
+
+	void allert(String message) throws  RemoteException;
 
 }

@@ -66,7 +66,7 @@ public class ClientPlayer implements ClientFunctionalities{
     }
 
 	@Override
-	public void ping() throws RemoteException {
+	public void ping() {
 
 	}
 
@@ -166,6 +166,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
 
+	}
+
+	@Override
+	public void allert(String message) {
+		System.out.println("ALLERT: "+message);
 	}
 
 	/**

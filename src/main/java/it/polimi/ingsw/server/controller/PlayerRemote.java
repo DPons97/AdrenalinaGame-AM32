@@ -232,6 +232,15 @@ public class PlayerRemote extends PlayerConnection {
 		pinged = ping;
 	}
 
+	@Override
+	public void allert(String s) {
+		try {
+			remotePlayer.allert(s);
+		} catch (RemoteException e) {
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();		}
+	}
+
 	private void disconnectPlayer(){
 		System.out.println(name+" disconnected");
 		this.getServerLobby().removePlayer(this);

@@ -1,6 +1,8 @@
 package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.controller.ClientFunctionalities;
+import it.polimi.ingsw.custom_exceptions.*;
+import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -25,7 +27,6 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	private static String address;
 	private static Registry registry;
-	private ClientFunctionalities client;
 
 	/**
 	 *  max connections number
@@ -116,12 +117,18 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 				});
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 name = input.readLine();
-                if(lobby.getDisconnectedPlayers().contains(name))
+                if(lobby.getDisconnectedPlayers().contains(name) || lobby.getDisconnectedPlayersInGame().contains(name))
                 	lobby.reconnectPlayer(new PlayerSocket(name,
 							new PrintWriter(clientSocket.getOutputStream(), true),
 							input)
 					);
-                else
+                else if (lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
+						JSONObject msg = new JSONObject();
+						msg.put("function", "allert");
+						msg.put("msg", "Cannot connect: username already exists");
+						PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
+						out.println(msg.toString());
+				} else
                 	lobby.addPlayer(new PlayerSocket(name,
 							new PrintWriter(clientSocket.getOutputStream(), true),
 							input)
@@ -153,9 +160,15 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 				e.printStackTrace();
 			}
 		});
-		if(lobby.getDisconnectedPlayers().contains(name))
+		if(lobby.getDisconnectedPlayers().contains(name) ||  lobby.getDisconnectedPlayersInGame().contains(name))
 			lobby.reconnectPlayer(new PlayerRemote(name, client));
-		else //TODO ADD CASE IN WHICH PLAYER WAS IN A MATCH
+		else if(lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
+			try {
+				client.allert("Cannot connect: username already exists");
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		} else
 			lobby.addPlayer(new PlayerRemote(name, client));
 	}
 
@@ -172,13 +185,61 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * Allow clients to ping server to check connection status
 	 */
 	@Override
-	public void ping(String name) throws RemoteException {
+	public void ping(String name) {
 		System.out.println("Got ping from "+ name);
 		if(lobby.getPlayersNames().contains(name)){
 			lobby.getPlayerByName(name).setPinged(true);
 		} else if(lobby.getPlayersNameInGame().contains(name)){
 			lobby.getPlayerInGameByName(name).setPinged(true);
 		}
+	}
+
+	/**
+	 * Allow user to create a game while in the lobby
+	 */
+	@Override
+	public void createGame(String name, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+		if(lobby.getPlayersNames().contains(name)) {
+			try {
+				lobby.hostMatch(lobby.getPlayerByName(name), maxPlayers, maxDeaths, turnDuration, mapID);
+			} catch (TooManyMatchesException e) {
+				lobby.getPlayerByName(name).allert("Cannot create match: server is full");
+			} catch (PlayerNotExistsException e) {
+				e.printStackTrace();
+			} catch (MatchAlreadyStartedException e) {
+				e.printStackTrace();
+			} catch (PlayerAlreadyExistsException e) {
+				e.printStackTrace();
+			} catch (TooManyPlayersException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	/**
+	 * Allow to join a game while in the loby
+	 */
+	@Override
+	public void joinGame(String name, int id) {
+		try {
+			lobby.joinMatch(lobby.getPlayerByName(name), id);
+		} catch (TooManyPlayersException e) {
+			lobby.getPlayerByName(name).allert("Cannot join match: match is full");
+		} catch (MatchAlreadyStartedException e) {
+			lobby.getPlayerByName(name).allert("Cannot join match: match already started");
+		} catch (PlayerAlreadyExistsException e) {
+			e.printStackTrace();
+		} catch (PlayerNotExistsException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Allow user to communicate that is ready
+	 */
+	@Override
+	public void ready(String name) {
+		lobby.setPlayerReady(lobby.getPlayerInGameByName(name));
 	}
 
 	protected void checkRMIConnections(){

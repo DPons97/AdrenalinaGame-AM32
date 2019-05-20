@@ -1,5 +1,6 @@
 package it.polimi.ingsw.server.controller;
 
+import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.model.Lobby;
 import it.polimi.ingsw.server.model.Player;
 
@@ -93,17 +94,27 @@ public class LobbyController {
 	}
 
 	/**
-	 *
+	 * @param player connectio to look for in the game
+	 * @return Player with given name
 	 */
-	public void joinMatch() {
-		// TODO implement here
+	public MatchController getMatchByPlayerConnection(PlayerConnection player){
+		return lobby.getLobbyMatches().stream().filter(m-> m.getPlayer(player.name)!= null).collect(Collectors.toList()).get(0);
 	}
 
 	/**
-	 *
+	 * Allow user to create a game while in the lobby
 	 */
-	public void hostMatch() {
-		// TODO implement here
+	public synchronized void joinMatch(PlayerConnection player, int gameID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
+		lobby.joinMatch(lobby.getPlayer(player),lobby.getJoinableMatches().get(gameID));
+		players.remove(player);
+		lobby.removePlayer(lobby.getPlayer(player));
+	}
+
+	/**
+	 * Allow to join a game while in the loby
+	 */
+	public synchronized void hostMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
+		lobby.createMatch(host, maxPlayers,maxDeaths,turnDuration,mapID);
 	}
 
 	/**
@@ -124,15 +135,28 @@ public class LobbyController {
 
 	}
 
+	/**
+	 * Gets all in game and disconnected player's nicknames
+	 * @return list with players nickname that are in game and disconnected
+	 */
+	public synchronized List<String> getDisconnectedPlayersInGame(){
+		return lobby.getLobbyMatches().stream().map(m->m.getMatch().getPlayers()).
+				flatMap(List::stream).filter(p->p.getConnection()==null).map(Player::getNickname).collect(Collectors.toList());
+	}
+
 	public synchronized List<String> getDisconnectedPlayers() {
 		return new ArrayList<>(disconnectedPlayers);
 	}
 
 	public synchronized void removePlayer(PlayerConnection player){
-		players.remove(player);
-		disconnectedPlayers.add(player.getName());
-		lobby.removePlayer(lobby.getPlayer(player));
-		updatePlayers();
+		if(players.contains(player)) {
+			players.remove(player);
+			disconnectedPlayers.add(player.getName());
+			lobby.removePlayer(lobby.getPlayer(player));
+			updatePlayers();
+		}else {
+			getMatchByPlayerConnection(player).getPlayer(player.name).setConnection(null);
+		}
 	}
 
 	/**
@@ -144,7 +168,7 @@ public class LobbyController {
 
 	/**
 	 * Sends a broadcast message to all players to update their model
-	 * @return list of threads that ned to be joined if there is need of being sure that all disconnected clientes have been removed
+	 * @return list of threads that ned to be joined if there is need of being sure that all disconnected clients have been removed
 	 */
 	public synchronized List<Thread> pingALl() {
 		List<Thread> toJoin= new ArrayList<>();
@@ -154,12 +178,28 @@ public class LobbyController {
 
 	}
 
+	/**
+	 *	Reconnects a player
+	 * @param player to reconnect
+	 */
 	public synchronized void reconnectPlayer(PlayerConnection player){
 		System.out.println("Reconnecting "+player.name);
-		player.setServerLobby(this);
-		players.add(player);
-		disconnectedPlayers.remove(player.getName());
-		lobby.reconnect(player);
-		updatePlayers();
+		if(getDisconnectedPlayers().contains(player.name)) {
+			player.setServerLobby(this);
+			players.add(player);
+			disconnectedPlayers.remove(player.getName());
+			lobby.reconnect(player);
+			updatePlayers();
+		} else {
+			getMatchByPlayerConnection(player).getPlayer(player.name).setConnection(player);
+		}
+	}
+
+	/**
+	 *	set correspondent player object state to ready
+	 * @param player player connection object of the player to set ready
+	 */
+	public synchronized void setPlayerReady(PlayerConnection player) {
+		lobby.getPlayer(player).setReady(true);
 	}
 }

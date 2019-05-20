@@ -29,4 +29,21 @@ public interface ServerFunctionalities extends Remote {
 	 * Allow user that detects a network issue to reconnect to server
 	 */
 	public void ping(String name)throws RemoteException;
+
+	/**
+	 * Allow user to create a game while in the lobby
+	 */
+	public void createGame(String name, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws RemoteException;
+
+	/**
+	 * Allow to join a game while in the loby
+	 */
+	public void joinGame(String name, int id) throws  RemoteException;
+
+	/**
+	 * Allow user to communicate that is ready
+	 */
+	public void ready(String name) throws RemoteException;
+
+
 }
