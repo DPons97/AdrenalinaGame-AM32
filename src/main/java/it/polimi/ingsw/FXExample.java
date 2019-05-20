@@ -25,8 +25,6 @@ public class FXExample extends Application {
         root.getChildren().add(canvas);
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
-        Label l = new Label();
-        l.setText("kek");
     }
     private void drawShapes(GraphicsContext gc) {
         gc.setFill(Color.GREEN);
