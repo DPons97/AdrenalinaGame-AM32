@@ -38,6 +38,12 @@
           <groupId>com.googlecode.json-simple</groupId>
           <artifactId>json-simple</artifactId>
           <version>1.1.1</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>hamcrest-core</artifactId>
+            <groupId>org.hamcrest</groupId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
     <!--JAVA FX-->
@@ -114,8 +120,8 @@
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
               <configuration>
-                  <source>8</source>
-                  <target>8</target>
+                  <source>12</source>
+                  <target>12</target>
               </configuration>
           </plugin>
       </plugins>
