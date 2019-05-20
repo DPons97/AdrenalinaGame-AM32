@@ -146,7 +146,7 @@ public abstract class PlayerConnection {
 	 */
 	public void startMatch() throws PlayerNotReadyException, MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
 		if (name.equals(currentMatch.getHostName()))
-			currentMatch.startMatch();
+			currentMatch.startMatch();		// TODO Manage returned leaderboard
 	}
 
 	/**

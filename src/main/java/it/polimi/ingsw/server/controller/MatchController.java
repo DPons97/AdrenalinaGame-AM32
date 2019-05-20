@@ -111,17 +111,7 @@ public class MatchController {
 		frenzyTurn(currentPlayer, playedFrenzy);
 		resolveDeaths(currentPlayer);
 
-		// Final scoring
-		match.setMatchState(MatchState.FINAL_SCORING);
-		finalScore();
-
-		// Final leaderboard
-		List<Player> leaderBoard = new ArrayList<>(match.getPlayers());
-		leaderBoard.sort(Comparator.comparing(Player::getScore));
-
-		// TODO Manage player with same score
-
-		return leaderBoard;
+		return finalScore();
 	}
 
 	/**
@@ -601,7 +591,9 @@ public class MatchController {
 	/**
 	 * Resolve final scoring of not dead players
 	 */
-	private void finalScore() {
+	private List<Player> finalScore() {
+        // Final scoring
+	    match.setMatchState(MatchState.FINAL_SCORING);
 		for (Player p : match.getPlayers()) {
 			// First to damage deadPlayer gets 1 point (First Blood)
 			if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
@@ -610,6 +602,29 @@ public class MatchController {
 
 		// Give points to players in death track
 		rewardPlayers(match.getDeathTrack(), match.getRewards());
+
+        // Final leaderboard
+        List<Player> leaderBoard = new ArrayList<>(match.getPlayers());
+        leaderBoard.sort(Comparator.comparing(Player::getScore));
+
+        // Manage player with same score
+        boolean modifiedLeaderboard;
+        int i = 0;
+        while (i < leaderBoard.size() - 1) {
+            modifiedLeaderboard = false;
+            Player p1 = leaderBoard.get(i);
+            Player p2 = leaderBoard.get(i+1);
+            if (p1.getScore() == p2.getScore() &&
+                    match.getDeathTrack().indexOf(p1) > match.getDeathTrack().indexOf(p2)) {
+                // Swap players in leaderboard
+                Collections.swap(leaderBoard, i, i+1);
+                modifiedLeaderboard = true;
+            }
+            if (modifiedLeaderboard) i = 0;
+            else i++;
+        }
+        match.setMatchState(MatchState.ENDED);
+        return leaderBoard;
 	}
 
 	/**
