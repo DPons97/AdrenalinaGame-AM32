@@ -87,6 +87,47 @@ public class SocketClient extends ServerConnection {
 	}
 
 	/**
+	 * Tells server that this client is ready
+	 */
+	@Override
+	public void setReady() {
+		output.println("{\"function\":\"PUSH\", \"type\":\"ready\"}");
+	}
+
+	/**
+	 * Ask server to create a new game
+	 * @param nickname name of player creating the game
+	 * @param maxPlayers max players to set for this match
+	 * @param maxDeaths max deaths to set forthis game
+	 * @param mapID id of the map to use for this game
+	 */
+	@Override
+	public void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+		JSONObject msg = new JSONObject();
+		msg.put("function", "PUSH");
+		msg.put("type", "create_match");
+		msg.put("max_players", maxPlayers);
+		msg.put("max_deaths", maxDeaths);
+		msg.put("turn_duration", turnDuration);
+		msg.put("map_id", mapID);
+		sendAnswer(msg);
+	}
+
+	/**
+	 * Ask server to join a game
+	 * @param nickname nickname of player joining the game
+	 * @param id id of the match to join
+	 */
+	@Override
+	public void joinGame(String nickname, int id) {
+		JSONObject msg = new JSONObject();
+		msg.put("function", "PUSH");
+		msg.put("type", "join_match");
+		msg.put("match_id", id);
+		sendAnswer(msg);
+	}
+
+	/**
 	 * listen for instructions from server
 	 */
 	private void listen() {
@@ -113,7 +154,7 @@ public class SocketClient extends ServerConnection {
 	 * @param message to send
 	 */
 	private void sendAnswer(JSONObject message) {
-		// TODO implement here
+		output.println(message.toString());
 	}
 
 	/**
@@ -121,7 +162,7 @@ public class SocketClient extends ServerConnection {
 	 * @param message to send
 	 */
 	private void sendAnswer(String message) {
-		// TODO implement here
+		output.println(message);
 	}
 
 	/**

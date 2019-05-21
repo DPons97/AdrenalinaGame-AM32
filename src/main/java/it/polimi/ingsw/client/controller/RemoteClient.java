@@ -81,6 +81,51 @@ public class RemoteClient extends ServerConnection {
 		}
 	}
 
+	/**
+	 * Tells server that this client is ready
+	 */
+	@Override
+	public void setReady() {
+		try {
+			server.ready(player.getNickname());
+		} catch (RemoteException e) {
+			// the disconnection is handled elsewhere
+			return;
+		}
+	}
+
+	/**
+	 * Ask server to create a new game
+	 * @param nickname name of player creating the game
+	 * @param maxPlayers max players to set for this match
+	 * @param maxDeaths max deaths to set forthis game
+	 * @param mapID id of the map to use for this game
+	 */
+	@Override
+	public void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+		try {
+			server.createGame(nickname, maxPlayers,maxDeaths,turnDuration,mapID);
+		} catch (RemoteException e) {
+			// the disconnection is handled elsewhere
+			return;
+		}
+	}
+
+	/**
+	 * Ask server to join a game
+	 * @param nickname nickname of player joining the game
+	 * @param id id of the match to join
+	 */
+	@Override
+	public void joinGame(String nickname, int id) {
+		try {
+			server.joinGame(nickname,id);
+		} catch (RemoteException e) {
+			// the disconnection is handled elsewhere
+			return;
+		}
+	}
+
 	private void checkConnection(){
 		while(true){
 			try {
