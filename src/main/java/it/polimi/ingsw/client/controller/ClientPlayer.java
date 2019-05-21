@@ -173,6 +173,18 @@ public class ClientPlayer implements ClientFunctionalities{
 		System.out.println("ALLERT: "+message);
 	}
 
+	public void setReady(){
+		server.setReady();
+	}
+
+	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID){
+		server.createGame(this.nickname, maxPlayers, maxDeaths, turnDuration, mapID);
+	}
+
+	public void joinGame(int id){
+		server.joinGame(this.nickname, id);
+	}
+
 	/**
 	 * Main method to test connection
 	 */

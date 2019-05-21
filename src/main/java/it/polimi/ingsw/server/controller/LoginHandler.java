@@ -196,6 +196,10 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	/**
 	 * Allow user to create a game while in the lobby
+	 * @param name name of player creating the game
+	 * @param maxPlayers max players to set for this match
+	 * @param maxDeaths max deaths to set forthis game
+	 * @param mapID id of the map to use for this game
 	 */
 	@Override
 	public void createGame(String name, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
@@ -218,6 +222,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 	/**
 	 * Allow to join a game while in the loby
+	 * @param name nickname of player joining the game
+	 * @param id id of the match to join
 	 */
 	@Override
 	public void joinGame(String name, int id) {

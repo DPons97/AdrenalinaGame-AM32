@@ -29,4 +29,9 @@ public abstract class ServerConnection {
 	 */
 	public abstract void disconnect();
 
+    public abstract void setReady();
+
+	public abstract void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID);
+
+	public abstract void joinGame(String nickname, int id);
 }

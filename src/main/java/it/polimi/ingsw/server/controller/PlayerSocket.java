@@ -102,7 +102,7 @@ public class PlayerSocket extends PlayerConnection {
 				}
 				break;
 			case "create_match":
-				int maxPlayers = Integer.parseInt(msg.get("max_pleyers").toString());
+				int maxPlayers = Integer.parseInt(msg.get("max_players").toString());
 				int maxDeaths = Integer.parseInt(msg.get("max_deaths").toString());
 				int turnDuration = Integer.parseInt(msg.get("turn_duration").toString());
 				int mapID = Integer.parseInt(msg.get("map_id").toString());
