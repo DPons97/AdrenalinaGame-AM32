@@ -3,6 +3,8 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.util.List;
 
@@ -27,7 +29,9 @@ public class GuiView extends ClientView{
      * Shows the lobby
      */
     @Override
-    public void showLobby() {
+    public void showLobby(String lobby) {
+        JSONObject lobbiObj = (JSONObject) JSONValue.parse(lobby);
+        int n_players = Integer.parseInt(lobbiObj.get("n_players").toString());
 
     }
 

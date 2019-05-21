@@ -109,7 +109,7 @@
           <artifactId>javafx-maven-plugin</artifactId>
           <version>0.0.2</version>
           <configuration>
-            <mainClass>org.openjfx.App</mainClass>
+            <mainClass>src/main/java/it.polimi.ingsw.client.view.FXExample</mainClass>
           </configuration>
         </plugin>
         <!--end of JAVA FX-->

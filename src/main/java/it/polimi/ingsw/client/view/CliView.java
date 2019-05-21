@@ -3,6 +3,9 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.util.List;
 
@@ -27,8 +30,25 @@ public class CliView extends ClientView {
      * Shows the lobby
      */
     @Override
-    public void showLobby() {
+    public void showLobby(String lobby) {
+        JSONObject lobbiObj = (JSONObject) JSONValue.parse(lobby);
+        int nPlayers = Integer.parseInt(lobbiObj.get("n_players").toString());
+        System.out.println("Current players online: "+nPlayers);
+        JSONArray matches = (JSONArray) lobbiObj.get("matches");
+        System.out.println("Matches:");
+        if(matches.size() == 0) System.out.println("Wow, such empty...");
+        for(int i = 0; i < matches.size(); i++){
+            JSONObject match = (JSONObject) matches.get(i);
+            int maxPlayers = Integer.parseInt(match.get("n_players").toString());
+            int mapID = Integer.parseInt(match.get("mapID").toString());
+            int maxDeaths = Integer.parseInt(match.get("max_deaths").toString());
+            JSONArray players = (JSONArray) match.get("players");
 
+            System.out.println("\n"+(i+1)+". Max players: " + maxPlayers+"     Max deaths: "+ maxDeaths + "     Map: "+mapID);
+            System.out.print("   Players in game: ");
+            for(Object o: players) System.out.print(o.toString()+"     ");
+
+        }
     }
 
     /**

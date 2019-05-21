@@ -2,6 +2,9 @@ package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
 import it.polimi.ingsw.client.model.Point;
+import it.polimi.ingsw.client.view.CliView;
+import it.polimi.ingsw.client.view.ClientView;
+import it.polimi.ingsw.client.view.GuiView;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import org.json.simple.JSONObject;
@@ -36,16 +39,24 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	private ServerConnection server;
 
+	/**
+	 * Reference to client view
+	 */
+	private ClientView view;
+
 
 	/**
 	 * Constructor
 	 * Initializes nickname and server connection
 	 */
-	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port) throws RemoteException {
+	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws RemoteException {
 		this.nickname = nickname;
 
 		if(connectionType == ConnectionType.RMI) this.server = new RemoteClient(this);
 		else this.server = new SocketClient(this);
+
+		if(gui) view = new GuiView();
+		else view = new CliView();
 
 		server.connect(ip, port);
 
@@ -67,7 +78,7 @@ public class ClientPlayer implements ClientFunctionalities{
 
 	@Override
 	public void ping() {
-
+		// this method exists just for the server to see if it can call the client
 	}
 
 	/**
@@ -155,8 +166,9 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateLobby(String toGetUpdateFrom) {
-		JSONObject o = (JSONObject) JSONValue.parse(toGetUpdateFrom);
-		System.out.println("Players connected: " + o.get("n_players").toString());
+		view.showLobby(toGetUpdateFrom);
+
+		//System.out.println("Players connected: " + o.get("n_players").toString());
 	}
 
 	/**
@@ -210,7 +222,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		}
 
 		try {
-			ClientPlayer clientPlayer = new ClientPlayer(nickname, connectionType, ip, port);
+			ClientPlayer clientPlayer = new ClientPlayer(nickname, connectionType, ip, port, false);
 		} catch (RemoteException e) {
 			e.printStackTrace();
 			exit(1);

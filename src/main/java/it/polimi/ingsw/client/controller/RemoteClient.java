@@ -36,6 +36,12 @@ public class RemoteClient extends ServerConnection {
 	 */
 	public RemoteClient(ClientPlayer player) {
 		super(player);
+		try {
+			UnicastRemoteObject.exportObject(this.player, 0);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	/**
@@ -53,7 +59,7 @@ public class RemoteClient extends ServerConnection {
 			System.out.println("Connection OK. Looking up registry...");
 			server = (ServerFunctionalities) (registry.lookup("rmiServer"));
 			System.out.println("Registry OK. Logging in...");
-			server.login(player.getNickname(), (ClientFunctionalities) UnicastRemoteObject.exportObject(this.player,0));
+			server.login(player.getNickname(), this.player);
 			System.out.println("Logged");
 			Thread t = new Thread(this::checkConnection);
 			t.start();

@@ -261,13 +261,15 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	}
 
 	private void checkPlayerPingStatus(PlayerConnection p) {
+
 		if (p.getPinged())
 			p.setPinged(false);
 		else
 		// if not received ping in last 10 seconds try to ping. if fails it automatically disconnects p
 		{
 			try {
-				p.ping().join();
+				Thread t = p.ping();
+				if (t!=null) t.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

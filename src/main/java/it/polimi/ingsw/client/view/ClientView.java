@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public abstract class ClientView {
     /**
      * Shows the lobby
      */
-    public abstract void showLobby();
+    public abstract void showLobby(String lobby);
 
     /**
      * Shows the launcher options
