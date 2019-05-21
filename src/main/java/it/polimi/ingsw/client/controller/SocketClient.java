@@ -225,7 +225,7 @@ public class SocketClient extends ServerConnection {
 					default:
 				}
 				break;
-			case "allert":
+			case "alert":
 				player.allert(message.get("msg").toString());
 				break;
 			default:

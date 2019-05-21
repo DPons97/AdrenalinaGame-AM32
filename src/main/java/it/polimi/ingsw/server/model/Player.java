@@ -121,11 +121,6 @@ public class Player {
 	private List<Resource> ammos;
 
 	/**
-	 *  When true indicates that player is ready. When set to false by controller means it's waiting for client to get ready.
-	 */
-	private boolean isReady;
-
-	/**
 	 * TESTING PURPOSE: Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
@@ -263,18 +258,7 @@ public class Player {
 	 * Set isReady to value in param
 	 * @param b value to set
 	 */
-	public void setReady(boolean b) {
-		this.isReady = b;
-	}
-
-	/**
-	 *
-	 * @return isReady
-	 */
-	public boolean getReady(){
-		return isReady;
-	}
-
+	public void setReady(boolean b) { this.readyToStart = b; }
 
 	/**
 	 *

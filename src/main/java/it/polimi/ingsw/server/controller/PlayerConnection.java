@@ -150,6 +150,16 @@ public abstract class PlayerConnection {
 	}
 
 	/**
+	 * Send player message to start loading
+	 */
+	public abstract void beginLoading();
+
+	/**
+	 * Send player message to start match
+	 */
+	public abstract void beginMatch();
+
+	/**
 	 * Go back to lobby
 	 */
 	public void backToLobby() throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
@@ -163,5 +173,5 @@ public abstract class PlayerConnection {
 
 	public abstract void setPinged(boolean ping);
 
-	public abstract void allert(String s);
+	public abstract void alert(String s);
 }

@@ -223,6 +223,16 @@ public class PlayerRemote extends PlayerConnection {
 	}
 
 	@Override
+	public void beginLoading() {
+
+	}
+
+	@Override
+	public void beginMatch() {
+
+	}
+
+	@Override
 	public boolean getPinged() {
 		return pinged;
 	}
@@ -233,7 +243,7 @@ public class PlayerRemote extends PlayerConnection {
 	}
 
 	@Override
-	public void allert(String s) {
+	public void alert(String s) {
 		try {
 			remotePlayer.allert(s);
 		} catch (RemoteException e) {

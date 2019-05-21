@@ -124,7 +124,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 					);
                 else if (lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
 						JSONObject msg = new JSONObject();
-						msg.put("function", "allert");
+						msg.put("function", "alert");
 						msg.put("msg", "Cannot connect: username already exists");
 						PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
 						out.println(msg.toString());
@@ -203,7 +203,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			try {
 				lobby.hostMatch(lobby.getPlayerByName(name), maxPlayers, maxDeaths, turnDuration, mapID);
 			} catch (TooManyMatchesException e) {
-				lobby.getPlayerByName(name).allert("Cannot create match: server is full");
+				lobby.getPlayerByName(name).alert("Cannot create match: server is full");
 			} catch (PlayerNotExistsException e) {
 				e.printStackTrace();
 			} catch (MatchAlreadyStartedException e) {
@@ -224,9 +224,9 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		try {
 			lobby.joinMatch(lobby.getPlayerByName(name), id);
 		} catch (TooManyPlayersException e) {
-			lobby.getPlayerByName(name).allert("Cannot join match: match is full");
+			lobby.getPlayerByName(name).alert("Cannot join match: match is full");
 		} catch (MatchAlreadyStartedException e) {
-			lobby.getPlayerByName(name).allert("Cannot join match: match already started");
+			lobby.getPlayerByName(name).alert("Cannot join match: match already started");
 		} catch (PlayerAlreadyExistsException e) {
 			e.printStackTrace();
 		} catch (PlayerNotExistsException e) {

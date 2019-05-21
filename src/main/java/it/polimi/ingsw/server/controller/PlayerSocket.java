@@ -92,9 +92,9 @@ public class PlayerSocket extends PlayerConnection {
 				try {
 					getServerLobby().joinMatch(this, id);
 				} catch (TooManyPlayersException e) {
-					this.allert("Cannot join match: match is full");
+					this.alert("Cannot join match: match is full");
 				} catch (MatchAlreadyStartedException e) {
-					this.allert("Cannot join match: match already started");
+					this.alert("Cannot join match: match already started");
 				} catch (PlayerAlreadyExistsException e) {
 					e.printStackTrace();
 				} catch (PlayerNotExistsException e) {
@@ -109,7 +109,7 @@ public class PlayerSocket extends PlayerConnection {
 				try {
 					getServerLobby().hostMatch(this,maxPlayers,maxDeaths,turnDuration,mapID);
 				} catch (TooManyMatchesException e) {
-					this.allert("Cannot create match: server is full");
+					this.alert("Cannot create match: server is full");
 				} catch (PlayerNotExistsException e) {
 					e.printStackTrace();
 				} catch (MatchAlreadyStartedException e) {
@@ -397,6 +397,16 @@ public class PlayerSocket extends PlayerConnection {
 		return null;
 	}
 
+	@Override
+	public void beginLoading() {
+		
+	}
+
+	@Override
+	public void beginMatch() {
+
+	}
+
 	/**
 	 * Socket doesn't use ping to detect disconnections but methods are provided to prevent usless casts
 	 */
@@ -410,9 +420,9 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	@Override
-	public void allert(String s) {
+	public void alert(String s) {
 		JSONObject msg = new JSONObject();
-		msg.put("function", "allert");
+		msg.put("function", "alert");
 		msg.put("msg", s);
 		this.sendInstruction(msg);
 	}

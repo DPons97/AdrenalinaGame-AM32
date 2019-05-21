@@ -7,10 +7,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -804,6 +801,43 @@ public class AdrenalinaMatch {
 		return toReturn;
 	}
 
+	/**
+	 * Distribution of victory points based on a defined reward list
+	 * @param track to an analyze
+	 * @param rewards current reward
+	 */
+	public void rewardPlayers(List<Player> track, List<Integer> rewards) {
+		/* This list contains a reference to every player in match.
+			Every player's index is equal to the number of damage he dealt to the dead player
+			Multiple players can share the same index */
+		SortedMap<Integer, List<Player>> toReward = new TreeMap<>(Collections.reverseOrder());
+
+		for (Player matchPlayer : getPlayers()) {
+			toReward.computeIfAbsent(Collections.frequency(track, matchPlayer), k -> new ArrayList<>());
+
+			toReward.get(Collections.frequency(track, matchPlayer)).add(matchPlayer);
+		}
+
+		int reward = 0;
+		for (int i : toReward.keySet()) {
+			// No damage = no score
+			if (i == 0) continue;
+			List<Player> damagers = toReward.get(i);
+
+			if (damagers.size() == 1) {
+				damagers.get(0).addScore(rewards.get(reward));
+				reward++;
+			} else {
+					for (Player damager : track) {
+						if (damagers.contains(damager)) {
+							damager.addScore(rewards.get(reward));
+							damagers.remove(damager);
+							reward++;
+						}
+					}
+			}
+		}
+	}
 
 	/**
 	 * This was taken from stackoverflow
