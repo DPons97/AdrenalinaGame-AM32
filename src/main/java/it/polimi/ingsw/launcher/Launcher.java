@@ -29,7 +29,7 @@ public class Launcher{
     public void startLaunherCli(){
 
         Scanner in = new Scanner(System.in);
-        System.out.print("Launch as server[0] or client[1]?");
+        System.out.print("Launch as Server [0] or Client [1]?");
         if(in.nextInt()==0)
         {
             startServer();
@@ -40,7 +40,7 @@ public class Launcher{
             serverddress = in.next();
             System.out.print("Server port: ");
             port = in.nextInt();
-            System.out.print("Connection type [socket 0, rmi 1]");
+            System.out.print("Connection type [Socket 0, RMI 1]");
             ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
             System.out.print("Nickname: ");
             nickname = in.next();
@@ -107,10 +107,9 @@ public class Launcher{
     }
 
     public static void main(String[] args) {
-        // read params and start right launcher o
-        List<String> argsList = new ArrayList<>();
+        // read params and start right launcher
         Launcher l= new Launcher();
-        argsList.addAll(Arrays.asList(args));
+        List<String> argsList = new ArrayList<>(Arrays.asList(args));
         String cfgFile = l.parseCfgFile(argsList);
         if(cfgFile!= null) {
             l.parseFile(cfgFile);
@@ -120,7 +119,6 @@ public class Launcher{
             int view = l.parseView(argsList);
             if(view == 1 ) l.startLauncherGui();
             else l.startLaunherCli();
-            return;
         } else {
             if(l.parseMode(argsList).equals("s")){
                 l.startServer();

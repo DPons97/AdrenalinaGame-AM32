@@ -66,7 +66,7 @@ public class MatchController {
 	 * @return List representing leaderboard
 	 * @throws PlayerNotReadyException if there is at least one player that is not ready to start match
 	 */
-		public List<Player> startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException {
+	public List<Player> startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException {
 		for (Player player : match.getPlayers()) {
 			if (!player.isReadyToStart()) throw new PlayerNotReadyException();
 		}
@@ -104,6 +104,7 @@ public class MatchController {
 			}
 
 			match.nextTurn();
+			playerTurn.updatePlayers();
 		}
 
 		return finalScore();
@@ -226,12 +227,5 @@ public class MatchController {
 		}
 		match.setMatchState(MatchState.ENDED);
 		return leaderBoard;
-	}
-
-	/**
-	 * Sends a broadcast message to all players to update their model
-	 */
-	private void updatePlayers() {
-		match.getPlayers().forEach(p-> p.getConnection().updateMatch(match));
 	}
 }
