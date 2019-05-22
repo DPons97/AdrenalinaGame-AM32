@@ -100,7 +100,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	/**
 	 * listen socket connection
 	 */
-	protected void listenSocketConnection() {
+	public void listenSocketConnection() {
         Socket clientSocket;
         BufferedReader input;
         String name;
@@ -248,7 +248,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		lobby.setPlayerReady(lobby.getPlayerInGameByName(name));
 	}
 
-	protected void checkRMIConnections(){
+	public void checkRMIConnections(){
 		while(true){
 			lobby.getPlayers().forEach(this::checkPlayerPingStatus);
 			lobby.getPlayersInGame().forEach(this::checkPlayerPingStatus);
@@ -277,23 +277,27 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	}
 
 
-	/**
-     * Main method to test connections
-     */
-    public static void main(String[] args) {
+	public static void startServer(){
 		LoginHandler loginHandler;
-    	try {
-            loginHandler = new LoginHandler();
+		try {
+			loginHandler = new LoginHandler();
 
-        } catch (RemoteException e) {
+		} catch (RemoteException e) {
 
-            e.printStackTrace();
+			e.printStackTrace();
 			return;
-    	}
+		}
 		Thread t1 = new Thread(loginHandler::listenSocketConnection);
 		t1.start();
 		Thread t2 = new Thread(loginHandler::checkRMIConnections);
 		t2.start();
+	}
+
+	/**
+     * Main method to test connections
+     */
+    public static void main(String[] args) {
+		startServer();
     }
 
 

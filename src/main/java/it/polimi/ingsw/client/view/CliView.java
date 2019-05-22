@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.List;
+import java.util.Scanner;
 
 public class CliView extends ClientView {
 
@@ -23,6 +24,24 @@ public class CliView extends ClientView {
      */
     @Override
     public void showLauncher() {
+        // TODO: MOVE THIS TO LAUNCHER
+        Scanner in = new Scanner(System.in);
+        System.out.println("Launch as server[0] or client[1]?");
+        if(in.nextInt()==0)
+        {
+            // start server
+        } else {
+            String serverddress, nickname;
+            int port;
+            System.out.println("Server address: ");
+            serverddress = in.next();
+            System.out.println("Server port: ");
+            port = in.nextInt();
+            System.out.println("Nickname: ");
+            nickname = in.next();
+            // start client
+
+        }
 
     }
 
