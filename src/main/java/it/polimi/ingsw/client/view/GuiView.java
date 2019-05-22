@@ -18,14 +18,6 @@ public class GuiView extends ClientView{
     }
 
     /**
-     * Shows the launcher options
-     */
-    @Override
-    public void showLauncher() {
-
-    }
-
-    /**
      * Shows the lobby
      */
     @Override

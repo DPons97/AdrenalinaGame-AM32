@@ -10,11 +10,6 @@ import java.util.List;
 public abstract class ClientView {
 
     /**
-     * Shows the launcher options
-     */
-    public abstract void showLauncher();
-
-    /**
      * Shows the lobby
      */
     public abstract void showLobby(String lobby);

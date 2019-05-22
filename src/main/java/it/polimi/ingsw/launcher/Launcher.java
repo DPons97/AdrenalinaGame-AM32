@@ -8,6 +8,7 @@ import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.System.exit;
 
@@ -27,10 +28,28 @@ public class Launcher{
 
     public void startLaunherCli(){
 
+        Scanner in = new Scanner(System.in);
+        System.out.print("Launch as server[0] or client[1]?");
+        if(in.nextInt()==0)
+        {
+            startServer();
+        } else {
+            String serverddress, nickname;
+            int port;
+            System.out.print("Server address: ");
+            serverddress = in.next();
+            System.out.print("Server port: ");
+            port = in.nextInt();
+            System.out.print("Connection type [socket 0, rmi 1]");
+            ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
+            System.out.print("Nickname: ");
+            nickname = in.next();
+            startClient(serverddress, port, nickname, c, 0);
+        }
     }
 
     public void startLauncherGui(){
-
+        // TODO gui launcher
     }
 
     public void startServer(){
@@ -77,10 +96,10 @@ public class Launcher{
     }
 
     private boolean needLauncher(List<String> args){
-        return args.contains(MODE) && (parseMode(args).equals("s") || ( args.contains(SERVER) &&
+        return ! (args.contains(MODE) && (parseMode(args).equals("s") || ( args.contains(SERVER) &&
                  args.contains(NICK) &&  args.contains(PORT) && args.contains(CONNECTION) &&
                 (parseConnection(args).equals("r") ||parseConnection(args).equals("s") )&&
-                (args.contains(CLI) || args.contains(GUI))));
+                (args.contains(CLI) || args.contains(GUI)))));
     }
 
     private void parseFile(String file){
@@ -99,7 +118,7 @@ public class Launcher{
         }
         if(l.needLauncher(argsList)) {
             int view = l.parseView(argsList);
-            if(view != 0 ) l.startLauncherGui();
+            if(view == 1 ) l.startLauncherGui();
             else l.startLaunherCli();
             return;
         } else {

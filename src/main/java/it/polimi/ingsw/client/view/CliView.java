@@ -20,32 +20,6 @@ public class CliView extends ClientView {
     }
 
     /**
-     * Shows the launcher options
-     */
-    @Override
-    public void showLauncher() {
-        // TODO: MOVE THIS TO LAUNCHER
-        Scanner in = new Scanner(System.in);
-        System.out.println("Launch as server[0] or client[1]?");
-        if(in.nextInt()==0)
-        {
-            // start server
-        } else {
-            String serverddress, nickname;
-            int port;
-            System.out.println("Server address: ");
-            serverddress = in.next();
-            System.out.println("Server port: ");
-            port = in.nextInt();
-            System.out.println("Nickname: ");
-            nickname = in.next();
-            // start client
-
-        }
-
-    }
-
-    /**
      * Shows the lobby
      */
     @Override
