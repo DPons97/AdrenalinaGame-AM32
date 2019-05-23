@@ -8,9 +8,21 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.List;
-import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class CliView extends ClientView {
+    /**
+     * ANSI color encoding for easy use
+     */
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLACK = "\u001B[30m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN = "\u001B[36m";
+    private static final String ANSI_WHITE = "\u001B[37m";
 
     /**
      * Default constructor
@@ -129,5 +141,35 @@ public class CliView extends ClientView {
     @Override
     public TurnAction actionSelection() {
         return null;
+    }
+
+    /**
+     * Print map
+     */
+    public static void main(String[] args) {
+        String map;
+
+        System.out.print(ANSI_RED + "Helloooooooooo, " + ANSI_CYAN + "World!!!!\n");
+        System.out.print(ANSI_GREEN + "Helloooo" + ANSI_WHITE + "ooooooo, " + ANSI_RED + "Italy!!!!\n");
+
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        clearConsole();
+
+        System.out.print(ANSI_RED + "Helloooooooooo, " + ANSI_CYAN + "World!!!!\n");
+        System.out.print(ANSI_GREEN + "Helloooo" + ANSI_WHITE + "ooooooo, " + ANSI_RED + "Italy!!!!\n");
+
+    }
+
+    /**
+     * Clear console (UNIX system only)
+     */
+    private static void clearConsole() {
+        System.out.print("\033\143");
+        System.out.flush();
     }
 }

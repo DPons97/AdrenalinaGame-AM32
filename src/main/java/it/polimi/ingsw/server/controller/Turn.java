@@ -36,7 +36,10 @@ public class Turn {
     public void startNewTurn() {
         if (match.getMatchState() == MatchState.ENDED) return;
 
+        // Get current playing player and check that he's not disconnected
         Player currentPlayer = match.getTurnPlayer();
+        if (currentPlayer.getConnection() == null) return;
+
         if (match.getMatchState() != MatchState.FRENZY_TURN) {
             // Start round logic
             // Manage first turn
