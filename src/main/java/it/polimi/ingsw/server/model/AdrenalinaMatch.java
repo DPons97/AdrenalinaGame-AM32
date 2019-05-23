@@ -486,7 +486,12 @@ public class AdrenalinaMatch {
 			currentDeaths++;
 			deathTrack.add(killer);
 			if (isOverkill) deathTrack.add(killer);
-			if (currentDeaths>= maxDeaths) state = MatchState.FRENZY_TURN;
+			if (currentDeaths>= maxDeaths) {
+				state = MatchState.FRENZY_TURN;
+				// All players without damage change their rewards to frenzy, and reset their deaths to 0
+				for (Player p : players)
+					if (p.getDmgPoints().isEmpty()) p.enableFrenzy();
+			}
 		} else throw new PlayerNotExistsException("Error, player not in game");
 	}
 

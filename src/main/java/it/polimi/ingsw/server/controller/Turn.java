@@ -17,11 +17,17 @@ public class Turn {
     private AdrenalinaMatch match;
 
     /**
+     * Players that already played their frenzy turn
+     */
+    private List<Player> playedFrenzy = new ArrayList<>();
+
+    /**
      * Default constructor
      * @param match where this turn takes place
      */
     public Turn(AdrenalinaMatch match) {
         this.match = match;
+        List<Player> playedFrenzy = new ArrayList<>();
     }
 
     /**
@@ -33,8 +39,6 @@ public class Turn {
         Player currentPlayer = match.getTurnPlayer();
         if (match.getMatchState() != MatchState.FRENZY_TURN) {
             // Start round logic
-            currentPlayer = match.getTurnPlayer();
-
             // Manage first turn
             if (match.getTurn()/match.getPlayers().size() == 0) respawnPlayer(currentPlayer);
 
@@ -47,42 +51,25 @@ public class Turn {
                 e.printStackTrace();
             }
             repopulateMap();
-        } else if (match.getMatchState() == MatchState.FRENZY_TURN) {
-            // Frenzy initialization
-            Player lastFrenzyPlayer = currentPlayer;
-            currentPlayer = match.getTurnPlayer();
-
-            // All players without damage change their rewards to frenzy, and reset their deaths to 0
-            for (Player p : match.getPlayers()) {
-                if (p.getDmgPoints().isEmpty()) p.enableFrenzy();
-            }
-
-            List<Player> playedFrenzy = new ArrayList<>();
-            // Frenzy turns
-            while (currentPlayer != lastFrenzyPlayer) {
-                currentPlayer = match.getTurnPlayer();
-
-                frenzyTurn(currentPlayer, playedFrenzy);
-                try {
-                    resolveDeaths(currentPlayer);
-                } catch (PlayerNotExistsException e) {
-                    e.printStackTrace();
-                }
-                repopulateMap();
-            }
-
-            // Do last frenzy turn (last player has to play)
-            currentPlayer = match.getTurnPlayer();
+        } else {
             frenzyTurn(currentPlayer, playedFrenzy);
+
             try {
                 resolveDeaths(currentPlayer);
             } catch (PlayerNotExistsException e) {
                 e.printStackTrace();
             }
 
-            // End game
-            match.setMatchState(MatchState.ENDED);
+            repopulateMap();
+
+            if (playedFrenzy.size() == match.getPlayers().size()){
+                // All player finished their frenzy turn. End game
+                match.setMatchState(MatchState.ENDED);
+            }
         }
+
+        // Update player's model after turn
+        updatePlayers();
     }
 
     /**
@@ -137,6 +124,7 @@ public class Turn {
                     if (executeShooting(playing, pickedWeapon)) remainingActions--;
                     break;
             }
+            updatePlayers();
         }
 
         // RELOAD management
@@ -148,7 +136,7 @@ public class Turn {
      * @param playing player
      * @param playedFrenzy players that already played their frenzy turn
      */
-    public void frenzyTurn(Player playing, List<Player> playedFrenzy) {
+    public void frenzyTurn(Player playing,List<Player> playedFrenzy) {
         int remainingActions = 2;
         boolean playingBeforeFirst = true;
 
@@ -158,7 +146,6 @@ public class Turn {
             playingBeforeFirst = false;
             remainingActions = 1;
         }
-
 
         while (remainingActions > 0) {
             // Ask player what to do (RUN, PICK, SHOOT)
@@ -211,9 +198,9 @@ public class Turn {
                         if (executeShooting(playing, pickedWeapon)) remainingActions--;
                         break;
                     default:
-
                 }
             }
+            updatePlayers();
         }
         playedFrenzy.add(playing);
     }
@@ -499,5 +486,12 @@ public class Turn {
 
         // Replace taken weapons in map
         match.getBoardMap().initSpawnCells(match.getWeaponDeck());
+    }
+
+    /**
+     * Sends a broadcast message to all players to update their model
+     */
+    public void updatePlayers() {
+        match.getPlayers().forEach(p-> p.getConnection().updateMatch(match));
     }
 }

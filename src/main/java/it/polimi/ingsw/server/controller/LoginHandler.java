@@ -80,9 +80,9 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		}
 		catch (Exception e)
 		{
-			System.out.println("can't get inet address.");
+			System.out.println("Can't get inet address.");
 		}
-		System.out.println("this address=" + address + ",port=" + rmiPort);
+		System.out.println("Server address = " + address + ", Port = 0" + rmiPort);
 		try
 		{
 			registry = LocateRegistry.createRegistry(rmiPort);
@@ -90,7 +90,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		}
 		catch (RemoteException e)
 		{
-			System.out.println("remote exception" + e);
+			System.out.println("Remote exception" + e);
 		}
 	}
 
