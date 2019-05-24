@@ -102,12 +102,6 @@ public abstract class PlayerConnection {
 	public abstract void updateMatch(AdrenalinaMatch toGetUpdateFrom);
 
 	/**
-	 * Updates the client lobby view
-	 * @param toGetUpdateFrom  lobby to get update from
-	 */
-	public abstract void updateLobby(Lobby toGetUpdateFrom);
-
-	/**
 	 * Pings client to check connection
 	 * @return Thread removing player
 	 */

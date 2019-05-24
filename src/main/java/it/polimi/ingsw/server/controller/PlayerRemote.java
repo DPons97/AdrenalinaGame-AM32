@@ -196,20 +196,6 @@ public class PlayerRemote extends PlayerConnection {
 		}
 	}
 
-	/**
-	 * Updates the client lobby view
-	 * @param toGetUpdateFrom  lobby to get update from
-	 */
-	@Override
-	public void updateLobby(Lobby toGetUpdateFrom) {
-		try {
-			remotePlayer.updateLobby(toGetUpdateFrom.toJSON().toString());
-		} catch (RemoteException e) {
-			Thread t = new Thread(this::disconnectPlayer);
-			t.start();
-		}
-	}
-
 	@Override
 	public Thread ping() {
 		try {

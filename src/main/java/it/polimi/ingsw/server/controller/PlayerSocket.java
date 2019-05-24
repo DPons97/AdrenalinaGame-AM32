@@ -122,6 +122,9 @@ public class PlayerSocket extends PlayerConnection {
 				break;
 			case "ready":
 				getServerLobby().setPlayerReady(this);
+				break;
+			case "update_lobby":
+				this.updateLobby(getServerLobby().lobby);
 			default:
 		}
 	}
@@ -371,7 +374,6 @@ public class PlayerSocket extends PlayerConnection {
 	 * Updates the client lobby view
 	 * @param toGetUpdateFrom  lobby to get update from
 	 */
-	@Override
 	public void updateLobby(Lobby toGetUpdateFrom) {
 		JSONObject message = new JSONObject();
 		message.put("function", "update");

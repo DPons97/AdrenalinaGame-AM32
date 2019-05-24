@@ -17,33 +17,38 @@ public interface ServerFunctionalities extends Remote {
 	 * @param client remote reference to client connecting
 	 * @param name client name
 	 */
-	public void login(String name, ClientFunctionalities client) throws RemoteException;
+	void login(String name, ClientFunctionalities client) throws RemoteException;
 
 	/**
 	 * Allow user to disconnect from server
 	 * Removes remote client in Player remote
 	 */
-	public void logout()throws RemoteException;
+	void logout()throws RemoteException;
 
 	/**
 	 * Allow user that detects a network issue to reconnect to server
 	 */
-	public void ping(String name)throws RemoteException;
+	void ping(String name)throws RemoteException;
 
 	/**
 	 * Allow user to create a game while in the lobby
 	 */
-	public void createGame(String name, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws RemoteException;
+	void createGame(String name, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws RemoteException;
 
 	/**
 	 * Allow to join a game while in the loby
 	 */
-	public void joinGame(String name, int id) throws  RemoteException;
+	void joinGame(String name, int id) throws  RemoteException;
 
 	/**
 	 * Allow user to communicate that is ready
 	 */
-	public void ready(String name) throws RemoteException;
+	void ready(String name) throws RemoteException;
 
+	/**
+	 * Updates the lobby view
+	 * @return  JSON lobby representation to get update from
+	 */
+	String updateLobby() throws  RemoteException;
 
 }

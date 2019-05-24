@@ -31,7 +31,13 @@ public abstract class ServerConnection {
 
     public abstract void setReady();
 
-	public abstract void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID);
+	public abstract void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID);
 
 	public abstract void joinGame(String nickname, int id);
+
+    /**
+     * Updates the lobby view
+     * @return JSON lobby representation to get update from
+     */
+    public abstract String updateLobby();
 }

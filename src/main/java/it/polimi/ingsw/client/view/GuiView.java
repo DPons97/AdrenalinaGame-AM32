@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.view;
 
+import it.polimi.ingsw.client.controller.ClientPlayer;
+import it.polimi.ingsw.client.controller.ServerConnection;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
@@ -10,11 +12,8 @@ import java.util.List;
 
 public class GuiView extends ClientView{
 
-    /**
-     * Default constructor
-     */
-    public GuiView(){
-        super();
+    public GuiView(ClientPlayer player) {
+        super(player);
     }
 
     /**

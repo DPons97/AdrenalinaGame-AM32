@@ -111,7 +111,7 @@ public class LobbyController {
 	}
 
 	/**
-	 * Allow to join a game while in the loby
+	 * Allow to join a game while in the lobby
 	 */
 	public synchronized void hostMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
 		lobby.createMatch(host, maxPlayers,maxDeaths,turnDuration,mapID);
@@ -130,8 +130,6 @@ public class LobbyController {
 		System.out.print(player.getName());
 		System.out.println(" connected.");
 
-
-		updatePlayers();
 
 	}
 
@@ -153,17 +151,16 @@ public class LobbyController {
 			players.remove(player);
 			disconnectedPlayers.add(player.getName());
 			lobby.removePlayer(lobby.getPlayer(player));
-			updatePlayers();
 		}else {
 			getMatchByPlayerConnection(player).getPlayer(player.name).setConnection(null);
 		}
 	}
 
 	/**
-	 * Sends a broadcast message to all players to update their model
+	 * @return representation of lobby
 	 */
-	private synchronized void updatePlayers() {
-		players.forEach(p -> p.updateLobby(lobby));
+	public synchronized String updatePlayer() {
+		return lobby.toJSON().toString();
 	}
 
 	/**
@@ -189,7 +186,7 @@ public class LobbyController {
 			players.add(player);
 			disconnectedPlayers.remove(player.getName());
 			lobby.reconnect(player);
-			updatePlayers();
+
 		} else {
 			getMatchByPlayerConnection(player).getPlayer(player.name).setConnection(player);
 		}
