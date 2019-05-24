@@ -125,6 +125,7 @@ public class PlayerSocket extends PlayerConnection {
 				break;
 			case "update_lobby":
 				this.updateLobby(getServerLobby().lobby);
+				break;
 			default:
 		}
 	}

@@ -52,6 +52,7 @@ public class SocketClient extends ServerConnection {
 	 */
 	private String response;
 	private boolean validResponse;
+	private static final Object  lock= new Object();
 	/**
 	 * Constructor
 	 */
@@ -89,10 +90,10 @@ public class SocketClient extends ServerConnection {
 	 */
 	private String getResponse(){
 		String msg;
-		synchronized (this){
+		synchronized (lock){
 			while(!validResponse) {
 				try {
-					wait();
+					lock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 					return null;
@@ -100,7 +101,7 @@ public class SocketClient extends ServerConnection {
 			}
 			msg = response;
 			validResponse = false;
-			notifyAll();
+			lock.notifyAll();
 		}
 		return msg;
 	}
@@ -157,7 +158,7 @@ public class SocketClient extends ServerConnection {
 	public String updateLobby() {
 		JSONObject msg = new JSONObject();
 		msg.put("function", "PUSH");
-		msg.put("type", "lobby");
+		msg.put("type", "update_lobby");
 		sendAnswer(msg);
 		return getResponse();
 	}
@@ -297,8 +298,11 @@ public class SocketClient extends ServerConnection {
 					case "lobby":
 							//player.updateLobby(message.get("lobby").toString());
 							if(!validResponse) {
-								response = message.toString();
-								validResponse = true;
+							    synchronized (lock) {
+                                    response = message.get("lobby").toString();
+                                    validResponse = true;
+                                    lock.notifyAll();
+                                }
 							}
 						break;
 
