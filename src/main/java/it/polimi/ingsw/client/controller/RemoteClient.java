@@ -102,15 +102,14 @@ public class RemoteClient extends ServerConnection {
 
 	/**
 	 * Ask server to create a new game
-	 * @param nickname name of player creating the game
 	 * @param maxPlayers max players to set for this match
 	 * @param maxDeaths max deaths to set forthis game
 	 * @param mapID id of the map to use for this game
 	 */
 	@Override
-	public void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
 		try {
-			server.createGame(nickname, maxPlayers,maxDeaths,turnDuration,mapID);
+			server.createGame(player.getNickname(), maxPlayers,maxDeaths,turnDuration,mapID);
 		} catch (RemoteException e) {
 			// the disconnection is handled elsewhere
 			return;
@@ -129,6 +128,16 @@ public class RemoteClient extends ServerConnection {
 		} catch (RemoteException e) {
 			// the disconnection is handled elsewhere
 			return;
+		}
+	}
+
+	@Override
+	public String updateLobby() {
+		try {
+			return server.updateLobby();
+		} catch (RemoteException e) {
+			// the disconnection is handled elsewhere
+			return null;
 		}
 	}
 

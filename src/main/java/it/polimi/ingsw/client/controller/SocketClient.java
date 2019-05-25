@@ -48,11 +48,18 @@ public class SocketClient extends ServerConnection {
 	private BufferedReader input;
 
 	/**
+	 * String with last response received from client
+	 */
+	private String response;
+	private boolean validResponse;
+	private static final Object  lock= new Object();
+	/**
 	 * Constructor
 	 */
 	public SocketClient(ClientPlayer player) {
 
 		super(player);
+		validResponse = false;
 	}
 
 	/**
@@ -79,6 +86,27 @@ public class SocketClient extends ServerConnection {
 	}
 
 	/**
+	 *	Gets last message sent from client or waits for it until it comes.
+	 */
+	private String getResponse(){
+		String msg;
+		synchronized (lock){
+			while(!validResponse) {
+				try {
+					lock.wait();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+					return null;
+				}
+			}
+			msg = response;
+			validResponse = false;
+			lock.notifyAll();
+		}
+		return msg;
+	}
+
+	/**
 	 * Disconnect client from server
 	 */
 	@Override
@@ -96,13 +124,12 @@ public class SocketClient extends ServerConnection {
 
 	/**
 	 * Ask server to create a new game
-	 * @param nickname name of player creating the game
 	 * @param maxPlayers max players to set for this match
 	 * @param maxDeaths max deaths to set forthis game
 	 * @param mapID id of the map to use for this game
 	 */
 	@Override
-	public void createGame(String nickname, int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
+	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID) {
 		JSONObject msg = new JSONObject();
 		msg.put("function", "PUSH");
 		msg.put("type", "create_match");
@@ -125,6 +152,15 @@ public class SocketClient extends ServerConnection {
 		msg.put("type", "join_match");
 		msg.put("match_id", id);
 		sendAnswer(msg);
+	}
+
+	@Override
+	public String updateLobby() {
+		JSONObject msg = new JSONObject();
+		msg.put("function", "PUSH");
+		msg.put("type", "update_lobby");
+		sendAnswer(msg);
+		return getResponse();
 	}
 
 	/**
@@ -260,7 +296,14 @@ public class SocketClient extends ServerConnection {
 
 						break;
 					case "lobby":
-							player.updateLobby(message.get("lobby").toString());
+							//player.updateLobby(message.get("lobby").toString());
+							if(!validResponse) {
+							    synchronized (lock) {
+                                    response = message.get("lobby").toString();
+                                    validResponse = true;
+                                    lock.notifyAll();
+                                }
+							}
 						break;
 
 					default:

@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.view;
 
+import it.polimi.ingsw.client.controller.ClientPlayer;
+import it.polimi.ingsw.client.controller.ServerConnection;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
@@ -9,6 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 public class CliView extends ClientView {
@@ -25,11 +28,8 @@ public class CliView extends ClientView {
     private static final String ANSI_CYAN = "\u001B[36m";
     private static final String ANSI_WHITE = "\u001B[37m";
 
-    /**
-     * Default constructor
-     */
-    public CliView(){
-        super();
+    public CliView(ClientPlayer player) {
+        super(player);
     }
 
     /**
@@ -42,7 +42,18 @@ public class CliView extends ClientView {
         System.out.println("Current players online: "+nPlayers);
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
         System.out.println("Matches:");
-        if(matches.size() == 0) System.out.println("Wow, such empty...");
+        if(matches.size() == 0){
+            System.out.println("Wow, such empty...");
+            System.out.println("To create a new match press enter 1, to reload enter 0: ");
+            Scanner in = new Scanner (System.in);
+            int response = in.nextInt();
+            if(response == 1)
+                createMatch();
+            else if(response == 0){
+                player.updateLobby();
+                return;
+            }
+        }
         for(int i = 0; i < matches.size(); i++){
             JSONObject match = (JSONObject) matches.get(i);
             int maxPlayers = Integer.parseInt(match.get("n_players").toString());
@@ -55,6 +66,25 @@ public class CliView extends ClientView {
             for(Object o: players) System.out.print(o.toString()+"     ");
 
         }
+
+    }
+
+    private void createMatch() {
+        int maxPlayers;
+        int maxDeaths;
+        int turnDuration;
+        int mapID;
+        Scanner in = new Scanner(System.in);
+        System.out.print("Enter number of players: ");
+        maxPlayers = in.nextInt();
+        System.out.print("Enter number of deaths: ");
+        maxDeaths = in.nextInt();
+        System.out.print("Enter turn duration [seconds]: ");
+        turnDuration = in.nextInt();
+        System.out.print("Enter map id: ");
+        mapID = in.nextInt();
+
+        player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
     }
 
     /**

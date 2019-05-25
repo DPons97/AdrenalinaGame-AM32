@@ -55,11 +55,11 @@ public class ClientPlayer implements ClientFunctionalities{
 		if(connectionType == ConnectionType.RMI) this.server = new RemoteClient(this);
 		else this.server = new SocketClient(this);
 
-		if(gui) view = new GuiView();
-		else view = new CliView();
+		if(gui) view = new GuiView(this);
+		else view = new CliView(this);
 
 		server.connect(ip, port);
-
+		updateLobby();
 	}
 
 	/**
@@ -162,13 +162,9 @@ public class ClientPlayer implements ClientFunctionalities{
 
 	/**
 	 * Updates the lobby view
-	 * @param toGetUpdateFrom JSON lobby representation to get update from
 	 */
-	@Override
-	public void updateLobby(String toGetUpdateFrom) {
-		view.showLobby(toGetUpdateFrom);
-
-		//System.out.println("Players connected: " + o.get("n_players").toString());
+	public void updateLobby() {
+		view.showLobby(server.updateLobby());
 	}
 
 	/**
@@ -190,7 +186,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	}
 
 	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID){
-		server.createGame(this.nickname, maxPlayers, maxDeaths, turnDuration, mapID);
+		server.createGame(maxPlayers, maxDeaths, turnDuration, mapID);
 	}
 
 	public void joinGame(int id){

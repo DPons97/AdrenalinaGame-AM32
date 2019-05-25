@@ -184,4 +184,7 @@ public class Lobby {
         toRet.put("matches", matches);
         return toRet;
     }
+
+    public void getUpdate() {
+    }
 }

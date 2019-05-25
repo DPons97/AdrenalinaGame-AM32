@@ -75,12 +75,6 @@ public interface ClientFunctionalities extends Remote {
 	TurnAction actionSelection() throws RemoteException;
 
 	/**
-	 * Updates the lobby view
-	 * @param toGetUpdateFrom JSON lobby representation to get update from
-	 */
-	void updateLobby(String toGetUpdateFrom) throws  RemoteException;
-
-	/**
 	 * Updates the match view
 	 * @param toGetUpdateFrom JSON match representation to get update from
 	 */
