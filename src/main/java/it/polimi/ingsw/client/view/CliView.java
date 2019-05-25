@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.view;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.AdrenalinaMatch;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -147,22 +148,11 @@ public class CliView extends ClientView {
      * Print map
      */
     public static void main(String[] args) {
-        String map;
-
-        System.out.print(ANSI_RED + "Helloooooooooo, " + ANSI_CYAN + "World!!!!\n");
-        System.out.print(ANSI_GREEN + "Helloooo" + ANSI_WHITE + "ooooooo, " + ANSI_RED + "Italy!!!!\n");
-
-        try {
-            TimeUnit.SECONDS.sleep(1);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 3);
+        for (char[] col : match.getBoardMap().getMapToDraw()) {
+            for (char c : col) System.out.print(c);
+            System.out.print("\n");
         }
-
-        clearConsole();
-
-        System.out.print(ANSI_RED + "Helloooooooooo, " + ANSI_CYAN + "World!!!!\n");
-        System.out.print(ANSI_GREEN + "Helloooo" + ANSI_WHITE + "ooooooo, " + ANSI_RED + "Italy!!!!\n");
-
     }
 
     /**

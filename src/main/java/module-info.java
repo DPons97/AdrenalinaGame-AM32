@@ -12,4 +12,5 @@ module AdrenalinaGame {
     exports it.polimi.ingsw.client.model;
     exports it.polimi.ingsw.client.view;
     exports it.polimi.ingsw.launcher;
+
 }

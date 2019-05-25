@@ -69,7 +69,7 @@ public class Launcher{
         return args.contains(MODE) ? args.get(args.indexOf(MODE)+1) : null;
     }
 
-    private String parseServerAddress(List<String> args){
+    private String parseServerAddress(List<String> args) {
         return args.contains(SERVER)? args.get(args.indexOf(SERVER)+1) : null;
     }
 
