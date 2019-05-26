@@ -50,29 +50,20 @@ public class RemoteClient extends ServerConnection {
 	 * @param port server port
 	 */
 	@Override
-	public void connect(String ip, int port) {
+	public void connect(String ip, int port) throws RemoteException, NotBoundException {
 		this.ip = ip;
 		this.port = port;
-		try {
-			System.out.println("Trying to connect via RMI");
-			registry = LocateRegistry.getRegistry(ip, port);
-			System.out.println("Connection OK. Looking up registry...");
-			server = (ServerFunctionalities) (registry.lookup("rmiServer"));
-			System.out.println("Registry OK. Logging in...");
-			server.login(player.getNickname(), this.player);
-			System.out.println("Logged");
-			Thread t = new Thread(this::checkConnection);
-			t.start();
-		} catch (RemoteException e)
-		{
-			e.printStackTrace();
-			exit(1);
-		}
-		catch (NotBoundException e)
-		{
-			System.err.println(e);
-			exit(1);
-		}
+
+		System.out.println("Trying to connect via RMI");
+		registry = LocateRegistry.getRegistry(ip, port);
+		System.out.println("Connection OK. Looking up registry...");
+		server = (ServerFunctionalities) (registry.lookup("rmiServer"));
+		System.out.println("Registry OK. Logging in...");
+		server.login(player.getNickname(), this.player);
+		System.out.println("Logged");
+		Thread t = new Thread(this::checkConnection);
+		t.start();
+
 	}
 
 	/**

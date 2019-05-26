@@ -10,6 +10,8 @@ import it.polimi.ingsw.server.controller.WeaponSelection;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
@@ -49,7 +51,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Constructor
 	 * Initializes nickname and server connection
 	 */
-	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws RemoteException {
+	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws IOException, NotBoundException {
 		this.nickname = nickname;
 
 		if(connectionType == ConnectionType.RMI) this.server = new RemoteClient(this);
@@ -219,7 +221,7 @@ public class ClientPlayer implements ClientFunctionalities{
 
 		try {
 			ClientPlayer clientPlayer = new ClientPlayer(nickname, connectionType, ip, port, false);
-		} catch (RemoteException e) {
+		} catch (IOException | NotBoundException e) {
 			e.printStackTrace();
 			exit(1);
 		}

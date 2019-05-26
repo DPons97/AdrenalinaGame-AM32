@@ -33,20 +33,17 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 */
 	private int maxConnections;
 
-    /**
-     * ip address
-     */
-    private String ip;
+
 
     /**
      * socket port
      */
-    private final int socketPort=52298;
+    private int socketPort=52298;
 
     /**
      * rmi port
      */
-    private final int rmiPort=52297;
+    private int rmiPort=52297;
 
 	/**
 	 * controller of the lobby
@@ -62,39 +59,37 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * Default constructor
 	 * Registers self in rmi register and opens socket
 	 */
-	public LoginHandler() throws RemoteException {
+	public LoginHandler() throws IOException {
 		super();
 
 		this.lobby = new LobbyController();
 
-        try {
-            serverSocket= new ServerSocket(socketPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-            exit(1);
-        }
+		serverSocket= new ServerSocket(socketPort);
 
-		try
-		{
-			address = (InetAddress.getLocalHost()).toString();
-		}
-		catch (Exception e)
-		{
-			System.out.println("Can't get inet address.");
-		}
+		address = (InetAddress.getLocalHost()).toString();
+
 		System.out.println("Server address = " + address + ", Port = " + rmiPort);
-		try
-		{
-			registry = LocateRegistry.createRegistry(rmiPort);
-			registry.rebind("rmiServer", this);
-		}
-		catch (RemoteException e)
-		{
-			System.out.println("Remote exception" + e);
-		}
+
+		registry = LocateRegistry.createRegistry(rmiPort);
+		registry.rebind("rmiServer", this);
 	}
 
+	public LoginHandler(int rmiPort, int socketPort) throws IOException {
+		super();
+		this.rmiPort = rmiPort;
+		this.socketPort = socketPort;
+		this.lobby = new LobbyController();
 
+		serverSocket= new ServerSocket(socketPort);
+
+		address = (InetAddress.getLocalHost()).toString();
+
+		System.out.println("Server address = " + address + ", Port = " + rmiPort);
+
+		registry = LocateRegistry.createRegistry(rmiPort);
+		registry.rebind("rmiServer", this);
+
+	}
 
 
 	/**
@@ -282,20 +277,20 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	}
 
 
-	public static void startServer(){
+	public static LoginHandler startServer(){
 		LoginHandler loginHandler;
 		try {
 			loginHandler = new LoginHandler();
 
-		} catch (RemoteException e) {
-
+		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			return null;
 		}
 		Thread t1 = new Thread(loginHandler::listenSocketConnection);
 		t1.start();
 		Thread t2 = new Thread(loginHandler::checkRMIConnections);
 		t2.start();
+		return loginHandler;
 	}
 
 	/**
@@ -305,5 +300,15 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		startServer();
     }
 
+	public String getAddress() {
+		return address;
+	}
 
+	public int getSocketPort() {
+		return socketPort;
+	}
+
+	public int getRmiPort() {
+		return rmiPort;
+	}
 }

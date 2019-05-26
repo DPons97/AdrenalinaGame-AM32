@@ -1,5 +1,8 @@
 package it.polimi.ingsw.client.controller;
 
+import java.io.IOException;
+import java.rmi.NotBoundException;
+
 /**
  * 
  */
@@ -22,7 +25,7 @@ public abstract class ServerConnection {
 	 * @param ip server ip
 	 * @param port server port
 	 */
-	public abstract void connect(String ip, int port);
+	public abstract void connect(String ip, int port) throws IOException, NotBoundException;
 
 	/**
 	 * Disconnect client from server

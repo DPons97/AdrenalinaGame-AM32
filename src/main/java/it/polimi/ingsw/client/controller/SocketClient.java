@@ -68,21 +68,15 @@ public class SocketClient extends ServerConnection {
 	 * @param port server port
 	 */
 	@Override
-	public void connect(String ip, int port) {
-		try {
-			socket= new Socket(ip, port);
-			this.ip = ip;
-			this. port = port;
-			this.output = new PrintWriter(socket.getOutputStream(), true);
-			this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			output.println(player.getNickname());
-			Thread t = new Thread(this::listen);
-			t.start();
-		} catch (IOException e) {
-			e.printStackTrace();
-			exit(1);
-		}
-
+	public void connect(String ip, int port) throws IOException {
+		socket= new Socket(ip, port);
+		this.ip = ip;
+		this. port = port;
+		this.output = new PrintWriter(socket.getOutputStream(), true);
+		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		output.println(player.getNickname());
+		Thread t = new Thread(this::listen);
+		t.start();
 	}
 
 	/**

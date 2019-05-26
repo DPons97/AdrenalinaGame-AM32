@@ -20,6 +20,8 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -220,7 +222,41 @@ public class Launcher{
                         actiontarget.setFill(Color.ALICEBLUE);
                         actiontarget.setText("Connecting to server...");
                         ConnectionType c = rbRmi.isSelected() ? ConnectionType.RMI : ConnectionType.SOCKET;
-                        startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
+                        ClientPlayer p = startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
+                        grid.getChildren().clear();
+                        if(p==null){
+                            Text scenetitle = new Text("Error connecting to server :(");
+                            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+                            grid.add(scenetitle, 0, 0, 2, 1);
+                            Label msg = new Label("Please restart the program.");
+                            grid.add(msg, 0,2);
+                        }
+                    }
+                }
+            });
+
+            btnServer.setOnAction(new EventHandler<ActionEvent>() {
+
+                @Override
+                public void handle(ActionEvent e) {
+                    LoginHandler server = startServer();
+                    grid.getChildren().clear();
+                    if(server != null) {
+                        Text scenetitle = new Text("Adrenalina server is running...");
+                        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+                        grid.add(scenetitle, 0, 0, 2, 1);
+                        Label ip = new Label("IP address: "+server.getAddress());
+                        Label rmi = new Label("RMI port: "+server.getRmiPort());
+                        Label socket = new Label("Socket port: "+server.getSocketPort());
+                        grid.add(ip, 0,2);
+                        grid.add(rmi, 0,3);
+                        grid.add(socket, 0,4);
+                    } else{
+                        Text scenetitle = new Text("Error starting server :(");
+                        scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+                        grid.add(scenetitle, 0, 0, 2, 1);
+                        Label msg = new Label("Please restart the program.");
+                        grid.add(msg, 0,2);
                     }
                 }
             });
@@ -228,17 +264,18 @@ public class Launcher{
         });
     }
 
-    public void startServer(){
-        LoginHandler.startServer();
+    public LoginHandler startServer(){
+        return LoginHandler.startServer();
     }
 
-    public void startClient(String server, int port, String nick, ConnectionType c, int view){
+    public ClientPlayer startClient(String server, int port, String nick, ConnectionType c, int view){
         try {
-            ClientPlayer clientPlayer = new ClientPlayer(nick, c, server, port, view==1);
-        } catch (RemoteException e) {
+            return new ClientPlayer(nick, c, server, port, view==1);
+        } catch (NotBoundException | IOException e) {
             e.printStackTrace();
-            exit(1);
+           return null;
         }
+
     }
 
     private String parseMode(List<String> args){
