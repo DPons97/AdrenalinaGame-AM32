@@ -5,8 +5,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -138,12 +140,11 @@ public class AdrenalinaMatch {
 		JSONParser parser = new JSONParser();
 		int xSize;
 		int ySize;
-		String fileName = "json/map"+mapID+".json";
+		String fileName = "/json/map" +mapID+".json";
 		String[] cardinals = {"north", "south", "west", "east"};
 		try {
 			int i = 0;
-			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource(fileName)
-					.getFile().replace("%20", " ")));
+			Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(fileName), StandardCharsets.UTF_8)));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			//get map size
@@ -206,8 +207,7 @@ public class AdrenalinaMatch {
 		ammoDeck = new Deck<>();
 		JSONParser parser = new JSONParser();
 		try {
-			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/ammos.json")
-					.getFile().replace("%20", " ")));
+			Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/json/ammos.json"), StandardCharsets.UTF_8)));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			JSONArray ammoCards = (JSONArray) jsonObject.get("ammoCards");
@@ -245,8 +245,8 @@ public class AdrenalinaMatch {
 		String description;
 		Resource bRes;
 		try {
-			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/powerups.json")
-					.getFile().replace("%20", " ")));
+			Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/json/powerups.json"), StandardCharsets.UTF_8)));
+
 			JSONObject jsonObject = (JSONObject) obj;
 			JSONArray pupCards = (JSONArray) jsonObject.get("Powerups");
 
@@ -271,8 +271,7 @@ public class AdrenalinaMatch {
 		JSONParser parser = new JSONParser();
 		String name;
 		try {
-			Object obj = parser.parse(new FileReader(getClass().getClassLoader().getResource("json/weapons.json")
-					.getFile().replace("%20", " ")));
+			Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/json/weapons.json"), StandardCharsets.UTF_8)));
 			JSONObject jsonObject = (JSONObject) obj;
 
 			JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");

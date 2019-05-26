@@ -19,7 +19,7 @@ public class Turn {
     /**
      * Players that already played their frenzy turn
      */
-    private List<Player> playedFrenzy = new ArrayList<>();
+    private List<Player> playedFrenzy;
 
     /**
      * Default constructor
@@ -27,7 +27,7 @@ public class Turn {
      */
     public Turn(AdrenalinaMatch match) {
         this.match = match;
-        List<Player> playedFrenzy = new ArrayList<>();
+        playedFrenzy = new ArrayList<>();
     }
 
     /**
@@ -55,7 +55,7 @@ public class Turn {
             }
             repopulateMap();
         } else {
-            frenzyTurn(currentPlayer, playedFrenzy);
+            frenzyTurn(currentPlayer);
 
             try {
                 resolveDeaths(currentPlayer);
@@ -137,9 +137,8 @@ public class Turn {
     /**
      *	Game turn logic during frenzy (Run/Pick/Shoot + reloading)
      * @param playing player
-     * @param playedFrenzy players that already played their frenzy turn
      */
-    public void frenzyTurn(Player playing,List<Player> playedFrenzy) {
+    public void frenzyTurn(Player playing) {
         int remainingActions = 2;
         boolean playingBeforeFirst = true;
 
