@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.UnaryOperator;
 
 import static java.lang.System.exit;
 
@@ -91,45 +92,45 @@ public class Launcher{
             scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
             grid.add(scenetitle, 0, 0, 2, 1);
 
-            Label label = new Label("Launch as:\t\t");
+            Label labelClientServer = new Label("Launch as:\t\t");
 
             // Group
-            ToggleGroup group = new ToggleGroup();
+            ToggleGroup groupClientServer = new ToggleGroup();
 
             // Radio 1: Client
-            RadioButton button1 = new RadioButton("Client");
-            button1.setToggleGroup(group);
-            button1.setSelected(true);
+            RadioButton rbClient = new RadioButton("Client");
+            rbClient.setToggleGroup(groupClientServer);
+            rbClient.setSelected(true);
 
             // Radio 3: Server.
-            RadioButton button2 = new RadioButton("Server");
-            button2.setToggleGroup(group);
+            RadioButton rbServer = new RadioButton("Server");
+            rbServer.setToggleGroup(groupClientServer);
 
-            HBox root = new HBox();
-            root.setSpacing(5);
-            root.getChildren().addAll(button1, button2);
-            grid.add(label, 0, 2);
-            grid.add(root, 1, 2);
+            HBox csBox = new HBox();
+            csBox.setSpacing(5);
+            csBox.getChildren().addAll(rbClient, rbServer);
+            grid.add(labelClientServer, 0, 2);
+            grid.add(csBox, 1, 2);
 
-            Label label1 = new Label("Connection mode:\t");
+            Label labelSktRmi = new Label("Connection mode:\t");
 
             // Group
-            ToggleGroup group1 = new ToggleGroup();
+            ToggleGroup groupSktRmi = new ToggleGroup();
 
             // Radio 1: Male
-            RadioButton button3 = new RadioButton("SOCKET");
-            button3.setToggleGroup(group1);
-            button3.setSelected(true);
+            RadioButton rbSocket = new RadioButton("SOCKET");
+            rbSocket.setToggleGroup(groupSktRmi);
+            rbSocket.setSelected(true);
 
             // Radio 3: Female.
-            RadioButton button4 = new RadioButton("RMI");
-            button4.setToggleGroup(group1);
+            RadioButton rbRmi = new RadioButton("RMI");
+            rbRmi.setToggleGroup(groupSktRmi);
 
-            HBox root1 = new HBox();
-            root1.setSpacing(5);
-            root1.getChildren().addAll( button3, button4);
-            grid.add(label1, 0, 3);
-            grid.add(root1, 1, 3);
+            HBox srBox = new HBox();
+            srBox.setSpacing(5);
+            srBox.getChildren().addAll( rbSocket, rbRmi);
+            grid.add(labelSktRmi, 0, 3);
+            grid.add(srBox, 1, 3);
 
 
             Label ip = new Label("Ip:");
@@ -143,6 +144,19 @@ public class Launcher{
 
             TextField portBox = new TextField();
             grid.add(portBox, 1, 6);
+
+            //port allows only integers
+            UnaryOperator<TextFormatter.Change> filter = change -> {
+                String text = change.getText();
+
+                if (text.matches("[0-9]*")) {
+                    return change;
+                }
+
+                return null;
+            };
+            TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+            portBox.setTextFormatter(textFormatter);
 
             Button btnServer = new Button("START SERVER");
             HBox hbBtnServer = new HBox(10);
@@ -165,30 +179,30 @@ public class Launcher{
             grid.add(userTextField, 1, 4);
             userTextField.setEditable(true);
 
-            button2.setOnAction(actionEvent -> {
-                userName.setVisible(!button2.isSelected());
-                userTextField.setVisible(!button2.isSelected());
-                ip.setVisible(!button2.isSelected());
-                ipBox.setVisible(!button2.isSelected());
-                port.setVisible(!button2.isSelected());
-                portBox.setVisible(!button2.isSelected());
-                btnClient.setVisible(!button2.isSelected()); //CLIENT
-                btnServer.setVisible(button2.isSelected()); //SERVER
-                root1.setVisible(!button2.isSelected());
-                label1.setVisible(!button2.isSelected());
+            rbServer.setOnAction(actionEvent -> {
+                userName.setVisible(!rbServer.isSelected());
+                userTextField.setVisible(!rbServer.isSelected());
+                ip.setVisible(!rbServer.isSelected());
+                ipBox.setVisible(!rbServer.isSelected());
+                port.setVisible(!rbServer.isSelected());
+                portBox.setVisible(!rbServer.isSelected());
+                btnClient.setVisible(!rbServer.isSelected()); //CLIENT
+                btnServer.setVisible(rbServer.isSelected()); //SERVER
+                srBox.setVisible(!rbServer.isSelected());
+                labelSktRmi.setVisible(!rbServer.isSelected());
             });
 
-            button1.setOnAction(actionEvent -> {
-                userTextField.setVisible(button1.isSelected());
-                userName.setVisible(button1.isSelected());
-                ip.setVisible(button1.isSelected());
-                port.setVisible(button1.isSelected());
-                ipBox.setVisible(button1.isSelected());
-                portBox.setVisible(button1.isSelected());
-                btnServer.setVisible(!button1.isSelected()); //SERVER
-                btnClient.setVisible(button1.isSelected()); //CLIENT
-                root1.setVisible(button1.isSelected());
-                label1.setVisible(button1.isSelected());
+            rbClient.setOnAction(actionEvent -> {
+                userTextField.setVisible(rbClient.isSelected());
+                userName.setVisible(rbClient.isSelected());
+                ip.setVisible(rbClient.isSelected());
+                port.setVisible(rbClient.isSelected());
+                ipBox.setVisible(rbClient.isSelected());
+                portBox.setVisible(rbClient.isSelected());
+                btnServer.setVisible(!rbClient.isSelected()); //SERVER
+                btnClient.setVisible(rbClient.isSelected()); //CLIENT
+                srBox.setVisible(rbClient.isSelected());
+                labelSktRmi.setVisible(rbClient.isSelected());
             });
 
             final Text actiontarget = new Text();
@@ -198,8 +212,16 @@ public class Launcher{
 
                 @Override
                 public void handle(ActionEvent e) {
-                    actiontarget.setFill(Color.FIREBRICK);
-                    actiontarget.setText("Sign in button pressed");
+                    if(userTextField.getText().equals("") || ipBox.getText().equals("") || portBox.getText().equals("")) {
+                        actiontarget.setFill(Color.FIREBRICK);
+                        actiontarget.setText("Please, fill in the boxes.");
+                    } else {
+                        System.out.println("connecting to server");
+                        actiontarget.setFill(Color.ALICEBLUE);
+                        actiontarget.setText("Connecting to server...");
+                        ConnectionType c = rbRmi.isSelected() ? ConnectionType.RMI : ConnectionType.SOCKET;
+                        startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
+                    }
                 }
             });
 
