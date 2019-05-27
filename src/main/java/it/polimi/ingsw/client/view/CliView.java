@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.controller.ConnectionType;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
@@ -16,21 +15,23 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class CliView extends ClientView {
-    private class IntersectionChar {
-        char character;
+    /**
+     * Data structure to hold cli assets
+     */
+    private class CharAsset {
+        String character;
         boolean north;
         boolean south;
         boolean east;
         boolean west;
 
-        public IntersectionChar(char character, boolean north, boolean south, boolean east, boolean west) {
+        CharAsset(String character, boolean north, boolean south, boolean east, boolean west) {
             this.character = character;
             this.north = north;
             this.south = south;
@@ -38,48 +39,47 @@ public class CliView extends ClientView {
             this.west = west;
         }
 
-        public boolean isRightChar(boolean north, boolean south, boolean east, boolean west) {
+        boolean isRightChar(boolean north, boolean south, boolean east, boolean west) {
             return east == this.east && north == this.north && south == this.south && west == this.west;
         }
 
-        public char getCharacter() {
+        String getCharacter() {
             return character;
         }
     }
 
-    List<IntersectionChar> intersectionChars;
+    private List<CharAsset> charAssets;
 
     /**
      * ASCII encoding of walls (Customizable from json)
      */
-    private static char WALL_O;
-    private static char WALL_V;
-    private static char WALL_CROSS_R;
-    private static char WALL_CROSS_L;
-    private static char WALL_CROSS_U;
-    private static char WALL_CROSS_D;
-    private static char FREE_CROSS;
-
+    private static String wallO = "═";
+    private static String wallV = "║";
+    private static String wallCrossR = "╠";
+    private static String wallCrossL = "╣";
+    private static String wallCrossU = "╩";
+    private static String wallCrossD = "╦";
 
     /**
      * ASCII encoding of free spaces (not customizable)
      */
-    private static char FREE_O   = '─';
-    private static char FREE_V = '│';
+    private static String freeO = "─";
+    private static String freeV = "│";
 
     /**
      * Number of characters used to build walls + 1 (one of two vertical walls)
      */
-    private static final int cellCharWidth = 22;
+    private static final int CELL_CHAR_WIDTH = 22;
 
     /**
      * Number of characters used to build walls + 1 (one of two horizontal walls)
      */
-    private static final int cellCharHeight = 10;
+    private static final int CELL_CHAR_HEIGHT = 10;
 
     /**
      * ANSI color encoding for easy use
      */
+    private static final String COLOR_BLOCK = "█";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_GREEN = "\u001B[32m";
@@ -87,6 +87,8 @@ public class CliView extends ClientView {
     private static final String ANSI_BLUE = "\u001B[36m";
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_WHITE = "\u001B[37m";
+
+    private static final String PLAYER = "X";
 
     public CliView(ClientPlayer player) {
         super(player);
@@ -243,17 +245,14 @@ public class CliView extends ClientView {
     public static void main(String[] args) {
         AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 1);
         CliView view = new CliView(null);
-        for (char[] col : view.getMapToDraw(match.getBoardMap())) {
-            for (char c : col) System.out.print(c);
-            System.out.print("\n");
-        }
+        view.drawMap(match.getBoardMap());
     }
 
     /**
      * Parse json with cli assets
      */
     private void parseCliAssets() {
-        this.intersectionChars = new ArrayList<>();
+        this.charAssets = new ArrayList<>();
         JSONParser parser = new JSONParser();
 
         try {
@@ -264,8 +263,8 @@ public class CliView extends ClientView {
             for (Object character : jsonArray) {
                 JSONObject currentChar = (JSONObject) character;
 
-                intersectionChars.add(new IntersectionChar(
-                        currentChar.get("char").toString().charAt(0),
+                charAssets.add(new CharAsset(
+                        currentChar.get("char").toString(),
                         Boolean.parseBoolean(currentChar.get("north").toString()),
                         Boolean.parseBoolean(currentChar.get("south").toString()),
                         Boolean.parseBoolean(currentChar.get("east").toString()),
@@ -278,40 +277,37 @@ public class CliView extends ClientView {
         }
 
         // Init walls
-        WALL_O = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallO = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 false, false, true, true)).collect(Collectors.toList()).get(0).getCharacter();
 
-        WALL_V = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallV = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, true, false, false)).collect(Collectors.toList()).get(0).getCharacter();
 
-        WALL_CROSS_D = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallCrossD = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 false, true, true, true)).collect(Collectors.toList()).get(0).getCharacter();
 
-        WALL_CROSS_U = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallCrossU = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, false, true, true)).collect(Collectors.toList()).get(0).getCharacter();
 
-        WALL_CROSS_R = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallCrossR = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, true, true, false)).collect(Collectors.toList()).get(0).getCharacter();
 
-        WALL_CROSS_L = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
+        wallCrossL = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, true, false, true)).collect(Collectors.toList()).get(0).getCharacter();
-
-        FREE_CROSS = intersectionChars.stream().filter(intersectionChar -> intersectionChar.isRightChar(
-                false, false, false, false)).collect(Collectors.toList()).get(0).getCharacter();
     }
 
     /**
-     * @return ready-to-print map
+     * Print a complete version of current map in current state
      */
-    public char[][] getMapToDraw(Map map) {
-        int printWidth = map.getYSize() * cellCharWidth + 1;
-        int printHeight = map.getXSize() * cellCharHeight + 1;
+    private void drawMap(Map map) {
+        int printWidth = map.getYSize() * CELL_CHAR_WIDTH + 1;
+        int printHeight = map.getXSize() * CELL_CHAR_HEIGHT + 1;
 
-        char[][] mapToReturn = new char[printHeight][printWidth];
+        String[][] mapToReturn = new String[printHeight][printWidth];
 
         // Init map
         for (int i = 0; i < mapToReturn.length; i++) {
-            for (int j = 0; j < mapToReturn[0].length; j++) mapToReturn[i][j] = ' ';
+            for (int j = 0; j < mapToReturn[0].length; j++) mapToReturn[i][j] = "\u0020";
         }
 
         for (int i = 0; i < map.getXSize(); i++) {
@@ -319,8 +315,13 @@ public class CliView extends ClientView {
                     map.getXSize(), map.getYSize());
         }
 
-
-        return mapToReturn;
+        // Actual drawing
+        for (String[] col : mapToReturn) {
+            for (int i = 0; i < printWidth; i++) {
+                System.out.print(col[i]);
+            }
+            System.out.print("\n");
+        }
     }
 
     /**
@@ -330,17 +331,14 @@ public class CliView extends ClientView {
      * @param x coordinate of toDraw
      * @param y coordinate of toDraw
      */
-    public void drawCell(char[][] charMap, Cell toDraw, int x, int y, int xSize, int ySize) {
+    private void drawCell(String[][] charMap, Cell toDraw, int x, int y, int xSize, int ySize) {
         if (toDraw == null) return;
 
-        int printWidth = ySize * cellCharWidth + 1;
-        int printHeight = xSize * cellCharHeight + 1;
-
         // Starting and
-        int startingX = x * cellCharHeight;
-        int endingX = startingX + cellCharHeight;
-        int startingY = y * cellCharWidth;
-        int endingY = startingY + cellCharWidth;
+        int startingX = x * CELL_CHAR_HEIGHT;
+        int endingX = startingX + CELL_CHAR_HEIGHT;
+        int startingY = y * CELL_CHAR_WIDTH;
+        int endingY = startingY + CELL_CHAR_WIDTH;
 
         // Sides
         for (Direction dir : Direction.values()) {
@@ -363,11 +361,20 @@ public class CliView extends ClientView {
         // Corners
         // Draw every corner of cell
         drawCorner(charMap, startingX, startingY, xSize, ySize);   // North-West
-        drawCorner(charMap, startingX,startingY + cellCharWidth, xSize, ySize);   // North-East
-        drawCorner(charMap, startingX + cellCharHeight, startingY, xSize, ySize);   // South-West
-        drawCorner(charMap, startingX + cellCharHeight, startingY + cellCharWidth, xSize, ySize); // South-East
+        drawCorner(charMap, startingX,startingY + CELL_CHAR_WIDTH, xSize, ySize);   // North-East
+        drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY, xSize, ySize);   // South-West
+        drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY + CELL_CHAR_WIDTH, xSize, ySize); // South-East
 
         // Color
+        String color = getANSIColor(toDraw);
+        for (int i = startingX+1; i < endingX; i++) {
+            for (int j = startingY+1; j < endingY; j++) {
+                charMap[i][j] = color + COLOR_BLOCK + ANSI_RESET;
+            }
+        }
+
+        // charMap[startingX + 1][endingY - 2] =  getANSIColor(toDraw) + COLOR_BLOCK + ANSI_RESET; TODO Remove this if current color display is OK!
+
 
         // Players
     }
@@ -379,15 +386,15 @@ public class CliView extends ClientView {
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
-    private void drawHorizontalSide(char[][] charMap, Side sideType, int startingX, int startingY) {
-        int sideWidth = cellCharWidth - 1;
+    private void drawHorizontalSide(String[][] charMap, Side sideType, int startingX, int startingY) {
+        int sideWidth = CELL_CHAR_WIDTH - 1;
         switch (sideType) {
             case FREE:
                 // Draw "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
                 boolean toDraw = true;
                 for (int i = startingY; i < startingY + sideWidth; i++) {
                     if (toDraw) {
-                        charMap[startingX][i] = FREE_O;
+                        charMap[startingX][i] = freeO;
                         toDraw = false;
                     } else toDraw = true;
                 }
@@ -397,7 +404,7 @@ public class CliView extends ClientView {
             case WALL:
                 // Draw "══════════════════════"
                 for (int i = startingY; i < startingY + sideWidth; i++) {
-                    charMap[startingX][i] = WALL_O;
+                    charMap[startingX][i] = wallO;
                 }
                 break;
 
@@ -405,11 +412,11 @@ public class CliView extends ClientView {
                 int openingWidth = 10;
                 // Draw "═════╣          ╠═════"
                 for (int i = startingY; i < startingY + sideWidth; i++) {
-                    if (i == (startingY + sideWidth/2 - openingWidth/2)) charMap[startingX][i] = WALL_CROSS_L;
-                    else if (i == (startingY + sideWidth/2 + openingWidth/2)) charMap[startingX][i] = WALL_CROSS_R;
+                    if (i == (startingY + sideWidth/2 - openingWidth/2)) charMap[startingX][i] = wallCrossL;
+                    else if (i == (startingY + sideWidth/2 + openingWidth/2)) charMap[startingX][i] = wallCrossR;
                     else if (i < (startingY + sideWidth/2 - openingWidth/2) ||
                             i > (startingY + sideWidth/2 + openingWidth/2))
-                        charMap[startingX][i] = WALL_O;
+                        charMap[startingX][i] = wallO;
                 }
                 break;
         }
@@ -422,15 +429,15 @@ public class CliView extends ClientView {
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
-    private void drawVerticalSide(char[][] charMap, Side sideType, int startingX, int startingY) {
-        int sideHeight = cellCharHeight - 1;
+    private void drawVerticalSide(String[][] charMap, Side sideType, int startingX, int startingY) {
+        int sideHeight = CELL_CHAR_HEIGHT - 1;
         switch (sideType) {
             case FREE:
                 // Draw vertical "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
                 boolean toDraw = true;
                 for (int i = startingX; i < startingX + sideHeight; i++) {
                     if (toDraw) {
-                        charMap[i][startingY] = FREE_V;
+                        charMap[i][startingY] = freeV;
                         toDraw = false;
                     } else toDraw = true;
                 }
@@ -440,19 +447,19 @@ public class CliView extends ClientView {
             case WALL:
                 // Draw vertical "══════════════════════"
                 for (int i = startingX; i < startingX + sideHeight; i++) {
-                    charMap[i][startingY] = WALL_V;
+                    charMap[i][startingY] = wallV;
                 }
                 break;
 
             case DOOR:
                 int openingHeight = 4;
                 // Draw vertical "═════╣         ╠═════"
-                for (int i = startingX; i < startingX + sideHeight; i++) {
-                    if (i == (startingX + sideHeight/2 - openingHeight/2)) charMap[i][startingY] = WALL_CROSS_U;
-                    else if (i == (startingX + sideHeight/2 + openingHeight/2)) charMap[i][startingY] = WALL_CROSS_D;
-                    else if (i < (startingX + sideHeight/2 - openingHeight/2) ||
-                            i > (startingX + sideHeight/2 + openingHeight/2))
-                        charMap[i][startingY] = WALL_V;
+                for (int j = startingX; j < startingX + sideHeight; j++) {
+                    if (j == (startingX + sideHeight/2 - openingHeight/2)) charMap[j][startingY] = wallCrossU;
+                    else if (j == (startingX + sideHeight/2 + openingHeight/2)) charMap[j][startingY] = wallCrossD;
+                    else if (j < (startingX + sideHeight/2 - openingHeight/2) ||
+                            j > (startingX + sideHeight/2 + openingHeight/2))
+                        charMap[j][startingY] = wallV;
                 }
                 break;
         }
@@ -464,25 +471,50 @@ public class CliView extends ClientView {
      * @param x coordinate of corner
      * @param y coordinate
      */
-    private void drawCorner(char[][] charMap, int x, int y, int xSize, int ySize) {
-        int printWidth = ySize * cellCharWidth;
-        int printHeight = xSize * cellCharHeight;
+    private void drawCorner(String[][] charMap, int x, int y, int xSize, int ySize) {
+        int printWidth = ySize * CELL_CHAR_WIDTH;
+        int printHeight = xSize * CELL_CHAR_HEIGHT;
 
         if (x < 0 || y < 0 || x > printHeight || y > printWidth) return;
 
         // North/South/West/East are true if there is a wall to be connected in this direction
-        boolean north = (x > 0) ? (charMap[x-1][y] == WALL_V) : false;
-        boolean south = (x < printHeight) ? (charMap[x+1][y] == WALL_V) : false;
-        boolean east = (y < printWidth) ? (charMap[x][y+1] == WALL_O) : false;
-        boolean west = (y > 0) ? (charMap[x][y-1] == WALL_O) : false;
+        boolean north = (x > 0) && (charMap[x - 1][y] == wallV);
+        boolean south = (x < printHeight) && (charMap[x + 1][y] == wallV);
+        boolean east = (y < printWidth) && (charMap[x][y + 1] == wallO);
+        boolean west = (y > 0) && (charMap[x][y - 1] == wallO);
 
-        for (IntersectionChar character : intersectionChars) {
+        for (CharAsset character : charAssets) {
             if (character.isRightChar(north, south, east, west)) {
                 charMap[x][y] = character.getCharacter();
                 break;
             }
         }
-        return;
+    }
+
+    /**
+     * Get cell's corresponding ANSI color code
+     * @param cell to get color from. Set this to null to get RESET code
+     * @return char color code
+     */
+    private String getANSIColor(Cell cell) {
+        if (cell == null) return ANSI_RESET;
+
+        switch (cell.getColor()) {
+            case BLUE:
+                return ANSI_BLUE;
+            case RED:
+                return ANSI_RED;
+            case YELLOW:
+                return ANSI_YELLOW;
+            case GREEN:
+                return ANSI_GREEN;
+            case WHITE:
+                return ANSI_WHITE;
+            case PURPLE:
+                return ANSI_PURPLE;
+            default:
+                return ANSI_RESET;
+        }
     }
 
     /**
