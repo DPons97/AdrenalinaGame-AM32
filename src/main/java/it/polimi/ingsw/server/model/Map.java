@@ -4,51 +4,17 @@ import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Map {
-    /**
-     * ASCII encoding of walls
-     */
-    private static final char WALL_O   = '═';
-    private static final char WALL_V = '║';
-    private static final char WALL_CROSS   = '╬';
-    private static final char WALL_CROSS_R = '╠';
-    private static final char WALL_CROSS__L   = '╣';
-    private static final char WALL_CROSS_U   = '╩';
-    private static final char WALL_CROSS_D   = '╦';
-    private static final char WALL_UP_L   = '╔';
-    private static final char WALL_UP_R   = '╗';
-    private static final char WALL_DOWN_L   = '╚';
-    private static final char WALL_DOWN_R   = '╝';
-
-    /**
-     * ASCII encoding of walls
-     */
-    private static final char FREE_O   = '─';
-    private static final char FREE_V = '│';
-    private static final char FREE_CROSS   = '┼';
-    private static final char FREE_CROSS_R = '├';
-    private static final char FREE_CROSS_L = '┤';
-    private static final char FREE_CROSS_U   = '┴';
-    private static final char FREE_CROSS_D   = '┬';
-    private static final char FREE_UP_L   = '┌';
-    private static final char FREE_UP_R   = '┐';
-    private static final char FREE_DOWN_L   = '└';
-    private static final char FREE_DOWN_R   = '┘';
-
-    /**
-     * Number of characters used to build walls + 1 (one of two vertical walls)
-     */
-    private static final int cellCharWidth = 22;
-
-    /**
-     * Number of characters used to build walls + 1 (one of two horizontal walls)
-     */
-    private static final int cellCharHeight = 10;
-
     /**
      * Representation of the map, bidemensional array of cells.
      */
@@ -345,157 +311,5 @@ public class Map {
         }
 
         return map;
-    }
-
-    /**
-     * @return ready-to-print map
-     */
-    public char[][] getMapToDraw() {
-        int printWidth = ySize * cellCharWidth + 1;
-        int printHeight = xSize * cellCharHeight + 1;
-
-        char[][] mapToReturn = new char[printHeight][printWidth];
-
-        // Init map
-        for (int i = 0; i < mapToReturn.length; i++) {
-            for (int j = 0; j < mapToReturn[0].length; j++) mapToReturn[i][j] = ' ';
-        }
-
-        for (int i = 0; i < xSize; i++) {
-            for (int j = 0; j < ySize; j++) drawCell(mapToReturn, getCell(i,j), i, j);
-        }
-
-
-        return mapToReturn;
-    }
-
-    /**
-     * Set correct character in charMap based on cell toDraw
-     * @param charMap character map that will be printed
-     * @param toDraw cell to draw
-     * @param x coordinate of toDraw
-     * @param y coordinate of toDraw
-     */
-    public void drawCell(char[][] charMap, Cell toDraw, int x, int y) {
-        if (toDraw == null) return;
-
-        int printWidth = ySize * cellCharWidth + 1;
-        int printHeight = xSize * cellCharHeight + 1;
-
-        // Starting and
-        int startingX = x * cellCharHeight;
-        int endingX = startingX + cellCharHeight;
-        int startingY = y * cellCharWidth;
-        int endingY = startingY + cellCharWidth;
-
-        // Corners
-
-        // Sides
-        for (Direction dir : Direction.values()) {
-            switch (dir) {
-                case NORTH:
-                    drawHorizontalSide(charMap, toDraw.getSide(dir), startingX, startingY + 1);
-                    break;
-                case SOUTH:
-                    drawHorizontalSide(charMap, toDraw.getSide(dir), endingX, startingY + 1);
-                    break;
-                case WEST:
-                    drawVerticalSide(charMap, toDraw.getSide(dir), startingX + 1, startingY);
-                    break;
-                case EAST:
-                    drawVerticalSide(charMap, toDraw.getSide(dir), startingX + 1, endingY);
-                    break;
-            }
-        }
-
-        // Color
-
-        // Players
-    }
-
-    /**
-     * Draw a horizontal wall/door/free
-     * @param charMap map of character to draw in
-     * @param sideType type of side to draw
-     * @param startingX coordinate of side
-     * @param startingY coordinate of side
-     */
-    private void drawHorizontalSide(char[][] charMap, Side sideType, int startingX, int startingY) {
-        int sideWidth = cellCharWidth - 1;
-        switch (sideType) {
-            case FREE:
-                // Draw "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
-                boolean toDraw = true;
-                for (int i = startingY; i < startingY + sideWidth; i++) {
-                    if (toDraw) {
-                        charMap[startingX][i] = FREE_O;
-                        toDraw = false;
-                    } else toDraw = true;
-                }
-                break;
-
-            case BORDER:
-            case WALL:
-                // Draw "══════════════════════"
-                for (int i = startingY; i < startingY + sideWidth; i++) {
-                    charMap[startingX][i] = WALL_O;
-                }
-                break;
-
-            case DOOR:
-                int openingWidth = 10;
-                // Draw "═════╣          ╠═════"
-                for (int i = startingY; i < startingY + sideWidth; i++) {
-                    if (i == (startingY + sideWidth/2 - openingWidth/2)) charMap[startingX][i] = WALL_CROSS__L;
-                    else if (i == (startingY + sideWidth/2 + openingWidth/2)) charMap[startingX][i] = WALL_CROSS_R;
-                    else if (i < (startingY + sideWidth/2 - openingWidth/2) ||
-                            i > (startingY + sideWidth/2 + openingWidth/2))
-                        charMap[startingX][i] = WALL_O;
-                }
-                break;
-        }
-    }
-
-    /**
-     * Draw a horizontal wall/door/free
-     * @param charMap map of character to draw in
-     * @param sideType type of side to draw
-     * @param startingX coordinate of side
-     * @param startingY coordinate of side
-     */
-    private void drawVerticalSide(char[][] charMap, Side sideType, int startingX, int startingY) {
-        int sideHeight = cellCharHeight - 1;
-        switch (sideType) {
-            case FREE:
-                // Draw vertical "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
-                boolean toDraw = true;
-                for (int i = startingX; i < startingX + sideHeight; i++) {
-                    if (toDraw) {
-                        charMap[i][startingY] = FREE_V;
-                        toDraw = false;
-                    } else toDraw = true;
-                }
-                break;
-
-            case BORDER:
-            case WALL:
-                // Draw vertical "══════════════════════"
-                for (int i = startingX; i < startingX + sideHeight; i++) {
-                    charMap[i][startingY] = WALL_V;
-                }
-                break;
-
-            case DOOR:
-                int openingHeight = 4;
-                // Draw vertical "═════╣         ╠═════"
-                for (int i = startingX; i < startingX + sideHeight; i++) {
-                    if (i == (startingX + sideHeight/2 - openingHeight/2)) charMap[i][startingY] = WALL_CROSS_U;
-                    else if (i == (startingX + sideHeight/2 + openingHeight/2)) charMap[i][startingY] = WALL_CROSS_D;
-                    else if (i < (startingX + sideHeight/2 - openingHeight/2) ||
-                            i > (startingX + sideHeight/2 + openingHeight/2))
-                        charMap[i][startingY] = WALL_V;
-                }
-                break;
-        }
     }
 }
