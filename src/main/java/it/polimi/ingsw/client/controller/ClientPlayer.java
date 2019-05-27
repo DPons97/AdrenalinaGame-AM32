@@ -227,4 +227,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		}
 	}
 
+	public ClientView getView() {
+		return view;
+	}
 }

@@ -120,7 +120,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
                 else if (lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
 						JSONObject msg = new JSONObject();
 						msg.put("function", "alert");
-						msg.put("msg", "Cannot connect: username already exists");
+						msg.put("msg", "ERROR CONNECTING: username already exists");
 						PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
 						out.println(msg.toString());
 				} else
@@ -159,7 +159,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			lobby.reconnectPlayer(new PlayerRemote(name, client));
 		else if(lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
 			try {
-				client.allert("Cannot connect: username already exists");
+				client.allert("ERROR CONNECTING: username already exists");
 			} catch (RemoteException e) {
 				e.printStackTrace();
 			}
