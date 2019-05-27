@@ -109,7 +109,7 @@ public class CliView extends ClientView {
             Scanner in = new Scanner (System.in);
             int response = in.nextInt();
             if(response == 1)
-                createMatch();
+                createNewGame();
             else if(response == 0){
                 player.updateLobby();
                 return;
@@ -130,23 +130,6 @@ public class CliView extends ClientView {
 
     }
 
-    private void createMatch() {
-        int maxPlayers;
-        int maxDeaths;
-        int turnDuration;
-        int mapID;
-        Scanner in = new Scanner(System.in);
-        System.out.print("Enter number of players: ");
-        maxPlayers = in.nextInt();
-        System.out.print("Enter number of deaths: ");
-        maxDeaths = in.nextInt();
-        System.out.print("Enter turn duration [seconds]: ");
-        turnDuration = in.nextInt();
-        System.out.print("Enter map id: ");
-        mapID = in.nextInt();
-
-        player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
-    }
 
     /**
      * Shows the launcher options
@@ -233,6 +216,25 @@ public class CliView extends ClientView {
     @Override
     public TurnAction actionSelection() {
         return null;
+    }
+
+    @Override
+    public void createNewGame() {
+        int maxPlayers;
+        int maxDeaths;
+        int turnDuration;
+        int mapID;
+        Scanner in = new Scanner(System.in);
+        System.out.print("Enter number of players: ");
+        maxPlayers = in.nextInt();
+        System.out.print("Enter number of deaths: ");
+        maxDeaths = in.nextInt();
+        System.out.print("Enter turn duration [seconds]: ");
+        turnDuration = in.nextInt();
+        System.out.print("Enter map id: ");
+        mapID = in.nextInt();
+
+        player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
     }
 
     /**

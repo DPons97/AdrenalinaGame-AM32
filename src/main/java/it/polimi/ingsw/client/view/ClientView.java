@@ -82,4 +82,5 @@ public abstract class ClientView {
     public abstract TurnAction actionSelection();
 
 
+    public abstract void createNewGame();
 }

@@ -68,7 +68,6 @@ public class Launcher{
     }
 
     public void startLauncherGui(){
-        // TODO gui launcher
         new Thread(()->Application.launch(FXWindow.class)).start();
 
         synchronized (FXWindow.lock) {
