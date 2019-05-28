@@ -1,5 +1,7 @@
 package it.polimi.ingsw.client.controller;
 
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
+
 import java.io.IOException;
 import java.rmi.NotBoundException;
 
@@ -25,7 +27,7 @@ public abstract class ServerConnection {
 	 * @param ip server ip
 	 * @param port server port
 	 */
-	public abstract void connect(String ip, int port) throws IOException, NotBoundException;
+	public abstract void connect(String ip, int port) throws IOException, NotBoundException, UsernameTakenException;
 
 	/**
 	 * Disconnect client from server

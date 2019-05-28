@@ -112,22 +112,19 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 				});
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 name = input.readLine();
-                if(lobby.getDisconnectedPlayers().contains(name) || lobby.getDisconnectedPlayersInGame().contains(name))
-                	lobby.reconnectPlayer(new PlayerSocket(name,
-							new PrintWriter(clientSocket.getOutputStream(), true),
-							input)
-					);
+                if(lobby.getDisconnectedPlayers().contains(name) || lobby.getDisconnectedPlayersInGame().contains(name)) {
+					PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
+					out.println("{\"function\": \"connection\", \"value\": \"OK\"}");
+					lobby.reconnectPlayer(new PlayerSocket(name, out, input));
+				}
                 else if (lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
-						JSONObject msg = new JSONObject();
-						msg.put("function", "alert");
-						msg.put("msg", "ERROR CONNECTING: username already exists");
-						PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
-						out.println(msg.toString());
-				} else
-                	lobby.addPlayer(new PlayerSocket(name,
-							new PrintWriter(clientSocket.getOutputStream(), true),
-							input)
-					);
+					PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
+					out.println("{\"function\": \"connection\", \"value\": \"KO\"}");
+				} else {
+					PrintWriter out  = new PrintWriter(clientSocket.getOutputStream(), true);
+					out.println("{\"function\": \"connection\", \"value\": \"OK\"}");
+					lobby.addPlayer(new PlayerSocket(name, out, input));
+				}
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -146,7 +143,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * @param name client name
 	 */
 	@Override
-	public void login(String name, ClientFunctionalities client){
+	public boolean login(String name, ClientFunctionalities client){
 		System.out.println("Received RMI connection request");
 		lobby.pingALl().stream().filter(Objects::nonNull).forEach(thread -> {
 			try {
@@ -155,16 +152,15 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 				e.printStackTrace();
 			}
 		});
-		if(lobby.getDisconnectedPlayers().contains(name) ||  lobby.getDisconnectedPlayersInGame().contains(name))
+		if(lobby.getDisconnectedPlayers().contains(name) ||  lobby.getDisconnectedPlayersInGame().contains(name)) {
 			lobby.reconnectPlayer(new PlayerRemote(name, client));
-		else if(lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)){
-			try {
-				client.allert("ERROR CONNECTING: username already exists");
-			} catch (RemoteException e) {
-				e.printStackTrace();
-			}
+			return true;
+		}
+		else if(lobby.getPlayersNameInGame().contains(name) || lobby.getPlayersNames().contains(name)) {
+			return false;
 		} else
 			lobby.addPlayer(new PlayerRemote(name, client));
+			return true;
 	}
 
 	/**

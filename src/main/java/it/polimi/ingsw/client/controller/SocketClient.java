@@ -2,6 +2,7 @@ package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.custom_exceptions.InvalidSelectionTypeException;
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -68,7 +69,7 @@ public class SocketClient extends ServerConnection {
 	 * @param port server port
 	 */
 	@Override
-	public void connect(String ip, int port) throws IOException {
+	public void connect(String ip, int port) throws IOException, UsernameTakenException {
 		socket= new Socket(ip, port);
 		this.ip = ip;
 		this. port = port;
@@ -77,6 +78,9 @@ public class SocketClient extends ServerConnection {
 		output.println(player.getNickname());
 		Thread t = new Thread(this::listen);
 		t.start();
+
+		String confirm = input.readLine();
+		if(confirm.contains("KO")) throw new UsernameTakenException();
 	}
 
 	/**

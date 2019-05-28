@@ -65,7 +65,7 @@ public class GuiView extends ClientView{
 
             Button refresh = new Button();
             refresh.setText("Refresh");
-            grid.add(refresh, 1, 2);
+
             refresh.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
@@ -112,7 +112,12 @@ public class GuiView extends ClientView{
             }
 
             Button newGame= new Button();
-            grid.add(newGame, 0,5);
+            HBox buttons = new HBox();
+            buttons.setAlignment(Pos.BOTTOM_RIGHT);
+            buttons.getChildren().add(newGame);
+            buttons.getChildren().add(refresh);
+            buttons.setSpacing(20);
+            grid.add(buttons, 0,5);
             newGame.setText("Create new game");
             newGame.setOnAction(new EventHandler<ActionEvent>() {
                 @Override

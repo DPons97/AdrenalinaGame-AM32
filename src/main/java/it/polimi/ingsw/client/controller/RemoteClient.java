@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.controller;
 
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.ServerFunctionalities;
 
 import java.rmi.NotBoundException;
@@ -50,7 +51,7 @@ public class RemoteClient extends ServerConnection {
 	 * @param port server port
 	 */
 	@Override
-	public void connect(String ip, int port) throws RemoteException, NotBoundException {
+	public void connect(String ip, int port) throws RemoteException, NotBoundException, UsernameTakenException {
 		this.ip = ip;
 		this.port = port;
 
@@ -59,7 +60,7 @@ public class RemoteClient extends ServerConnection {
 		System.out.println("Connection OK. Looking up registry...");
 		server = (ServerFunctionalities) (registry.lookup("rmiServer"));
 		System.out.println("Registry OK. Logging in...");
-		server.login(player.getNickname(), this.player);
+		if (!server.login(player.getNickname(), this.player))throw new UsernameTakenException();
 		System.out.println("Logged");
 		Thread t = new Thread(this::checkConnection);
 		t.start();

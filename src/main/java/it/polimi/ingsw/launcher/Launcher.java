@@ -3,6 +3,7 @@ package it.polimi.ingsw.launcher;
 import it.polimi.ingsw.client.controller.ClientPlayer;
 import it.polimi.ingsw.client.controller.ConnectionType;
 import it.polimi.ingsw.client.view.FXWindow;
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.LoginHandler;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -221,14 +222,15 @@ public class Launcher{
                         actiontarget.setFill(Color.ALICEBLUE);
                         actiontarget.setText("Connecting to server...");
                         ConnectionType c = rbRmi.isSelected() ? ConnectionType.RMI : ConnectionType.SOCKET;
-                        ClientPlayer p = startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
-                        grid.getChildren().clear();
-                        if(p==null){
-                            Text scenetitle = new Text("Error connecting to server :(");
-                            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-                            grid.add(scenetitle, 0, 0, 2, 1);
-                            Label msg = new Label("Please restart the program.");
-                            grid.add(msg, 0,2);
+                        int p = startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
+                        if(p==1){
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("Error connecting to the server: invlid ip/port");
+                        } else  if (p == 2) {
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("Error connecting to the server: username already in use");
+                        }else {
+                            grid.getChildren().clear();
                         }
                     }
                 }
@@ -267,12 +269,14 @@ public class Launcher{
         return LoginHandler.startServer();
     }
 
-    public ClientPlayer startClient(String server, int port, String nick, ConnectionType c, int view){
+    public int startClient(String server, int port, String nick, ConnectionType c, int view){
         try {
-            return new ClientPlayer(nick, c, server, port, view==1);
+            ClientPlayer p =  new ClientPlayer(nick, c, server, port, view==1);
+            return 0;
         } catch (NotBoundException | IOException e) {
-            e.printStackTrace();
-           return null;
+           return 1;
+        } catch (UsernameTakenException e) {
+            return 2;
         }
 
     }

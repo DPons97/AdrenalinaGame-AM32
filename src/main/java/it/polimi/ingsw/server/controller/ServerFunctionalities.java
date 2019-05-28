@@ -17,7 +17,7 @@ public interface ServerFunctionalities extends Remote {
 	 * @param client remote reference to client connecting
 	 * @param name client name
 	 */
-	void login(String name, ClientFunctionalities client) throws RemoteException;
+	boolean login(String name, ClientFunctionalities client) throws RemoteException;
 
 	/**
 	 * Allow user to disconnect from server

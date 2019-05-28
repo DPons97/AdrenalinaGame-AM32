@@ -5,6 +5,7 @@ import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.client.view.CliView;
 import it.polimi.ingsw.client.view.ClientView;
 import it.polimi.ingsw.client.view.GuiView;
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import org.json.simple.JSONObject;
@@ -51,7 +52,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Constructor
 	 * Initializes nickname and server connection
 	 */
-	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws IOException, NotBoundException {
+	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws IOException, NotBoundException, UsernameTakenException {
 		this.nickname = nickname;
 
 		if(connectionType == ConnectionType.RMI) this.server = new RemoteClient(this);
@@ -61,6 +62,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		else view = new CliView(this);
 
 		server.connect(ip, port);
+
 		updateLobby();
 	}
 
@@ -222,6 +224,9 @@ public class ClientPlayer implements ClientFunctionalities{
 		try {
 			ClientPlayer clientPlayer = new ClientPlayer(nickname, connectionType, ip, port, false);
 		} catch (IOException | NotBoundException e) {
+			e.printStackTrace();
+			exit(1);
+		} catch (UsernameTakenException e) {
 			e.printStackTrace();
 			exit(1);
 		}
