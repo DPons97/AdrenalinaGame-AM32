@@ -1,0 +1,86 @@
+[
+  {
+    "char": "═",
+    "north": false,
+    "south": false,
+    "east": true,
+    "west": true
+  },
+  {
+    "char": "║",
+    "north": true,
+    "south": true,
+    "east": false,
+    "west": false
+  },
+  {
+    "char": "╬",
+    "north": true,
+    "south": true,
+    "east": true,
+    "west": true
+  },
+  {
+    "char": "╠",
+    "north": true,
+    "south": true,
+    "east": true,
+    "west": false
+  },
+  {
+    "char": "╣",
+    "north": true,
+    "south": true,
+    "east": false,
+    "west": true
+  },
+  {
+    "char": "╩",
+    "north": true,
+    "south": false,
+    "east": true,
+    "west": true
+  },
+  {
+    "char": "╦",
+    "north": false,
+    "south": true,
+    "east": true,
+    "west": true
+  },
+  {
+    "char": "╔",
+    "north": false,
+    "south": true,
+    "east": true,
+    "west": false
+  },
+  {
+    "char": "╗",
+    "north": false,
+    "south": true,
+    "east": false,
+    "west": true
+  },
+  {
+    "char": "╚",
+    "north": true,
+    "south": false,
+    "east": true,
+    "west": false
+  },
+  {
+    "char": "╝",
+    "north": true,
+    "south": false,
+    "east": false,
+    "west": true
+  },
+  {
+    "char": "┼",
+    "north": false,
+    "south": false,
+    "east": false,
+    "west": false
+  }
+]
