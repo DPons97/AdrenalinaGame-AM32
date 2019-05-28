@@ -54,6 +54,11 @@ public class Player {
 	private String nickname;
 
 	/**
+	 * This player's color
+	 */
+	private Color color;
+
+	/**
 	 * True if this player is ready to start the match
 	 */
 	private boolean readyToStart;
@@ -228,6 +233,16 @@ public class Player {
 	public String getNickname(){
 		return nickname;
 	}
+
+	/**
+	 * @return player's color
+	 */
+	public Color getColor() { return color; }
+
+	/**
+	 * @param color new color this player's will be assigned
+	 */
+	public void setColor(Color color) { this.color = color; }
 
 	/**
 	 * @return player's connection handler

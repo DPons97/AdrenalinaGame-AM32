@@ -2,6 +2,9 @@ package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
 import it.polimi.ingsw.client.model.Point;
+import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
+import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
+import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -75,6 +78,16 @@ public class CliView extends ClientView {
      * Number of characters used to build walls + 1 (one of two horizontal walls)
      */
     private static final int CELL_CHAR_HEIGHT = 10;
+
+    /**
+     * Width of players' box inside cell
+     */
+    private static final int PLAYER_BOX_WIDTH = 3;
+
+    /**
+     * Height of players' box inside cell
+     */
+    private static final int PLAYER_BOX_HEIGHT = 5;
 
     /**
      * ANSI color encoding for easy use
@@ -243,8 +256,40 @@ public class CliView extends ClientView {
      * Print map
      */
     public static void main(String[] args) {
-        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 1);
+        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 3);
         CliView view = new CliView(null);
+
+        try {
+            Player newPlayer1 = new Player(match, "Davide");
+            newPlayer1.setColor(Color.RED);
+            Player newPlayer2 = new Player(match, "Luca");
+            newPlayer2.setColor(Color.BLUE);
+            Player newPlayer3 = new Player(match, "Mike");
+            newPlayer3.setColor(Color.GREEN);
+            Player newPlayer4 = new Player(match, "Conti");
+            newPlayer4.setColor(Color.PURPLE);
+            Player newPlayer5 = new Player(match, "Lorenzo");
+            newPlayer5.setColor(Color.YELLOW);
+
+            match.addPlayer(newPlayer1);
+            match.addPlayer(newPlayer2);
+            match.addPlayer(newPlayer3);
+            match.addPlayer(newPlayer4);
+            match.addPlayer(newPlayer5);
+
+            newPlayer1.respawn(match.getBoardMap().getSpawnPoints().get(0));
+            newPlayer2.respawn(match.getBoardMap().getSpawnPoints().get(0));
+            newPlayer3.respawn(match.getBoardMap().getSpawnPoints().get(0));
+            newPlayer4.respawn(match.getBoardMap().getSpawnPoints().get(0));
+            newPlayer5.respawn(match.getBoardMap().getSpawnPoints().get(0));
+        } catch (TooManyPlayersException e) {
+            e.printStackTrace();
+        } catch (MatchAlreadyStartedException e) {
+            e.printStackTrace();
+        } catch (PlayerAlreadyExistsException e) {
+            e.printStackTrace();
+        }
+
         view.drawMap(match.getBoardMap());
     }
 
@@ -344,16 +389,16 @@ public class CliView extends ClientView {
         for (Direction dir : Direction.values()) {
             switch (dir) {
                 case NORTH:
-                    drawHorizontalSide(charMap, toDraw.getSide(dir), startingX, startingY + 1);
+                    drawHorizontalSide(charMap, toDraw, dir, startingX, startingY + 1);
                     break;
                 case SOUTH:
-                    drawHorizontalSide(charMap, toDraw.getSide(dir), endingX, startingY + 1);
+                    drawHorizontalSide(charMap, toDraw, dir, endingX, startingY + 1);
                     break;
                 case WEST:
-                    drawVerticalSide(charMap, toDraw.getSide(dir), startingX + 1, startingY);
+                    drawVerticalSide(charMap, toDraw, dir, startingX + 1, startingY);
                     break;
                 case EAST:
-                    drawVerticalSide(charMap, toDraw.getSide(dir), startingX + 1, endingY);
+                    drawVerticalSide(charMap, toDraw, dir, startingX + 1, endingY);
                     break;
             }
         }
@@ -365,18 +410,9 @@ public class CliView extends ClientView {
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY, xSize, ySize);   // South-West
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY + CELL_CHAR_WIDTH, xSize, ySize); // South-East
 
-        // Color
-        String color = getANSIColor(toDraw);
-        for (int i = startingX+1; i < endingX; i++) {
-            for (int j = startingY+1; j < endingY; j++) {
-                charMap[i][j] = color + COLOR_BLOCK + ANSI_RESET;
-            }
-        }
+        // Draw plyers
+        drawPlayers(charMap, toDraw, startingX, startingY);
 
-        // charMap[startingX + 1][endingY - 2] =  getANSIColor(toDraw) + COLOR_BLOCK + ANSI_RESET; TODO Remove this if current color display is OK!
-
-
-        // Players
     }
 
     /**
@@ -386,28 +422,40 @@ public class CliView extends ClientView {
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
-    private void drawHorizontalSide(String[][] charMap, Side sideType, int startingX, int startingY) {
+    private void drawHorizontalSide(String[][] charMap, Cell cell, Direction dir, int startingX, int startingY) {
+        Side sideType = cell.getSide(dir);
+
+        int toBeColored = startingX;
+        if (dir == Direction.NORTH) toBeColored++;
+        else if (dir == Direction.SOUTH) toBeColored--;
+
         int sideWidth = CELL_CHAR_WIDTH - 1;
         switch (sideType) {
             case FREE:
                 // Draw "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
                 boolean toDraw = true;
-                for (int i = startingY; i < startingY + sideWidth; i++) {
+
+                // Draw colored border
+                charMap[startingX][startingY] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
+                for (int i = startingY+1; i < startingY + sideWidth; i++) {
                     if (toDraw) {
                         charMap[startingX][i] = freeO;
                         toDraw = false;
                     } else toDraw = true;
                 }
+                charMap[startingX][startingY+sideWidth-1] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
                 break;
-
             case BORDER:
             case WALL:
                 // Draw "══════════════════════"
                 for (int i = startingY; i < startingY + sideWidth; i++) {
                     charMap[startingX][i] = wallO;
-                }
-                break;
 
+                    // Draw colored border
+                    charMap[toBeColored][i] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
+                }
+
+                break;
             case DOOR:
                 int openingWidth = 10;
                 // Draw "═════╣          ╠═════"
@@ -415,8 +463,13 @@ public class CliView extends ClientView {
                     if (i == (startingY + sideWidth/2 - openingWidth/2)) charMap[startingX][i] = wallCrossL;
                     else if (i == (startingY + sideWidth/2 + openingWidth/2)) charMap[startingX][i] = wallCrossR;
                     else if (i < (startingY + sideWidth/2 - openingWidth/2) ||
-                            i > (startingY + sideWidth/2 + openingWidth/2))
+                            i > (startingY + sideWidth/2 + openingWidth/2)) {
                         charMap[startingX][i] = wallO;
+
+                        // Draw colored border
+                        charMap[toBeColored][i] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
+
+                    }
                 }
                 break;
         }
@@ -429,18 +482,27 @@ public class CliView extends ClientView {
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
-    private void drawVerticalSide(String[][] charMap, Side sideType, int startingX, int startingY) {
+    private void drawVerticalSide(String[][] charMap, Cell cell, Direction dir, int startingX, int startingY) {
+        Side sideType = cell.getSide(dir);
+
+        int toBeColored = startingY;
+        if (dir == Direction.EAST) toBeColored--;
+        else if (dir == Direction.WEST) toBeColored++;
+
         int sideHeight = CELL_CHAR_HEIGHT - 1;
         switch (sideType) {
             case FREE:
                 // Draw vertical "─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─"
                 boolean toDraw = true;
-                for (int i = startingX; i < startingX + sideHeight; i++) {
+
+                charMap[startingX][startingY] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
+                for (int i = startingX + 1; i < startingX + sideHeight; i++) {
                     if (toDraw) {
                         charMap[i][startingY] = freeV;
                         toDraw = false;
                     } else toDraw = true;
                 }
+                charMap[startingX + sideHeight - 1][startingY] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
                 break;
 
             case BORDER:
@@ -448,18 +510,27 @@ public class CliView extends ClientView {
                 // Draw vertical "══════════════════════"
                 for (int i = startingX; i < startingX + sideHeight; i++) {
                     charMap[i][startingY] = wallV;
+
+                    // Draw colored border
+                    charMap[i][toBeColored] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
                 }
                 break;
 
             case DOOR:
                 int openingHeight = 4;
                 // Draw vertical "═════╣         ╠═════"
-                for (int j = startingX; j < startingX + sideHeight; j++) {
-                    if (j == (startingX + sideHeight/2 - openingHeight/2)) charMap[j][startingY] = wallCrossU;
-                    else if (j == (startingX + sideHeight/2 + openingHeight/2)) charMap[j][startingY] = wallCrossD;
-                    else if (j < (startingX + sideHeight/2 - openingHeight/2) ||
-                            j > (startingX + sideHeight/2 + openingHeight/2))
-                        charMap[j][startingY] = wallV;
+                for (int i = startingX; i < startingX + sideHeight; i++) {
+                    if (i == (startingX + sideHeight/2 - openingHeight/2)) charMap[i][startingY] = wallCrossU;
+                    else if (i == (startingX + sideHeight/2 + openingHeight/2)) charMap[i][startingY] = wallCrossD;
+                    else if (i < (startingX + sideHeight/2 - openingHeight/2) ||
+                            i > (startingX + sideHeight/2 + openingHeight/2)) {
+                        charMap[i][startingY] = wallV;
+
+                        // Draw colored border
+                        charMap[i][toBeColored] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
+
+                    }
+
                 }
                 break;
         }
@@ -492,6 +563,38 @@ public class CliView extends ClientView {
     }
 
     /**
+     * Draw players in given cell
+     * @param charMap map of strings to print
+     * @param toDraw cell to get players from
+     * @param startingX starting X coord
+     * @param startingY starting Y coord
+     */
+    private void drawPlayers(String[][] charMap, Cell toDraw, int startingX, int startingY) {
+        // Players
+        List<Player> playersToDraw = toDraw.getPlayers();
+        if (playersToDraw.isEmpty()) return;
+
+        // Calculate x and y coords of player box
+        int boxXOffset = 3;
+        int boxYOffset = 15;
+
+        int playerBoxX = startingX + boxXOffset;
+        int playerBoxY = startingY + boxYOffset;
+
+        for (Player p : playersToDraw) {
+            charMap[playerBoxX][playerBoxY] = getANSIColor(p) + String.valueOf(p.getNickname().charAt(0)) + ANSI_RESET;
+
+            if (playerBoxY > startingY + boxYOffset + PLAYER_BOX_WIDTH - 2) {
+                playerBoxX = playerBoxX + 2;
+                playerBoxY = startingY + boxYOffset;
+            } else playerBoxY = playerBoxY + 2;
+        }
+
+
+
+    }
+
+    /**
      * Get cell's corresponding ANSI color code
      * @param cell to get color from. Set this to null to get RESET code
      * @return char color code
@@ -500,6 +603,32 @@ public class CliView extends ClientView {
         if (cell == null) return ANSI_RESET;
 
         switch (cell.getColor()) {
+            case BLUE:
+                return ANSI_BLUE;
+            case RED:
+                return ANSI_RED;
+            case YELLOW:
+                return ANSI_YELLOW;
+            case GREEN:
+                return ANSI_GREEN;
+            case WHITE:
+                return ANSI_WHITE;
+            case PURPLE:
+                return ANSI_PURPLE;
+            default:
+                return ANSI_RESET;
+        }
+    }
+
+    /**
+     * Get player's corresponding ANSI color code
+     * @param player to get color from. Set this to null to get RESET code
+     * @return char color code
+     */
+    private String getANSIColor(Player player) {
+        if (player == null) return ANSI_RESET;
+
+        switch (player.getColor()) {
             case BLUE:
                 return ANSI_BLUE;
             case RED:
