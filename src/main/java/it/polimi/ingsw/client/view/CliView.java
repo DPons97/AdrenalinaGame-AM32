@@ -654,8 +654,25 @@ public class CliView extends ClientView {
      */
     private void drawCellWeapon(String[][] charMap, SpawnCell toDraw, int startingX, int startingY) {
         int boxXOffset = 3;
-        int boxYOffset = 2;
+        int boxYOffset = 3;
 
+        String spawnArt =   "  ___ \n" +
+                            "/ __>\n" +
+                            "\\__ \\\n" +
+                             "<___/ ";
+
+        int i = startingX + boxXOffset;
+        int j = startingY + boxYOffset - 1;
+        for (char c : spawnArt.toCharArray()) {
+            if (c == '\n') {
+                i++;
+                j = startingY + boxYOffset;
+            }
+            else {
+                charMap[i][j] = getANSIColor(toDraw) + c + ANSI_RESET;
+                j++;
+            }
+        }
 
     }
 
