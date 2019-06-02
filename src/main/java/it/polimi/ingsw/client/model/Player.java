@@ -2,10 +2,7 @@ package it.polimi.ingsw.client.model;
 
 import java.util.*;
 
-import it.polimi.ingsw.server.model.Ammo;
-import it.polimi.ingsw.server.model.Cell;
-import it.polimi.ingsw.server.model.Powerup;
-import it.polimi.ingsw.server.model.Weapon;
+import it.polimi.ingsw.server.model.*;
 
 /**
  * 
@@ -16,6 +13,11 @@ public class Player {
 	 * nickname
 	 */
 	private String nickname;
+
+	/**
+	 * color
+	 */
+	private Color color;
 
 	/**
 	 * score
@@ -92,6 +94,16 @@ public class Player {
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
+
+	/**
+	 * @return player's color
+	 */
+	public Color getColor() { return color; }
+
+	/**
+	 * @param color new color this player's will be assigned
+	 */
+	public void setColor(Color color) { this.color = color; }
 
 	/**
 	 * @return score
