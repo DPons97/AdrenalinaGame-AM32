@@ -60,7 +60,7 @@ public class ClientPlayer implements ClientFunctionalities{
 
 		if(gui) view = new GuiView(this);
 		else view = new CliView(this);
-
+		this.match = null;
 		server.connect(ip, port);
 
 		updateLobby();
@@ -177,7 +177,10 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
-
+		if(match == null){
+			match = new AdrenalinaMatch();
+		}
+		match.update(toGetUpdateFrom);
 	}
 
 	@Override

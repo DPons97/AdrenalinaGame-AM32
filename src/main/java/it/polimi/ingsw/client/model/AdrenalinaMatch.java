@@ -1,8 +1,8 @@
 package it.polimi.ingsw.client.model;
 
-import it.polimi.ingsw.server.model.Map;
-import it.polimi.ingsw.server.model.MatchState;
-import it.polimi.ingsw.server.model.SpawnCell;
+import it.polimi.ingsw.server.model.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -12,9 +12,14 @@ import java.util.List;
 public class AdrenalinaMatch {
 
 	/**
-	 * match map
-	 */
-	private Map map;
+     * match map
+     */
+    private Map map;
+
+    /**
+     * map id
+     */
+    private int mapID;
 
 	/**
 	 * state of the match
@@ -30,6 +35,11 @@ public class AdrenalinaMatch {
 	 * current Deaths
 	 */
 	private int currentDeaths;
+
+    /**
+     * max Deaths
+     */
+    private int maxDeaths;
 
 	/**
 	 * track of the player's death
@@ -55,6 +65,8 @@ public class AdrenalinaMatch {
 	 * duration of the turn
 	 */
 	private int turnDuration;
+
+	private List<WeaponCard> weapons;
 
 	/**
 	 * turn
@@ -206,5 +218,12 @@ public class AdrenalinaMatch {
      */
     public void setTurn(int turn) {
         this.turn = turn;
+    }
+
+    public void update(JSONObject o) {
+        this.maxDeaths = Integer.parseInt(o.get("max_deaths").toString());
+        this.mapID = Integer.parseInt(o.get("mapID").toString());
+        this.state = MatchState.valueOf(o.get("state").toString());
+        this.map =  Map.parseJSON((JSONObject) o.get("map"), weapons, players);
     }
 }

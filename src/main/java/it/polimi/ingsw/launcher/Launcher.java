@@ -54,17 +54,25 @@ public class Launcher{
         {
             startServer();
         } else {
-            String serverddress, nickname;
-            int port;
-            System.out.print("Server address: ");
-            serverddress = in.next();
-            System.out.print("Server port: ");
-            port = in.nextInt();
-            System.out.print("Connection type [Socket 0, RMI 1]");
-            ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
-            System.out.print("Nickname: ");
-            nickname = in.next();
-            startClient(serverddress, port, nickname, c, 0);
+            int res = 1;
+            do{
+                String serverddress, nickname;
+                int port;
+                System.out.print("Server address: ");
+                serverddress = in.next();
+                System.out.print("Server port: ");
+                port = in.nextInt();
+                System.out.print("Connection type [Socket 0, RMI 1]");
+                ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
+                System.out.print("Nickname: ");
+                nickname = in.next();
+                res = startClient(serverddress, port, nickname, c, 0);
+                if(res == 1){
+                    System.out.println("Error connecting: ip/port not valid");
+                }else if (res == 2){
+                    System.out.println("Error connecting: username arlready in use");
+                }
+            }while(res != 0);
         }
     }
 
@@ -246,7 +254,7 @@ public class Launcher{
                         Text scenetitle = new Text("Adrenalina server is running...");
                         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
                         grid.add(scenetitle, 0, 0, 2, 1);
-                        Label ip = new Label("IP address: "+server.getAddress());
+                        Label ip = new Label("IP addresses: "+server.getAddress());
                         Label rmi = new Label("RMI port: "+server.getRmiPort());
                         Label socket = new Label("Socket port: "+server.getSocketPort());
                         grid.add(ip, 0,2);

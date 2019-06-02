@@ -129,7 +129,14 @@ public class CliView extends ClientView {
             for(Object o: players) System.out.print(o.toString()+"     ");
 
         }
-
+        System.out.println("\nEnter match id to join or -1 to cerate new game, other to refresh: ");
+        Scanner in = new Scanner (System.in);
+        int choice = in.nextInt();
+        if(choice >= 0 && choice < matches.size()) player.joinGame(choice);
+        else if (choice == -1)createNewGame();
+        else {
+            showLobby(lobby);
+        }
     }
 
 

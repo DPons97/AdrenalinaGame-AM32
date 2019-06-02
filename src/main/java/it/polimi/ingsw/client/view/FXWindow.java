@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import static java.lang.System.exit;
+
 public class FXWindow extends Application {
     private static Stage primaryStage;
     private static GridPane mainGrid;
@@ -28,6 +30,10 @@ public class FXWindow extends Application {
         primaryStage.setTitle("Adrenalina: the best game ever made. \"ITS FUN COZ YOU SHOOT\"");
         Scene scene = new Scene(mainGrid,600, 600);
         primaryStage.setScene(scene);
+        primaryStage.setOnCloseRequest(event -> {
+            System.out.println("Stage is closing");
+            Platform.exit();
+        });
         primaryStage.show();
     }
 
@@ -42,4 +48,10 @@ public class FXWindow extends Application {
             return mainGrid;
 
     }
+
+    @Override
+    public void stop(){
+       System.exit(0);
+    }
+
 }

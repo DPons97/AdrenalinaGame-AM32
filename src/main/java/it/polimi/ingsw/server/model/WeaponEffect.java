@@ -22,12 +22,12 @@ public class WeaponEffect extends Weapon {
 	/**
 	 * Weapon first optional effect (null if not present)
 	 */
-	private Action firstOptional;
+	private Action firstOptional = null;
 
 	/**
 	 * Weapon second optional effect (null if not present)
 	 */
-	private Action secondOptional;
+	private Action secondOptional = null;
 
 
 	/**
@@ -36,10 +36,7 @@ public class WeaponEffect extends Weapon {
 	 * @param actions json object with effects description
 	 */
 	public WeaponEffect(String name, List<Resource> cost, JSONObject actions) {
-
 		super(name, cost, actions);
-		firstOptional = null;
-		secondOptional = null;
 	}
 
 	/**
