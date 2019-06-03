@@ -9,11 +9,9 @@ import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -198,6 +196,7 @@ public class ClientPlayer implements ClientFunctionalities{
 			match = new AdrenalinaMatch();
 		}
 		match.update(toGetUpdateFrom);
+		view.showMatch();
 	}
 
 	@Override

@@ -6,7 +6,6 @@ import it.polimi.ingsw.server.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 /**
@@ -192,11 +191,4 @@ public class LobbyController {
 		}
 	}
 
-	/**
-	 *	set correspondent player object state to ready
-	 * @param player player connection object of the player to set ready
-	 */
-	public synchronized void setPlayerReady(PlayerConnection player) {
-		lobby.getPlayer(player).setReady(true);
-	}
 }

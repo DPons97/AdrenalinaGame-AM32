@@ -228,4 +228,14 @@ public class MatchController {
 		match.setMatchState(MatchState.ENDED);
 		return leaderBoard;
 	}
+
+	/**
+	 *	set correspondent player object state to ready
+	 * @param player player connection object of the player to set ready
+	 */
+	public synchronized void setPlayerReady(PlayerConnection player) {
+		getPlayer(player.getName()).setReady(true);
+		match.getPlayers().forEach(p->p.getConnection().updateMatch(match));
+	}
+
 }

@@ -11,7 +11,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -23,14 +22,11 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.function.UnaryOperator;
-
-import static java.lang.System.exit;
 
 /**
  * Will be the main method for the jar from which will be launched the right process
@@ -281,6 +277,7 @@ public class Launcher{
     }
 
     private void initView() {
+        if(FXWindow.isRunning())return;
         new Thread(()->Application.launch(FXWindow.class)).start();
 
         synchronized (FXWindow.lock) {

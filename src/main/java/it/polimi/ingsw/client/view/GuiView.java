@@ -1,17 +1,17 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.controller.ConnectionType;
-import it.polimi.ingsw.client.controller.ServerConnection;
+import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.MatchState;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -66,12 +66,9 @@ public class GuiView extends ClientView{
             Button refresh = new Button();
             refresh.setText("Refresh");
 
-            refresh.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    grid.getChildren().clear();
-                    player.updateLobby();
-                }
+            refresh.setOnAction(e -> {
+                grid.getChildren().clear();
+                player.updateLobby();
             });
 
             ScrollPane matches = new ScrollPane();
@@ -119,12 +116,9 @@ public class GuiView extends ClientView{
             buttons.setSpacing(20);
             grid.add(buttons, 0,5);
             newGame.setText("Create new game");
-            newGame.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent e) {
-                    grid.getChildren().clear();
-                    player.getView().createNewGame();
-                }
+            newGame.setOnAction(e -> {
+                grid.getChildren().clear();
+                player.getView().createNewGame();
             });
 
         });
@@ -136,7 +130,7 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
-
+            grid.getChildren().clear();
             grid.setAlignment(Pos.CENTER);
             grid.setHgap(10);
             grid.setVgap(10);
@@ -205,18 +199,14 @@ public class GuiView extends ClientView{
             final Text actiontarget = new Text();
             grid.add(actiontarget, 1, 9);
 
-            btnNewGame.setOnAction(new EventHandler<ActionEvent>() {
-
-                @Override
-                public void handle(ActionEvent e) {
-                    if(!nPlayersBox.getText().equals("")&& !nDeathsBox.getText().equals("") &&
-                            !mapIdBox.getText().equals("") && !turnDurationBox.getText().equals("")){
-                        player.createGame(Integer.parseInt(nPlayersBox.getText()), Integer.parseInt(nDeathsBox.getText()),
-                                Integer.parseInt(turnDurationBox.getText()), Integer.parseInt(mapIdBox.getText()));
-                    }else {
-                        actiontarget.setFill(Color.FIREBRICK);
-                        actiontarget.setText("Please fill in all fields!");
-                    }
+            btnNewGame.setOnAction(e -> {
+                if (!nPlayersBox.getText().equals("") && !nDeathsBox.getText().equals("") &&
+                        !mapIdBox.getText().equals("") && !turnDurationBox.getText().equals("")) {
+                    player.createGame(Integer.parseInt(nPlayersBox.getText()), Integer.parseInt(nDeathsBox.getText()),
+                            Integer.parseInt(turnDurationBox.getText()), Integer.parseInt(mapIdBox.getText()));
+                } else {
+                    actiontarget.setFill(Color.FIREBRICK);
+                    actiontarget.setText("Please fill in all fields!");
                 }
             });
 
@@ -229,6 +219,70 @@ public class GuiView extends ClientView{
      */
     @Override
     public void showMatch() {
+        if(player.getMatch().getState()== MatchState.NOT_STARTED){
+            showWaitingRoom();
+
+        }
+    }
+
+    private void showWaitingRoom() {
+        AdrenalinaMatch match= player.getMatch();
+        Platform.runLater(()->{
+            Stage primaryStage = FXWindow.getStage();
+            GridPane grid = FXWindow.getGrid();
+
+            grid.getChildren().clear();
+            grid.setAlignment(Pos.CENTER);
+            grid.setHgap(10);
+            grid.setVgap(10);
+            grid.setPadding(new Insets(25, 25, 25, 25));
+
+            Text scenetitle = new Text("Waiting room");
+            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            grid.add(scenetitle, 0, 0);
+            Label label = new Label("Your name: "+player.getNickname());
+            grid.add(label, 0, 1);
+            Label label1 = new Label("Players: "+match.getPlayers().size()+" / "+ match.getnPlayers());
+            grid.add(label1, 0, 2);
+            ScrollPane players = new ScrollPane();
+            players.setPrefSize(primaryStage.getWidth()*0.8, primaryStage.getHeight()*0.5);
+            GridPane playersGrid = new GridPane();
+            playersGrid.setHgap(0);
+            playersGrid.setVgap(0);
+            grid.add(players,0,6);
+            players.setContent(playersGrid);
+            int i =0;
+            for(Player p :match.getPlayers()){
+                    Label msg = new Label("Player Name: " + p.getNickname() +
+                            "\tColor Player: " + p.getColor()+
+                            "\tReady: "+ (p.isReadyToStart()?"ready":"not ready"));
+                    playersGrid.add(msg, 0, i + 1);
+                    i++;
+            }
+
+            Button btnReady = new Button("READY");
+            HBox hbBtnReady = new HBox(10);
+            hbBtnReady.setAlignment(Pos.BOTTOM_RIGHT);
+            hbBtnReady.getChildren().add(btnReady);
+            grid.add(hbBtnReady, 0, 8);
+
+            if(match.getPlayers().size()<match.getnPlayers()){
+                btnReady.setDisable(true);
+            }
+
+
+
+            final Text actiontarget = new Text();
+            grid.add(actiontarget, 0, 9);
+
+            btnReady.setOnAction(e -> {
+                actiontarget.setFill(Color.FIREBRICK);
+                actiontarget.setText("Waiting for other players");
+                player.setReady();
+            });
+
+        });
+
 
     }
 

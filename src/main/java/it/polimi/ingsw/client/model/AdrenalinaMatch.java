@@ -239,9 +239,9 @@ public class AdrenalinaMatch {
         this.mapID = Integer.parseInt(o.get("mapID").toString());
         this.turnDuration = Integer.parseInt(o.get("turnDuration").toString());
         this.turn = Integer.parseInt(o.get("turn").toString());
-
+        this.nPlayers = Integer.parseInt((o.get("nPlayers").toString()));
         JSONArray playersArray = (JSONArray) o.get("players");
-        if(players == null) {
+        if(state == MatchState.NOT_STARTED||players == null) {
             initPlayers(playersArray);
         }
 
