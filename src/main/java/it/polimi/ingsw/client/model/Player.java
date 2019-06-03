@@ -1,8 +1,11 @@
 package it.polimi.ingsw.client.model;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import it.polimi.ingsw.server.model.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 
 /**
  * 
@@ -57,7 +60,7 @@ public class Player {
 	/**
 	 * weapons
 	 */
-	private List<Weapon> weapons;
+	private List<WeaponCard> weapons;
 
 	/**
 	 * powerups
@@ -65,14 +68,19 @@ public class Player {
 	private List<Powerup> powerups;
 
 	/**
-	 * ammos
+	 *  Ammos this player has (Max 3 of each type)
 	 */
-	private List<Ammo> ammons;
+	private List<Resource> resources;
 
 	/**
 	 * match
 	 */
 	private AdrenalinaMatch match;
+
+	/**
+	 * True if this player is ready to start the match
+	 */
+	private boolean readyToStart;
 
 	/**
 	 * Default constructor
@@ -90,7 +98,6 @@ public class Player {
 	/**
 	 * @param nickname nickname to set
 	 */
-
 	public void setNickname(String nickname) {
 		this.nickname = nickname;
 	}
@@ -108,7 +115,6 @@ public class Player {
 	/**
 	 * @return score
 	 */
-
 	public int getScore() {
 		return score;
 	}
@@ -116,7 +122,6 @@ public class Player {
 	/**
 	 * @param score score to set
 	 */
-
 	public void setScore(int score) {
 		this.score = score;
 	}
@@ -124,7 +129,6 @@ public class Player {
 	/**
 	 * @return damage points
 	 */
-
 	public List<Player> getDmgPoints() {
 		return dmgPoints;
 	}
@@ -132,7 +136,6 @@ public class Player {
 	/**
 	 * @param dmgPoints damage points to set
 	 */
-
 	public void setDmgPoints(List<Player> dmgPoints) {
 		this.dmgPoints = dmgPoints;
 	}
@@ -140,7 +143,6 @@ public class Player {
 	/**
 	 * @return marks
 	 */
-
 	public List<Player> getMarks() {
 		return marks;
 	}
@@ -148,7 +150,6 @@ public class Player {
 	/**
 	 * @param marks marks to set
 	 */
-
 	public void setMarks(List<Player> marks) {
 		this.marks = marks;
 	}
@@ -156,7 +157,6 @@ public class Player {
 	/**
 	 * @return true if is death
 	 */
-
 	public boolean getDead() {
 		return dead;
 	}
@@ -164,7 +164,6 @@ public class Player {
 	/**
 	 * @param dead booleanean set
 	 */
-
 	public void setDead(boolean dead) {
 		this.dead = dead;
 	}
@@ -172,7 +171,6 @@ public class Player {
 	/**
 	 * @return the deaths
 	 */
-
 	public int getDeaths() {
 		return deaths;
 	}
@@ -180,7 +178,6 @@ public class Player {
 	/**
 	 * @param deaths deaths to set
 	 */
-
 	public void setDeaths(int deaths) {
 		this.deaths = deaths;
 	}
@@ -188,7 +185,6 @@ public class Player {
 	/**
 	 * @return givenMarks
 	 */
-
 	public int getGivenMarks() {
 		return givenMarks;
 	}
@@ -196,7 +192,6 @@ public class Player {
 	/**
 	 * @param givenMarks givenMarks to set
 	 */
-
 	public void setGivenMarks(int givenMarks) {
 		this.givenMarks = givenMarks;
 	}
@@ -204,7 +199,6 @@ public class Player {
 	/**
 	 * @return the position of the cell
 	 */
-
 	public Cell getPosition() {
 		return position;
 	}
@@ -212,7 +206,6 @@ public class Player {
 	/**
 	 * @param position position of the cell to set
 	 */
-
 	public void setPosition(Cell position) {
 		this.position = position;
 	}
@@ -220,23 +213,20 @@ public class Player {
 	/**
 	 * @return list of the Weapons
 	 */
-
-	public List<Weapon> getWeapons() {
+	public List<WeaponCard> getWeapons() {
 		return weapons;
 	}
 
 	/**
 	 * @param weapons list of the weapons to set
 	 */
-
-	public void setWeapons(List<Weapon> weapons) {
+	public void setWeapons(List<WeaponCard> weapons) {
 		this.weapons = weapons;
 	}
 
 	/**
 	 * @return powerups
 	 */
-
 	public List<Powerup> getPowerups() {
 		return powerups;
 	}
@@ -244,31 +234,15 @@ public class Player {
 	/**
 	 * @param powerups powerups to set
 	 */
-
 	public void setPowerups(List<Powerup> powerups) {
 		this.powerups = powerups;
 	}
 
-	/**
-	 * @return list of the ammo
-	 */
 
-	public List<Ammo> getAmmons() {
-		return ammons;
-	}
-
-	/**
-	 * @param ammons ammons to set
-	 */
-
-	public void setAmmons(List<Ammo> ammons) {
-		this.ammons = ammons;
-	}
 
 	/**
 	 * @return match
 	 */
-
 	public AdrenalinaMatch getMatch() {
 		return match;
 	}
@@ -276,8 +250,64 @@ public class Player {
 	/**
 	 * @param match match to set
 	 */
-
 	public void setMatch(AdrenalinaMatch match) {
 		this.match = match;
+	}
+
+	public boolean isReadyToStart() {
+		return readyToStart;
+	}
+
+	public void setReadyToStart(boolean readyToStart) {
+		this.readyToStart = readyToStart;
+	}
+
+	public boolean isDead() {
+		return dead;
+	}
+
+	public List<Resource> getResources() {
+		return resources;
+	}
+
+	public void setResources(List<Resource> resources) {
+		this.resources = resources;
+	}
+
+	public void update(JSONObject toParse) {
+		this.nickname = toParse.get("name").toString();
+		this.readyToStart = Boolean.parseBoolean(toParse.get("ready").toString());
+		this.deaths = Integer.parseInt(toParse.get("deaths").toString());
+		this.dead = Boolean.parseBoolean(toParse.get("dead").toString());
+		this.color = Color.valueOf(toParse.get("color").toString());
+
+		JSONArray weaponsArray = (JSONArray) toParse.get("weapons");
+		JSONArray powerupsArray = (JSONArray) toParse.get("powerups");
+		JSONArray marksArray = (JSONArray) toParse.get("marks");
+		JSONArray dmgpointsArray = (JSONArray) toParse.get("dmgpoints");
+		JSONArray resourcesArray = (JSONArray) toParse.get("resources");
+
+		weapons = new ArrayList<>();
+		powerups = new ArrayList<>();
+		marks = new ArrayList<>();
+		dmgPoints = new ArrayList<>();
+		resources = new ArrayList<>();
+
+		for(Object o: weaponsArray){
+			weapons.add(match.getWeapons().stream().filter(w->w.getName().equals(o.toString())).collect(Collectors.toList()).get(0));
+		}
+		for(Object o: powerupsArray){
+			powerups.add(Powerup.parseJSON((JSONObject) o));
+		}
+		for(Object o: marksArray){
+			marks.add(match.getPlayers().stream().filter(p->p.getNickname().equals(o.toString())).collect(Collectors.toList()).get(0));
+		}
+		for(Object o: dmgpointsArray){
+			dmgPoints.add(match.getPlayers().stream().filter(p->p.getNickname().equals(o.toString())).collect(Collectors.toList()).get(0));
+		}
+		for(Object o: weaponsArray){
+			resources.add(Resource.valueOf(o.toString()));
+		}
+
 	}
 }

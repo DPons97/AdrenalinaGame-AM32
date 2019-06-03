@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Enumeration;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -32,8 +34,6 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 *  max connections number
 	 */
 	private int maxConnections;
-
-
 
     /**
      * socket port
@@ -66,9 +66,21 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 		serverSocket= new ServerSocket(socketPort);
 
-		address = (InetAddress.getLocalHost()).toString();
+		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
+		String addresses="";
+		for (;n.hasMoreElements();){
+			NetworkInterface e = n.nextElement();
+			Enumeration<InetAddress> a = e.getInetAddresses();
 
-		System.out.println("Server address = " + address + ", Port = " + rmiPort);
+			if(a.hasMoreElements()) {
+				InetAddress addr = a.nextElement();
+				if(addr.getHostAddress().length() > 15) continue;
+				addresses = addresses + "     " + addr.getHostAddress();
+			}
+
+		}
+		address = addresses;
+		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+"Port socket= "+socketPort);
 
 		registry = LocateRegistry.createRegistry(rmiPort);
 		registry.rebind("rmiServer", this);
@@ -82,9 +94,21 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 		serverSocket= new ServerSocket(socketPort);
 
-		address = (InetAddress.getLocalHost()).toString();
+		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
+		String addresses="";
+		for (;n.hasMoreElements();){
+			NetworkInterface e = n.nextElement();
+			Enumeration<InetAddress> a = e.getInetAddresses();
 
-		System.out.println("Server address = " + address + ", Port = " + rmiPort);
+			if(a.hasMoreElements()) {
+				InetAddress addr = a.nextElement();
+				if(addr.getHostAddress().length() > 15) continue;
+				addresses = addresses + "     " + addr.getHostAddress();
+			}
+
+		}
+
+		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+"Port socket= "+socketPort);
 
 		registry = LocateRegistry.createRegistry(rmiPort);
 		registry.rebind("rmiServer", this);

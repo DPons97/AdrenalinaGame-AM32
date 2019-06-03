@@ -27,8 +27,13 @@ public class CliView extends ClientView {
     /**
      * Data structure to hold cli assets
      */
-    private class CharAsset {
+    private static class CharAsset {
+        // This asset's character
         String character;
+
+        // Informations about walls:
+        //  [direction] == true --> there is a wall
+        //  [direction] == false --> no wall in this direction
         boolean north;
         boolean south;
         boolean east;
@@ -42,6 +47,14 @@ public class CliView extends ClientView {
             this.west = west;
         }
 
+        /**
+         * Get if this character is the right one with this adjacent walls
+         * @param north true if there is a wall to the north of this char
+         * @param south true if there is a wall to the south of this char
+         * @param east true if there is a wall to the east of this char
+         * @param west true if there is a wall to the west of this char
+         * @return
+         */
         boolean isRightChar(boolean north, boolean south, boolean east, boolean west) {
             return east == this.east && north == this.north && south == this.south && west == this.west;
         }
@@ -51,7 +64,7 @@ public class CliView extends ClientView {
         }
     }
 
-    private List<CharAsset> charAssets;
+    private static List<CharAsset> charAssets;
 
     /**
      * ASCII encoding of walls (Customizable from json)
@@ -83,11 +96,6 @@ public class CliView extends ClientView {
      * Width of players' box inside cell
      */
     private static final int PLAYER_BOX_WIDTH = 3;
-
-    /**
-     * Height of players' box inside cell
-     */
-    private static final int PLAYER_BOX_HEIGHT = 5;
 
     /**
      * ANSI color encoding for easy use
@@ -142,7 +150,14 @@ public class CliView extends ClientView {
             for(Object o: players) System.out.print(o.toString()+"     ");
 
         }
-
+        System.out.println("\nEnter match id to join or -1 to cerate new game, other to refresh: ");
+        Scanner in = new Scanner (System.in);
+        int choice = in.nextInt();
+        if(choice >= 0 && choice < matches.size()) player.joinGame(choice);
+        else if (choice == -1)createNewGame();
+        else {
+            showLobby(lobby);
+        }
     }
 
 
@@ -256,7 +271,7 @@ public class CliView extends ClientView {
      * Print map
      */
     public static void main(String[] args) {
-        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 3);
+        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 1);
         CliView view = new CliView(null);
 
         try {
@@ -290,19 +305,20 @@ public class CliView extends ClientView {
             e.printStackTrace();
         }
 
+        clearConsole();
         view.drawMap(match.getBoardMap());
     }
 
     /**
      * Parse json with cli assets
      */
-    private void parseCliAssets() {
-        this.charAssets = new ArrayList<>();
+    private static void parseCliAssets() {
+        charAssets = new ArrayList<>();
         JSONParser parser = new JSONParser();
 
         try {
-            Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().
-                    getResourceAsStream("/json/cliAssets.json"), StandardCharsets.UTF_8)));
+            Object obj = parser.parse(new BufferedReader(new InputStreamReader(CliView.class
+                    .getResourceAsStream("/json/cliAssets.json"), StandardCharsets.UTF_8)));
             JSONArray jsonArray = (JSONArray) obj;
 
             for (Object character : jsonArray) {
@@ -410,15 +426,20 @@ public class CliView extends ClientView {
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY, xSize, ySize);   // South-West
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY + CELL_CHAR_WIDTH, xSize, ySize); // South-East
 
-        // Draw plyers
+        // Draw players
         drawPlayers(charMap, toDraw, startingX, startingY);
 
+        // Draw weapons and ammos
+        if (toDraw.isSpawn()) {
+            drawCellWeapon(charMap, (SpawnCell) toDraw, startingX, startingY );
+        } else drawCellAmmo(charMap, (AmmoCell) toDraw, startingX, startingY );
     }
 
     /**
      * Draw a horizontal wall/door/free
      * @param charMap map of character to draw in
-     * @param sideType type of side to draw
+     * @param cell where the wall belongs
+     * @param dir direction of wall
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
@@ -476,9 +497,10 @@ public class CliView extends ClientView {
     }
 
     /**
-     * Draw a horizontal wall/door/free
+     * Draw a vertical wall/door/free
      * @param charMap map of character to draw in
-     * @param sideType type of side to draw
+     * @param cell where the wall belongs
+     * @param dir direction of wall
      * @param startingX coordinate of side
      * @param startingY coordinate of side
      */
@@ -549,10 +571,10 @@ public class CliView extends ClientView {
         if (x < 0 || y < 0 || x > printHeight || y > printWidth) return;
 
         // North/South/West/East are true if there is a wall to be connected in this direction
-        boolean north = (x > 0) && (charMap[x - 1][y] == wallV);
-        boolean south = (x < printHeight) && (charMap[x + 1][y] == wallV);
-        boolean east = (y < printWidth) && (charMap[x][y + 1] == wallO);
-        boolean west = (y > 0) && (charMap[x][y - 1] == wallO);
+        boolean north = (x > 0) && (charMap[x - 1][y].equals(wallV));
+        boolean south = (x < printHeight) && (charMap[x + 1][y].equals(wallV));
+        boolean east = (y < printWidth) && (charMap[x][y + 1].equals(wallO));
+        boolean west = (y > 0) && (charMap[x][y - 1].equals(wallO));
 
         for (CharAsset character : charAssets) {
             if (character.isRightChar(north, south, east, west)) {
@@ -582,15 +604,82 @@ public class CliView extends ClientView {
         int playerBoxY = startingY + boxYOffset;
 
         for (Player p : playersToDraw) {
-            charMap[playerBoxX][playerBoxY] = getANSIColor(p) + String.valueOf(p.getNickname().charAt(0)) + ANSI_RESET;
+            charMap[playerBoxX][playerBoxY] = getANSIColor(p) + p.getNickname().charAt(0) + ANSI_RESET;
 
             if (playerBoxY > startingY + boxYOffset + PLAYER_BOX_WIDTH - 2) {
                 playerBoxX = playerBoxX + 2;
                 playerBoxY = startingY + boxYOffset;
             } else playerBoxY = playerBoxY + 2;
         }
+    }
 
+    /**
+     * Draw this cell's ammos
+     * @param charMap map of strings to print
+     * @param toDraw cell to get ammo from
+     * @param startingX starting X coord
+     * @param startingY starting Y coord
+     */
+    private void drawCellAmmo(String[][] charMap, AmmoCell toDraw, int startingX, int startingY) {
+        Ammo ammoToDraw = toDraw.getResource();
 
+        int boxXOffset = 3;
+        int boxYOffset = 3;
+
+        // Draw ammo box's walls
+        charMap[startingX + boxXOffset][startingY+boxYOffset] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
+                false, true, true, false)).collect(Collectors.toList()).get(0).getCharacter();
+
+        for (int i = startingY+boxYOffset+1; i < startingY+boxYOffset+4; i++) charMap[startingX+boxXOffset][i] = wallO;
+        for (int i = startingY+boxYOffset+1; i < startingY+boxYOffset+4; i++) charMap[startingX+boxXOffset+4][i] = wallO;
+
+        charMap[startingX + boxXOffset][startingY+boxYOffset + 4] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
+                false, true, false, true)).collect(Collectors.toList()).get(0).getCharacter();
+
+        for (int i = startingX+boxXOffset+1; i < startingX+boxXOffset+4; i++) charMap[i][startingY+boxYOffset] = wallV;
+        for (int i = startingX+boxXOffset+1; i < startingX+boxXOffset+4; i++) charMap[i][startingY+boxYOffset+4] = wallV;
+        charMap[startingX + boxXOffset + 4][startingY+boxYOffset] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
+                true, false, true, false)).collect(Collectors.toList()).get(0).getCharacter();
+        charMap[startingX + boxXOffset + 4][startingY+boxYOffset + 4] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
+                true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
+
+        // Write Ammos
+        charMap[startingX+boxXOffset +1][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(0)) +"■"+ANSI_RESET;
+        charMap[startingX+boxXOffset+2][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(1)) +"■"+ANSI_RESET;
+
+        if (ammoToDraw.hasPowerup()) charMap[startingX+boxXOffset+3][startingY+boxYOffset+2] = "\u25B2";
+        else charMap[startingX+boxXOffset+3][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(2)) +"■"+ANSI_RESET;
+
+    }
+
+    /**
+     * Draw spawn mark inside this cell
+     * @param charMap map of strings to print
+     * @param toDraw cell to get ammo from
+     * @param startingX starting X coord
+     * @param startingY starting Y coord
+     */
+    private void drawCellWeapon(String[][] charMap, SpawnCell toDraw, int startingX, int startingY) {
+        int boxXOffset = 3;
+        int boxYOffset = 3;
+
+        String spawnArt =   "  ___ \n" +
+                            "/ __>\n" +
+                            "\\__ \\\n" +
+                             "<___/ ";
+
+        int i = startingX + boxXOffset;
+        int j = startingY + boxYOffset - 1;
+        for (char c : spawnArt.toCharArray()) {
+            if (c == '\n') {
+                i++;
+                j = startingY + boxYOffset;
+            }
+            else {
+                charMap[i][j] = getANSIColor(toDraw) + c + ANSI_RESET;
+                j++;
+            }
+        }
 
     }
 
@@ -641,6 +730,26 @@ public class CliView extends ClientView {
                 return ANSI_WHITE;
             case PURPLE:
                 return ANSI_PURPLE;
+            default:
+                return ANSI_RESET;
+        }
+    }
+
+    /**
+     * Get player's corresponding ANSI color code
+     * @param resource to get color from. Set this to null to get RESET code
+     * @return char color code
+     */
+    private String getANSIColor(Resource resource) {
+        if (resource == null) return ANSI_RESET;
+
+        switch (resource) {
+            case BLUE_BOX:
+                return ANSI_BLUE;
+            case RED_BOX:
+                return ANSI_RED;
+            case YELLOW_BOX:
+                return ANSI_YELLOW;
             default:
                 return ANSI_RESET;
         }

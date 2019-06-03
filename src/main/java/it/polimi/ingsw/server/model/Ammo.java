@@ -70,4 +70,21 @@ public class Ammo {
 		return toRet;
 	}
 
+	/**
+	 * Builds a json object from a json representation
+	 * @param toParse json representation to parse
+	 * @return corresponding ammo
+	 */
+	public static Ammo parseJSON(JSONObject toParse){
+		JSONArray res =(JSONArray) toParse.get("resources");
+		if(res.size()==2){
+			return new Ammo(Resource.valueOf(res.get(0).toString()),
+							Resource.valueOf(res.get(1).toString()));
+		} else {
+			return new Ammo(Resource.valueOf(res.get(0).toString()),
+							Resource.valueOf(res.get(1).toString()),
+							Resource.valueOf(res.get(2).toString()));
+		}
+	}
+
 }

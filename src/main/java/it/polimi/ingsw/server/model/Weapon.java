@@ -2,6 +2,7 @@ package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.RequirementsNotMetException;
 import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
@@ -118,4 +119,21 @@ public abstract class Weapon {
 	 * @return
 	 */
 	protected abstract void parseEffects(JSONObject actions);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

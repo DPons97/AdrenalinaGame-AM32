@@ -76,7 +76,16 @@ public class Powerup {
 	public JSONObject toJSON(){
 		JSONObject p = new JSONObject();
 		p.put("name", name);
+		p.put("description", description);
 		p.put("bonusResource", bonusResource.toString());
 		return p;
+	}
+
+	public static Powerup parseJSON(JSONObject toParse){
+		String name = toParse.get("name").toString();
+		String description = toParse.get("description").toString();
+		Resource resource = Resource.valueOf(toParse.get("bonusResource").toString());
+		return new Powerup(name, description, resource, null);
+
 	}
 }

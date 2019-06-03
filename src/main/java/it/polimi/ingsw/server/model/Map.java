@@ -1,16 +1,12 @@
 package it.polimi.ingsw.server.model;
 
+import it.polimi.ingsw.client.model.SpawnCellClient;
+import it.polimi.ingsw.client.model.WeaponCard;
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -281,14 +277,22 @@ public class Map {
     /**
      * @return JSON representation of this
      */
-    public JSONArray toJSON(){
+    public JSONObject toJSON(){
+        JSONObject toRet = new JSONObject();
+        toRet.put("xSize", mapMatrix.length);
+        toRet.put("ySize", mapMatrix[0].length);
         JSONArray map = new JSONArray();
 
         for (Cell[] cells : mapMatrix) {
             for (Cell cell : cells) {
+                JSONObject currCell = new JSONObject();
                 if(cell != null){
-                    JSONObject currCell = new JSONObject();
-
+                    currCell.put("valid", true);
+                    currCell.put("color",cell.getColor().toString());
+                    currCell.put("north", cell.getNorth().toString());
+                    currCell.put("south", cell.getSouth().toString());
+                    currCell.put("east", cell.getEast().toString());
+                    currCell.put("west", cell.getWest().toString());
                     if(cell.isSpawn()){
                         currCell.put("type", "spawn");
                         JSONArray weapons = new JSONArray();
@@ -297,19 +301,42 @@ public class Map {
 
                         currCell.put("weapons", weapons);
                     }else {
+                        currCell.put("type", "ammo");
                         currCell.put("ammo", ((AmmoCell) cell).getResource().toJSON());
-
                     }
                     JSONArray players = new JSONArray();
                     cell.getPlayers().forEach(p -> players.add(p.getNickname()));
                     currCell.put("players", players);
-
-                    map.add(currCell);
-
+                }else {
+                    currCell.put("valid", false);
                 }
+                map.add(currCell);
+
             }
         }
-
-        return map;
+        toRet.put("map", map);
+        return toRet;
     }
+
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

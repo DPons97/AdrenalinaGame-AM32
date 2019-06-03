@@ -77,10 +77,10 @@ public class SocketClient extends ServerConnection {
 		this.input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		output.println(player.getNickname());
 		Thread t = new Thread(this::listen);
-		t.start();
-
 		String confirm = input.readLine();
 		if(confirm.contains("KO")) throw new UsernameTakenException();
+		t.start();
+
 	}
 
 	/**
@@ -291,19 +291,16 @@ public class SocketClient extends ServerConnection {
 			case "update":
 				switch (message.get("type").toString()){
 					case "match":
-
+						player.updateMatch((JSONObject) message.get("match"));
 						break;
 					case "lobby":
-							//player.updateLobby(message.get("lobby").toString());
-							if(!validResponse) {
-							    synchronized (lock) {
-                                    response = message.get("lobby").toString();
-                                    validResponse = true;
-                                    lock.notifyAll();
-                                }
+						if(!validResponse) {
+							synchronized (lock) {
+								response = message.get("lobby").toString();
+								validResponse = true;
+								lock.notifyAll();
 							}
-						break;
-
+						}
 					default:
 				}
 				break;

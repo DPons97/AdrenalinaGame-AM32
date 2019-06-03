@@ -1,10 +1,18 @@
 package it.polimi.ingsw.client.model;
 
-import it.polimi.ingsw.server.model.Map;
-import it.polimi.ingsw.server.model.MatchState;
-import it.polimi.ingsw.server.model.SpawnCell;
+import it.polimi.ingsw.server.model.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -12,9 +20,14 @@ import java.util.List;
 public class AdrenalinaMatch {
 
 	/**
-	 * match map
-	 */
-	private Map map;
+     * match map
+     */
+    private Map map;
+
+    /**
+     * map id
+     */
+    private int mapID;
 
 	/**
 	 * state of the match
@@ -22,14 +35,14 @@ public class AdrenalinaMatch {
 	private MatchState state;
 
 	/**
-	 * points of the spawn
-	 */
-	private List<SpawnCell> spawnPoints;
-
-	/**
 	 * current Deaths
 	 */
 	private int currentDeaths;
+
+    /**
+     * max Deaths
+     */
+    private int maxDeaths;
 
 	/**
 	 * track of the player's death
@@ -56,6 +69,8 @@ public class AdrenalinaMatch {
 	 */
 	private int turnDuration;
 
+	private List<WeaponCard> weapons;
+
 	/**
 	 * turn
 	 */
@@ -66,6 +81,7 @@ public class AdrenalinaMatch {
      * Default constructor
      */
     public AdrenalinaMatch() {
+        initWeapons();
     }
 
     /**
@@ -94,20 +110,6 @@ public class AdrenalinaMatch {
      */
     public void setState(MatchState state) {
         this.state = state;
-    }
-
-    /**
-     * @return the spawnpoints cells
-     */
-    public List<SpawnCell> getSpawnPoints() {
-        return spawnPoints;
-    }
-
-    /**
-     * @param spawnPoints spawnPoints to set
-     */
-    public void setSpawnPoints(List<SpawnCell> spawnPoints) {
-        this.spawnPoints = spawnPoints;
     }
 
     /**
@@ -207,4 +209,85 @@ public class AdrenalinaMatch {
     public void setTurn(int turn) {
         this.turn = turn;
     }
+
+    public int getMapID() {
+        return mapID;
+    }
+
+    public void setMapID(int mapID) {
+        this.mapID = mapID;
+    }
+
+    public int getMaxDeaths() {
+        return maxDeaths;
+    }
+
+    public void setMaxDeaths(int maxDeaths) {
+        this.maxDeaths = maxDeaths;
+    }
+
+    public List<WeaponCard> getWeapons() {
+        return weapons;
+    }
+
+    public void setWeapons(List<WeaponCard> weapons) {
+        this.weapons = weapons;
+    }
+
+    public void update(JSONObject o) {
+        this.maxDeaths = Integer.parseInt(o.get("max_deaths").toString());
+        this.mapID = Integer.parseInt(o.get("mapID").toString());
+        this.turnDuration = Integer.parseInt(o.get("turnDuration").toString());
+        this.turn = Integer.parseInt(o.get("turn").toString());
+
+        JSONArray playersArray = (JSONArray) o.get("players");
+        if(players == null) {
+            initPlayers(playersArray);
+        }
+
+        for(Object player: playersArray){
+            players.stream().filter(p->p.getNickname().equals(((JSONObject) player).get("name").toString())).collect(Collectors.toList()).get(0).update((JSONObject) player);
+        }
+
+        this.state = MatchState.valueOf(o.get("state").toString());
+        this.map =  Map.parseJSON((JSONObject) o.get("map"), weapons, players);
+
+        JSONArray deathTrackArray = (JSONArray) o.get("deathTrack");
+        deathTrack = new ArrayList<>();
+        for(Object player: deathTrackArray){
+            deathTrack.add(players.stream().filter(p->p.getNickname().equals(player.toString())).collect(Collectors.toList()).get(0));
+        }
+        System.out.println("match model updated");
+    }
+
+    private void initPlayers(JSONArray playersArray) {
+        this.players = new ArrayList<>();
+        for (Object p : playersArray) {
+            Player toAdd = new Player();
+            toAdd.setNickname(((JSONObject) p).get("name").toString());
+            toAdd.setMatch(this);
+            this.players.add(toAdd);
+        }
+    }
+
+    private void initWeapons(){
+        weapons = new ArrayList<>();
+        JSONParser parser = new JSONParser();
+        String name;
+        try {
+            Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/json/weapons.json"), StandardCharsets.UTF_8)));
+            JSONObject jsonObject = (JSONObject) obj;
+
+            JSONArray weaponCards = (JSONArray) jsonObject.get("Weapons");
+
+            for(Object weaponCard: weaponCards){
+                weapons.add(WeaponCard.parseJSON((JSONObject) weaponCard));
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

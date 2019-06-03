@@ -54,33 +54,30 @@ public class Launcher{
         {
             startServer();
         } else {
-            String serverddress, nickname;
-            int port;
-            System.out.print("Server address: ");
-            serverddress = in.next();
-            System.out.print("Server port: ");
-            port = in.nextInt();
-            System.out.print("Connection type [Socket 0, RMI 1]");
-            ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
-            System.out.print("Nickname: ");
-            nickname = in.next();
-            startClient(serverddress, port, nickname, c, 0);
+            int res = 1;
+            do{
+                String serverddress, nickname;
+                int port;
+                System.out.print("Server address: ");
+                serverddress = in.next();
+                System.out.print("Server port: ");
+                port = in.nextInt();
+                System.out.print("Connection type [Socket 0, RMI 1]");
+                ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
+                System.out.print("Nickname: ");
+                nickname = in.next();
+                res = startClient(serverddress, port, nickname, c, 0);
+                if(res == 1){
+                    System.out.println("Error connecting: ip/port not valid");
+                }else if (res == 2){
+                    System.out.println("Error connecting: username arlready in use");
+                }
+            }while(res != 0);
         }
     }
 
     public void startLauncherGui(){
-        new Thread(()->Application.launch(FXWindow.class)).start();
-
-        synchronized (FXWindow.lock) {
-            while (FXWindow.getStage() == null) {
-                try {
-                    FXWindow.lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            FXWindow.lock.notifyAll();
-        }
+        initView();
         Platform.setImplicitExit(false);
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
@@ -246,7 +243,7 @@ public class Launcher{
                         Text scenetitle = new Text("Adrenalina server is running...");
                         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
                         grid.add(scenetitle, 0, 0, 2, 1);
-                        Label ip = new Label("IP address: "+server.getAddress());
+                        Label ip = new Label("IP addresses: "+server.getAddress());
                         Label rmi = new Label("RMI port: "+server.getRmiPort());
                         Label socket = new Label("Socket port: "+server.getSocketPort());
                         grid.add(ip, 0,2);
@@ -271,7 +268,9 @@ public class Launcher{
 
     public int startClient(String server, int port, String nick, ConnectionType c, int view){
         try {
+            if(view == 1)initView();
             ClientPlayer p =  new ClientPlayer(nick, c, server, port, view==1);
+
             return 0;
         } catch (NotBoundException | IOException e) {
            return 1;
@@ -279,6 +278,21 @@ public class Launcher{
             return 2;
         }
 
+    }
+
+    private void initView() {
+        new Thread(()->Application.launch(FXWindow.class)).start();
+
+        synchronized (FXWindow.lock) {
+            while (FXWindow.getStage() == null) {
+                try {
+                    FXWindow.lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            FXWindow.lock.notifyAll();
+        }
     }
 
     private String parseMode(List<String> args){
@@ -344,7 +358,7 @@ public class Launcher{
                 String nick = l.parseNickname(argsList);
                 ConnectionType c = l.parseConnection(argsList).equals("r") ? ConnectionType.RMI : ConnectionType.SOCKET;
                 int view = l.parseView(argsList);
-                if(view == 0) l.startClient(server, port, nick, c, view);
+                l.startClient(server, port, nick, c, view);
             }
         }
     }

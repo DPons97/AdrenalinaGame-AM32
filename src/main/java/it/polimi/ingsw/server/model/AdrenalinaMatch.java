@@ -177,12 +177,12 @@ public class AdrenalinaMatch {
 					if (Boolean.parseBoolean(currCell.get("isSpawn").toString())) {
 						// create spawn cell
                         SpawnCell newCell = new SpawnCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
-                        newMap[(i / 4) % 3][i % 4] = newCell;
+                        newMap[(i / ySize) % xSize][i % ySize] = newCell;
                         spawnPoints.add(newCell);
 					} else {
 						// create AmmoCell
                         AmmoCell newCell = new AmmoCell(cords[0], cords[1], cords[2], cords[3], c, (i / ySize) % xSize, i % ySize);
-						newMap[(i / 4) % 3][i % 4] = newCell;
+						newMap[(i / ySize) % xSize][i % ySize] = newCell;
 						ammoPoints.add(newCell);
 					}
 				}
@@ -868,19 +868,19 @@ public class AdrenalinaMatch {
 		JSONObject toRet = new JSONObject();
 		toRet.put("max_deaths", this.maxDeaths);
 		toRet.put("mapID", this.mapID);
-		toRet.put("state", this.state);
+		toRet.put("state", this.state.toString());
 		toRet.put("map", this.boardMap.toJSON());
+		toRet.put("turn", this.turn);
 		JSONArray playersArray = new JSONArray();
 		players.forEach(p -> {
-			JSONObject player = new JSONObject();
-			toRet.put("name", p.getNickname());
-			toRet.put("ready", p.isReadyToStart());
-			toRet.put("name", p.getNickname());
-
+			playersArray.add(p.toJSON());
 		});
 
 		toRet.put("players", playersArray);
-
+		JSONArray deathTrackAray = new JSONArray();
+		deathTrack.forEach(p->deathTrackAray.add(p.getNickname()));
+		toRet.put("deathTrack", deathTrackAray);
+		toRet.put("turnDuration", turnDuration);
 		return toRet;
 	}
 
