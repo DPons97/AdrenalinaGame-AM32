@@ -61,14 +61,17 @@ public class Map {
                             .collect(Collectors.toList()).get(0));
 
                 int finalI = i;
-                cellPlayers.forEach(p->map.mapMatrix[(finalI / ySize) % xSize][finalI % ySize].addPlayer(p));
+                cellPlayers.forEach(p->{
+                    map.mapMatrix[(finalI / ySize) % xSize][finalI % ySize].addPlayer(p);
+                    p.setPosition(map.mapMatrix[(finalI / ySize) % xSize][finalI % ySize]);
+                });
             } else {
                 map.mapMatrix[(i / ySize) % xSize][i % ySize] = null;
             }
             i++;
         }
 
-        return null; //TODO implement this
+        return map;
     }
 
     private static AmmoCell initAmmoCell(int xSize, int ySize, int i, JSONObject cellObj, Color color) {

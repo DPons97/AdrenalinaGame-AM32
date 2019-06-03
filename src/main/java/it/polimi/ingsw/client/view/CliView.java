@@ -271,7 +271,7 @@ public class CliView extends ClientView {
      * Print map
      */
     public static void main(String[] args) {
-        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 3);
+        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 1);
         CliView view = new CliView(null);
 
         try {

@@ -77,18 +77,7 @@ public class Launcher{
     }
 
     public void startLauncherGui(){
-        new Thread(()->Application.launch(FXWindow.class)).start();
-
-        synchronized (FXWindow.lock) {
-            while (FXWindow.getStage() == null) {
-                try {
-                    FXWindow.lock.wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            FXWindow.lock.notifyAll();
-        }
+        initView();
         Platform.setImplicitExit(false);
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
@@ -279,7 +268,9 @@ public class Launcher{
 
     public int startClient(String server, int port, String nick, ConnectionType c, int view){
         try {
+            if(view == 1)initView();
             ClientPlayer p =  new ClientPlayer(nick, c, server, port, view==1);
+
             return 0;
         } catch (NotBoundException | IOException e) {
            return 1;
@@ -287,6 +278,21 @@ public class Launcher{
             return 2;
         }
 
+    }
+
+    private void initView() {
+        new Thread(()->Application.launch(FXWindow.class)).start();
+
+        synchronized (FXWindow.lock) {
+            while (FXWindow.getStage() == null) {
+                try {
+                    FXWindow.lock.wait();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            FXWindow.lock.notifyAll();
+        }
     }
 
     private String parseMode(List<String> args){
@@ -352,7 +358,7 @@ public class Launcher{
                 String nick = l.parseNickname(argsList);
                 ConnectionType c = l.parseConnection(argsList).equals("r") ? ConnectionType.RMI : ConnectionType.SOCKET;
                 int view = l.parseView(argsList);
-                if(view == 0) l.startClient(server, port, nick, c, view);
+                l.startClient(server, port, nick, c, view);
             }
         }
     }

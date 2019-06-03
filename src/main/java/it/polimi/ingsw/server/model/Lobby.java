@@ -161,6 +161,7 @@ public class Lobby {
         player.setMatch(toJoin.getMatch());
         player.getConnection().setCurrentMatch(toJoin);
         players.remove(player);
+        toJoin.getMatch().getPlayers().forEach(p->p.getConnection().updateMatch(toJoin.getMatch()));
     }
 
     /**

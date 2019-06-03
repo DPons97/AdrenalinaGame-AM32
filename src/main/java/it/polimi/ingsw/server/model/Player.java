@@ -151,6 +151,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
+		color = Color.RED; // TODO: give the right color here
 	}
 
 	/**
@@ -177,6 +178,8 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
+		color = Color.RED; // TODO: give the right color here
+
 	}
 
 	/**
@@ -203,6 +206,8 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
+		color = Color.RED; // TODO: give the right color here
+
 	}
 
 	/**
@@ -805,7 +810,7 @@ public class Player {
 		player.put("name", nickname);
 		player.put("ready", readyToStart);
 		player.put("deaths", deaths);
-
+		player.put("dead", dead);
 		JSONArray weaponsArray = new JSONArray();
 		JSONArray powerupsArray = new JSONArray();
 		JSONArray marksArray = new JSONArray();
@@ -818,12 +823,12 @@ public class Player {
 		dmgPoints.forEach(d -> dmgpointsArray.add(d.getNickname()));
 		ammos.forEach(a -> resourcesArray.add(a.toString()));
 
-
 		player.put("weapons", weaponsArray);
 		player.put("powerups", powerupsArray);
 		player.put("marks", marksArray);
 		player.put("dmgpoints", dmgpointsArray);
 		player.put("resources", resourcesArray);
+		player.put("color", color.toString());
 
 		return player;
 	}

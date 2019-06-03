@@ -297,7 +297,7 @@ public class Map {
                         currCell.put("type", "spawn");
                         JSONArray weapons = new JSONArray();
 
-                        ((SpawnCell) cell).getWeapons().forEach(w -> weapons.add(w.toString()));
+                        ((SpawnCell) cell).getWeapons().forEach(w -> weapons.add(w.getName()));
 
                         currCell.put("weapons", weapons);
                     }else {

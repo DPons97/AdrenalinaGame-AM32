@@ -95,7 +95,7 @@ public class WeaponCard {
             String cardName = toParse.get("name").toString();
             boolean isEffect = toParse.get("type").toString().equals("EFFECT");
             List<Resource> cost = parseResources(toParse);
-            List<Effect> effects = parseEffects(toParse);
+            List<Effect> effects = parseEffects(toParse, isEffect);
             return new WeaponCard(cardName, cost,effects,isEffect);
         } catch (InvalidStringException e) {
                 e.printStackTrace();
@@ -103,10 +103,10 @@ public class WeaponCard {
         }
     }
 
-    private static List<Effect> parseEffects(JSONObject toParse) throws InvalidStringException {
+    private static List<Effect> parseEffects(JSONObject toParse, boolean isEffect) throws InvalidStringException {
         List<Effect> effects = new ArrayList<>();
 
-        JSONObject effect = (JSONObject) toParse.get("base-effect");
+        JSONObject effect = (JSONObject) toParse.get( isEffect ? "base-effect" : "base-mode");
 
         JSONArray costJSON = (JSONArray) effect.get("cost");
         List<Resource> effectCost = new ArrayList<>();
@@ -116,18 +116,30 @@ public class WeaponCard {
         effects.add(new Effect("base effect", effect.get("description").toString(),
                 effectCost));
 
-        JSONArray optionalEffectJ = (JSONArray) toParse.get("secondaryEffects");
-        if(optionalEffectJ != null) {
-            for (Object effectName : optionalEffectJ) {
-                effect = (JSONObject) toParse.get(effectName.toString());
-                JSONArray effCostJSON = (JSONArray) effect.get("cost");
-                List<Resource> effCost = new ArrayList<>();
-                for(Object res: effCostJSON){
-                    effCost.add(stringToResource(res.toString()));
+        if(isEffect) {
+            JSONArray optionalEffectJ = (JSONArray) toParse.get("secondaryEffects");
+            if (optionalEffectJ != null) {
+                for (Object effectName : optionalEffectJ) {
+                    effect = (JSONObject) toParse.get(effectName.toString());
+                    JSONArray effCostJSON = (JSONArray) effect.get("cost");
+                    List<Resource> effCost = new ArrayList<>();
+                    for (Object res : effCostJSON) {
+                        effCost.add(stringToResource(res.toString()));
+                    }
+                    effects.add(new Effect(effectName.toString(), effect.get("description").toString(),
+                            effCost));
                 }
-                effects.add(new Effect(effectName.toString(), effect.get("description").toString(),
-                        effCost));
             }
+        } else {
+            effect = (JSONObject) toParse.get(toParse.get("secondaryMode").toString());
+
+            JSONArray effCostJSON = (JSONArray) effect.get("cost");
+            List<Resource> effCost = new ArrayList<>();
+            for(Object res: costJSON){
+                effCost.add(stringToResource(res.toString()));
+            }
+            effects.add(new Effect("base effect", effect.get("description").toString(),
+                    effectCost));
         }
         return effects;
     }

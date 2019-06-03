@@ -870,20 +870,17 @@ public class AdrenalinaMatch {
 		toRet.put("mapID", this.mapID);
 		toRet.put("state", this.state.toString());
 		toRet.put("map", this.boardMap.toJSON());
+		toRet.put("turn", this.turn);
 		JSONArray playersArray = new JSONArray();
 		players.forEach(p -> {
-			JSONObject player = new JSONObject();
-			player.put("name", p.getNickname());
-			player.put("ready", p.isReadyToStart());
-			player.put("score", p.getScore());
-			player.put("dead", p.isDead());
-			//toRet.put("color", p.getColor());
-
-			playersArray.add(player);
+			playersArray.add(p.toJSON());
 		});
 
 		toRet.put("players", playersArray);
-
+		JSONArray deathTrackAray = new JSONArray();
+		deathTrack.forEach(p->deathTrackAray.add(p.getNickname()));
+		toRet.put("deathTrack", deathTrackAray);
+		toRet.put("turnDuration", turnDuration);
 		return toRet;
 	}
 
