@@ -1,10 +1,18 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.model.Point;
+import it.polimi.ingsw.client.controller.ConnectionType;
+import it.polimi.ingsw.client.model.*;
+import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.AmmoCell;
+import it.polimi.ingsw.client.model.Cell;
+import it.polimi.ingsw.client.model.Map;
+import it.polimi.ingsw.client.model.Player;
+import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
 import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
+import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -18,9 +26,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CliView extends ClientView {
@@ -153,20 +163,123 @@ public class CliView extends ClientView {
         System.out.println("\nEnter match id to join or -1 to cerate new game, other to refresh: ");
         Scanner in = new Scanner (System.in);
         int choice = in.nextInt();
-        if(choice >= 0 && choice < matches.size()) player.joinGame(choice);
+        if(choice >= 0 && choice < matches.size()) {
+            player.joinGame(choice);
+            clearConsole();
+            showMatch();
+        }
         else if (choice == -1)createNewGame();
         else {
             showLobby(lobby);
         }
     }
 
+    /**
+     * Main for testing showMatch function
+     * @param args
+     */
+    public static void main(String[] args) {
+        it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.AdrenalinaMatch(5, 8, 120, 1);
+
+        it.polimi.ingsw.server.model.Player newPlayer1 = new it.polimi.ingsw.server.model.Player(match, "Davide");
+        newPlayer1.setColor(Color.RED);
+
+        ClientPlayer p1;
+        try {
+            p1 = new ClientPlayer("Dr4ke");
+            CliView view = new CliView(p1);
+
+            it.polimi.ingsw.server.model.Player newPlayer2 = new it.polimi.ingsw.server.model.Player(match, "Luca");
+            newPlayer2.setColor(Color.BLUE);
+            it.polimi.ingsw.server.model.Player newPlayer3 = new it.polimi.ingsw.server.model.Player(match, "Mike");
+            newPlayer3.setColor(Color.GREEN);
+            it.polimi.ingsw.server.model.Player newPlayer4 = new it.polimi.ingsw.server.model.Player(match, "Conti");
+            newPlayer4.setColor(Color.PURPLE);
+            it.polimi.ingsw.server.model.Player newPlayer5 = new it.polimi.ingsw.server.model.Player(match, "Lorenzo");
+            newPlayer5.setColor(Color.YELLOW);
+
+            match.addPlayer(newPlayer1);
+            match.addPlayer(newPlayer2);
+            match.addPlayer(newPlayer3);
+            match.addPlayer(newPlayer4);
+            match.addPlayer(newPlayer5);
+
+            AdrenalinaMatch clientMatch = new AdrenalinaMatch();
+            clientMatch.update(match.toJSON());
+            p1.setMatch(clientMatch);
+
+            view.showMatch();
+        } catch (TooManyPlayersException e) {
+            e.printStackTrace();
+        } catch (PlayerAlreadyExistsException e) {
+            e.printStackTrace();
+        } catch (MatchAlreadyStartedException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Shows the launcher options
      */
     @Override
     public void showMatch() {
+        AdrenalinaMatch match = player.getMatch();
+        boolean isReady = false;
+        // Draw match pre-game
+        String leftAlignFormat = "|   %-20s   |      %-7s    |  %-9s  |\n";
 
+        if (match.getState() == MatchState.NOT_STARTED) {
+            clearConsole();
+            // Print header + table
+            System.out.format(
+                    "Welcome to the match, " + player.getNickname() + "\n\n" +
+                    "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "\n" +
+                    "+--------------------------+-----------------+-------------+\n" +
+                    "|         Nickname         |      Color      |    Ready    |\n" +
+                    "+--------------------------+-----------------+-------------+\n");
+
+            for (Player p : match.getPlayers()) {
+                System.out.format(leftAlignFormat, p.getNickname(), p.getColor().toString(),
+                        (p.isReadyToStart()) ? "Ready" : "Not Ready" );
+            }
+
+            System.out.printf("+--------------------------+-----------------+-------------+\n\n");
+
+            Scanner in = new Scanner (System.in);
+            String response;
+            if (!isReady) {
+                System.out.printf("Are you [R]eady? ([E] to go back to lobby)\n");
+                response = in.nextLine();
+
+                while (!response.equals("R") && !response.equals("r") &&
+                        !response.equals("E") && !response.equals("e")) {
+                    System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
+                    response = in.nextLine();
+                }
+
+                if (response.equals("R") || response.equals("r")) {
+                    player.setReady();
+                    isReady = true;
+                } else if (response.equals("E") || response.equals("e")) {
+                    System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
+                    // TODO back to lobby
+                }
+            } else {
+                System.out.printf("You are now ready to play. Take a snack while waiting to start... ([E]xit or ");
+
+                response = in.nextLine();
+
+                while (!response.equals("E") && !response.equals("e")) {
+                    System.out.printf("Invalid command. Press [E] to go back to lobby\n");
+                    response = in.nextLine();
+                }
+
+                if (response.equals("E") || response.equals("e")) {
+                    System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
+                    // TODO back to lobby
+                }
+            }
+        }
     }
 
     /**
@@ -270,20 +383,21 @@ public class CliView extends ClientView {
     /**
      * Print map
      */
-    public static void main(String[] args) {
-        AdrenalinaMatch match = new AdrenalinaMatch(5, 5, 120, 1);
+    /*public static void main(String[] args) {
+        it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.
+                AdrenalinaMatch(5, 5, 120, 1);
         CliView view = new CliView(null);
 
         try {
-            Player newPlayer1 = new Player(match, "Davide");
+            it.polimi.ingsw.server.model.Player newPlayer1 = new it.polimi.ingsw.server.model.Player(match, "Davide");
             newPlayer1.setColor(Color.RED);
-            Player newPlayer2 = new Player(match, "Luca");
+            it.polimi.ingsw.server.model.Player newPlayer2 = new it.polimi.ingsw.server.model.Player(match, "Luca");
             newPlayer2.setColor(Color.BLUE);
-            Player newPlayer3 = new Player(match, "Mike");
+            it.polimi.ingsw.server.model.Player newPlayer3 = new it.polimi.ingsw.server.model.Player(match, "Mike");
             newPlayer3.setColor(Color.GREEN);
-            Player newPlayer4 = new Player(match, "Conti");
+            it.polimi.ingsw.server.model.Player newPlayer4 = new it.polimi.ingsw.server.model.Player(match, "Conti");
             newPlayer4.setColor(Color.PURPLE);
-            Player newPlayer5 = new Player(match, "Lorenzo");
+            it.polimi.ingsw.server.model.Player newPlayer5 = new it.polimi.ingsw.server.model.Player(match, "Lorenzo");
             newPlayer5.setColor(Color.YELLOW);
 
             match.addPlayer(newPlayer1);
@@ -305,9 +419,12 @@ public class CliView extends ClientView {
             e.printStackTrace();
         }
 
+        AdrenalinaMatch clientMatch = new AdrenalinaMatch();
+        clientMatch.update(match.toJSON());
+
         clearConsole();
-        view.drawMap(match.getBoardMap());
-    }
+        view.drawMap(clientMatch.getBoardMap());
+    }*/
 
     /**
      * Parse json with cli assets

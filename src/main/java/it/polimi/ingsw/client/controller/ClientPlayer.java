@@ -67,10 +67,27 @@ public class ClientPlayer implements ClientFunctionalities{
 	}
 
 	/**
+	 * Constructor
+	 * Initializes nickname and server connection
+	 */
+	public ClientPlayer(String nickname) {
+		this.nickname = nickname;
+		this.match = null;
+	}
+
+	/**
 	 * @return string with nickname
 	 */
 	public AdrenalinaMatch getMatch(){
 		return match;
+	}
+
+	/**
+	 * Match setter for testing purposes
+	 * @param match
+	 */
+	public void setMatch(AdrenalinaMatch match) {
+		this.match = match;
 	}
 
 	/**
