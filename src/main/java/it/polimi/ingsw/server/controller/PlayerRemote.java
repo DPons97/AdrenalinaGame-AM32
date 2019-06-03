@@ -189,7 +189,7 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public void updateMatch(AdrenalinaMatch toGetUpdateFrom) {
 		try {
-			remotePlayer.updateMatch(toGetUpdateFrom.toJSON());
+			if (remotePlayer != null) remotePlayer.updateMatch(toGetUpdateFrom.toJSON());
 		} catch (RemoteException e) {
 			Thread t = new Thread(this::disconnectPlayer);
 			t.start();
