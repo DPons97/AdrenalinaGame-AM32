@@ -2,7 +2,6 @@ package it.polimi.ingsw.server.controller;
 
 import it.polimi.ingsw.client.controller.ClientFunctionalities;
 import it.polimi.ingsw.custom_exceptions.*;
-import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -260,7 +259,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 */
 	@Override
 	public void ready(String name) {
-		lobby.setPlayerReady(lobby.getPlayerInGameByName(name));
+		lobby.getMatchByPlayerConnection(lobby.getPlayerInGameByName(name)).setPlayerReady(lobby.getPlayerInGameByName(name));
 	}
 
 	@Override

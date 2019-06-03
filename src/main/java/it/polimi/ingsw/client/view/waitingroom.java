@@ -44,7 +44,7 @@ public class waitingroom extends Application {
             grid.add(label, 0, 1);
 
             ScrollPane players = new ScrollPane();
-            players.setPrefSize(300, 300);
+            players.setPrefSize(primaryStage.getWidth()*0.8, primaryStage.getHeight()*0.5);
             GridPane playersGrid = new GridPane();
             playersGrid.setHgap(0);
             playersGrid.setVgap(0);
@@ -82,7 +82,7 @@ public class waitingroom extends Application {
                 }
             });
 
-            Scene scene = new Scene(grid, 300, 300);
+            Scene scene = new Scene(grid, 900, 600);
             primaryStage.setScene(scene);
             primaryStage.show();
     }
