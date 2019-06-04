@@ -87,7 +87,7 @@ public class LobbyController {
 	 * @return Player with given name
 	 */
 	public PlayerConnection getPlayerInGameByName(String name){
-		if(!getPlayersNames().contains(name))
+		if(!getPlayersNameInGame().contains(name))
 			return null;
 		return getPlayersInGame().stream().filter(p-> p.name.equals(name)).collect(Collectors.toList()).get(0);
 	}
