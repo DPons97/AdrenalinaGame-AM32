@@ -17,13 +17,13 @@ public class LobbyTest {
 
         // Check right init of class
         assertTrue(testLobby.getLobbyMatches().isEmpty());
-        assertThrows(PlayerNotExistsException.class, () -> testLobby.createMatch(testPlayer.getConnection(), 5, 8, 60, 2));
+        assertThrows(PlayerNotExistsException.class, () -> testLobby.createMatch(null, testPlayer.getConnection(), 5, 8, 60, 2));
 
         // Add player to lobby
         testLobby.addPlayer(testPlayer);
 
         // testPlayer creates new match
-        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 5, 8, 120, 1);
+        MatchController newMatch = testLobby.createMatch(null,testPlayer.getConnection(), 5, 8, 120, 1);
 
         // Match successfully created
         assertNotNull(newMatch);
@@ -45,10 +45,10 @@ public class LobbyTest {
         for (int i = 0; i < testLobby.getMaxMatches() - 1; i++) {
             Player newMatchPlayer = new Player("Stormtrooper", new PlayerRemote("Stormtrooper", null));
             testLobby.addPlayer(newMatchPlayer);
-            testLobby.createMatch(newMatchPlayer.getConnection(), 5, 8, 120, 1);
+            testLobby.createMatch(null,newMatchPlayer.getConnection(), 5, 8, 120, 1);
         }
         Player newMatchPlayer = new Player("ObiWan", new PlayerRemote("ObiWan", null));
-        assertThrows(TooManyMatchesException.class, () -> testLobby.createMatch(newMatchPlayer.getConnection(), 5, 8, 60, 1));
+        assertThrows(TooManyMatchesException.class, () -> testLobby.createMatch(null,newMatchPlayer.getConnection(), 5, 8, 60, 1));
     }
 
     @Test
@@ -59,7 +59,7 @@ public class LobbyTest {
         assertTrue(testLobby.getJoinableMatches().isEmpty());
 
         testLobby.addPlayer(testPlayer);
-        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(null,testPlayer.getConnection(), 3, 5, 120, 1);
 
         assertEquals(newMatch, testLobby.getJoinableMatches().get(0));
 
@@ -87,7 +87,7 @@ public class LobbyTest {
         testLobby.addPlayer(testPlayer2);
         testLobby.addPlayer(testPlayer3);
 
-        MatchController newMatch = testLobby.createMatch(testPlayer.getConnection(), 3, 5, 120, 1);
+        MatchController newMatch = testLobby.createMatch(null,testPlayer.getConnection(), 3, 5, 120, 1);
 
         assertEquals(3, testLobby.getLobbyPlayers().size());
         assertTrue(newMatch.getMatch().getPlayers().contains(testPlayer));

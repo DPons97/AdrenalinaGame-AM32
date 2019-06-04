@@ -76,14 +76,11 @@ class AdrenalinaMatchTest {
         Player p4 = new Player(testMatch, "testPlayer4");
 
         testMatch.addPlayer(p1);
-        assertThrows(NotEnoughPlayersException.class,()->testMatch.kickPlayer(p2));
-
         testMatch.addPlayer(p2);
         testMatch.addPlayer(p3);
         testMatch.addPlayer(p4);
         assertDoesNotThrow(()->testMatch.kickPlayer(p1));
 
-        assertThrows(NotEnoughPlayersException.class, ()-> testMatch.kickPlayer(p2));
 
         testMatch.addPlayer(p1);
         assertDoesNotThrow(testMatch::startMatch);

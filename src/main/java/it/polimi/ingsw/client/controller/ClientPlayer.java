@@ -217,6 +217,11 @@ public class ClientPlayer implements ClientFunctionalities{
 		server.joinGame(this.nickname, id);
 	}
 
+	public void backToLobby(){
+		this.match = null;
+		server.backToLobby();
+	}
+
 	/**
 	 * Main method to test connection
 	 */
@@ -251,6 +256,8 @@ public class ClientPlayer implements ClientFunctionalities{
 			exit(1);
 		}
 	}
+
+
 
 	public ClientView getView() {
 		return view;

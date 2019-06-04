@@ -133,6 +133,16 @@ public class RemoteClient extends ServerConnection {
 		}
 	}
 
+	@Override
+	public void backToLobby() {
+		try {
+			server.backToLobby(this.player.getNickname());
+		} catch (RemoteException e) {
+			// the disconnection is handled elsewhere
+			return;
+		}
+	}
+
 	private void checkConnection(){
 		while(true){
 			try {

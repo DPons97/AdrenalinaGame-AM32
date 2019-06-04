@@ -1,6 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 import it.polimi.ingsw.custom_exceptions.*;
+import it.polimi.ingsw.server.controller.LobbyController;
 import it.polimi.ingsw.server.controller.MatchController;
 import it.polimi.ingsw.server.controller.PlayerConnection;
 import org.json.simple.JSONArray;
@@ -92,7 +93,7 @@ public class Lobby {
      * Create and add a new match to the lobby
      * @return Controller to new match
      */
-    public MatchController createMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
+    public MatchController createMatch(LobbyController lobby, PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
         if (matches.size() >= maxMatches) throw new TooManyMatchesException();
         if (!players.contains(getPlayer(host))) throw new PlayerNotExistsException();
 
@@ -100,7 +101,7 @@ public class Lobby {
         AdrenalinaMatch newMatchModel = new AdrenalinaMatch(maxPlayers, maxDeaths, turnDuration, mapID);
 
         // Returns controller for new match
-        MatchController newMatchController = new MatchController(newMatchModel, this);
+        MatchController newMatchController = new MatchController(newMatchModel, lobby);
 
         joinMatch(getPlayer(host), newMatchController);
         matches.add(newMatchController);
