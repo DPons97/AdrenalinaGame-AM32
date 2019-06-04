@@ -328,7 +328,7 @@ public class CliView extends ClientView {
                     isReady = true;
                 } else if (response.equals("E") || response.equals("e")) {
                     System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
-                    // TODO back to lobby
+                    player.backToLobby();
                 } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
 
             } else {
@@ -346,7 +346,7 @@ public class CliView extends ClientView {
 
                 if (response.equals("E") || response.equals("e")) {
                     System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
-                    // TODO back to lobby
+                    player.backToLobby();
                 } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready\n");
 
             }
