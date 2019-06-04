@@ -195,6 +195,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		if(match == null){
 			match = new AdrenalinaMatch();
 		}
+
 		match.update(toGetUpdateFrom);
 		view.showMatch();
 	}

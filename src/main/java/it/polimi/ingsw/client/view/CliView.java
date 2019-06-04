@@ -22,9 +22,7 @@ import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.util.ArrayList;
@@ -77,6 +75,45 @@ public class CliView extends ClientView {
     private static List<CharAsset> charAssets;
 
     /**
+     * Reader class
+     */
+    private class CommandReader extends Thread {
+        private Scanner stringReader;
+
+        private boolean stopReader;
+
+        private String buffer;
+
+        public CommandReader() {
+            stringReader = new Scanner(System.in);
+            this.stopReader = false;
+            this.buffer = "";
+        }
+
+        public void run() {
+            while (!stopReader)
+                if (buffer.isEmpty()) buffer = stringReader.nextLine();
+        }
+
+        /**
+         * Send reader command to stop after next line
+         */
+        public synchronized void shutdownReader() {
+            stopReader = true;
+        }
+
+        /**
+         * Retreive next line read and reset buffer
+         * @return last read line
+         */
+        public synchronized String nextLine() {
+            String toReturn = buffer;
+            buffer = "";
+            return toReturn;
+        }
+    }
+
+    /**
      * ASCII encoding of walls (Customizable from json)
      */
     private static String wallO = "═";
@@ -119,11 +156,16 @@ public class CliView extends ClientView {
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_WHITE = "\u001B[37m";
 
-    private static final String PLAYER = "X";
+    /**
+     *  Command Line reader
+     */
+    private static CommandReader cmdReader;
 
     public CliView(ClientPlayer player) {
         super(player);
         parseCliAssets();
+        cmdReader = new CommandReader();
+        cmdReader.start();
     }
 
     /**
@@ -208,7 +250,27 @@ public class CliView extends ClientView {
             clientMatch.update(match.toJSON());
             p1.setMatch(clientMatch);
 
-            view.showMatch();
+            Thread newThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    view.showMatch();
+                }
+            });
+            newThread.start();
+
+            try {
+                TimeUnit.SECONDS.sleep(3);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            Thread newThread2 = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    view.showMatch();
+                }
+            });
+            newThread2.start();
         } catch (TooManyPlayersException e) {
             e.printStackTrace();
         } catch (PlayerAlreadyExistsException e) {
@@ -245,16 +307,20 @@ public class CliView extends ClientView {
 
             System.out.printf("+--------------------------+-----------------+-------------+\n\n");
 
-            Scanner in = new Scanner (System.in);
             String response;
             if (!isReady) {
                 System.out.printf("Are you [R]eady? ([E] to go back to lobby)\n");
-                response = in.nextLine();
 
-                while (!response.equals("R") && !response.equals("r") &&
-                        !response.equals("E") && !response.equals("e")) {
-                    System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
-                    response = in.nextLine();
+                // Retreive next command
+                response = cmdReader.nextLine();
+
+                while (response.isEmpty()) {
+                    response = cmdReader.nextLine();
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (response.equals("R") || response.equals("r")) {
@@ -263,21 +329,26 @@ public class CliView extends ClientView {
                 } else if (response.equals("E") || response.equals("e")) {
                     System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
                     // TODO back to lobby
-                }
+                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
+
             } else {
-                System.out.printf("You are now ready to play. Take a snack while waiting to start... ([E]xit or ");
+                System.out.printf("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
-                response = in.nextLine();
-
-                while (!response.equals("E") && !response.equals("e")) {
-                    System.out.printf("Invalid command. Press [E] to go back to lobby\n");
-                    response = in.nextLine();
+                response = cmdReader.nextLine();
+                while (response.isEmpty()) {
+                    response = cmdReader.nextLine();
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 if (response.equals("E") || response.equals("e")) {
                     System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
                     // TODO back to lobby
-                }
+                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready\n");
+
             }
         }
     }
