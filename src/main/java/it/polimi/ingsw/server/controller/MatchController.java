@@ -29,12 +29,12 @@ public class MatchController {
 	/**
 	 * Lobby of this server
 	 */
-	private Lobby serverLobby;
+	private LobbyController serverLobby;
 
 	/**
 	 * Default constructor
 	 */
-	public MatchController(AdrenalinaMatch toControl, Lobby serverLobby) {
+	public MatchController(AdrenalinaMatch toControl, LobbyController serverLobby) {
 		this.match = toControl;
 		this.serverLobby = serverLobby;
 	}
@@ -165,28 +165,19 @@ public class MatchController {
 	 * Make player leave match and go back to server lobby
 	 * @param playerLeaving player that leaves
 	 */
-	public void backToLobby(PlayerConnection playerLeaving) throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
-		if (playerLeaving == match.getPlayers().get(0).getConnection()) {
-			//  Move all players in lobby
-			for (Player p : match.getPlayers()) {
-				match.kickPlayer(p);
-				serverLobby.addPlayer(p);
-				p.getConnection().setCurrentMatch(null);
-			}
+	public void backToLobby(PlayerConnection playerLeaving) throws MatchAlreadyStartedException, PlayerNotExistsException {
+		Player toKick = getPlayer(playerLeaving.getName());
 
+		if(toKick==null)throw new PlayerNotExistsException();
+		match.kickPlayer(toKick);
+		serverLobby.addPlayer(toKick.getConnection());
+		toKick.getConnection().setCurrentMatch(null);
+
+		if(match.getPlayers().isEmpty()){
 			// All players kicked from match. Destroying
 			match.setMatchState(MatchState.ENDED);
 			match = null;
-			serverLobby.destroyMatch(this);
-		} else {
-			// Make player leave match without destroying it
-			for (Player p : match.getPlayers()) {
-				if (p.getNickname().equals(playerLeaving.getName())) {
-					match.kickPlayer(p);
-					serverLobby.addPlayer(p);
-					p.getConnection().setCurrentMatch(null);
-				}
-			}
+			serverLobby.lobby.destroyMatch(this);
 		}
 	}
 

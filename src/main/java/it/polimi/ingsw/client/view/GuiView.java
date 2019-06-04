@@ -46,13 +46,7 @@ public class GuiView extends ClientView{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
 
-            primaryStage.show();
-            grid.setAlignment(Pos.CENTER);
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(25, 25, 25, 25));
-
-
+            initGrid(grid);
 
             Text scenetitle = new Text("Lobby");
             scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -101,7 +95,6 @@ public class GuiView extends ClientView{
                     btn.setOnAction(new EventHandler<ActionEvent>() {
                         @Override
                         public void handle(ActionEvent e) {
-                            grid.getChildren().clear();
                             player.joinGame(finalI);
                         }
                     });
@@ -117,7 +110,6 @@ public class GuiView extends ClientView{
             grid.add(buttons, 0,5);
             newGame.setText("Create new game");
             newGame.setOnAction(e -> {
-                grid.getChildren().clear();
                 player.getView().createNewGame();
             });
 
@@ -130,12 +122,7 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
-            grid.getChildren().clear();
-            grid.setAlignment(Pos.CENTER);
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(25, 25, 25, 25));
-
+            initGrid(grid);
 
 
             Text scenetitle = new Text("Create new game");
@@ -231,11 +218,8 @@ public class GuiView extends ClientView{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
 
-            grid.getChildren().clear();
-            grid.setAlignment(Pos.CENTER);
-            grid.setHgap(10);
-            grid.setVgap(10);
-            grid.setPadding(new Insets(25, 25, 25, 25));
+            initGrid(grid);
+
 
             Text scenetitle = new Text("Waiting room");
             scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -261,16 +245,18 @@ public class GuiView extends ClientView{
             }
 
             Button btnReady = new Button("READY");
-            HBox hbBtnReady = new HBox(10);
-            hbBtnReady.setAlignment(Pos.BOTTOM_RIGHT);
-            hbBtnReady.getChildren().add(btnReady);
-            grid.add(hbBtnReady, 0, 8);
+            HBox buttons = new HBox(10);
+            buttons.setAlignment(Pos.BOTTOM_RIGHT);
+            buttons.getChildren().add(btnReady);
+            grid.add(buttons, 0, 8);
 
             if(match.getPlayers().size()<match.getnPlayers()){
                 btnReady.setDisable(true);
             }
 
-
+            Button btnBack = new Button("GO BACK");
+            HBox hbBtnBack = new HBox(10);
+            buttons.getChildren().add(btnBack);
 
             final Text actiontarget = new Text();
             grid.add(actiontarget, 0, 9);
@@ -281,9 +267,25 @@ public class GuiView extends ClientView{
                 player.setReady();
             });
 
+            btnBack.setOnAction(e -> {
+                player.backToLobby();
+                player.updateLobby();
+            });
+
+
+
         });
 
 
+    }
+
+    private void initGrid(GridPane grid) {
+        grid.getChildren().clear();
+        grid.setAlignment(Pos.CENTER);
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.getChildren().clear();
     }
 
     /**

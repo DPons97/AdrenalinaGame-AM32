@@ -254,6 +254,14 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		}
 	}
 
+	@Override
+	public void backToLobby(String name) throws RemoteException {
+		try {
+			lobby.getPlayerInGameByName(name).backToLobby();
+		} catch (MatchAlreadyStartedException | PlayerNotExistsException e) {
+			lobby.getPlayerInGameByName(name).alert("Error leaving waiting room");		}
+	}
+
 	/**
 	 * Allow user to communicate that is ready
 	 */

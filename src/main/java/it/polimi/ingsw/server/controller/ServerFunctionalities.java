@@ -41,6 +41,11 @@ public interface ServerFunctionalities extends Remote {
 	void joinGame(String name, int id) throws  RemoteException;
 
 	/**
+	 * Allow user to leave a waiting room and go back to the lobby
+	 */
+	void backToLobby(String name) throws  RemoteException;
+
+	/**
 	 * Allow user to communicate that is ready
 	 */
 	void ready(String name) throws RemoteException;

@@ -104,7 +104,11 @@ public class LobbyController {
 	 * Allow user to create a game while in the lobby
 	 */
 	public synchronized void joinMatch(PlayerConnection player, int gameID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
-		lobby.joinMatch(lobby.getPlayer(player),lobby.getJoinableMatches().get(gameID));
+		if(lobby.getJoinableMatches().isEmpty()){
+		    player.alert("Cannot join: Match not exists");
+		    return;
+        }
+	    lobby.joinMatch(lobby.getPlayer(player),lobby.getJoinableMatches().get(gameID));
 		players.remove(player);
 		lobby.removePlayer(lobby.getPlayer(player));
 	}
@@ -113,7 +117,7 @@ public class LobbyController {
 	 * Allow to join a game while in the lobby
 	 */
 	public synchronized void hostMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
-		lobby.createMatch(host, maxPlayers,maxDeaths,turnDuration,mapID);
+		lobby.createMatch(this, host, maxPlayers,maxDeaths,turnDuration,mapID);
 	}
 
 	/**
