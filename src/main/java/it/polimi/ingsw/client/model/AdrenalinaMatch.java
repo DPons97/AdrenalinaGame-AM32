@@ -87,7 +87,7 @@ public class AdrenalinaMatch {
     /**
      * @return board map
      */
-    public Map getMap() {
+    public Map getBoardMap() {
         return map;
     }
 

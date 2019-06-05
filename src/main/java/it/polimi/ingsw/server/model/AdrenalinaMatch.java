@@ -321,20 +321,17 @@ public class AdrenalinaMatch {
 	 * Kick a player from match and set his match to null
 	 * @param toKick player that wants to leave
 	 */
-	public void kickPlayer(Player toKick) throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
+	public void kickPlayer(Player toKick) throws MatchAlreadyStartedException, PlayerNotExistsException {
 		if(state == MatchState.NOT_STARTED){
-			if (players.size() > minPlayers) {
-				boolean playerNotExists = true;
-				for (Player p : players) {
-					if (p.getNickname().equals(toKick.getNickname())) {
-						playerNotExists = false;
-						break;
-					}
-				}
-				if (playerNotExists) throw new PlayerNotExistsException();
-				toKick.setMatch(null);
-				players.remove(toKick);
-			} else throw new NotEnoughPlayersException();
+			if(!players.contains(toKick))throw new PlayerNotExistsException();
+			players.remove(toKick);
+			toKick.setMatch(null);
+			for (Player p : players) {
+				p.setReady(false);
+				if(p.getConnection()!=null)
+					p.getConnection().updateMatch(this);
+
+			}
 		} else throw new MatchAlreadyStartedException();
 	}
 

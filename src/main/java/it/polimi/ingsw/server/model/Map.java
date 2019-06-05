@@ -1,7 +1,5 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.client.model.SpawnCellClient;
-import it.polimi.ingsw.client.model.WeaponCard;
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 import it.polimi.ingsw.custom_exceptions.InventoryFullException;
 import org.json.simple.JSONArray;

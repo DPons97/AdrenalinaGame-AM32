@@ -161,6 +161,14 @@ public class SocketClient extends ServerConnection {
 		return getResponse();
 	}
 
+	@Override
+	public void backToLobby() {
+		JSONObject msg = new JSONObject();
+		msg.put("function", "PUSH");
+		msg.put("type", "back_to_lobby");
+		sendAnswer(msg);
+	}
+
 	/**
 	 * listen for instructions from server
 	 */

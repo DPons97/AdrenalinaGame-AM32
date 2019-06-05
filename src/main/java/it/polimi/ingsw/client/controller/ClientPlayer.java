@@ -65,10 +65,27 @@ public class ClientPlayer implements ClientFunctionalities{
 	}
 
 	/**
+	 * Constructor
+	 * Initializes nickname and server connection
+	 */
+	public ClientPlayer(String nickname) {
+		this.nickname = nickname;
+		this.match = null;
+	}
+
+	/**
 	 * @return string with nickname
 	 */
 	public AdrenalinaMatch getMatch(){
 		return match;
+	}
+
+	/**
+	 * Match setter for testing purposes
+	 * @param match
+	 */
+	public void setMatch(AdrenalinaMatch match) {
+		this.match = match;
 	}
 
 	/**
@@ -166,7 +183,13 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		view.showLobby(server.updateLobby());
+		Thread updater = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				view.showLobby(server.updateLobby());
+			}
+		});
+		updater.start();
 	}
 
 	/**
@@ -178,8 +201,16 @@ public class ClientPlayer implements ClientFunctionalities{
 		if(match == null){
 			match = new AdrenalinaMatch();
 		}
+
 		match.update(toGetUpdateFrom);
-		view.showMatch();
+
+		Thread updater = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				view.showMatch();
+			}
+		});
+		updater.start();
 	}
 
 	@Override
@@ -197,6 +228,11 @@ public class ClientPlayer implements ClientFunctionalities{
 
 	public void joinGame(int id){
 		server.joinGame(this.nickname, id);
+	}
+
+	public void backToLobby(){
+		this.match = null;
+		server.backToLobby();
 	}
 
 	/**
@@ -233,6 +269,8 @@ public class ClientPlayer implements ClientFunctionalities{
 			exit(1);
 		}
 	}
+
+
 
 	public ClientView getView() {
 		return view;

@@ -6,7 +6,7 @@ import it.polimi.ingsw.server.model.Side;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpawnCellClient extends Cell {
+public class SpawnCell extends Cell {
 
     /**
      * list of the weapons
@@ -22,7 +22,7 @@ public class SpawnCellClient extends Cell {
      * @param x     cell x coordinate
      * @param y     cell y coordinate
      */
-    public SpawnCellClient(Side north, Side south, Side west, Side east, Color c, int x, int y) {
+    public SpawnCell(Side north, Side south, Side west, Side east, Color c, int x, int y) {
         super(north, south, west, east, c, x, y);
         weapons = new ArrayList<>();
     }

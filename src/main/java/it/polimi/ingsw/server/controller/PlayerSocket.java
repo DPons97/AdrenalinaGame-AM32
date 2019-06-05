@@ -126,6 +126,13 @@ public class PlayerSocket extends PlayerConnection {
 			case "update_lobby":
 				this.updateLobby(getServerLobby().lobby);
 				break;
+			case "back_to_lobby":
+				try {
+					this.backToLobby();
+				} catch (MatchAlreadyStartedException | PlayerNotExistsException e) {
+					alert("Error leaving waiting room");
+				}
+				break;
 			default:
 		}
 	}

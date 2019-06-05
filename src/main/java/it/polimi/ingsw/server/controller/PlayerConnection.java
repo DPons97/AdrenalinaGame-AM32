@@ -156,7 +156,7 @@ public abstract class PlayerConnection {
 	/**
 	 * Go back to lobby
 	 */
-	public void backToLobby() throws MatchAlreadyStartedException, NotEnoughPlayersException, PlayerNotExistsException {
+	public void backToLobby() throws MatchAlreadyStartedException, PlayerNotExistsException {
 		currentMatch.backToLobby(this);
 	}
 
