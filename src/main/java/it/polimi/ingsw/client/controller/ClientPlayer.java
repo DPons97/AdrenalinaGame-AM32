@@ -183,7 +183,13 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		view.showLobby(server.updateLobby());
+		Thread updater = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				view.showLobby(server.updateLobby());
+			}
+		});
+		updater.start();
 	}
 
 	/**
@@ -197,7 +203,14 @@ public class ClientPlayer implements ClientFunctionalities{
 		}
 
 		match.update(toGetUpdateFrom);
-		view.showMatch();
+
+		Thread updater = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				view.showMatch();
+			}
+		});
+		updater.start();
 	}
 
 	@Override

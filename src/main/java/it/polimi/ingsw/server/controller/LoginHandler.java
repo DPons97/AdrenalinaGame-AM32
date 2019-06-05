@@ -79,7 +79,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 
 		}
 		address = addresses;
-		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+"Port socket= "+socketPort);
+		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+" / Port socket= "+socketPort);
 
 		registry = LocateRegistry.createRegistry(rmiPort);
 		registry.rebind("rmiServer", this);

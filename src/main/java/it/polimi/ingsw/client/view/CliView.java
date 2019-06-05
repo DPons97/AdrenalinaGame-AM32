@@ -32,6 +32,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CliView extends ClientView {
+
+    public static final int TIMEOUT = 200;
+
     /**
      * Data structure to hold cli assets
      */
@@ -92,7 +95,9 @@ public class CliView extends ClientView {
 
         public void run() {
             while (!stopReader)
-                if (buffer.isEmpty()) buffer = stringReader.nextLine();
+                synchronized (buffer) {
+                    if (buffer.isEmpty()) buffer = stringReader.nextLine();
+                }
         }
 
         /**
@@ -106,9 +111,12 @@ public class CliView extends ClientView {
          * Retreive next line read and reset buffer
          * @return last read line
          */
-        public synchronized String nextLine() {
-            String toReturn = buffer;
-            buffer = "";
+        public String nextLine() {
+            String toReturn;
+            synchronized (buffer) {
+                toReturn = new String(buffer);
+                buffer = "";
+            }
             return toReturn;
         }
     }
@@ -175,45 +183,97 @@ public class CliView extends ClientView {
     public void showLobby(String lobby) {
         JSONObject lobbiObj = (JSONObject) JSONValue.parse(lobby);
         int nPlayers = Integer.parseInt(lobbiObj.get("n_players").toString());
-        System.out.println("Current players online: "+nPlayers);
+
+        clearConsole();
+        System.out.format(
+                "...::: Adrenalina LOBBY :::... \n" +
+                "Current players online: " + nPlayers + "\n\n");
+
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
-        System.out.println("Matches:");
+        System.out.format(
+                "+------+---------------+--------------+---------+-----------------+\n" +
+                "|         Matches:       %-4s                                     |\n" +
+                "+------+---------------+--------------+---------+-----------------+\n", matches.size());
+
+        String response;
+
         if(matches.size() == 0){
             System.out.println("Wow, such empty...");
-            System.out.println("To create a new match press enter 1, to reload enter 0: ");
-            Scanner in = new Scanner (System.in);
-            int response = in.nextInt();
-            if(response == 1)
+            System.out.println("CREATE [N]ew match. [Any key to reload]");
+
+            // Retreive next command
+            response = getResponse();
+
+            if(response.equals("N") || response.equals("n"))
                 createNewGame();
-            else if(response == 0){
+            else {
                 player.updateLobby();
                 return;
             }
         }
         for(int i = 0; i < matches.size(); i++){
+            // Print header table
+            String matchInfoFormat = "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |\n";
+            String playerInfoFormat = "|      |               |              |         |  %-13s  |\n\n";
+
+            System.out.format(
+                    "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |\n" +
+                    "+------+---------------+--------------+---------+-----------------+\n");
+
+            // Print table
             JSONObject match = (JSONObject) matches.get(i);
             int maxPlayers = Integer.parseInt(match.get("n_players").toString());
             int mapID = Integer.parseInt(match.get("mapID").toString());
             int maxDeaths = Integer.parseInt(match.get("max_deaths").toString());
             JSONArray players = (JSONArray) match.get("players");
 
-            System.out.println("\n"+(i+1)+". Max players: " + maxPlayers+"     Max deaths: "+ maxDeaths + "     Map: "+mapID);
-            System.out.print("   Players in game: ");
-            for(Object o: players) System.out.print(o.toString()+"     ");
+            // Draw Match infos
+            System.out.format( matchInfoFormat, i + 1, maxPlayers, maxDeaths, mapID, players.get(0).toString());
 
+            // Draw match players
+            for(Object o: players) {
+                if (!o.toString().equals(players.get(0).toString()))
+                    System.out.format(playerInfoFormat, o.toString());
+            };
+            System.out.format("+------+---------------+--------------+---------+-----------------+\n");
         }
-        System.out.println("\nEnter match id to join or -1 to cerate new game, other to refresh: ");
-        Scanner in = new Scanner (System.in);
-        int choice = in.nextInt();
-        if(choice >= 0 && choice < matches.size()) {
+
+        System.out.println("Do you want to CREATE [N]ew match, or JOIN an existing one?\n" +
+                "(Specify match's ID to join) [Any key to reload]");
+
+        response = getResponse();
+        int choice = 0;
+
+        try {
+            choice = Integer.parseInt(response) - 1;
+        } catch (NumberFormatException e) {}
+
+        if (response.equals("N") || response.equals("n")) createNewGame();
+        else if(choice >= 0 && choice <  matches.size()) {
             player.joinGame(choice);
             clearConsole();
-            showMatch();
         }
-        else if (choice == -1)createNewGame();
         else {
             showLobby(lobby);
         }
+    }
+
+    /**
+     * Retreive last response (waiting if none is provided)
+     * @return
+     */
+    private String getResponse() {
+        String response;
+        response = cmdReader.nextLine();
+        while (response.isEmpty()) {
+            response = cmdReader.nextLine();
+            try {
+                TimeUnit.MILLISECONDS.sleep(TIMEOUT);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        return response;
     }
 
     /**
@@ -294,7 +354,7 @@ public class CliView extends ClientView {
             clearConsole();
             // Print header + table
             System.out.format(
-                    "Welcome to the match, " + player.getNickname() + "\n\n" +
+                    "...::: Welcome to the match, " + player.getNickname() + " :::... \n\n" +
                     "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "\n" +
                     "+--------------------------+-----------------+-------------+\n" +
                     "|         Nickname         |      Color      |    Ready    |\n" +
@@ -312,41 +372,24 @@ public class CliView extends ClientView {
                 System.out.printf("Are you [R]eady? ([E] to go back to lobby)\n");
 
                 // Retreive next command
-                response = cmdReader.nextLine();
-
-                while (response.isEmpty()) {
-                    response = cmdReader.nextLine();
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                response = getResponse();
 
                 if (response.equals("R") || response.equals("r")) {
                     player.setReady();
                     isReady = true;
                 } else if (response.equals("E") || response.equals("e")) {
-                    System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
                     player.backToLobby();
+                    player.updateLobby();
                 } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
 
             } else {
                 System.out.printf("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
-                response = cmdReader.nextLine();
-                while (response.isEmpty()) {
-                    response = cmdReader.nextLine();
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                response = getResponse();
 
                 if (response.equals("E") || response.equals("e")) {
-                    System.out.printf("Bye bye! (Not really exiting ohohohooho...)\n");
                     player.backToLobby();
+                    player.updateLobby();
                 } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready\n");
 
             }
@@ -438,15 +481,14 @@ public class CliView extends ClientView {
         int maxDeaths;
         int turnDuration;
         int mapID;
-        Scanner in = new Scanner(System.in);
         System.out.print("Enter number of players: ");
-        maxPlayers = in.nextInt();
+        maxPlayers = Integer.parseInt(getResponse());
         System.out.print("Enter number of deaths: ");
-        maxDeaths = in.nextInt();
+        maxDeaths = Integer.parseInt(getResponse());
         System.out.print("Enter turn duration [seconds]: ");
-        turnDuration = in.nextInt();
+        turnDuration = Integer.parseInt(getResponse());
         System.out.print("Enter map id: ");
-        mapID = in.nextInt();
+        mapID = Integer.parseInt(getResponse());
 
         player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
     }
