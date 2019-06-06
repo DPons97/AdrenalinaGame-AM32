@@ -328,6 +328,8 @@ public class AdrenalinaMatch {
 			toKick.setMatch(null);
 			for (Player p : players) {
 				p.setReady(false);
+			}
+			for (Player p : players) {
 				if(p.getConnection()!=null)
 					p.getConnection().updateMatch(this);
 
@@ -499,7 +501,7 @@ public class AdrenalinaMatch {
 		if (nPlayers == players.size()) {
 			if(state == MatchState.NOT_STARTED) {
 				int luckyFirstPlayerNumber = new Random().nextInt(nPlayers);
-				this.state = MatchState.PLAYER_TURN;
+				this.state = MatchState.LOADING;
 				this.firstPlayer = players.get(luckyFirstPlayerNumber);
 			} else {
 				throw new MatchAlreadyStartedException();

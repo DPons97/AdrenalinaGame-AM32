@@ -16,7 +16,7 @@ import java.net.URL;
 
 public class ImageExample extends Application {
 
-    private final static String MAP1 = "/img/maps/1.png";
+    private final static String MAP1 = "/img/maps/2.png";
     //private final static String MAP2 = "/img/maps/2.png";
     //private final static String MAP3 = "/img/maps/3.png";
     //private final static String MAP4 = "/img/maps/4.png";
@@ -51,23 +51,23 @@ public class ImageExample extends Application {
 // which is a better approach to load resources that are
 // contained in the classpath
         URL urlMap1 = getClass().getResource(MAP1);
-        Image map = new Image(new FileInputStream(urlMap1.getFile()));
+        Image map = new Image(new FileInputStream(urlMap1.getFile().replace("%20", " ")));
         URL urlTab1 = getClass().getResource(TAB1);
-        Image tab1 = new Image(new FileInputStream(urlTab1.getFile()));
+        Image tab1 = new Image(new FileInputStream(urlTab1.getFile().replace("%20", " ")));
         URL urlTab2 = getClass().getResource(TAB2);
-        Image tab2 = new Image(new FileInputStream(urlTab2.getFile()));
+        Image tab2 = new Image(new FileInputStream(urlTab2.getFile().replace("%20", " ")));
         URL urlTab3 = getClass().getResource(TAB3);
-        Image tab3 = new Image(new FileInputStream(urlTab3.getFile()));
+        Image tab3 = new Image(new FileInputStream(urlTab3.getFile().replace("%20", " ")));
         URL urlTab4 = getClass().getResource(TAB4);
-        Image tab4 = new Image(new FileInputStream(urlTab4.getFile()));
+        Image tab4 = new Image(new FileInputStream(urlTab4.getFile().replace("%20", " ")));
         URL urlTab5 = getClass().getResource(TAB5);
-        Image tab5 = new Image(new FileInputStream(urlTab5.getFile()));
+        Image tab5 = new Image(new FileInputStream(urlTab5.getFile().replace("%20", " ")));
         URL urlCardBack00 = getClass().getResource(CARDBACK00);
-        Image cardback00 = new Image(new FileInputStream(urlCardBack00.getFile()));
+        Image cardback00 = new Image(new FileInputStream(urlCardBack00.getFile().replace("%20", " ")));
         URL urlCardBack01 = getClass().getResource(CARDBACK01);
-        Image cardback01 = new Image(new FileInputStream(urlCardBack01.getFile()));
+        Image cardback01 = new Image(new FileInputStream(urlCardBack01.getFile().replace("%20", " ")));
         URL urlDroplets = getClass().getResource(DROPLET);
-        Image droplet = new Image (new FileInputStream(urlDroplets.getFile()));
+        Image droplet = new Image (new FileInputStream(urlDroplets.getFile().replace("%20", " ")));
 
 
         ImageView mapView = new ImageView(map);
@@ -91,6 +91,7 @@ public class ImageExample extends Application {
 
         //Setting title to the Stage
         stage.setTitle("Loading a map");
+
 
         //Adding scene to the stage
         stage.setScene(scene);

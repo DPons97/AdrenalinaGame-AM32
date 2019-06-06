@@ -16,8 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static java.lang.System.exit;
-
 /**
  * 
  */
@@ -313,7 +311,7 @@ public class SocketClient extends ServerConnection {
 				}
 				break;
 			case "alert":
-				player.allert(message.get("msg").toString());
+				player.alert(message.get("msg").toString());
 				break;
 			default:
 

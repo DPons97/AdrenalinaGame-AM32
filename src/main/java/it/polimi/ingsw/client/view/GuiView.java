@@ -6,20 +6,26 @@ import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.MatchState;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
+import javafx.util.Duration;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -201,15 +207,67 @@ public class GuiView extends ClientView{
 
     }
 
+    @Override
+    public void showAlert(String message) {
+        Platform.runLater(()->{
+            final Popup popup = new Popup();
+            popup.setAutoFix(true);
+            popup.setAutoHide(true);
+            popup.setHideOnEscape(true);
+            Label label = new Label(message);
+            label.setStyle("-fx-background-color: cornsilk;\n" +
+                            "    -fx-padding: 10;\n" +
+                            "    -fx-border-color: black; \n" +
+                            "    -fx-border-width: 5;\n" +
+                            "    -fx-font-size: 16;");
+            popup.getContent().add(label);
+
+            Stage stage = FXWindow.getStage();
+            popup.setOnShown(new EventHandler<WindowEvent>() {
+                @Override
+                public void handle(WindowEvent e) {
+                    popup.setX(stage.getX() + stage.getWidth()/2 - popup.getWidth()/2);
+                    popup.setY(stage.getY() + stage.getHeight()/2 - popup.getHeight()/2);
+                }
+            });
+            popup.show(stage);
+            PauseTransition wait = new PauseTransition(Duration.seconds(5));
+            wait.setOnFinished((e) -> {
+                popup.hide();
+            });
+            wait.play();
+        });
+    }
+
     /**
      * Shows the launcher options
      */
     @Override
     public void showMatch() {
-        if(player.getMatch().getState()== MatchState.NOT_STARTED){
-            showWaitingRoom();
-
+        switch (player.getMatch().getState()){
+            case NOT_STARTED:
+                showWaitingRoom();
+                break;
+            case LOADING:
+            case PLAYER_TURN:
+                showGameBoard();
+                break;
         }
+    }
+
+    private void showGameBoard() {
+        AdrenalinaMatch match= player.getMatch();
+        Platform.runLater(()-> {
+            Stage primaryStage = FXWindow.getStage();
+            GridPane grid = FXWindow.getGrid();
+
+            initGrid(grid);
+
+            Text scenetitle = new Text("GAME BOARD");
+            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
+            grid.add(scenetitle, 0, 0);
+
+        });
     }
 
     private void showWaitingRoom() {

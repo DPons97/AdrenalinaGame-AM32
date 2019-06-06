@@ -118,6 +118,7 @@ public class LobbyController {
 	 */
 	public synchronized void hostMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
 		lobby.createMatch(this, host, maxPlayers,maxDeaths,turnDuration,mapID);
+		players.remove(host);
 	}
 
 	/**

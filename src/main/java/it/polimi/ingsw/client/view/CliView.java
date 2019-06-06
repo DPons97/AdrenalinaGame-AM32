@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.controller.ConnectionType;
 import it.polimi.ingsw.client.model.*;
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
 import it.polimi.ingsw.client.model.AmmoCell;
@@ -12,7 +11,6 @@ import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
 import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
-import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -24,7 +22,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -491,6 +488,11 @@ public class CliView extends ClientView {
         mapID = Integer.parseInt(getResponse());
 
         player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
+    }
+
+    @Override
+    public void showAlert(String message) {
+
     }
 
     /**

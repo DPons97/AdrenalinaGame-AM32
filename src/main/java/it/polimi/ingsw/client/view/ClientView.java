@@ -1,11 +1,9 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.controller.ServerConnection;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import org.json.simple.JSONObject;
 
 import java.util.List;
 
@@ -83,4 +81,6 @@ public abstract class ClientView {
 
 
     public abstract void createNewGame();
+
+    public abstract void showAlert(String message);
 }
