@@ -1,7 +1,6 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.controller.ConnectionType;
 import it.polimi.ingsw.client.model.*;
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
 import it.polimi.ingsw.client.model.AmmoCell;
@@ -12,7 +11,6 @@ import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
 import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
-import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -24,7 +22,6 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.rmi.NotBoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -157,12 +154,66 @@ public class CliView extends ClientView {
      */
     private static final String COLOR_BLOCK = "█";
     private static final String ANSI_RESET = "\u001B[0m";
-    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_RED = "\u001b[31;1m";
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_YELLOW = "\u001B[33m";
-    private static final String ANSI_BLUE = "\u001B[36m";
+    private static final String ANSI_BLUE = "\u001b[34;1m";
     private static final String ANSI_PURPLE = "\u001B[35m";
     private static final String ANSI_WHITE = "\u001B[37m";
+
+    private static final String SPAWN_ART =  "  ___ \n" +
+                                            "/ __>\n" +
+                                            "\\__ \\\n" +
+                                            "<___/ ";
+
+    private static final String AMMO_BLOCK = "■";
+
+    /**
+     * ASCII icon for dead players
+     */
+    private static final String DEAD_PLAYER = "!";
+
+    /**
+     * ASCII icon for marks
+     */
+    private static final String MARK = "■";
+
+    /**
+     * ASCII icon for hit point
+     */
+    private static final String HIT_POINT = "■";
+
+    /**
+     * Standard format for text inside lobby table
+     */
+    private static final String LOBBY_HEADER =       "+--------------------------+-----------------+-------------+\n" +
+                                                     "|         Nickname         |      Color      |    Ready    |\n" +
+                                                     "+--------------------------+-----------------+-------------+\n";
+    private static final String LOBBY_TABLE_FORMAT = "|   %-20s   |      %-7s    |  %-9s  |%n";
+    private static final String LOBBY_CLOSER =       "+--------------------------+-----------------+-------------+\n\n";
+
+    /**
+     * Standard format for text inside match table
+     */
+    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |\n" +
+                                                        "+------+---------------+--------------+---------+-----------------+\n";
+    private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |%n";
+    private static final String MATCH_PLAYER_FORMAT =    "|      |               |              |         |  %-13s  |%n%n";
+    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+\n";
+
+    /**
+     * Standard format for text inside weapon info table
+     */
+    private static final String WEAPON_INFO_HEADER =    "\t\t\t|  Spawn  |        Weapon        |  Reload cost  |";
+    private static final String WEAPON_INFO_FORMAT =    "\t\t\t|    %-2s    | %-20s |  %-3s %-3s %-3s  |";
+    private static final String WEAPON_INFO_CLOSER =    "\t\t\t+---------+----------------------+---------------+";
+
+    /**
+     * Standard format for text inside player info table
+     */
+    private static final String PLAYER_INFO_HEADER =    "\t\t\t|         Nickname         |       Life points       |  Marks  |  Ammos  |";
+    private static final String PLAYER_INFO_FORMAT =    "\t\t\t|   %s%-20s%s   | %-24s| %-7s | %-7s |";
+    private static final String PLAYER_INFO_CLOSER =    "\t\t\t+--------------------------+-------------------------+---------+---------+";
 
     /**
      *  Command Line reader
@@ -213,12 +264,7 @@ public class CliView extends ClientView {
         }
         for(int i = 0; i < matches.size(); i++){
             // Print header table
-            String matchInfoFormat = "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |\n";
-            String playerInfoFormat = "|      |               |              |         |  %-13s  |\n\n";
-
-            System.out.format(
-                    "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |\n" +
-                    "+------+---------------+--------------+---------+-----------------+\n");
+            System.out.format(MATCH_INFO_HEADER);
 
             // Print table
             JSONObject match = (JSONObject) matches.get(i);
@@ -228,14 +274,14 @@ public class CliView extends ClientView {
             JSONArray players = (JSONArray) match.get("players");
 
             // Draw Match infos
-            System.out.format( matchInfoFormat, i + 1, maxPlayers, maxDeaths, mapID, players.get(0).toString());
+            System.out.format(MATCH_INFO_FORMAT, i + 1, maxPlayers, maxDeaths, mapID, players.get(0).toString());
 
             // Draw match players
             for(Object o: players) {
                 if (!o.toString().equals(players.get(0).toString()))
-                    System.out.format(playerInfoFormat, o.toString());
+                    System.out.format(MATCH_PLAYER_FORMAT, o.toString());
             };
-            System.out.format("+------+---------------+--------------+---------+-----------------+\n");
+            System.out.format(MATCH_INFO_CLOSER);
         }
 
         System.out.println("Do you want to CREATE [N]ew match, or JOIN an existing one?\n" +
@@ -276,15 +322,11 @@ public class CliView extends ClientView {
         return response;
     }
 
-    /**
-     * Main for testing showMatch function
-     * @param args
-     */
     public static void main(String[] args) {
         it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.AdrenalinaMatch(5, 8, 120, 1);
 
         it.polimi.ingsw.server.model.Player newPlayer1 = new it.polimi.ingsw.server.model.Player(match, "Davide");
-        newPlayer1.setColor(Color.RED);
+        newPlayer1.setColor(Color.WHITE);
 
         ClientPlayer p1;
         try {
@@ -306,31 +348,18 @@ public class CliView extends ClientView {
             match.addPlayer(newPlayer4);
             match.addPlayer(newPlayer5);
 
+            match.setMatchState(MatchState.PLAYER_TURN);
+
+            newPlayer1.respawn(match.getBoardMap().getSpawnPoints().get(1));
+            newPlayer3.respawn(match.getBoardMap().getSpawnPoints().get(0));
+            newPlayer4.respawn(match.getBoardMap().getSpawnPoints().get(1));
+            newPlayer5.respawn(match.getBoardMap().getSpawnPoints().get(2));
+
             AdrenalinaMatch clientMatch = new AdrenalinaMatch();
             clientMatch.update(match.toJSON());
             p1.setMatch(clientMatch);
 
-            Thread newThread = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    view.showMatch();
-                }
-            });
-            newThread.start();
-
-            try {
-                TimeUnit.SECONDS.sleep(3);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            Thread newThread2 = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    view.showMatch();
-                }
-            });
-            newThread2.start();
+            view.showMatch();
         } catch (TooManyPlayersException e) {
             e.printStackTrace();
         } catch (PlayerAlreadyExistsException e) {
@@ -347,25 +376,22 @@ public class CliView extends ClientView {
     public void showMatch() {
         AdrenalinaMatch match = player.getMatch();
         boolean isReady = false;
-        // Draw match pre-game
-        String leftAlignFormat = "|   %-20s   |      %-7s    |  %-9s  |\n";
 
+        clearConsole();
+
+        // Draw match pre-game
         if (match.getState() == MatchState.NOT_STARTED) {
-            clearConsole();
             // Print header + table
             System.out.format(
                     "...::: Welcome to the match, " + player.getNickname() + " :::... \n\n" +
-                    "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "\n" +
-                    "+--------------------------+-----------------+-------------+\n" +
-                    "|         Nickname         |      Color      |    Ready    |\n" +
-                    "+--------------------------+-----------------+-------------+\n");
+                            "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "\n" + LOBBY_HEADER);
 
             for (Player p : match.getPlayers()) {
-                System.out.format(leftAlignFormat, p.getNickname(), p.getColor().toString(),
-                        (p.isReadyToStart()) ? "Ready" : "Not Ready" );
+                System.out.format(LOBBY_TABLE_FORMAT, p.getNickname(), p.getColor().toString(),
+                        (p.isReadyToStart()) ? "Ready" : "Not Ready");
             }
 
-            System.out.printf("+--------------------------+-----------------+-------------+\n\n");
+            System.out.printf(LOBBY_CLOSER);
 
             String response;
             if (!isReady) {
@@ -393,6 +419,24 @@ public class CliView extends ClientView {
                 } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready\n");
 
             }
+        } else if (match.getState() == MatchState.PLAYER_TURN) {
+            // Print players;
+            System.out.print("\n");
+            for (Player p : match.getPlayers()) {
+                String playerString;
+                if (p.isDead())
+                    playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
+                else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
+
+                System.out.print(playerString + "\t\t");
+            }
+            System.out.print("\n\n");
+
+            // Print map
+            drawMap(match);
+
+            // Print timer
+
         }
     }
 
@@ -494,52 +538,6 @@ public class CliView extends ClientView {
     }
 
     /**
-     * Print map
-     */
-    /*public static void main(String[] args) {
-        it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.
-                AdrenalinaMatch(5, 5, 120, 1);
-        CliView view = new CliView(null);
-
-        try {
-            it.polimi.ingsw.server.model.Player newPlayer1 = new it.polimi.ingsw.server.model.Player(match, "Davide");
-            newPlayer1.setColor(Color.RED);
-            it.polimi.ingsw.server.model.Player newPlayer2 = new it.polimi.ingsw.server.model.Player(match, "Luca");
-            newPlayer2.setColor(Color.BLUE);
-            it.polimi.ingsw.server.model.Player newPlayer3 = new it.polimi.ingsw.server.model.Player(match, "Mike");
-            newPlayer3.setColor(Color.GREEN);
-            it.polimi.ingsw.server.model.Player newPlayer4 = new it.polimi.ingsw.server.model.Player(match, "Conti");
-            newPlayer4.setColor(Color.PURPLE);
-            it.polimi.ingsw.server.model.Player newPlayer5 = new it.polimi.ingsw.server.model.Player(match, "Lorenzo");
-            newPlayer5.setColor(Color.YELLOW);
-
-            match.addPlayer(newPlayer1);
-            match.addPlayer(newPlayer2);
-            match.addPlayer(newPlayer3);
-            match.addPlayer(newPlayer4);
-            match.addPlayer(newPlayer5);
-
-            newPlayer1.respawn(match.getBoardMap().getSpawnPoints().get(0));
-            newPlayer2.respawn(match.getBoardMap().getSpawnPoints().get(0));
-            newPlayer3.respawn(match.getBoardMap().getSpawnPoints().get(0));
-            newPlayer4.respawn(match.getBoardMap().getSpawnPoints().get(0));
-            newPlayer5.respawn(match.getBoardMap().getSpawnPoints().get(0));
-        } catch (TooManyPlayersException e) {
-            e.printStackTrace();
-        } catch (MatchAlreadyStartedException e) {
-            e.printStackTrace();
-        } catch (PlayerAlreadyExistsException e) {
-            e.printStackTrace();
-        }
-
-        AdrenalinaMatch clientMatch = new AdrenalinaMatch();
-        clientMatch.update(match.toJSON());
-
-        clearConsole();
-        view.drawMap(clientMatch.getBoardMap());
-    }*/
-
-    /**
      * Parse json with cli assets
      */
     private static void parseCliAssets() {
@@ -590,9 +588,10 @@ public class CliView extends ClientView {
     /**
      * Print a complete version of current map in current state
      */
-    private void drawMap(Map map) {
-        int printWidth = map.getYSize() * CELL_CHAR_WIDTH + 1;
-        int printHeight = map.getXSize() * CELL_CHAR_HEIGHT + 1;
+    private void drawMap(AdrenalinaMatch match) {
+        // Initializing print canvas size (map + weapon and additional tables)
+        int printWidth = match.getBoardMap().getYSize() * CELL_CHAR_WIDTH + 2;
+        int printHeight = match.getBoardMap().getXSize() * CELL_CHAR_HEIGHT + 2;
 
         String[][] mapToReturn = new String[printHeight][printWidth];
 
@@ -601,10 +600,17 @@ public class CliView extends ClientView {
             for (int j = 0; j < mapToReturn[0].length; j++) mapToReturn[i][j] = "\u0020";
         }
 
-        for (int i = 0; i < map.getXSize(); i++) {
-            for (int j = 0; j < map.getYSize(); j++) drawCell(mapToReturn, map.getCell(i,j), i, j,
-                    map.getXSize(), map.getYSize());
+        // Draw single cells
+        for (int i = 0; i < match.getBoardMap().getXSize(); i++) {
+            for (int j = 0; j < match.getBoardMap().getYSize(); j++) drawCell(mapToReturn, match.getBoardMap().getCell(i,j), i, j,
+                    match.getBoardMap().getXSize(), match.getBoardMap().getYSize());
         }
+
+        // Draw weapon info table
+        drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - 1);
+
+        // Draw player infos
+        drawPlayerInfo(mapToReturn, match, printHeight/2, printWidth - 1);
 
         // Actual drawing
         for (String[] col : mapToReturn) {
@@ -874,11 +880,11 @@ public class CliView extends ClientView {
                 true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
 
         // Write Ammos
-        charMap[startingX+boxXOffset +1][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(0)) +"■"+ANSI_RESET;
-        charMap[startingX+boxXOffset+2][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(1)) +"■"+ANSI_RESET;
+        charMap[startingX+boxXOffset +1][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(0)) + AMMO_BLOCK +ANSI_RESET;
+        charMap[startingX+boxXOffset+2][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(1)) +AMMO_BLOCK+ANSI_RESET;
 
         if (ammoToDraw.hasPowerup()) charMap[startingX+boxXOffset+3][startingY+boxYOffset+2] = "\u25B2";
-        else charMap[startingX+boxXOffset+3][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(2)) +"■"+ANSI_RESET;
+        else charMap[startingX+boxXOffset+3][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(2)) +AMMO_BLOCK+ANSI_RESET;
 
     }
 
@@ -893,14 +899,9 @@ public class CliView extends ClientView {
         int boxXOffset = 3;
         int boxYOffset = 3;
 
-        String spawnArt =   "  ___ \n" +
-                            "/ __>\n" +
-                            "\\__ \\\n" +
-                             "<___/ ";
-
         int i = startingX + boxXOffset;
         int j = startingY + boxYOffset - 1;
-        for (char c : spawnArt.toCharArray()) {
+        for (char c : SPAWN_ART.toCharArray()) {
             if (c == '\n') {
                 i++;
                 j = startingY + boxYOffset;
@@ -910,7 +911,76 @@ public class CliView extends ClientView {
                 j++;
             }
         }
+    }
 
+    /**
+     * Draw weapon info
+     * @param charMap map of strings to print
+     * @param map to get weapon info from
+     * @param startingX starting X coord of table
+     * @param startingY starting Y coord of table
+     */
+    private void drawWeaponInfo(String[][] charMap, Map map, int startingX, int startingY) {
+        charMap[startingX][startingY] = WEAPON_INFO_CLOSER;
+        charMap[startingX+1][startingY] = WEAPON_INFO_HEADER;
+        charMap[startingX+2][startingY] = WEAPON_INFO_CLOSER;
+
+        int i = 3;
+        for (SpawnCell spawn : map.getSpawnPoints()) {
+            for (WeaponCard weapon : spawn.getWeapons()) {
+                String cost1 = "";
+                String cost2 = "";
+                String cost3 = "";
+
+                cost1 = getANSIColor(weapon.getCost().get(0)) + " " + AMMO_BLOCK + ANSI_RESET + " ";
+                if (weapon.getCost().size() > 1) cost2 = getANSIColor(weapon.getCost().get(1)) + " " + AMMO_BLOCK + ANSI_RESET + " ";
+                if (weapon.getCost().size() > 2) cost3 = getANSIColor(weapon.getCost().get(2)) + " " + AMMO_BLOCK + ANSI_RESET + " ";
+
+                charMap[startingX+i][startingY] = String.format(WEAPON_INFO_FORMAT,
+                                                                getANSIColor(spawn) + COLOR_BLOCK + ANSI_RESET,
+                                                                weapon.getName(), cost1, cost2, cost3);
+                i++;
+            }
+            charMap[startingX+i][startingY] = WEAPON_INFO_CLOSER;
+        }
+    }
+
+    /**
+     * Draw player info
+     * @param charMap map of strings to print
+     * @param match to get player info from
+     * @param startingX starting X coord of table
+     * @param startingY starting Y coord of table
+     */
+    private void drawPlayerInfo(String[][] charMap, AdrenalinaMatch match, int startingX, int startingY) {
+        charMap[startingX][startingY] = PLAYER_INFO_CLOSER;
+        charMap[startingX+1][startingY] = PLAYER_INFO_HEADER;
+        charMap[startingX+2][startingY] = PLAYER_INFO_CLOSER;
+
+        int i = 3;
+        for (Player p : match.getPlayers() ) {
+            String dmgTrack = "";
+
+            for (Player damager : p.getDmgPoints()) {
+                dmgTrack += getANSIColor(damager) + HIT_POINT + ANSI_RESET + " ";
+            }
+
+            String marks = "";
+            for (Player marker : p.getMarks()) {
+                marks += getANSIColor(marker) + MARK + ANSI_RESET + " ";
+            }
+
+            String resources = "";
+            for (Resource res : p.getResources()) {
+                resources += getANSIColor(res) + AMMO_BLOCK + ANSI_RESET + " ";
+            }
+
+            charMap[startingX+i][startingY] = String.format(PLAYER_INFO_FORMAT,
+                    getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, resources);
+            i++;
+
+            charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;
+        }
     }
 
     /**

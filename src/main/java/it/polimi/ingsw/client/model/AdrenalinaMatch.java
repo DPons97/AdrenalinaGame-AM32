@@ -69,6 +69,9 @@ public class AdrenalinaMatch {
 	 */
 	private int turnDuration;
 
+    /**
+     * List of all possible weapons
+     */
 	private List<WeaponCard> weapons;
 
 	/**

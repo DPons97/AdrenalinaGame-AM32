@@ -142,4 +142,18 @@ public class Map {
     public Cell getCell(int x, int y) {
         return mapMatrix[x][y];
     }
+
+    /**
+     * @return list with all spawn points in map
+     */
+    public List<SpawnCell> getSpawnPoints() {
+        return spawnPoints;
+    }
+
+    /**
+     * @return list with all ammo cells in map
+     */
+    public List<AmmoCell> getAmmoPoints() {
+        return ammoPoints;
+    }
 }
