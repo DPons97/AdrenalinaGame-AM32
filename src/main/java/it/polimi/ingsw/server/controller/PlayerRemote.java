@@ -231,7 +231,7 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public void alert(String s) {
 		try {
-			remotePlayer.allert(s);
+			remotePlayer.alert(s);
 		} catch (RemoteException e) {
 			Thread t = new Thread(this::disconnectPlayer);
 			t.start();		}

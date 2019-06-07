@@ -537,6 +537,11 @@ public class CliView extends ClientView {
         player.createGame(maxPlayers,maxDeaths,turnDuration, mapID);
     }
 
+    @Override
+    public void showAlert(String message) {
+
+    }
+
     /**
      * Parse json with cli assets
      */

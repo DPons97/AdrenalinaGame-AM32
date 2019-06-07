@@ -170,7 +170,7 @@ public class Lobby {
      * */
     public JSONObject toJSON(){
         JSONObject toRet = new JSONObject();
-        toRet.put("n_players", players.size()+matches.stream().map(m->getLobbyPlayers().size()).mapToInt(Integer::intValue).sum());
+        toRet.put("n_players", players.size()+matches.stream().map(m->m.getMatch().getPlayers().size()).mapToInt(Integer::intValue).sum());
 
         JSONArray matches = new JSONArray();
         this.matches.forEach(m -> {

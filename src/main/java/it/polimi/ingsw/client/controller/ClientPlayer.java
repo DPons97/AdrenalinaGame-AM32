@@ -8,12 +8,14 @@ import it.polimi.ingsw.client.view.GuiView;
 import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.MatchState;
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
@@ -198,24 +200,30 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
+
 		if(match == null){
 			match = new AdrenalinaMatch();
 		}
 
 		match.update(toGetUpdateFrom);
-
-		Thread updater = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				view.showMatch();
-			}
-		});
-		updater.start();
+        Thread updater = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                view.showMatch();
+            }
+        });
+        updater.start();
+		if (match.getState() == MatchState.LOADING &&
+			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
+					collect(Collectors.toList()).get(0).isReadyToStart()) {
+			server.setReady();
+			System.out.println("DONE LOADING");
+		}
 	}
 
 	@Override
-	public void allert(String message) {
-		System.out.println("ALLERT: "+message);
+	public void alert(String message) {
+		view.showAlert(message);
 	}
 
 	public void setReady(){

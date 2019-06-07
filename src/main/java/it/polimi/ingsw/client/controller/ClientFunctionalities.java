@@ -80,6 +80,6 @@ public interface ClientFunctionalities extends Remote {
 	 */
 	void updateMatch(JSONObject toGetUpdateFrom) throws  RemoteException;
 
-	void allert(String message) throws  RemoteException;
+	void alert(String message) throws  RemoteException;
 
 }

@@ -19,7 +19,7 @@ public class MatchController {
 	/**
 	 * Maximum time match waits all player to be connected
 	 */
-	static private int waitingTime = 120;
+	static private int waitingTime = 60000;
 
 	/**
 	 * Match that is controlled
@@ -117,27 +117,15 @@ public class MatchController {
 	 */
 	private void loadAndStart() {
 		// Make clients start loading
-		ExecutorService loadingExecutor = Executors.newSingleThreadExecutor();
-
-		loadingExecutor.submit(() -> {
-			for (Player p : match.getPlayers()) {
+		for (Player p : match.getPlayers()) {
+			synchronized (this) {
 				p.setReady(false);
-				p.getConnection().beginLoading();
+				this.notifyAll();
 			}
-		});
-		loadingExecutor.shutdown();
-		try {
-			loadingExecutor.awaitTermination(10, TimeUnit.SECONDS);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
-
-		if (!loadingExecutor.isTerminated()) {
-			// Send all client message to stop loading / game interrupted
-			for (Player p : match.getPlayers())
-				if (p.getConnection() != null) p.getConnection().alert("Game interrupted");
+		for (Player p : match.getPlayers()) {
+			p.getConnection().updateMatch(match);
 		}
-		loadingExecutor.shutdownNow();
 
 		// Wait players to load (max 120s)
 		boolean allReady = false;
@@ -147,8 +135,14 @@ public class MatchController {
 			for (Player p : match.getPlayers()) {
 				if (!p.isReadyToStart()) {
 					allReady = false;
+					p.getConnection().updateMatch(match);
 					break;
 				}
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 			if (allReady) break;
 		}
@@ -156,8 +150,10 @@ public class MatchController {
 			for (Player p : match.getPlayers()) p.getConnection().alert("Game interrupted");
 		} else {
 			// Send all client message that all player connected and match is starting
+			System.out.println("All players loaded and ready to play");
+			match.setMatchState(MatchState.PLAYER_TURN);
 			for (Player p : match.getPlayers())
-				if (p.getConnection() != null) p.getConnection().beginMatch();
+				if (p.getConnection() != null) p.getConnection().updateMatch(match);
 		}
 	}
 
@@ -224,9 +220,35 @@ public class MatchController {
 	 *	set correspondent player object state to ready
 	 * @param player player connection object of the player to set ready
 	 */
-	public synchronized void setPlayerReady(PlayerConnection player) {
-		getPlayer(player.getName()).setReady(true);
-		match.getPlayers().forEach(p->p.getConnection().updateMatch(match));
+	public void setPlayerReady(PlayerConnection player) {
+		synchronized (this) {
+			getPlayer(player.getName()).setReady(true);
+			System.out.println(player.getName()+" ready");
+			this.notifyAll();
+		}
+		if(match.getMatchState()== MatchState.NOT_STARTED) {
+			for (Player p : match.getPlayers()) {
+				if (!p.isReadyToStart()){
+					match.getPlayers().forEach(pl -> pl.getConnection().updateMatch(match));
+					return;
+				}
+			}
+
+			Thread t = new Thread(()-> {
+				try {
+					System.out.println("Everyone is ready... starting match!");
+					startMatch();
+				} catch (PlayerNotReadyException e) {
+					e.printStackTrace();
+				} catch (NotEnoughPlayersException e) {
+					e.printStackTrace();
+				} catch (MatchAlreadyStartedException e) {
+					e.printStackTrace();
+				}
+			});
+			t.start();
+
+		}
 	}
 
 }
