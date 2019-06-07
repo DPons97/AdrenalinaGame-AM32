@@ -215,9 +215,10 @@ public class GuiView extends ClientView{
             popup.setAutoHide(true);
             popup.setHideOnEscape(true);
             Label label = new Label(message);
-            label.setStyle("-fx-background-color: cornsilk;\n" +
+            label.setStyle("-fx-background-color: rgba(50,50,50,0.25);\n" +
                             "    -fx-padding: 10;\n" +
-                            "    -fx-border-color: black; \n" +
+                            "    -fx-border-radius: 20; \n" +
+                            "    -fx-background-radius: 20;\n" +
                             "    -fx-border-width: 5;\n" +
                             "    -fx-font-size: 16;");
             popup.getContent().add(label);
@@ -227,7 +228,7 @@ public class GuiView extends ClientView{
                 @Override
                 public void handle(WindowEvent e) {
                     popup.setX(stage.getX() + stage.getWidth()/2 - popup.getWidth()/2);
-                    popup.setY(stage.getY() + stage.getHeight()/2 - popup.getHeight()/2);
+                    popup.setY(stage.getY() + stage.getHeight()*4/5 - popup.getHeight()/2);
                 }
             });
             popup.show(stage);

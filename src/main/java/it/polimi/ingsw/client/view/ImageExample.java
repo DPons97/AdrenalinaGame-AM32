@@ -2,11 +2,16 @@ package it.polimi.ingsw.client.view;
 
 
 import javafx.application.Application;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
@@ -78,14 +83,19 @@ public class ImageExample extends Application {
         ImageView tab5View = new ImageView(tab5);
         ImageView cardback00View = new ImageView(cardback00);
         ImageView cardback01View = new ImageView(cardback01);
-
-
-        Group root = new Group(mapView, cardback00View, cardback01View, tab1View, tab2View, tab3View, tab4View, tab5View);
-
         Rectangle2D bounds = Screen.getPrimary().getBounds();
-        //Creating a scene object
-        Scene scene = new Scene(root, bounds.getWidth(), bounds.getHeight()-50);
 
+        BorderPane borders = new BorderPane();
+        Pane root = new Pane(mapView, cardback00View, cardback01View, tab1View, tab2View, tab3View, tab4View, tab5View);
+
+        borders.setCenter(root);
+
+        //Creating a scene object
+        Scene scene = new Scene(borders, 1223, 759);
+        borders.setPrefSize(scene.getWidth(),scene.getHeight());
+
+        borders.setStyle("-fx-background-color: #222");
+        root.setStyle("-fx-background-color: red");
 
 
 
@@ -95,9 +105,24 @@ public class ImageExample extends Application {
 
         //Adding scene to the stage
         stage.setScene(scene);
-
+        stage.setMaximized(true);
+        stage.setResizable(false);
         //Displaying the contents of the stage
         stage.show();
+        double pV, pH, width16, height9;
+        if(stage.getHeight() > stage.getWidth()*9/16){
+            pH = 0;
+            pV = (stage.getHeight()- stage.getWidth()*9/16)/2;
+            width16 =  stage.getWidth();
+            height9 = stage.getWidth()*9/16;
+        } else {
+            pV = 0;
+            pH =  (stage.getWidth()-stage.getHeight()*16/9)/2;
+            width16 =  stage.getHeight()*16/9;
+            height9 = stage.getHeight();
+        }
+
+        BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
 
         // position on X and Y
         double mapX=0;
@@ -211,8 +236,44 @@ public class ImageExample extends Application {
 
         //Creating a Group object
 
+        stage.widthProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                int pV, pH;
+                if(stage.getHeight() > stage.getWidth()*9/16){
+                    pH = 0;
+                    pV = (int) (stage.getHeight()- stage.getWidth()*9/16)/2;
+                } else {
+                    pV = 0;
+                    pH = (int) (stage.getWidth()-stage.getHeight()*16/9)/2;
+                }
+
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
 
 
+
+
+
+
+            }
+        });
+        stage.heightProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                int pV, pH;
+                if (stage.getHeight() > stage.getWidth() * 9 / 16) {
+                    pH = 0;
+                    pV = (int) (stage.getHeight() - stage.getWidth() * 9 / 16) / 2;
+                    root.setPrefSize(stage.getWidth(), stage.getWidth()*9/16);
+                } else {
+                    pV = 0;
+                    pH = (int) (stage.getWidth() - stage.getHeight() * 16 / 9) / 2;
+                    root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
+
+                }
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+            }
+        });
     }
     public static void main(String args[]) {
         launch(args);
