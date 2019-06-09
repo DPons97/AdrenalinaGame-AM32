@@ -8,6 +8,7 @@ import it.polimi.ingsw.client.model.Cell;
 import it.polimi.ingsw.client.model.Map;
 import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.SpawnCell;
+import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
 import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
 import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
@@ -30,7 +31,7 @@ import java.util.stream.Collectors;
 
 public class CliView extends ClientView {
 
-    public static final int TIMEOUT = 200;
+    private static final int TIMEOUT = 200;
 
     /**
      * Data structure to hold cli assets
@@ -61,7 +62,7 @@ public class CliView extends ClientView {
          * @param south true if there is a wall to the south of this char
          * @param east true if there is a wall to the east of this char
          * @param west true if there is a wall to the west of this char
-         * @return
+         * @return True if this char has given walls
          */
         boolean isRightChar(boolean north, boolean south, boolean east, boolean west) {
             return east == this.east && north == this.north && south == this.south && west == this.west;
@@ -78,21 +79,22 @@ public class CliView extends ClientView {
      * Reader class
      */
     private class CommandReader extends Thread {
-        private Scanner stringReader;
+        private final Scanner stringReader;
 
         private boolean stopReader;
 
         private String buffer;
 
-        public CommandReader() {
+        CommandReader() {
             stringReader = new Scanner(System.in);
             this.stopReader = false;
             this.buffer = "";
         }
 
+        @Override
         public void run() {
             while (!stopReader)
-                synchronized (buffer) {
+                synchronized (stringReader) {
                     if (buffer.isEmpty()) buffer = stringReader.nextLine();
                 }
         }
@@ -108,10 +110,10 @@ public class CliView extends ClientView {
          * Retreive next line read and reset buffer
          * @return last read line
          */
-        public String nextLine() {
+        String nextLine() {
             String toReturn;
-            synchronized (buffer) {
-                toReturn = new String(buffer);
+            synchronized (stringReader) {
+                toReturn = buffer;
                 buffer = "";
             }
             return toReturn;
@@ -131,8 +133,8 @@ public class CliView extends ClientView {
     /**
      * ASCII encoding of free spaces (not customizable)
      */
-    private static String freeO = "─";
-    private static String freeV = "│";
+    private static final String FREE_O = "─";
+    private static final String FREE_V = "│";
 
     /**
      * Number of characters used to build walls + 1 (one of two vertical walls)
@@ -155,16 +157,16 @@ public class CliView extends ClientView {
     private static final String COLOR_BLOCK = "█";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001b[31;1m";
-    private static final String ANSI_GREEN = "\u001B[32m";
+    private static final String ANSI_GREEN = "\u001b[32;1m";
     private static final String ANSI_YELLOW = "\u001B[33m";
     private static final String ANSI_BLUE = "\u001b[34;1m";
-    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_PURPLE = "\u001b[35;1m";
     private static final String ANSI_WHITE = "\u001B[37m";
 
     private static final String SPAWN_ART =  "  ___ \n" +
-                                            "/ __>\n" +
-                                            "\\__ \\\n" +
-                                            "<___/ ";
+                                             "/ __>\n" +
+                                             "\\__ \\\n" +
+                                             "<___/ ";
 
     private static final String AMMO_BLOCK = "■";
 
@@ -186,20 +188,19 @@ public class CliView extends ClientView {
     /**
      * Standard format for text inside lobby table
      */
-    private static final String LOBBY_HEADER =       "+--------------------------+-----------------+-------------+\n" +
-                                                     "|         Nickname         |      Color      |    Ready    |\n" +
-                                                     "+--------------------------+-----------------+-------------+\n";
+    private static final String LOBBY_HEADER =       "+--------------------------+-----------------+-------------+%n" +
+                                                     "|         Nickname         |      Color      |    Ready    |%n" +
+                                                     "+--------------------------+-----------------+-------------+%n";
     private static final String LOBBY_TABLE_FORMAT = "|   %-20s   |      %-7s    |  %-9s  |%n";
-    private static final String LOBBY_CLOSER =       "+--------------------------+-----------------+-------------+\n\n";
+    private static final String LOBBY_CLOSER =       "+--------------------------+-----------------+-------------+%n%n";
 
     /**
      * Standard format for text inside match table
      */
-    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |\n" +
-                                                        "+------+---------------+--------------+---------+-----------------+\n";
+    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |%n";
     private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |%n";
     private static final String MATCH_PLAYER_FORMAT =    "|      |               |              |         |  %-13s  |%n%n";
-    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+\n";
+    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+%n";
 
     /**
      * Standard format for text inside weapon info table
@@ -212,7 +213,7 @@ public class CliView extends ClientView {
      * Standard format for text inside player info table
      */
     private static final String PLAYER_INFO_HEADER =    "\t\t\t|         Nickname         |       Life points       |  Marks  |  Ammos  |";
-    private static final String PLAYER_INFO_FORMAT =    "\t\t\t|   %s%-20s%s   | %-24s| %-7s | %-7s |";
+    private static final String PLAYER_INFO_FORMAT =    "\t\t\t|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
     private static final String PLAYER_INFO_CLOSER =    "\t\t\t+--------------------------+-------------------------+---------+---------+";
 
     /**
@@ -237,18 +238,16 @@ public class CliView extends ClientView {
 
         clearConsole();
         System.out.format(
-                "...::: Adrenalina LOBBY :::... \n" +
-                "Current players online: " + nPlayers + "\n\n");
+                "...::: Adrenalina LOBBY :::... %n" +
+                "Current players online: " + nPlayers + "%n%n");
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
         System.out.format(
-                "+------+---------------+--------------+---------+-----------------+\n" +
-                "|         Matches:       %-4s                                     |\n" +
-                "+------+---------------+--------------+---------+-----------------+\n", matches.size());
+                MATCH_INFO_CLOSER + "|         Matches:       %-4s                                     |%n" + MATCH_INFO_CLOSER, matches.size());
 
         String response;
 
-        if(matches.size() == 0){
+        if(matches.isEmpty()){
             System.out.println("Wow, such empty...");
             System.out.println("CREATE [N]ew match. [Any key to reload]");
 
@@ -264,7 +263,7 @@ public class CliView extends ClientView {
         }
         for(int i = 0; i < matches.size(); i++){
             // Print header table
-            System.out.format(MATCH_INFO_HEADER);
+            System.out.format(MATCH_INFO_CLOSER + "%n" + MATCH_INFO_HEADER);
 
             // Print table
             JSONObject match = (JSONObject) matches.get(i);
@@ -284,8 +283,8 @@ public class CliView extends ClientView {
             System.out.format(MATCH_INFO_CLOSER);
         }
 
-        System.out.println("Do you want to CREATE [N]ew match, or JOIN an existing one?\n" +
-                "(Specify match's ID to join) [Any key to reload]");
+        System.out.printf("Do you want to CREATE [N]ew match, or JOIN an existing one?%n" +
+                            "(Specify match's ID to join) [Any key to reload]");
 
         response = getResponse();
         int choice = 0;
@@ -306,7 +305,7 @@ public class CliView extends ClientView {
 
     /**
      * Retreive last response (waiting if none is provided)
-     * @return
+     * @return Last player's response
      */
     private String getResponse() {
         String response;
@@ -330,7 +329,7 @@ public class CliView extends ClientView {
 
         ClientPlayer p1;
         try {
-            p1 = new ClientPlayer("Dr4ke");
+            p1 = new ClientPlayer("Davide");
             CliView view = new CliView(p1);
 
             it.polimi.ingsw.server.model.Player newPlayer2 = new it.polimi.ingsw.server.model.Player(match, "Luca");
@@ -355,16 +354,30 @@ public class CliView extends ClientView {
             newPlayer4.respawn(match.getBoardMap().getSpawnPoints().get(1));
             newPlayer5.respawn(match.getBoardMap().getSpawnPoints().get(2));
 
+            newPlayer1.takeDamage(newPlayer2);
+            newPlayer1.takeDamage(newPlayer2);
+            newPlayer1.takeDamage(newPlayer3);
+            newPlayer1.takeDamage(newPlayer3);
+            newPlayer1.takeDamage(newPlayer4);
+            newPlayer1.takeDamage(newPlayer4);
+            newPlayer1.takeDamage(newPlayer4);
+            newPlayer1.takeDamage(newPlayer4);
+            newPlayer1.takeDamage(newPlayer3);
+            newPlayer1.takeDamage(newPlayer3);
+            newPlayer1.takeDamage(newPlayer2);
+
+            newPlayer1.takeMark(newPlayer3);
+            newPlayer1.takeMark(newPlayer4);
+            newPlayer1.takeMark(newPlayer3);
+
+            newPlayer1.addAmmo(Resource.BLUE_BOX);
+
             AdrenalinaMatch clientMatch = new AdrenalinaMatch();
             clientMatch.update(match.toJSON());
             p1.setMatch(clientMatch);
 
             view.showMatch();
-        } catch (TooManyPlayersException e) {
-            e.printStackTrace();
-        } catch (PlayerAlreadyExistsException e) {
-            e.printStackTrace();
-        } catch (MatchAlreadyStartedException e) {
+        } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException e) {
             e.printStackTrace();
         }
     }
@@ -375,7 +388,9 @@ public class CliView extends ClientView {
     @Override
     public void showMatch() {
         AdrenalinaMatch match = player.getMatch();
-        boolean isReady = false;
+        boolean isReady = match.getPlayers().stream().
+                filter(p -> p.getNickname().equals(player.getNickname())).
+                collect(Collectors.toList()).get(0).isReadyToStart();
 
         clearConsole();
 
@@ -383,8 +398,8 @@ public class CliView extends ClientView {
         if (match.getState() == MatchState.NOT_STARTED) {
             // Print header + table
             System.out.format(
-                    "...::: Welcome to the match, " + player.getNickname() + " :::... \n\n" +
-                            "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "\n" + LOBBY_HEADER);
+                    "...::: Welcome to the match, " + player.getNickname() + " :::... %n%n" +
+                            "Players: " + match.getPlayers().size() + " / " + match.getnPlayers() + "%n" + LOBBY_HEADER);
 
             for (Player p : match.getPlayers()) {
                 System.out.format(LOBBY_TABLE_FORMAT, p.getNickname(), p.getColor().toString(),
@@ -394,34 +409,33 @@ public class CliView extends ClientView {
             System.out.printf(LOBBY_CLOSER);
 
             String response;
-            if (!isReady) {
-                System.out.printf("Are you [R]eady? ([E] to go back to lobby)\n");
+            if (isReady) {
+                System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
 
                 // Retreive next command
                 response = getResponse();
 
                 if (response.equals("R") || response.equals("r")) {
                     player.setReady();
-                    isReady = true;
                 } else if (response.equals("E") || response.equals("e")) {
                     player.backToLobby();
                     player.updateLobby();
-                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby\n");
+                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
 
             } else {
-                System.out.printf("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
+                System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
                 response = getResponse();
 
                 if (response.equals("E") || response.equals("e")) {
                     player.backToLobby();
                     player.updateLobby();
-                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready\n");
+                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
 
             }
         } else if (match.getState() == MatchState.PLAYER_TURN) {
-            // Print players;
-            System.out.print("\n");
+            // Print players
+            System.out.printf("%n");
             for (Player p : match.getPlayers()) {
                 String playerString;
                 if (p.isDead())
@@ -430,7 +444,7 @@ public class CliView extends ClientView {
 
                 System.out.print(playerString + "\t\t");
             }
-            System.out.print("\n\n");
+            System.out.printf("%n%n");
 
             // Print map
             drawMap(match);
@@ -622,7 +636,7 @@ public class CliView extends ClientView {
             for (int i = 0; i < printWidth; i++) {
                 System.out.print(col[i]);
             }
-            System.out.print("\n");
+            System.out.printf("%n");
         }
     }
 
@@ -701,7 +715,7 @@ public class CliView extends ClientView {
                 charMap[startingX][startingY] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
                 for (int i = startingY+1; i < startingY + sideWidth; i++) {
                     if (toDraw) {
-                        charMap[startingX][i] = freeO;
+                        charMap[startingX][i] = FREE_O;
                         toDraw = false;
                     } else toDraw = true;
                 }
@@ -761,7 +775,7 @@ public class CliView extends ClientView {
                 charMap[startingX][startingY] = getANSIColor(cell) + COLOR_BLOCK + ANSI_RESET;
                 for (int i = startingX + 1; i < startingX + sideHeight; i++) {
                     if (toDraw) {
-                        charMap[i][startingY] = freeV;
+                        charMap[i][startingY] = FREE_V;
                         toDraw = false;
                     } else toDraw = true;
                 }
@@ -910,8 +924,7 @@ public class CliView extends ClientView {
             if (c == '\n') {
                 i++;
                 j = startingY + boxYOffset;
-            }
-            else {
+            } else {
                 charMap[i][j] = getANSIColor(toDraw) + c + ANSI_RESET;
                 j++;
             }
@@ -964,24 +977,45 @@ public class CliView extends ClientView {
 
         int i = 3;
         for (Player p : match.getPlayers() ) {
-            String dmgTrack = "";
 
+            StringBuilder dmgTrack = new StringBuilder();
+            int colorLength = 0;
             for (Player damager : p.getDmgPoints()) {
-                dmgTrack += getANSIColor(damager) + HIT_POINT + ANSI_RESET + " ";
+                dmgTrack.append(getANSIColor(damager)).append(HIT_POINT).append(ANSI_RESET).append(" ");
+
+                // Keep track of lost chars due to colors
+                colorLength += getANSIColor(damager).length() + ANSI_RESET.length();
             }
 
-            String marks = "";
+            int stringLen = dmgTrack.length() - colorLength;
+            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+            dmgTrack.append(" ".repeat(24-stringLen));
+
+
+            StringBuilder marks = new StringBuilder();
+            colorLength = 0;
             for (Player marker : p.getMarks()) {
-                marks += getANSIColor(marker) + MARK + ANSI_RESET + " ";
-            }
+                marks.append(getANSIColor(marker)).append(MARK).append(ANSI_RESET).append(" ");
 
-            String resources = "";
-            for (Resource res : p.getResources()) {
-                resources += getANSIColor(res) + AMMO_BLOCK + ANSI_RESET + " ";
+                colorLength += getANSIColor(marker).length() + ANSI_RESET.length();
             }
+            stringLen = marks.length() - colorLength;
+            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+            marks.append(" ".repeat(6-stringLen));
+
+            StringBuilder ammos = new StringBuilder();
+            colorLength = 0;
+            for (Resource res : p.getAmmos()) {
+                ammos.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+
+                colorLength += getANSIColor(res).length() + ANSI_RESET.length();
+            }
+            stringLen = ammos.length() - colorLength;
+            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+            ammos.append(" ".repeat(6-stringLen));
 
             charMap[startingX+i][startingY] = String.format(PLAYER_INFO_FORMAT,
-                    getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, resources);
+                    getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, ammos);
             i++;
 
             charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;

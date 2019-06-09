@@ -200,11 +200,7 @@ public class Action {
 			toApply.forEach(p-> {
 				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
 				IntStream.range(0,dmg).forEach(a-> {
-					try {
-						p.takeDamage(caller);
-					} catch (DeadPlayerException e) {
-						e.printStackTrace();
-					}
+					p.takeDamage(caller);
 				});
 			});
 		};
