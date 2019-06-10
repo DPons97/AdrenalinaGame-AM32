@@ -8,10 +8,7 @@ import it.polimi.ingsw.client.model.Cell;
 import it.polimi.ingsw.client.model.Map;
 import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.SpawnCell;
-import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
-import it.polimi.ingsw.custom_exceptions.MatchAlreadyStartedException;
-import it.polimi.ingsw.custom_exceptions.PlayerAlreadyExistsException;
-import it.polimi.ingsw.custom_exceptions.TooManyPlayersException;
+import it.polimi.ingsw.custom_exceptions.*;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -202,19 +199,24 @@ public class CliView extends ClientView {
     private static final String MATCH_PLAYER_FORMAT =    "|      |               |              |         |  %-13s  |%n%n";
     private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+%n";
 
+    private static final int INFO_OFFSET = 20;
+
     /**
      * Standard format for text inside weapon info table
      */
-    private static final String WEAPON_INFO_HEADER =    "\t\t\t|  Spawn  |        Weapon        |  Reload cost  |";
-    private static final String WEAPON_INFO_FORMAT =    "\t\t\t|    %-2s    | %-20s |  %-3s %-3s %-3s  |";
-    private static final String WEAPON_INFO_CLOSER =    "\t\t\t+---------+----------------------+---------------+";
+    private static final String WEAPON_INFO_HEADER =    "|  Spawn  |        Weapon        |  Reload cost  |";
+    private static final String WEAPON_INFO_FORMAT =    "|    %-2s    | %-20s |  %-3s %-3s %-3s  |";
+    private static final String WEAPON_INFO_CLOSER =    "+---------+----------------------+---------------+";
 
     /**
      * Standard format for text inside player info table
      */
-    private static final String PLAYER_INFO_HEADER =    "\t\t\t|         Nickname         |       Life points       |  Marks  |  Ammos  |";
-    private static final String PLAYER_INFO_FORMAT =    "\t\t\t|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
-    private static final String PLAYER_INFO_CLOSER =    "\t\t\t+--------------------------+-------------------------+---------+---------+";
+    private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |  Ammos  |";
+    private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
+    private static final String PLAYER_REWARD_HEADER =  "|                          | %-24s|         |         |";
+    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-23s |         |         |";
+    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-23s |         |         |";
+    private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------+";
 
     /**
      *  Command Line reader
@@ -370,14 +372,44 @@ public class CliView extends ClientView {
             newPlayer1.takeMark(newPlayer4);
             newPlayer1.takeMark(newPlayer3);
 
+            newPlayer2.enableFrenzy();
+
+            newPlayer2.takeDamage(newPlayer1);
+            newPlayer2.takeDamage(newPlayer1);
+            newPlayer2.takeDamage(newPlayer3);
+            newPlayer2.takeDamage(newPlayer5);
+            newPlayer2.takeDamage(newPlayer4);
+            newPlayer2.takeDamage(newPlayer3);
+            newPlayer2.takeDamage(newPlayer1);
+            newPlayer2.takeDamage(newPlayer1);
+
             newPlayer1.addAmmo(Resource.BLUE_BOX);
+            newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.YELLOW_BOX);
+
+            newPlayer5.addAmmo(Resource.BLUE_BOX);
+            newPlayer5.addAmmo(Resource.RED_BOX);
+            newPlayer5.addAmmo(Resource.YELLOW_BOX);
+
+            newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0));
+
+            newPlayer5.addAmmo(Resource.BLUE_BOX);
+            newPlayer5.addAmmo(Resource.RED_BOX);
+            newPlayer5.addAmmo(Resource.YELLOW_BOX);
+
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(1));
 
             AdrenalinaMatch clientMatch = new AdrenalinaMatch();
             clientMatch.update(match.toJSON());
             p1.setMatch(clientMatch);
 
+            List<WeaponCard> newLoaded = new ArrayList<>();
+            newLoaded.add(clientMatch.getPlayers().get(4).getLoadedWeapons().get(0));
+            clientMatch.getPlayers().get(4).setLoadedWeapons(newLoaded);
+
             view.showMatch();
-        } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException e) {
+        } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException | InventoryFullException | InsufficientResourcesException e) {
             e.printStackTrace();
         }
     }
@@ -435,14 +467,14 @@ public class CliView extends ClientView {
             }
         } else if (match.getState() == MatchState.PLAYER_TURN) {
             // Print players
-            System.out.printf("%n");
+            System.out.printf("%n      ");
             for (Player p : match.getPlayers()) {
                 String playerString;
                 if (p.isDead())
                     playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
                 else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
 
-                System.out.print(playerString + "\t\t");
+                System.out.print(playerString + "      ");
             }
             System.out.printf("%n%n");
 
@@ -454,7 +486,7 @@ public class CliView extends ClientView {
         }
     }
 
-    /**
+    /**-
      * Lets client select a player from a list
      * @param selectables list of players
      * @return selected player
@@ -609,8 +641,8 @@ public class CliView extends ClientView {
      */
     private void drawMap(AdrenalinaMatch match) {
         // Initializing print canvas size (map + weapon and additional tables)
-        int printWidth = match.getBoardMap().getYSize() * CELL_CHAR_WIDTH + 2;
-        int printHeight = match.getBoardMap().getXSize() * CELL_CHAR_HEIGHT + 2;
+        int printWidth = match.getBoardMap().getYSize() * CELL_CHAR_WIDTH + 1 + INFO_OFFSET;
+        int printHeight = match.getBoardMap().getXSize() * CELL_CHAR_HEIGHT + 1 + INFO_OFFSET;
 
         String[][] mapToReturn = new String[printHeight][printWidth];
 
@@ -629,7 +661,7 @@ public class CliView extends ClientView {
         drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - 1);
 
         // Draw player infos
-        drawPlayerInfo(mapToReturn, match, printHeight/2, printWidth - 1);
+        drawPlayerInfo(mapToReturn, match, 15, printWidth - 1);
 
         // Actual drawing
         for (String[] col : mapToReturn) {
@@ -973,53 +1005,133 @@ public class CliView extends ClientView {
     private void drawPlayerInfo(String[][] charMap, AdrenalinaMatch match, int startingX, int startingY) {
         charMap[startingX][startingY] = PLAYER_INFO_CLOSER;
         charMap[startingX+1][startingY] = PLAYER_INFO_HEADER;
-        charMap[startingX+2][startingY] = PLAYER_INFO_CLOSER;
 
-        int i = 3;
+        int i = 2;
         for (Player p : match.getPlayers() ) {
+            StringBuilder dmgTrack = drawPlayerDamage(p);
+            StringBuilder rewards = drawPlayerRewards(p);
+            StringBuilder marks = drawPlayerMarks(p);
+            StringBuilder ammos = drawPlayerAmmos(p);
 
-            StringBuilder dmgTrack = new StringBuilder();
-            int colorLength = 0;
-            for (Player damager : p.getDmgPoints()) {
-                dmgTrack.append(getANSIColor(damager)).append(HIT_POINT).append(ANSI_RESET).append(" ");
-
-                // Keep track of lost chars due to colors
-                colorLength += getANSIColor(damager).length() + ANSI_RESET.length();
-            }
-
-            int stringLen = dmgTrack.length() - colorLength;
-            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-            dmgTrack.append(" ".repeat(24-stringLen));
-
-
-            StringBuilder marks = new StringBuilder();
-            colorLength = 0;
-            for (Player marker : p.getMarks()) {
-                marks.append(getANSIColor(marker)).append(MARK).append(ANSI_RESET).append(" ");
-
-                colorLength += getANSIColor(marker).length() + ANSI_RESET.length();
-            }
-            stringLen = marks.length() - colorLength;
-            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-            marks.append(" ".repeat(6-stringLen));
-
-            StringBuilder ammos = new StringBuilder();
-            colorLength = 0;
-            for (Resource res : p.getAmmos()) {
-                ammos.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
-
-                colorLength += getANSIColor(res).length() + ANSI_RESET.length();
-            }
-            stringLen = ammos.length() - colorLength;
-            // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-            ammos.append(" ".repeat(6-stringLen));
-
+            charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;
+            i++;
             charMap[startingX+i][startingY] = String.format(PLAYER_INFO_FORMAT,
                     getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, ammos);
             i++;
+            charMap[startingX+i][startingY] = String.format(PLAYER_REWARD_HEADER, rewards);
 
+            // Draw weapons. See weapon name only if this player's weapon or not reloaded
+            if (!p.getWeapons().isEmpty()) {
+                for (int j = 0; j < p.getWeapons().size(); j++) {
+                    StringBuilder weaponsString = new StringBuilder();
+                    i++;
+                    if (p.getNickname().equals(player.getNickname())) {
+                        weaponsString.append(p.getWeapons().get(j).getName());
+                    } else if (!p.getLoadedWeapons().contains(p.getWeapons().get(j))) {
+                        weaponsString.append(p.getWeapons().get(j).getName()).append(" (Unloaded)");
+                    } else weaponsString.append("[Hidden weapon]");
+
+                    charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString);
+                }
+            }
+
+            i++;
             charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;
         }
+    }
+
+    /**
+     * Draw a defined player's resources infos
+     * @param p player to get info from
+     * @return string builder initialized with infos
+     */
+    private StringBuilder drawPlayerAmmos(Player p) {
+        int colorLength;
+        int stringLen;// Draw ammos
+        StringBuilder ammos = new StringBuilder();
+        colorLength = 0;
+        for (Resource res : p.getAmmos()) {
+            ammos.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+
+            colorLength += getANSIColor(res).length() + ANSI_RESET.length();
+        }
+        stringLen = ammos.length() - colorLength;
+        // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+        ammos.append(" ".repeat(6-stringLen));
+        return ammos;
+    }
+
+    /**
+     * Draw a defined player's marks infos
+     * @param p player to get info from
+     * @return string builder initialized with infos
+     */
+    private StringBuilder drawPlayerMarks(Player p) {
+        int colorLength;
+        int stringLen;// Draw marks
+        StringBuilder marks = new StringBuilder();
+        colorLength = 0;
+        for (Player marker : p.getMarks()) {
+            marks.append(getANSIColor(marker)).append(MARK).append(ANSI_RESET).append(" ");
+
+            colorLength += getANSIColor(marker).length() + ANSI_RESET.length();
+        }
+        stringLen = marks.length() - colorLength;
+        // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+        marks.append(" ".repeat(6-stringLen));
+        return marks;
+    }
+
+    /**
+     * Draw a defined player's current rewards infos
+     * @param p player to get info from
+     * @return string builder initialized with infos
+     */
+    private StringBuilder drawPlayerRewards(Player p) {
+        int colorLength;
+        int stringLen;// Draw rewards
+        StringBuilder rewards = new StringBuilder();
+        rewards.append((p.isFrenzyPlayer()) ? "    " : "1   ");
+        int deaths = p.getDeaths();
+        colorLength = 0;
+        for (int reward : (p.isFrenzyPlayer()) ? Player.getFrenzyRewards() : Player.getKillRewards()) {
+            if (deaths > 0) {
+                rewards.append(ANSI_RED);
+
+                // Keep track of lost chars due to colors
+                colorLength += ANSI_RED.length();
+                deaths--;
+            }
+
+            rewards.append(reward).append(ANSI_RESET).append(" ");
+            colorLength += ANSI_RESET.length();
+        }
+        stringLen = rewards.length() - colorLength;
+        rewards.append((p.isFrenzyPlayer()) ? "    >>  " : ">>  ").append(ANSI_RED).append("D M").append(ANSI_RESET);
+        // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+        rewards.append(" ".repeat(((p.isFrenzyPlayer()) ? 13 : 17) - stringLen));
+        return rewards;
+    }
+
+    /**
+     * Draw a defined player's damage points infos
+     * @param p player to get info from
+     * @return string builder initialized with infos
+     */
+    private StringBuilder drawPlayerDamage(Player p) {
+        // Draw damage track
+        StringBuilder dmgTrack = new StringBuilder();
+        int colorLength = 0;
+        for (Player damager : p.getDmgPoints()) {
+            dmgTrack.append(getANSIColor(damager)).append(HIT_POINT).append(ANSI_RESET).append(" ");
+
+            // Keep track of lost chars due to colors
+            colorLength += getANSIColor(damager).length() + ANSI_RESET.length();
+        }
+        int stringLen = dmgTrack.length() - colorLength;
+        // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+        dmgTrack.append(" ".repeat(24-stringLen));
+        return dmgTrack;
     }
 
     /**

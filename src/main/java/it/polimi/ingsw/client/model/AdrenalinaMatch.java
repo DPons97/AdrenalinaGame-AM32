@@ -276,7 +276,6 @@ public class AdrenalinaMatch {
     private void initWeapons(){
         weapons = new ArrayList<>();
         JSONParser parser = new JSONParser();
-        String name;
         try {
             Object obj = parser.parse(new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/json/weapons.json"), StandardCharsets.UTF_8)));
             JSONObject jsonObject = (JSONObject) obj;

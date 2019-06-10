@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -814,13 +815,18 @@ public class Player {
 		player.put("ready", readyToStart);
 		player.put("deaths", deaths);
 		player.put("dead", dead);
+		player.put("isFrenzyPlayer", isFrenzyPlayer);
 		JSONArray weaponsArray = new JSONArray();
 		JSONArray powerupsArray = new JSONArray();
 		JSONArray marksArray = new JSONArray();
 		JSONArray dmgpointsArray = new JSONArray();
 		JSONArray ammosArray = new JSONArray();
+		JSONArray loadedWeaponsArray = new JSONArray();
 
 		weapons.forEach(w -> weaponsArray.add(w.getName()));
+		weapons.forEach(w -> {
+			if (w.isLoaded()) loadedWeaponsArray.add(w.getName());
+		});
 		powerups.forEach(p -> powerupsArray.add(p.toJSON()));
 		marks.forEach(m -> marksArray.add(m.getNickname()));
 		dmgPoints.forEach(d -> dmgpointsArray.add(d.getNickname()));
@@ -831,6 +837,7 @@ public class Player {
 		player.put("marks", marksArray);
 		player.put("dmgpoints", dmgpointsArray);
 		player.put("ammos", ammosArray);
+		player.put("loadedweapons", loadedWeaponsArray);
 		player.put("color", color.toString());
 
 		return player;

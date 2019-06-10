@@ -24,8 +24,8 @@ import static java.lang.System.exit;
  */
 public class ClientPlayer implements ClientFunctionalities{
 
-	private static final int rmiPort = 52297;
-	private static final int socketPort = 52298;
+	private static final int RMI_PORT = 52297;
+	private static final int SOCKET_PORT = 52298;
 
 	/**
 	 * Client nickname
@@ -185,12 +185,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		Thread updater = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				view.showLobby(server.updateLobby());
-			}
-		});
+		Thread updater = new Thread(() -> view.showLobby(server.updateLobby()));
 		updater.start();
 	}
 
@@ -206,12 +201,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		}
 
 		match.update(toGetUpdateFrom);
-        Thread updater = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                view.showMatch();
-            }
-        });
+        Thread updater = new Thread(() -> view.showMatch());
         updater.start();
 		if (match.getState() == MatchState.LOADING &&
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
@@ -261,10 +251,10 @@ public class ClientPlayer implements ClientFunctionalities{
 		System.out.println("Select connection type [0: SOCKET, 1: RMI]: ");
 		if (Integer.parseInt(in.next()) == 0) {
 			connectionType = ConnectionType.SOCKET;
-			port = socketPort;
+			port = SOCKET_PORT;
 		} else {
 			connectionType = ConnectionType.RMI;
-			port = rmiPort;
+			port = RMI_PORT;
 		}
 
 		try {
