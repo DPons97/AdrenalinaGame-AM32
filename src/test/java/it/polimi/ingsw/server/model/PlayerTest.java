@@ -155,8 +155,8 @@ class PlayerTest {
         // Victim takes 1 damage, then check that he isn't dead
         assertFalse(victimPlayer.takeDamage(killerPlayer));
 
-        // Victim takes another 8 damage
-        for (int i=0; i < Player.getMaxDamage() - 2; i++) {
+        // Victim takes another 9 damage
+        for (int i=0; i < Player.getMaxDamage() - 1; i++) {
             assertFalse(victimPlayer.takeDamage(killerPlayer));
         }
 
@@ -165,7 +165,7 @@ class PlayerTest {
 
         // Victim takes another 1 damage and check he's still killed and overkilled
         assertTrue(victimPlayer.takeDamage(killerPlayer));
-        assertEquals(Player.getMaxDamage() + 1, victimPlayer.getDmgPoints().size());
+        assertEquals(Player.getMaxDamage() + 2, victimPlayer.getDmgPoints().size());
 
         // Check damage from marks is correctly dealt
         victimPlayer.respawn(new SpawnCell(Side.FREE,Side.FREE,Side.FREE,Side.FREE,Color.BLUE,0,0));

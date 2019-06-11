@@ -3,7 +3,10 @@ package it.polimi.ingsw.client.model;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.Color;
+import it.polimi.ingsw.server.model.Powerup;
+import it.polimi.ingsw.server.model.Resource;
+import it.polimi.ingsw.server.model.Weapon;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -11,6 +14,15 @@ import org.json.simple.JSONObject;
  * 
  */
 public class Player {
+	/**
+	 *  Point reward to give to who kills this player during common turns
+	 */
+	private static int[] killRewards = {8, 6, 4, 2, 1, 1};
+
+	/**
+	 *  Point reward to give to who kills this player during frenzy
+	 */
+	private static int[] frenzyRewards = {2, 1, 1, 1};
 
 	/**
 	 * nickname
@@ -48,6 +60,11 @@ public class Player {
 	private int deaths;
 
 	/**
+	 * True if this player is using frenzy rewards
+	 */
+	private boolean isFrenzyPlayer;
+
+	/**
 	 * number of given marks
 	 */
 	private int givenMarks;
@@ -63,6 +80,11 @@ public class Player {
 	private List<WeaponCard> weapons;
 
 	/**
+	 * weapons that are loaded
+	 */
+	private List<WeaponCard> loadedWeapons;
+
+	/**
 	 * powerups
 	 */
 	private List<Powerup> powerups;
@@ -70,7 +92,7 @@ public class Player {
 	/**
 	 *  Ammos this player has (Max 3 of each type)
 	 */
-	private List<Resource> resources;
+	private List<Resource> ammos;
 
 	/**
 	 * match
@@ -87,6 +109,30 @@ public class Player {
 	 */
 	public Player() {
 	}
+
+	/**
+	 * @return List of kill rewards
+	 */
+	public static List<Integer> getKillRewards() {
+		List<Integer> returnReward = new ArrayList<>();
+		for (int i : killRewards) {
+			returnReward.add(i);
+		}
+		return returnReward;
+	}
+
+	/**
+	 * @return List of kill rewards during frenzy
+	 */
+	public static List<Integer> getFrenzyRewards() {
+		List<Integer> returnReward = new ArrayList<>();
+		for (int i : frenzyRewards) {
+			returnReward.add(i);
+		}
+		return returnReward;
+	}
+
+	public boolean isFrenzyPlayer() { return isFrenzyPlayer; }
 
 	/**
 	 * @return nickname
@@ -225,6 +271,20 @@ public class Player {
 	}
 
 	/**
+	 * @return all loaded weapons
+	 */
+	public List<WeaponCard> getLoadedWeapons() {
+		return loadedWeapons;
+	}
+
+	/**
+	 * @param loadedWeapons new array of loaded weapons
+	 */
+	public void setLoadedWeapons(List<WeaponCard> loadedWeapons) {
+		this.loadedWeapons = loadedWeapons;
+	}
+
+	/**
 	 * @return powerups
 	 */
 	public List<Powerup> getPowerups() {
@@ -237,8 +297,6 @@ public class Player {
 	public void setPowerups(List<Powerup> powerups) {
 		this.powerups = powerups;
 	}
-
-
 
 	/**
 	 * @return match
@@ -266,12 +324,12 @@ public class Player {
 		return dead;
 	}
 
-	public List<Resource> getResources() {
-		return resources;
+	public List<Resource> getAmmos() {
+		return ammos;
 	}
 
-	public void setResources(List<Resource> resources) {
-		this.resources = resources;
+	public void setAmmos(List<Resource> ammos) {
+		this.ammos = ammos;
 	}
 
 	public void update(JSONObject toParse) {
@@ -280,21 +338,27 @@ public class Player {
 		this.deaths = Integer.parseInt(toParse.get("deaths").toString());
 		this.dead = Boolean.parseBoolean(toParse.get("dead").toString());
 		this.color = Color.valueOf(toParse.get("color").toString());
+		this.isFrenzyPlayer = Boolean.parseBoolean(toParse.get("isFrenzyPlayer").toString());
 
 		JSONArray weaponsArray = (JSONArray) toParse.get("weapons");
 		JSONArray powerupsArray = (JSONArray) toParse.get("powerups");
 		JSONArray marksArray = (JSONArray) toParse.get("marks");
 		JSONArray dmgpointsArray = (JSONArray) toParse.get("dmgpoints");
-		JSONArray resourcesArray = (JSONArray) toParse.get("resources");
+		JSONArray ammosArray = (JSONArray) toParse.get("ammos");
+		JSONArray loadedWeaponsArray = (JSONArray) toParse.get("loadedweapons");
 
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		marks = new ArrayList<>();
 		dmgPoints = new ArrayList<>();
-		resources = new ArrayList<>();
+		ammos = new ArrayList<>();
+		loadedWeapons = new ArrayList<>();
 
 		for(Object o: weaponsArray){
 			weapons.add(match.getWeapons().stream().filter(w->w.getName().equals(o.toString())).collect(Collectors.toList()).get(0));
+		}
+		for(Object o: loadedWeaponsArray){
+			loadedWeapons.add(match.getWeapons().stream().filter(w->w.getName().equals(o.toString())).collect(Collectors.toList()).get(0));
 		}
 		for(Object o: powerupsArray){
 			powerups.add(Powerup.parseJSON((JSONObject) o));
@@ -305,9 +369,8 @@ public class Player {
 		for(Object o: dmgpointsArray){
 			dmgPoints.add(match.getPlayers().stream().filter(p->p.getNickname().equals(o.toString())).collect(Collectors.toList()).get(0));
 		}
-		for(Object o: weaponsArray){
-			resources.add(Resource.valueOf(o.toString()));
+		for(Object o: ammosArray){
+			ammos.add(Resource.valueOf(o.toString()));
 		}
-
 	}
 }

@@ -135,11 +135,11 @@ public class WeaponCard {
 
             JSONArray effCostJSON = (JSONArray) effect.get("cost");
             List<Resource> effCost = new ArrayList<>();
-            for(Object res: costJSON){
+            for(Object res: effCostJSON){
                 effCost.add(stringToResource(res.toString()));
             }
             effects.add(new Effect("base effect", effect.get("description").toString(),
-                    effectCost));
+                    effCost));
         }
         return effects;
     }

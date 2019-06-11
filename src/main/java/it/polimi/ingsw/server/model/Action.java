@@ -128,111 +128,16 @@ public class Action {
 				JSONObject baseActionJSON = (JSONObject) baseActionObj;
 				switch(baseActionJSON.get("type").toString()){
 					case "SELECT":
-						Object notID = baseActionJSON.get("notID");
-						JSONArray distance = (JSONArray) baseActionJSON.get("distance");
-						JSONArray qty = (JSONArray) baseActionJSON.get("quantity");
-						Object diffCellsObj =  baseActionJSON.get("differentCells");
-						boolean diffCells = diffCellsObj != null && Boolean.parseBoolean(diffCellsObj.toString());
-						int minQty = Integer.parseInt(qty.get(0).toString());
-						int maxQty = Integer.parseInt(qty.get(1).toString());
-						// check what needs to be selected (cell/player/room/self)
-						switch(baseActionJSON.get("target").toString()){
-							case "CELL":
-								actions.add(caller -> {
-									targetCells.clear();
-									List<Cell> couldBeAdded = caller.getMatch().
-											getSelectableCells(caller,
-													baseActionJSON.get("from").toString(),
-													notID != null ? Integer.parseInt(notID.toString()) : -10,
-													Integer.parseInt(distance.get(0).toString()),
-													Integer.parseInt(distance.get(1).toString()),
-													targetPlayers
-											);
-
-									if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
-										// if there is no choice -> add all you could add
-										targetCells.addAll(couldBeAdded);
-									else{
-										if (caller.getConnection() != null) caller.getConnection().selectCell(couldBeAdded);
-									}
-								});
-								break;
-							case "PLAYER":
-								actions.add(caller -> {
-									targetPlayers.clear();
-									List<Player> couldBeAdded = caller.getMatch().
-											getSelectablePlayers(caller,
-													baseActionJSON.get("from").toString(),
-													notID != null ? Integer.parseInt(notID.toString()) : -10,
-													Integer.parseInt(distance.get(0).toString()),
-													Integer.parseInt(distance.get(1).toString()),
-													targetPlayers
-											);
-
-									if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
-										// if there is no choice -> add all you could add
-										targetPlayers.addAll(couldBeAdded);
-									else{
-										if (caller.getConnection() != null) caller.getConnection().selectPlayer(couldBeAdded);
-									}
-								});
-								break;
-							case "SELF":
-								actions.add(caller -> {
-									targetPlayers.clear();
-									targetPlayers.add(caller);
-								});
-								break;
-							case "ROOM":
-								actions.add(caller -> {
-									targetCells.clear();
-									List<List<Cell>> couldBeAdded = caller.getMatch().getSelectableRooms(caller);
-									if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
-										// if there is no choice -> add all you could add
-										targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
-									else{
-										if (caller.getConnection() != null) caller.getConnection().selectRoom(couldBeAdded);
-									}
-								});
-								break;
-							default:
-								throw new InvalidJSONException();
-
-						}
-
+						parseSelectAction(baseActionJSON);
 						break;
 					case "DAMAGE":
-						actions.add(caller -> {
-							List<Player> toApply = selectTargets();
-							toApply.forEach(p-> {
-								int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
-								IntStream.range(0,dmg).forEach(a-> {
-									try {
-										p.takeDamage(caller);
-									} catch (DeadPlayerException e) {
-										e.printStackTrace();
-									}
-								});
-							});
-						});
+						actions.add(damageLambda(baseActionJSON));
 						break;
 					case "MOVE":
-
-							actions.add(caller -> {
-								List<Player> toApply = selectTargets();
-								if(!targetCells.isEmpty())
-									toApply.forEach(p->p.move(targetCells.get(0)));
-							});
-
+						actions.add(moveLambda());
 						break;
 					case "MARK":
-						actions.add(caller -> {
-							List<Player> toApply = selectTargets();
-							toApply.forEach(p-> {
-								int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
-								IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
-							});
-						});
+						actions.add(markLambda(baseActionJSON));
 						break;
 					default:
 						throw new InvalidJSONException();
@@ -241,6 +146,126 @@ public class Action {
 		} catch (InvalidJSONException | InvalidStringException  e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void parseSelectAction(JSONObject baseActionJSON) throws InvalidJSONException {
+		Object notID = baseActionJSON.get("notID");
+		JSONArray distance = (JSONArray) baseActionJSON.get("distance");
+		JSONArray qty = (JSONArray) baseActionJSON.get("quantity");
+		Object diffCellsObj =  baseActionJSON.get("differentCells");
+		boolean diffCells = diffCellsObj != null && Boolean.parseBoolean(diffCellsObj.toString());
+		int minQty = Integer.parseInt(qty.get(0).toString());
+		int maxQty = Integer.parseInt(qty.get(1).toString());
+		// check what needs to be selected (cell/player/room/self)
+		switch(baseActionJSON.get("target").toString()){
+			case "CELL":
+				actions.add(selectCellLambda(baseActionJSON, notID, distance, minQty, maxQty));
+				break;
+			case "PLAYER":
+				actions.add(selectPlayerLambda(baseActionJSON, notID, distance, diffCells, minQty, maxQty));
+				break;
+			case "SELF":
+				selectSeflLambda();
+				break;
+			case "ROOM":
+				actions.add(selectRoomLambda(minQty, maxQty));
+				break;
+			default:
+				throw new InvalidJSONException();
+
+		}
+	}
+
+	public BaseAction markLambda(JSONObject baseActionJSON) {
+		return caller -> {
+			List<Player> toApply = selectTargets();
+			toApply.forEach(p-> {
+				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
+				IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
+			});
+		};
+	}
+
+	public BaseAction moveLambda() {
+		return caller -> {
+			List<Player> toApply = selectTargets();
+			if(!targetCells.isEmpty())
+				toApply.forEach(p->p.move(targetCells.get(0)));
+		};
+	}
+
+	public BaseAction damageLambda(JSONObject baseActionJSON) {
+		return caller -> {
+			List<Player> toApply = selectTargets();
+			toApply.forEach(p-> {
+				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
+				IntStream.range(0,dmg).forEach(a-> {
+					p.takeDamage(caller);
+				});
+			});
+		};
+	}
+
+	public BaseAction selectRoomLambda(int minQty, int maxQty) {
+		return caller -> {
+			targetCells.clear();
+			List<List<Cell>> couldBeAdded = caller.getMatch().getSelectableRooms(caller);
+			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+				// if there is no choice -> add all you could add
+				targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
+			else{
+				if (caller.getConnection() != null) caller.getConnection().selectRoom(couldBeAdded);
+			}
+		};
+	}
+
+	public boolean selectSeflLambda() {
+		return actions.add(caller -> {
+			targetPlayers.clear();
+			targetPlayers.add(caller);
+		});
+	}
+
+	public BaseAction selectPlayerLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, boolean diffCells, int minQty, int maxQty) {
+		return caller -> {
+			targetPlayers.clear();
+			List<Player> couldBeAdded = caller.getMatch().
+					getSelectablePlayers(caller,
+							baseActionJSON.get("from").toString(),
+							notID != null ? Integer.parseInt(notID.toString()) : -10,
+							Integer.parseInt(distance.get(0).toString()),
+							Integer.parseInt(distance.get(1).toString()),
+							targetPlayers
+					);
+
+			if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+				// if there is no choice -> add all you could add
+				targetPlayers.addAll(couldBeAdded);
+			else{
+				if (caller.getConnection() != null) caller.getConnection().selectPlayer(couldBeAdded);
+			}
+		};
+	}
+
+	public BaseAction selectCellLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, int minQty, int maxQty) {
+		return caller -> {
+			targetCells.clear();
+			List<Cell> couldBeAdded = caller.getMatch().
+					getSelectableCells(caller,
+							baseActionJSON.get("from").toString(),
+							notID != null ? Integer.parseInt(notID.toString()) : -10,
+							Integer.parseInt(distance.get(0).toString()),
+							Integer.parseInt(distance.get(1).toString()),
+							targetPlayers
+					);
+
+			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+				// if there is no choice -> add all you could add
+				targetCells.addAll(couldBeAdded);
+			else{
+				if (caller.getConnection() != null) caller.getConnection().selectCell(couldBeAdded);
+			}
+		};
 	}
 
 	private List<Player> selectTargets() {

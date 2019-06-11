@@ -262,7 +262,7 @@ public class Map {
      */
     public void initSpawnCells(Deck<Weapon> weaponDeck) {
         for (SpawnCell cell : spawnPoints) {
-            if (cell.getWeapons().size() < 3) {
+            for (int i = 0; i < 3 && cell.getWeapons().size() < 3; i++) {
                 try {
                     cell.addWeapon(weaponDeck.drawCard());
                 } catch (InventoryFullException e) {

@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -471,11 +472,10 @@ public class Player {
 	 * Apply damage to player. Additional damage due to source's marks on this player are also applied.
 	 * @param source Damage dealt to this player
 	 * @return true if player's dead after damage
-	 * @throws DeadPlayerException if player is already dead
 	 */
-	public boolean takeDamage(Player source) throws DeadPlayerException {
+	public boolean takeDamage(Player source) {
 		// Player take damage from source only if not overkilled
-		if (dmgPoints.size() <= maxDamage) {
+		if (dmgPoints.size() <= maxDamage + 1 ) {
 			dmgPoints.add(source);
 
 			if (marks.contains(source)) {
@@ -483,19 +483,23 @@ public class Player {
 				marks.remove(source);
 				takeDamage(source);
 			}
-		} else throw new DeadPlayerException();
+		}
 
-		if (dmgPoints.size() > maxDamage) {
-			// Player is overkilled
+		if (dmgPoints.size() > maxDamage + 1) {
+			// Player is overkilled (12 dmg)
 			overkilled = true;
 			return true;
-		} else if (dmgPoints.size() == maxDamage) {
+		}
+
+		if (dmgPoints.size() == maxDamage + 1) {
 			// Player is dead, but not overkilled
 			deaths++;
 			dead = true;
 			overkilled = false;
 			return true;
-		}  else return false;
+		}
+
+		return false;
 	}
 
 	/**
@@ -811,23 +815,29 @@ public class Player {
 		player.put("ready", readyToStart);
 		player.put("deaths", deaths);
 		player.put("dead", dead);
+		player.put("isFrenzyPlayer", isFrenzyPlayer);
 		JSONArray weaponsArray = new JSONArray();
 		JSONArray powerupsArray = new JSONArray();
 		JSONArray marksArray = new JSONArray();
 		JSONArray dmgpointsArray = new JSONArray();
-		JSONArray resourcesArray = new JSONArray();
+		JSONArray ammosArray = new JSONArray();
+		JSONArray loadedWeaponsArray = new JSONArray();
 
 		weapons.forEach(w -> weaponsArray.add(w.getName()));
+		weapons.forEach(w -> {
+			if (w.isLoaded()) loadedWeaponsArray.add(w.getName());
+		});
 		powerups.forEach(p -> powerupsArray.add(p.toJSON()));
 		marks.forEach(m -> marksArray.add(m.getNickname()));
 		dmgPoints.forEach(d -> dmgpointsArray.add(d.getNickname()));
-		ammos.forEach(a -> resourcesArray.add(a.toString()));
+		ammos.forEach(a -> ammosArray.add(a.toString()));
 
 		player.put("weapons", weaponsArray);
 		player.put("powerups", powerupsArray);
 		player.put("marks", marksArray);
 		player.put("dmgpoints", dmgpointsArray);
-		player.put("resources", resourcesArray);
+		player.put("ammos", ammosArray);
+		player.put("loadedweapons", loadedWeaponsArray);
 		player.put("color", color.toString());
 
 		return player;
