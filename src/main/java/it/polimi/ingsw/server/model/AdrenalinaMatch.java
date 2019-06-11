@@ -871,6 +871,7 @@ public class AdrenalinaMatch {
 		toRet.put("map", this.boardMap.toJSON());
 		toRet.put("turn", this.turn);
 		toRet.put("nPlayers", this.nPlayers);
+		toRet.put("firstPlayer", this.firstPlayer.getNickname());
 		JSONArray playersArray = new JSONArray();
 		players.forEach(p -> {
 			playersArray.add(p.toJSON());

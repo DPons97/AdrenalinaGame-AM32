@@ -266,10 +266,9 @@ public class Turn {
 
         // Get cells that can be picked doing from 0 to 1 or 2 movements
         List<Cell> canPick;
-        boolean bonusMovement = !playing.isFrenzyPlayer() && (playing.getDmgPoints().size() >= 3);
 
-        if (playingBeforeFirst) canPick = playing.getCellsToMove((bonusMovement) ? 3 : 2);
-        else canPick = playing.getCellsToMove((bonusMovement) ? 4 : 3);
+        if (playingBeforeFirst) canPick = playing.getCellsToMove(2);
+        else canPick = playing.getCellsToMove(3);
 
         return grabSomething(playing, canPick);
     }

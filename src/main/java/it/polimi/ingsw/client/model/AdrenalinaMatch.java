@@ -59,6 +59,11 @@ public class AdrenalinaMatch {
 	 */
 	private List<Player> players;
 
+    /**
+     * First player to play
+     */
+    private Player firstPlayer;
+
 	/**
 	 * true if is frenzy
 	 */
@@ -237,12 +242,18 @@ public class AdrenalinaMatch {
         this.weapons = weapons;
     }
 
+    public Player getFirstPlayer() {
+        return firstPlayer;
+    }
+
     public void update(JSONObject o) {
         this.maxDeaths = Integer.parseInt(o.get("max_deaths").toString());
         this.mapID = Integer.parseInt(o.get("mapID").toString());
         this.turnDuration = Integer.parseInt(o.get("turnDuration").toString());
         this.turn = Integer.parseInt(o.get("turn").toString());
         this.nPlayers = Integer.parseInt((o.get("nPlayers").toString()));
+
+        // Init players
         JSONArray playersArray = (JSONArray) o.get("players");
         if(state == MatchState.NOT_STARTED||players == null) {
             initPlayers(playersArray);
@@ -254,6 +265,10 @@ public class AdrenalinaMatch {
 
         this.state = MatchState.valueOf(o.get("state").toString());
         this.map =  Map.parseJSON((JSONObject) o.get("map"), weapons, players);
+
+        if (!state.equals(MatchState.NOT_STARTED)) {
+            this.firstPlayer = players.stream().filter(p -> p.getNickname().equals(o.get("firstPlayer").toString())).collect(Collectors.toList()).get(0);
+        }
 
         JSONArray deathTrackArray = (JSONArray) o.get("deathTrack");
         deathTrack = new ArrayList<>();
