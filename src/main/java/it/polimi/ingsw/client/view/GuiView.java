@@ -383,7 +383,7 @@ public class GuiView extends ClientView{
      * @return selected weapon and effect
      */
     @Override
-    public WeaponSelection selectCShoot(List<String> selectables) {
+    public WeaponSelection selectShoot(List<String> selectables) {
         return null;
     }
     /**
