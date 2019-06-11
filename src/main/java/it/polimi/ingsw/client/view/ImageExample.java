@@ -83,10 +83,10 @@ public class ImageExample extends Application {
         ImageView tab4View = new ImageView(tab4);
         ImageView tab5View = new ImageView(tab5);
         ImageView cardback00View = new ImageView(cardback00);
-        ImageView cardback01View = new ImageView(cardback01);
+      //  ImageView cardback01View = new ImageView(cardback01);
 
         BorderPane borders = new BorderPane();
-        Pane root = new Pane(mapView, cardback00View, cardback01View, tab1View, tab2View, tab3View, tab4View, tab5View);
+        Pane root = new Pane(mapView, cardback00View, tab1View, tab2View, tab3View, tab4View, tab5View);
 
         borders.setCenter(root);
 
@@ -157,10 +157,8 @@ public class ImageExample extends Application {
         double ammo1_2X = (width16*0.383);
         double ammo1_3X = (width16*0.449);
         double ammo1rotation = 0;
-        double ammo2X = (width16*0.017);
-        double ammo2_1Y = (height9*0.227);
-        double ammo2_2Y = (height9*0.327);
-        double ammo2_3Y = (height9*0.427);
+
+
         double ammo2rotation= (90);
         double ammo3X = (width16*0.528);
         double ammo3_1Y = (height9*0.37);
@@ -176,8 +174,8 @@ public class ImageExample extends Application {
 
         cardback00View.setX(powerupsDeckX);
         cardback00View.setY(powerupsDeckY);
-        cardback01View.setX(ammo2X);
-        cardback01View.setY(ammo2_3Y);
+       // cardback01View.setX(ammo2X);
+       // cardback01View.setY(ammo2_2Y);
         mapView.setX(mapX);
         mapView.setY(mapY);
 
@@ -195,7 +193,7 @@ public class ImageExample extends Application {
         tab4View.setPreserveRatio(true);
         tab5View.setPreserveRatio(true);
         cardback00View.setPreserveRatio(true);
-        cardback01View.setPreserveRatio(true);
+        //cardback01View.setPreserveRatio(true);
         //setting the fit height and width of the map view
 
 
@@ -222,8 +220,7 @@ public class ImageExample extends Application {
         tab4View.setFitWidth(tab4Size);
         tab5View.setFitHeight(height9-mapH);
         cardback00View.setFitWidth(powerupsSize);
-        cardback01View.setFitWidth(ammoSize);
-        cardback01View.setRotate(ammo2rotation);
+
 
         //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
         //double tab1droplet1X = (width16*((0.6220+(0.0215*6)))); //colonna fino a 10
@@ -242,6 +239,30 @@ public class ImageExample extends Application {
                 root.getChildren().add(dropletView);
             }
         }
+
+
+// weapon 2
+
+        double weaponOffset2Y = height9*0.115;
+        double weaponBase2Y = height9*0.26;
+        double ammo2X = (width16*0.017);
+
+        for(int i = 0; i<3; i++){
+            {
+                ImageView cardback01View = new ImageView(cardback01);
+                cardback01View.setX(ammo2X);
+                cardback01View.setY(weaponBase2Y+weaponOffset2Y*i);
+                cardback01View.setPreserveRatio(true);
+                cardback01View.setFitWidth(ammoSize);
+                cardback01View.setRotate(ammo2rotation);
+                root.getChildren().add(cardback01View);
+            }
+        }
+
+
+
+
+
 
         double buttonEdge = height9*0.16;
         double buttonX0 = width16*0.1;
