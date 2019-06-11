@@ -9,6 +9,7 @@ import it.polimi.ingsw.client.model.Map;
 import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.custom_exceptions.*;
+import it.polimi.ingsw.server.controller.Turn;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -271,7 +272,7 @@ public class CliView extends ClientView {
      */
     private static CommandReader cmdReader;
 
-    private static String selectionMessage;
+    private String selectionMessage;
 
     public CliView(ClientPlayer player) {
         super(player);
@@ -611,6 +612,25 @@ public class CliView extends ClientView {
      */
     @Override
     public TurnAction actionSelection() {
+        if (!player.getMatch().isFrenzyEnabled()) {
+            selectionMessage = ACTION_SELECTION;
+            String response = getResponse();
+
+            while (true) {
+                switch (response) {
+                    case "R":
+                        return TurnAction.MOVE;
+                    case "P":
+                        return TurnAction.PICK;
+                    case "S":
+                        return TurnAction.SHOOT;
+                    default:
+                        System.out.println("Invalid action selected");
+                }
+            }
+        } else {
+            // TODO Manage frenzy turn
+        }
         return null;
     }
 
