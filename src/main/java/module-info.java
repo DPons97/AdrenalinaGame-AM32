@@ -1,6 +1,6 @@
 module AdrenalinaGame {
+
     requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
     requires json.simple;
     requires java.rmi;

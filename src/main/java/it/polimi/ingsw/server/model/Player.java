@@ -152,7 +152,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.RED; // TODO: give the right color here
+		color = Color.BLUE; // TODO: give the right color here
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.RED; // TODO: give the right color here
+		color = Color.BLUE; // TODO: give the right color here
 
 	}
 
