@@ -9,7 +9,6 @@ import it.polimi.ingsw.client.model.Map;
 import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.custom_exceptions.*;
-import it.polimi.ingsw.server.controller.Turn;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.*;
@@ -222,6 +221,12 @@ public class CliView extends ClientView {
     /**
      * Default action selection messages
      */
+    private static final String INVALID_SELECTION = "Invalid selection";
+
+    private static final String IDLE_MESSAGE = "Waiting server...";
+
+    private static final String NOT_YOUR_TURN = "It's someone else's turn...";
+
     private static final String ACTION_SELECTION =
             "It's your turn! Here's what you can do: \n\n" +
             "[R]un: move up to 3 cells \n" +
@@ -277,7 +282,7 @@ public class CliView extends ClientView {
     public CliView(ClientPlayer player) {
         super(player);
         parseCliAssets();
-        selectionMessage = ACTION_SELECTION;
+        selectionMessage = IDLE_MESSAGE;
         cmdReader = new CommandReader();
         cmdReader.start();
     }
@@ -296,8 +301,9 @@ public class CliView extends ClientView {
                 "Current players online: " + nPlayers + "%n%n");
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
-        System.out.format(
-                MATCH_INFO_CLOSER + "|         Matches:       %-4s                                     |%n" + MATCH_INFO_CLOSER, matches.size());
+        System.out.print(MATCH_INFO_CLOSER);
+        System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
+        System.out.print(MATCH_INFO_CLOSER);
 
         String response;
 
@@ -543,7 +549,13 @@ public class CliView extends ClientView {
      */
     @Override
     public String selectPlayer(List<String> selectables) {
-        return null;
+        StringBuilder messageToPrint = new StringBuilder();
+        messageToPrint.append(PLAYER_SELECTION);
+
+        for (int i = 0; i < selectables.size(); i++) {
+            messageToPrint.append("[").append(i+1).append("] ").append(selectables.get(i)).append("\n");
+        }
+        return getIndexedResponse(selectables, messageToPrint);
     }
 
     /**
@@ -563,6 +575,43 @@ public class CliView extends ClientView {
      */
     @Override
     public List<Point> selectRoom(List<List<Point>> selectables) {
+        StringBuilder messageToPrint = new StringBuilder();
+        messageToPrint.append(ROOM_SELECTION);
+
+        for (int i = 0; i < selectables.size(); i++) {
+            int x = selectables.get(i).get(0).getX();
+            int y = selectables.get(i).get(0).getY();
+
+            messageToPrint.append("[").append(i+1).append("] ")
+                    .append(player.getMatch().getBoardMap().getCell(x, y).getColor()).append("\n");
+        }
+        return getIndexedResponse(selectables, messageToPrint);
+    }
+
+    private <T> T getIndexedResponse(List<T> selectables, StringBuilder messageToPrint) {
+        messageToPrint.append("\n [X] to STOP selection (turn action could be lost!)");
+
+        selectionMessage = messageToPrint.toString();
+        String response = getResponse();
+
+        while (!response.equals("X") && !response.equals("x")) {
+            int choice;
+            try {
+                choice = Integer.parseInt(response) - 1;
+            } catch (NumberFormatException e) {
+                System.out.println(INVALID_SELECTION);
+                response = getResponse();
+                continue;
+            }
+
+            if (choice >= 0 && choice < selectables.size()) {
+                selectionMessage = IDLE_MESSAGE;
+                return selectables.get(choice);
+            } else {
+                System.out.println(INVALID_SELECTION);
+                response = getResponse();
+            }
+        }
         return null;
     }
 
@@ -619,19 +668,59 @@ public class CliView extends ClientView {
             while (true) {
                 switch (response) {
                     case "R":
+                        selectionMessage = IDLE_MESSAGE;
                         return TurnAction.MOVE;
                     case "P":
+                        selectionMessage = IDLE_MESSAGE;
                         return TurnAction.PICK;
                     case "S":
+                        selectionMessage = IDLE_MESSAGE;
                         return TurnAction.SHOOT;
                     default:
-                        System.out.println("Invalid action selected");
+                        System.out.println(INVALID_SELECTION);
+                        response = getResponse();
                 }
             }
         } else {
-            // TODO Manage frenzy turn
+            if (!player.getMatch().isFirstPlayedFrenzy()) {
+                selectionMessage = FRENZY_ACTION_BEFORE_FIRST;
+                String response = getResponse();
+
+                while (true) {
+                    switch (response) {
+                        case "1":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.SHOOT;
+                        case "2":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.MOVE;
+                        case "3":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.PICK;
+                        default:
+                            System.out.println(INVALID_SELECTION);
+                            response = getResponse();
+                    }
+                }
+            } else {
+                selectionMessage = FRENZY_ACTION_AFTER_FIRST;
+                String response = getResponse();
+
+                while (true) {
+                    switch (response) {
+                        case "1":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.SHOOT;
+                        case "2":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.PICK;
+                        default:
+                            System.out.println(INVALID_SELECTION);
+                            response = getResponse();
+                    }
+                }
+            }
         }
-        return null;
     }
 
     @Override
