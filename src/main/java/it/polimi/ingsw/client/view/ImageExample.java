@@ -32,16 +32,18 @@ public class ImageExample extends Application {
     //private final static String TAB8 = "/img/tabs/03_greyback.png";
     //private final static String TAB9 = "/img/tabs/04_yellowback.png";
     // private final static String TAB10 = "/img/tabs/05_blueback.png";
-   // private final static String TAB11 = "/img/tabs/01_purpleback.png";
-   // private final static String TAB12 = "/img/tabs/02_greenback.png";
-   // private final static String TAB13 = "/img/tabs/03_greyback.png";
-   // private final static String TAB14 = "/img/tabs/04_yellowback.png";
-   // private final static String TAB15 = "/img/tabs/05_blueback.png";
+   // private final static String TAB11 = "/img/tabs/01_purplebackfire.png";
+   // private final static String TAB12 = "/img/tabs/02_greenbackfire.png";
+   // private final static String TAB13 = "/img/tabs/03_greybackfire.png";
+   // private final static String TAB14 = "/img/tabs/04_yellowbackfire.png";
+   // private final static String TAB15 = "/img/tabs/05_bluebackfire.png";
     private final static String CARDBACK00 = "/img/cards/AD_powerups_IT_02.png";
     private final static String CARDBACK01 = "/img/cards/AD_weapons_IT_0212.png";
-    private final static String DROPLET = "/img/droplets/dropblue-removebg.png";
+    private final static String DROPLET = "/img/droplets/dropblue.png";
     private final static String PAWN = "/img/pawns/blue.png";
     private final static String AMMO = "/img/ammo/AD_ammo_0434.png";
+    private final static String BOARDINO = "/img/tabs/boardino.png";
+    private final static String MYDASHBOARD = "/img/tabs/mydashboard.png";
 
     @Override
     public void start(Stage stage) throws FileNotFoundException {
@@ -75,7 +77,10 @@ public class ImageExample extends Application {
         Image pawn = new Image(new FileInputStream(urlPawn.getFile().replace("%20", " ")));
         URL urlAmmo = getClass().getResource(AMMO);
         Image ammo = new Image(new FileInputStream(urlAmmo.getFile().replace("%20", " ")));
-
+       // URL urlBoardino = getClass().getResource(BOARDINO);
+       // Image boardino = new Image(new FileInputStream(urlBoardino.getFile().replace("%20", " ")));
+        URL urlMydashboard = getClass().getResource(MYDASHBOARD);
+        Image mydashboard = new Image(new FileInputStream(urlMydashboard.getFile().replace("%20", " ")));
         ImageView mapView = new ImageView(map);
         ImageView tab1View = new ImageView(tab1);
         ImageView tab2View = new ImageView(tab2);
@@ -84,9 +89,10 @@ public class ImageExample extends Application {
         ImageView tab5View = new ImageView(tab5);
         ImageView cardback00View = new ImageView(cardback00);
       //  ImageView cardback01View = new ImageView(cardback01);
-
+     //   ImageView boardinoView = new ImageView(boardino);
+        ImageView mydashboardView = new ImageView(mydashboard);
         BorderPane borders = new BorderPane();
-        Pane root = new Pane(mapView, cardback00View, tab1View, tab2View, tab3View, tab4View, tab5View);
+        Pane root = new Pane(mapView, cardback00View, tab1View, tab2View, tab3View, tab4View, tab5View, mydashboardView);
 
         borders.setCenter(root);
 
@@ -135,9 +141,11 @@ public class ImageExample extends Application {
         double powerupsSize = (width16*0.038);
         double ammoSize = (width16*0.055);
         double dropletSize = (width16*0.0149);
-
+      //  double boardinoSize = (width16-getWidth(mapView));
+        double mydashboardSize =(width16-getWidth(tab5View));
 
         // position on X and Y
+
         double mapX=0;
         double mapY=0;
 
@@ -145,26 +153,16 @@ public class ImageExample extends Application {
         double tab2Y=(height9*0.175*1);
         double tab3Y=(height9*0.175*2);
         double tab4Y=(height9*0.175*3);
-
+      //  double boardinoY=(height9*0.175*4);
+      //  double boardinoX=
         double tab0X=0;//my tab X
         double tab0Y=(mapH); //my tab Y
         double powerupsDeckX= (width16*0.54);
         double powerupsDeckY= (height9*0.04);
         double ammoDeckX= (width16*0.523);
         double ammoDeckY= (height9*0.1905);
-        double ammo1Y = 0;
-        double ammo1_1X = (width16*0.317);
-        double ammo1_2X = (width16*0.383);
-        double ammo1_3X = (width16*0.449);
-        double ammo1rotation = 0;
 
 
-        double ammo2rotation= (90);
-        double ammo3X = (width16*0.528);
-        double ammo3_1Y = (height9*0.37);
-        double ammo3_2Y = (height9*0.47);
-        double ammo3_3Y = (height9*0.57);
-        double ammo3rotation= (-90);
 
 
 
@@ -193,6 +191,8 @@ public class ImageExample extends Application {
         tab4View.setPreserveRatio(true);
         tab5View.setPreserveRatio(true);
         cardback00View.setPreserveRatio(true);
+        mydashboardView.setPreserveRatio(true);
+     //   boardinoView.setPreserveRatio(true);
         //cardback01View.setPreserveRatio(true);
         //setting the fit height and width of the map view
 
@@ -213,6 +213,9 @@ public class ImageExample extends Application {
         tab3View.setY(tab3Y);
         tab4View.setX(tabOthers);
         tab4View.setY(tab4Y);
+      //  boardinoView.setX(tabOthers);
+      //  boardinoView.setY(boardinoY);
+
 
         tab1View.setFitWidth(tab1size);
         tab2View.setFitWidth(tab2Size);
@@ -220,7 +223,10 @@ public class ImageExample extends Application {
         tab4View.setFitWidth(tab4Size);
         tab5View.setFitHeight(height9-mapH);
         cardback00View.setFitWidth(powerupsSize);
-
+       // boardinoView.setFitWidth(tab4Size);
+        mydashboardView.setFitWidth(width16-getWidth(tab5View));
+        mydashboardView.setX(getWidth(tab5View));
+        mydashboardView.setY(mapH);
 
         //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
         //double tab1droplet1X = (width16*((0.6220+(0.0215*6)))); //colonna fino a 10
@@ -241,20 +247,56 @@ public class ImageExample extends Application {
         }
 
 
-// weapon 2
+// weapon box
 
-        double weaponOffset2Y = height9*0.115;
+        double weaponOffsetY = height9*0.115;
         double weaponBase2Y = height9*0.26;
         double ammo2X = (width16*0.017);
+        double ammo2rotation= (90);
+        double weaponBase3Y = height9*0.422;
+        double ammo3X = (width16*0.524);
+        double ammo3rotation= (-90);
+        double ammo1Y = 0;
+        double ammo1rotation = 0;
+        double weaponBase1X = width16*0.318;
+        // offset x check if is = a offset Y
+
+      //  double ammo1_1X = (width16*0.317);
+      //  double ammo1_2X = (width16*0.383);
+      //  double ammo1_3X = (width16*0.449);
 
         for(int i = 0; i<3; i++){
             {
                 ImageView cardback01View = new ImageView(cardback01);
                 cardback01View.setX(ammo2X);
-                cardback01View.setY(weaponBase2Y+weaponOffset2Y*i);
+                cardback01View.setY(weaponBase2Y+weaponOffsetY*i);
                 cardback01View.setPreserveRatio(true);
                 cardback01View.setFitWidth(ammoSize);
                 cardback01View.setRotate(ammo2rotation);
+                root.getChildren().add(cardback01View);
+            }
+        }
+
+        for(int i = 0; i<3; i++){
+            {
+                ImageView cardback01View = new ImageView(cardback01);
+                cardback01View.setX(ammo3X);
+                cardback01View.setY(weaponBase3Y+weaponOffsetY*i);
+                cardback01View.setPreserveRatio(true);
+                cardback01View.setFitWidth(ammoSize);
+                cardback01View.setRotate(ammo3rotation);
+                root.getChildren().add(cardback01View);
+            }
+        }
+
+        for(int i = 0; i<3; i++){
+            {
+                ImageView cardback01View = new ImageView(cardback01);
+                cardback01View.setY(ammo1Y);
+                cardback01View.setX(weaponBase1X+weaponOffsetY*i);
+                cardback01View.setPreserveRatio(true);
+                cardback01View.setFitWidth(ammoSize);
+                cardback01View.setRotate(ammo1rotation);
                 root.getChildren().add(cardback01View);
             }
         }
