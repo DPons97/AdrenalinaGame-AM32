@@ -1,15 +1,19 @@
 package it.polimi.ingsw.client.view;
 
 
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,21 +26,21 @@ public class ImageExample extends Application {
     //private final static String MAP3 = "/img/maps/3.png";
     //private final static String MAP4 = "/img/maps/4.png";
 
-    private final static String TAB1 = "/img/tabs/01_purple.png";
-    private final static String TAB2 = "/img/tabs/02_green.png";
-    private final static String TAB3 = "/img/tabs/03_grey.png";
-    private final static String TAB4 = "/img/tabs/04_yellow.png";
-    private final static String TAB5 = "/img/tabs/05_blue.png";
-    //private final static String TAB6 = "/img/tabs/01_purpleback.png";
-    //private final static String TAB7 = "/img/tabs/02_greenback.png";
-    //private final static String TAB8 = "/img/tabs/03_greyback.png";
-    //private final static String TAB9 = "/img/tabs/04_yellowback.png";
-    // private final static String TAB10 = "/img/tabs/05_blueback.png";
-   // private final static String TAB11 = "/img/tabs/01_purplebackfire.png";
-   // private final static String TAB12 = "/img/tabs/02_greenbackfire.png";
-   // private final static String TAB13 = "/img/tabs/03_greybackfire.png";
-   // private final static String TAB14 = "/img/tabs/04_yellowbackfire.png";
-   // private final static String TAB15 = "/img/tabs/05_bluebackfire.png";
+    private final static String TAB1 = "/img/tabs/purple.png";
+    private final static String TAB2 = "/img/tabs/green.png";
+    private final static String TAB3 = "/img/tabs/grey.png";
+    private final static String TAB4 = "/img/tabs/yellow.png";
+    private final static String TAB5 = "/img/tabs/blue.png";
+    //private final static String TAB6 = "/img/tabs/purpleback.png";
+    //private final static String TAB7 = "/img/tabs/greenback.png";
+    //private final static String TAB8 = "/img/tabs/greyback.png";
+    //private final static String TAB9 = "/img/tabs/yellowback.png";
+    // private final static String TAB10 = "/img/tabs/blueback.png";
+   // private final static String TAB11 = "/img/tabs/purpleback.png";
+   // private final static String TAB12 = "/img/tabs/greenback.png";
+   // private final static String TAB13 = "/img/tabs/greyback.png";
+   // private final static String TAB14 = "/img/tabs/yellowback.png";
+   // private final static String TAB15 = "/img/tabs/blueback.png";
     private final static String CARDBACK00 = "/img/cards/AD_powerups_IT_02.png";
     private final static String CARDBACK01 = "/img/cards/AD_weapons_IT_0212.png";
     private final static String DROPLET = "/img/droplets/dropblue.png";
@@ -44,6 +48,10 @@ public class ImageExample extends Application {
     private final static String AMMO = "/img/ammo/AD_ammo_0434.png";
     private final static String BOARDINO = "/img/tabs/boardino.png";
     private final static String MYDASHBOARD = "/img/tabs/mydashboard.png";
+    public static final double ISTANT_RESIZE = 1.01;
+    public static final double DELAY_IN = 0.4;
+    public static final int DELEYED_RESIZE = 2;
+    public static final double DELAY_OUT = 0.3;
 
     @Override
     public void start(Stage stage) throws FileNotFoundException {
@@ -53,8 +61,8 @@ public class ImageExample extends Application {
         //InputStream map = getClass().getResourceAsStream("/resources/maps/1.png");
 
         // ImageIcon, like many others, can receive an URL as argument,
-// which is a better approach to load resources that are
-// contained in the classpath
+        // which is a better approach to load resources that are
+        // contained in the classpath
         URL urlMap1 = getClass().getResource(MAP1);
         Image map = new Image(new FileInputStream(urlMap1.getFile().replace("%20", " ")));
         URL urlTab1 = getClass().getResource(TAB1);
@@ -334,6 +342,7 @@ public class ImageExample extends Application {
             }
         }
 
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
 
         //lplayer pawns
         double pawnX0 = width16*0.1;
@@ -375,6 +384,7 @@ public class ImageExample extends Application {
 
 
 
+
     }
     public static void main(String args[]) {
         launch(args);
@@ -391,6 +401,45 @@ public class ImageExample extends Application {
     private Double getHeight(ImageView i){
         double ar = i.getImage().getWidth()/i.getImage().getHeight();
         return i.getFitHeight() > i.getFitWidth()/ar || i.getFitHeight() == 0 ? i.getFitWidth()/ar : i.getFitHeight();
+    }
+
+    public void setHoverEffect(ImageView i, double size){
+        i.setOnMouseEntered(new EventHandler<MouseEvent>
+                () {
+
+            @Override
+            public void handle(MouseEvent t) {
+                i.setFitWidth(size* ISTANT_RESIZE);
+                PauseTransition wait = new PauseTransition(Duration.seconds(DELAY_IN));
+                wait.setOnFinished((e) -> {
+                    if(i.isHover()) {
+                        i.setFitWidth(size * DELEYED_RESIZE);
+                    }
+                    else
+                        i.setFitWidth(size);
+
+                });
+                wait.play();
+
+            }
+
+        });
+
+        i.setOnMouseExited(new EventHandler<MouseEvent>
+                () {
+
+            @Override
+            public void handle(MouseEvent t) {
+                PauseTransition wait = new PauseTransition(Duration.seconds(DELAY_OUT));
+                wait.setOnFinished((e) -> {
+                    if(!i.isHover())
+                        i.setFitWidth(size);
+                });
+                wait.play();
+
+            }
+
+        });
     }
 
 }

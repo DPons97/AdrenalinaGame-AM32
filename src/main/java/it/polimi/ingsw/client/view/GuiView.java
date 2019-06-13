@@ -12,28 +12,55 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.net.URL;
 import java.util.List;
 import java.util.function.UnaryOperator;
 
 public class GuiView extends ClientView{
+
+    // Constants definition
+    public static final double ISTANT_RESIZE = 1.01;
+    public static final double DELAY_IN = 0.4;
+    public static final int DELEYED_RESIZE = 2;
+    public static final double DELAY_OUT = 0.3;
+
+    private final static String MAP = "/img/maps/";
+    private final static String MAP_EXTENSION = ".png";
+    private final static double MAP_X = 0;
+    private final static double MAP_Y = 0;
+    public static final double RELATIVE_MAP_HEIGHT = 0.8;
+
+    private final static String TAB = "/img/tabs/";
+    private final static String TAB_EXTENSION = ".png";
+    private final static String TAB_BACK = "back";
+    private final static double TAB_OFFSET = 0.175;
+    public static final double RELATIVE_TAB_HEIGHT = 0.20;
+
+
+    private double width;
+    private double height;
+
+
 
     public GuiView(ClientPlayer player) {
         super(player);
@@ -264,9 +291,7 @@ public class GuiView extends ClientView{
 
             initGrid(grid);
 
-            Text scenetitle = new Text("GAME BOARD");
-            scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-            grid.add(scenetitle, 0, 0);
+            loadLayout();
 
         });
     }
@@ -383,7 +408,7 @@ public class GuiView extends ClientView{
      * @return selected weapon and effect
      */
     @Override
-    public WeaponSelection selectCShoot(List<String> selectables) {
+    public WeaponSelection selectShoot(List<String> selectables) {
         return null;
     }
     /**
@@ -423,5 +448,140 @@ public class GuiView extends ClientView{
     @Override
     public TurnAction actionSelection() {
         return null;
+    }
+
+
+
+    private void loadLayout(){
+        Stage stage = FXWindow.getStage();
+        BorderPane borders = new BorderPane();
+        Pane root = new Pane();
+
+        Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
+
+        borders.setCenter(root);
+        stage.setScene(scene);
+        stage.setMaximized(true);
+        stage.setResizable(false);
+
+        double pV, pH;
+        if(root.getHeight() > root.getWidth()*9/16){
+            pH = 0;
+            pV = (root.getHeight()- root.getWidth()*9/16)/2;
+            System.out.println("stagew h: " + stage.getHeight());
+            System.out.println("margin v: "+pV);
+        } else {
+            pV = 0;
+            pH =  (root.getWidth()-root.getHeight()*16/9)/2;
+        }
+
+        width = root.getWidth()-2*pH;
+        height = root.getHeight()-2*pV;
+
+        BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+
+        //Creating a scene object
+        borders.setPrefSize(scene.getWidth(),scene.getHeight());
+
+        borders.setStyle("-fx-background-color: #222");
+        root.setStyle("-fx-background-color: red");
+
+        root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
+
+        ImageView map = loadMap();
+        root.getChildren().add(map);
+
+        loadPlayersTabs(root, map);
+
+    }
+
+    private void loadPlayersTabs(Pane root, ImageView map) {
+        double tabSize =(width - getWidth(map));
+        int i = 0;
+        for(Player p: player.getMatch().getPlayers()){
+            if(p.getNickname().equals(player.getNickname())){ continue;}
+            ImageView tab = loadImage(TAB+p.getColor().toString().toLowerCase()+
+                    (p.isFrenzyPlayer()?"":TAB_BACK)+TAB_EXTENSION);
+            tab.setPreserveRatio(true);
+            tab.setFitWidth(tabSize);
+            tab.setX(getWidth(map));
+            tab.setY(height*TAB_OFFSET*i);
+            root.getChildren().add(tab);
+            i++;
+        }
+    }
+
+    private ImageView loadMap() {
+        double mapH = (height* RELATIVE_MAP_HEIGHT);
+
+        ImageView map = loadImage(MAP+player.getMatch().getMapID()+MAP_EXTENSION);
+        map.setX(MAP_X);
+        map.setY(MAP_Y);
+        map.setPreserveRatio(true);
+        map.setFitHeight(mapH);
+        return map;
+    }
+
+    private ImageView loadImage(String filePath){
+        URL url = getClass().getResource(filePath);
+        try {
+            Image img = new Image(new FileInputStream(url.getFile().replace("%20", " ")));
+            return new ImageView(img);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private Double getWidth(ImageView i){
+        double ar = i.getImage().getWidth()/i.getImage().getHeight();
+        System.out.println("fit width: " + i.getFitWidth());
+        System.out.println("calc width: " +  i.getFitHeight()*ar);
+        return i.getFitWidth() > i.getFitHeight()*ar || i.getFitWidth() == 0 ? i.getFitHeight()*ar :i.getFitWidth() ;
+    }
+
+    private Double getHeight(ImageView i){
+        double ar = i.getImage().getWidth()/i.getImage().getHeight();
+        return i.getFitHeight() > i.getFitWidth()/ar || i.getFitHeight() == 0 ? i.getFitWidth()/ar : i.getFitHeight();
+    }
+
+    public void setHoverEffect(ImageView i, double size){
+        i.setOnMouseEntered(new EventHandler<MouseEvent>
+                () {
+
+            @Override
+            public void handle(MouseEvent t) {
+                i.setFitWidth(size* ISTANT_RESIZE);
+                PauseTransition wait = new PauseTransition(Duration.seconds(DELAY_IN));
+                wait.setOnFinished((e) -> {
+                    if(i.isHover()) {
+                        i.setFitWidth(size * DELEYED_RESIZE);
+                    }
+                    else
+                        i.setFitWidth(size);
+
+                });
+                wait.play();
+
+            }
+
+        });
+
+        i.setOnMouseExited(new EventHandler<MouseEvent>
+                () {
+
+            @Override
+            public void handle(MouseEvent t) {
+                PauseTransition wait = new PauseTransition(Duration.seconds(DELAY_OUT));
+                wait.setOnFinished((e) -> {
+                    if(!i.isHover())
+                        i.setFitWidth(size);
+                });
+                wait.play();
+
+            }
+
+        });
     }
 }

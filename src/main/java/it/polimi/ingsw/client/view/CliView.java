@@ -213,19 +213,76 @@ public class CliView extends ClientView {
      */
     private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |  Ammos  |";
     private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
-    private static final String PLAYER_REWARD_HEADER =  "|                          | %-24s|         |         |";
-    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-23s |         |         |";
-    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-23s |         |         |";
+    private static final String PLAYER_REWARD_HEADER =  "|                          | %-24s|         |";
+    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-6s |";
+    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-6s |";
     private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------+";
+
+    /**
+     * Default action selection messages
+     */
+    private static final String INVALID_SELECTION = "Invalid selection";
+
+    private static final String IDLE_MESSAGE = "Waiting server...";
+
+    private static final String NOT_YOUR_TURN = "It's someone else's turn...";
+
+    private static final String ACTION_SELECTION =
+            "It's your turn! Here's what you can do: \n\n" +
+            "[R]un: move up to 3 cells \n" +
+            "[P]ick: move up to 1 cell and pick something (2+ damage >>> +1 movement) \n" +
+            "[S]hoot: shoot someone with one of your weapons! (6+ damage >>> +1 movement before shooting) \n\n" +
+            "What's your choice?  ";
+
+    private static final String FRENZY_ACTION_BEFORE_FIRST =
+            "FREEEEEEEENZYYYYY! Now it's your last chance to get those points! Here's what you can do: \n\n" +
+            "[1] Move up to 1 cell, reload (if you want), then SHOOT! \n" +
+            "[2] Move up to 4 cells \n" +
+            "[3] Move up to 2 cell, then pick something \n\n" +
+            "What's your choice?  ";
+
+    private static final String FRENZY_ACTION_AFTER_FIRST =
+            "FREEEEEEEENZYYYYY! Now it's your last chance to get those points! Here's what you can do: \n\n" +
+            "[1] Move up to 2 cell, reload (if you want), then SHOOT! \n" +
+            "[2] Move up to 3 cell, then pick something \n\n" +
+            "What's your choice?  ";
+
+    /**
+     * Player selection message
+     */
+    private static final String PLAYER_SELECTION = "Select one of players listed above: \n";
+
+    /**
+     * Cell selection
+     */
+    private static final String CELL_SELECTION = "Select one of cells listed above: \n";
+
+    /**
+     * Room selection
+     */
+    private static final String ROOM_SELECTION = "Select one of rooms listed above: \n";
+
+    /**
+     * Weapon selection
+     */
+    private static final String WEAPON_SELECTION = "Select one of weapons listed above: \n";
+
+    /**
+     * Powerup selection
+     */
+    private static final String POWERUP_SELECTION = "Select one of powerups listed above: \n";
 
     /**
      *  Command Line reader
      */
     private static CommandReader cmdReader;
 
+    private String selectionMessage;
+
     public CliView(ClientPlayer player) {
         super(player);
         parseCliAssets();
+        selectionMessage = IDLE_MESSAGE;
         cmdReader = new CommandReader();
         cmdReader.start();
     }
@@ -244,8 +301,9 @@ public class CliView extends ClientView {
                 "Current players online: " + nPlayers + "%n%n");
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
-        System.out.format(
-                MATCH_INFO_CLOSER + "|         Matches:       %-4s                                     |%n" + MATCH_INFO_CLOSER, matches.size());
+        System.out.print(MATCH_INFO_CLOSER);
+        System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
+        System.out.print(MATCH_INFO_CLOSER);
 
         String response;
 
@@ -481,8 +539,6 @@ public class CliView extends ClientView {
             // Print map
             drawMap(match);
 
-            // Print timer
-
         }
     }
 
@@ -493,7 +549,13 @@ public class CliView extends ClientView {
      */
     @Override
     public String selectPlayer(List<String> selectables) {
-        return null;
+        StringBuilder messageToPrint = new StringBuilder();
+        messageToPrint.append(PLAYER_SELECTION);
+
+        for (int i = 0; i < selectables.size(); i++) {
+            messageToPrint.append("[").append(i+1).append("] ").append(selectables.get(i)).append("\n");
+        }
+        return getIndexedResponse(selectables, messageToPrint);
     }
 
     /**
@@ -513,6 +575,43 @@ public class CliView extends ClientView {
      */
     @Override
     public List<Point> selectRoom(List<List<Point>> selectables) {
+        StringBuilder messageToPrint = new StringBuilder();
+        messageToPrint.append(ROOM_SELECTION);
+
+        for (int i = 0; i < selectables.size(); i++) {
+            int x = selectables.get(i).get(0).getX();
+            int y = selectables.get(i).get(0).getY();
+
+            messageToPrint.append("[").append(i+1).append("] ")
+                    .append(player.getMatch().getBoardMap().getCell(x, y).getColor()).append("\n");
+        }
+        return getIndexedResponse(selectables, messageToPrint);
+    }
+
+    private <T> T getIndexedResponse(List<T> selectables, StringBuilder messageToPrint) {
+        messageToPrint.append("\n [X] to STOP selection (turn action could be lost!)");
+
+        selectionMessage = messageToPrint.toString();
+        String response = getResponse();
+
+        while (!response.equals("X") && !response.equals("x")) {
+            int choice;
+            try {
+                choice = Integer.parseInt(response) - 1;
+            } catch (NumberFormatException e) {
+                System.out.println(INVALID_SELECTION);
+                response = getResponse();
+                continue;
+            }
+
+            if (choice >= 0 && choice < selectables.size()) {
+                selectionMessage = IDLE_MESSAGE;
+                return selectables.get(choice);
+            } else {
+                System.out.println(INVALID_SELECTION);
+                response = getResponse();
+            }
+        }
         return null;
     }
 
@@ -522,7 +621,7 @@ public class CliView extends ClientView {
      * @return selected weapon and effect
      */
     @Override
-    public WeaponSelection selectCShoot(List<String> selectables) {
+    public WeaponSelection selectShoot(List<String> selectables) {
         return null;
     }
 
@@ -562,7 +661,66 @@ public class CliView extends ClientView {
      */
     @Override
     public TurnAction actionSelection() {
-        return null;
+        if (!player.getMatch().isFrenzyEnabled()) {
+            selectionMessage = ACTION_SELECTION;
+            String response = getResponse();
+
+            while (true) {
+                switch (response) {
+                    case "R":
+                        selectionMessage = IDLE_MESSAGE;
+                        return TurnAction.MOVE;
+                    case "P":
+                        selectionMessage = IDLE_MESSAGE;
+                        return TurnAction.PICK;
+                    case "S":
+                        selectionMessage = IDLE_MESSAGE;
+                        return TurnAction.SHOOT;
+                    default:
+                        System.out.println(INVALID_SELECTION);
+                        response = getResponse();
+                }
+            }
+        } else {
+            if (!player.getMatch().isFirstPlayedFrenzy()) {
+                selectionMessage = FRENZY_ACTION_BEFORE_FIRST;
+                String response = getResponse();
+
+                while (true) {
+                    switch (response) {
+                        case "1":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.SHOOT;
+                        case "2":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.MOVE;
+                        case "3":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.PICK;
+                        default:
+                            System.out.println(INVALID_SELECTION);
+                            response = getResponse();
+                    }
+                }
+            } else {
+                selectionMessage = FRENZY_ACTION_AFTER_FIRST;
+                String response = getResponse();
+
+                while (true) {
+                    switch (response) {
+                        case "1":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.SHOOT;
+                        case "2":
+                            selectionMessage = IDLE_MESSAGE;
+                            return TurnAction.PICK;
+                        default:
+                            System.out.println(INVALID_SELECTION);
+                            response = getResponse();
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -662,6 +820,19 @@ public class CliView extends ClientView {
 
         // Draw player infos
         drawPlayerInfo(mapToReturn, match, 15, printWidth - 1);
+
+        // Write selection message
+        int k = match.getBoardMap().getYSize() * (CELL_CHAR_HEIGHT-1);
+        int w = 0;
+        for (char c : selectionMessage.toCharArray()) {
+            if (c != '\n') {
+                mapToReturn[k][w] = String.valueOf(c);
+                w++;
+            } else {
+                w = 0;
+                k++;
+            }
+        }
 
         // Actual drawing
         for (String[] col : mapToReturn) {
@@ -1019,25 +1190,52 @@ public class CliView extends ClientView {
                     getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, ammos);
             i++;
             charMap[startingX+i][startingY] = String.format(PLAYER_REWARD_HEADER, rewards);
-
-            // Draw weapons. See weapon name only if this player's weapon or not reloaded
-            if (!p.getWeapons().isEmpty()) {
-                for (int j = 0; j < p.getWeapons().size(); j++) {
-                    StringBuilder weaponsString = new StringBuilder();
-                    i++;
-                    if (p.getNickname().equals(player.getNickname())) {
-                        weaponsString.append(p.getWeapons().get(j).getName());
-                    } else if (!p.getLoadedWeapons().contains(p.getWeapons().get(j))) {
-                        weaponsString.append(p.getWeapons().get(j).getName()).append(" (Unloaded)");
-                    } else weaponsString.append("[Hidden weapon]");
-
-                    charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString);
-                }
-            }
+            i = drawPlayerWeapon(charMap, startingX, startingY, i, p);
 
             i++;
             charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;
         }
+    }
+
+    /**
+     * Draw a player's weapons
+     * @param charMap map to be drawn
+     * @param startingX starting X coordinate
+     * @param startingY starting Y coordinate
+     * @param i current X offset
+     * @param p player
+     * @return new drawing offset
+     */
+    private int drawPlayerWeapon(String[][] charMap, int startingX, int startingY, int i, Player p) {
+        // Draw weapons. See weapon name only if this player's weapon or not reloaded
+        if (!p.getWeapons().isEmpty()) {
+            for (int j = 0; j < p.getWeapons().size(); j++) {
+                i++;
+
+                StringBuilder weaponsString = new StringBuilder();
+                StringBuilder weaponCost = new StringBuilder();
+                WeaponCard currentWeapon = p.getWeapons().get(j);
+                if (p.getNickname().equals(player.getNickname())) {
+                    weaponsString.append(currentWeapon.getName());
+                } else if (!p.getLoadedWeapons().contains(currentWeapon)) {
+                    weaponsString.append(currentWeapon.getName()).append(" (Unloaded)");
+
+                    int colorLength = 0;
+                    for (Resource res : currentWeapon.getCost()) {
+                        weaponCost.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+
+                        colorLength += getANSIColor(res).length() + ANSI_RESET.length();
+                    }
+                    int stringLen = weaponCost.length() - colorLength;
+                    // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+                    weaponCost.append(" ".repeat(6-stringLen));
+
+                } else weaponsString.append("[Hidden weapon]");
+
+                charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString, weaponCost);
+            }
+        }
+        return i;
     }
 
     /**
@@ -1046,10 +1244,11 @@ public class CliView extends ClientView {
      * @return string builder initialized with infos
      */
     private StringBuilder drawPlayerAmmos(Player p) {
-        int colorLength;
-        int stringLen;// Draw ammos
+        int colorLength = 0;
+        int stringLen;
+
+        // Draw ammos
         StringBuilder ammos = new StringBuilder();
-        colorLength = 0;
         for (Resource res : p.getAmmos()) {
             ammos.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
 
@@ -1067,10 +1266,11 @@ public class CliView extends ClientView {
      * @return string builder initialized with infos
      */
     private StringBuilder drawPlayerMarks(Player p) {
-        int colorLength;
-        int stringLen;// Draw marks
+        int colorLength = 0;
+        int stringLen;
+
+        // Draw marks
         StringBuilder marks = new StringBuilder();
-        colorLength = 0;
         for (Player marker : p.getMarks()) {
             marks.append(getANSIColor(marker)).append(MARK).append(ANSI_RESET).append(" ");
 
@@ -1088,12 +1288,13 @@ public class CliView extends ClientView {
      * @return string builder initialized with infos
      */
     private StringBuilder drawPlayerRewards(Player p) {
-        int colorLength;
-        int stringLen;// Draw rewards
+        int colorLength = 0;
+        int stringLen;
+
+        // Draw rewards
         StringBuilder rewards = new StringBuilder();
         rewards.append((p.isFrenzyPlayer()) ? "    " : "1   ");
         int deaths = p.getDeaths();
-        colorLength = 0;
         for (int reward : (p.isFrenzyPlayer()) ? Player.getFrenzyRewards() : Player.getKillRewards()) {
             if (deaths > 0) {
                 rewards.append(ANSI_RED);

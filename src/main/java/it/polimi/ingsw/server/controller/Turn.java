@@ -119,6 +119,12 @@ public class Turn {
                     break;
                 case SHOOT:
                     // SHOOT management
+                    if (playing.getDmgPoints().size() >= 6) {
+                        // Move 0 or 1 cell
+                        List<Cell> canMove = playing.getCellsToMove(1);
+                        canMove.add(playing.getPosition());
+                        playing.move(playing.getConnection().selectCell(canMove));
+                    }
 
                     // Get all loaded weapons and pick one
                     List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
@@ -140,20 +146,19 @@ public class Turn {
      */
     public void frenzyTurn(Player playing) {
         int remainingActions = 2;
-        boolean playingBeforeFirst = true;
 
         // Calculate available actions
-        if (playing.equals(match.getFirstPlayer()) ||
-                playedFrenzy.contains(match.getFirstPlayer())) {
-            playingBeforeFirst = false;
-            remainingActions = 1;
+        if (playing.equals(match.getFirstPlayer())) {
+            match.setFirstPlayedFrenzy(true);
         }
+
+        if (match.isFirstPlayedFrenzy()) remainingActions = 1;
 
         while (remainingActions > 0) {
             // Ask player what to do (RUN, PICK, SHOOT)
             TurnAction currentAcion = playing.getConnection().selectAction();
 
-            if (playingBeforeFirst) {
+            if (match.isFirstPlayedFrenzy()) {
                 switch (currentAcion) {
                     case MOVE:
                         if (movePlayer(playing, 4)) remainingActions--;
@@ -165,7 +170,7 @@ public class Turn {
                         // Move 0 or 1 cell
                         List<Cell> canMove = playing.getCellsToMove(1);
                         canMove.add(playing.getPosition());
-                        playing.getConnection().selectCell(canMove);
+                        playing.move(playing.getConnection().selectCell(canMove));
 
                         // Ask reload
                         reloadWeapon(playing);
@@ -188,7 +193,7 @@ public class Turn {
                         // Move 0, 1 or 2 cell
                         List<Cell> canMove = playing.getCellsToMove(2);
                         canMove.add(playing.getPosition());
-                        playing.getConnection().selectCell(canMove);
+                        playing.move(playing.getConnection().selectCell(canMove));
 
                         // Ask reload
                         reloadWeapon(playing);
@@ -266,10 +271,9 @@ public class Turn {
 
         // Get cells that can be picked doing from 0 to 1 or 2 movements
         List<Cell> canPick;
-        boolean bonusMovement = !playing.isFrenzyPlayer() && (playing.getDmgPoints().size() >= 3);
 
-        if (playingBeforeFirst) canPick = playing.getCellsToMove((bonusMovement) ? 3 : 2);
-        else canPick = playing.getCellsToMove((bonusMovement) ? 4 : 3);
+        if (playingBeforeFirst) canPick = playing.getCellsToMove(2);
+        else canPick = playing.getCellsToMove(3);
 
         return grabSomething(playing, canPick);
     }

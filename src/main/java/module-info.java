@@ -1,6 +1,6 @@
 module AdrenalinaGame {
+
     requires javafx.base;
-    requires javafx.graphics;
     requires javafx.controls;
     requires json.simple;
     requires java.rmi;
@@ -12,5 +12,4 @@ module AdrenalinaGame {
     exports it.polimi.ingsw.client.model;
     exports it.polimi.ingsw.client.view;
     exports it.polimi.ingsw.launcher;
-
 }

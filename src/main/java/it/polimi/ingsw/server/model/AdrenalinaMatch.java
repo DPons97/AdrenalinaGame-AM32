@@ -88,6 +88,11 @@ public class AdrenalinaMatch {
 	private Player firstPlayer;
 
 	/**
+	 * True if firstPlayer played his frenzy turn
+	 */
+	private boolean firstPlayedFrenzy;
+
+	/**
 	 * 	duration of a turn in seconds.
 	 */
 	private int turnDuration;
@@ -121,6 +126,7 @@ public class AdrenalinaMatch {
 		this.turn = 0;
 		this.mapID = mapID;
 		this.players = new ArrayList<>();
+		this.firstPlayedFrenzy = false;
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
@@ -352,6 +358,16 @@ public class AdrenalinaMatch {
 	public Player getFirstPlayer() {
 		return firstPlayer;
 	}
+
+	/**
+	 * @return true if first player played frenzy turn
+	 */
+	public boolean isFirstPlayedFrenzy() { return firstPlayedFrenzy; }
+
+	/**
+	 * @param firstPlayedFrenzy set true if first player played frenzy
+	 */
+	public void setFirstPlayedFrenzy(boolean firstPlayedFrenzy) { this.firstPlayedFrenzy = firstPlayedFrenzy; }
 
 	/**
 	 * @return the first player.
@@ -871,6 +887,7 @@ public class AdrenalinaMatch {
 		toRet.put("map", this.boardMap.toJSON());
 		toRet.put("turn", this.turn);
 		toRet.put("nPlayers", this.nPlayers);
+		toRet.put("firstPlayedFrenzy", this.firstPlayedFrenzy);
 		JSONArray playersArray = new JSONArray();
 		players.forEach(p -> {
 			playersArray.add(p.toJSON());
