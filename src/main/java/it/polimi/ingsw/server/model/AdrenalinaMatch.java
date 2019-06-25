@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
  *
  */
 public class AdrenalinaMatch {
+
+	private static final Color[] PLAYER_COLORS = {Color.YELLOW, Color.PURPLE, Color.BLUE, Color.WHITE, Color.GREEN};
+
 	/**
 	 *  Point reward to give to players inside death track
 	 */
@@ -106,6 +109,11 @@ public class AdrenalinaMatch {
 	 * Current match's state
 	 */
 	private MatchState state;
+
+	/**
+	 * List of available colors
+	 */
+	private List<Color> availableColors= new ArrayList<>(Arrays.asList(PLAYER_COLORS));
 
 	/**
 	 * @param nPlayers number of players [3,5].
@@ -314,7 +322,12 @@ public class AdrenalinaMatch {
 						throw new PlayerAlreadyExistsException();
 					}
 				}
+				Random r = new Random();
+				int randomIndex = r.nextInt(availableColors.size());
+				toAdd.setColor(availableColors.get(randomIndex));
+				availableColors.remove(randomIndex);
 				players.add(toAdd);
+				if(firstPlayer == null) firstPlayer = toAdd;
 			} else {
 				throw new TooManyPlayersException();
 			}
@@ -331,6 +344,7 @@ public class AdrenalinaMatch {
 		if(state == MatchState.NOT_STARTED){
 			if(!players.contains(toKick))throw new PlayerNotExistsException();
 			players.remove(toKick);
+			availableColors.add(toKick.getColor());
 			toKick.setMatch(null);
 			for (Player p : players) {
 				p.setReady(false);

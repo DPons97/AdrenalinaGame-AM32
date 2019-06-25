@@ -86,7 +86,7 @@ public class LobbyController {
 	 * @param name of player to get from a game
 	 * @return Player with given name
 	 */
-	public PlayerConnection getPlayerInGameByName(String name){
+	public synchronized PlayerConnection getPlayerInGameByName(String name){
 		if(!getPlayersNameInGame().contains(name))
 			return null;
 		return getPlayersInGame().stream().filter(p-> p.name.equals(name)).collect(Collectors.toList()).get(0);
@@ -96,7 +96,7 @@ public class LobbyController {
 	 * @param player connectio to look for in the game
 	 * @return Player with given name
 	 */
-	public MatchController getMatchByPlayerConnection(PlayerConnection player){
+	public synchronized MatchController getMatchByPlayerConnection(PlayerConnection player){
 		return lobby.getLobbyMatches().stream().filter(m-> m.getPlayer(player.name)!= null).collect(Collectors.toList()).get(0);
 	}
 
