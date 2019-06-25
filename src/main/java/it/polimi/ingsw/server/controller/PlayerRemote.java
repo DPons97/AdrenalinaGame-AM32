@@ -119,13 +119,16 @@ public class PlayerRemote extends PlayerConnection {
 		return null;
 	}
 
+	/**
+	 * Select a weapon from a given list
+	 * @param selectable list of weapons
+	 * @return a WeaponSelection with only the selected weapons
+	 */
 	@Override
 	public WeaponSelection chooseWeapon(List<Weapon> selectable) {
 		try {
-			String selection = remotePlayer.weaponSelection(selectable.stream().map(Weapon::getName).collect(Collectors.toList()));
-			// TODO fix this
-			return new WeaponSelection();
-			//return selectable.stream().filter(w-> w.getName().equals(selection)).collect(Collectors.toList()).get(0);
+			return remotePlayer.shootSelection(
+					selectable.stream().map(Weapon::getName).collect(Collectors.toList()));
 		} catch (RemoteException e) {
 			Thread t = new Thread(this::disconnectPlayer);
 			t.start();

@@ -67,7 +67,7 @@ public abstract class ClientView {
      * @param selectables list of weapons
      * @return selected weapon and effect
      */
-    public abstract String selectWeapon (List<String> selectables);
+    public abstract WeaponSelection selectWeapon (List<String> selectables);
 
     /**
      * Lets client select a powerup from a list

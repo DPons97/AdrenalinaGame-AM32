@@ -617,9 +617,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectShoot(List<String> selectables) {
-        WeaponSelection selection = new WeaponSelection();
-
-        selection.setWeapon(selectWeapon(selectables));
+        WeaponSelection selection = selectWeapon(selectables);
         if (selection.getWeapon() == null) return selection;
 
         WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
@@ -645,9 +643,8 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
-        WeaponSelection selection = new WeaponSelection();
+        WeaponSelection selection = selectWeapon(selectables);
 
-        selection.setWeapon(selectWeapon(selectables));
         if (selection.getWeapon() == null) return selection;
 
         WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
@@ -756,7 +753,7 @@ public class CliView extends ClientView {
      * @return selected weapon and effect
      */
     @Override
-    public String selectWeapon(List<String> selectables) {
+    public WeaponSelection selectWeapon(List<String> selectables) {
         StringBuilder messageToPrint = new StringBuilder();
 
         // Let player select a weapon
@@ -780,7 +777,10 @@ public class CliView extends ClientView {
             messageToPrint.append("\n");
         }
 
-        return getIndexedResponse(selectables, messageToPrint);
+        WeaponSelection toReturn = new WeaponSelection();
+        toReturn.setWeapon(getIndexedResponse(selectables, messageToPrint));
+
+        return toReturn;
     }
 
     /**

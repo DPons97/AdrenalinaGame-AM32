@@ -288,7 +288,7 @@ public class SocketClient extends ServerConnection {
 						for(Object o: wArray){
 							selectableWeapon.add(o.toString());
 						}
-						sendAnswer(player.weaponSelection(selectableWeapon));
+						sendAnswer(player.weaponSelection(selectableWeapon).toJSON());
 						break;
 					default:
 						throw new InvalidSelectionTypeException();
