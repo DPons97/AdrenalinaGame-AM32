@@ -1,24 +1,23 @@
 package it.polimi.ingsw.client.view;
-
-
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
-
 public class ImageExample extends Application {
 
     private final static String MAP1 = "/img/maps/4.png";
@@ -48,6 +47,8 @@ public class ImageExample extends Application {
     private final static String AMMO = "/img/ammo/AD_ammo_0434.png";
     private final static String BOARDINO = "/img/tabs/boardino.png";
     private final static String MYDASHBOARD = "/img/tabs/mydashboard.png";
+    public static final String SKULL = "/img/others/skull.png";
+
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
     public static final int DELEYED_RESIZE = 2;
@@ -85,22 +86,16 @@ public class ImageExample extends Application {
         Image pawn = new Image(new FileInputStream(urlPawn.getFile().replace("%20", " ")));
         URL urlAmmo = getClass().getResource(AMMO);
         Image ammo = new Image(new FileInputStream(urlAmmo.getFile().replace("%20", " ")));
-       // URL urlBoardino = getClass().getResource(BOARDINO);
-       // Image boardino = new Image(new FileInputStream(urlBoardino.getFile().replace("%20", " ")));
         URL urlMydashboard = getClass().getResource(MYDASHBOARD);
         Image mydashboard = new Image(new FileInputStream(urlMydashboard.getFile().replace("%20", " ")));
+        URL urlSkull = getClass().getResource(SKULL);
+        Image skull = new Image(new FileInputStream(urlSkull.getFile().replace("%20", " ")));
         ImageView mapView = new ImageView(map);
-        ImageView tab1View = new ImageView(tab1);
-        ImageView tab2View = new ImageView(tab2);
-        ImageView tab3View = new ImageView(tab3);
-        ImageView tab4View = new ImageView(tab4);
-        ImageView tab5View = new ImageView(tab5);
-        ImageView cardback00View = new ImageView(cardback00);
-      //  ImageView cardback01View = new ImageView(cardback01);
-     //   ImageView boardinoView = new ImageView(boardino);
+        ImageView mytabView = new ImageView(tab5);
+       // ImageView cardback00View = new ImageView(cardback00);
         ImageView mydashboardView = new ImageView(mydashboard);
         BorderPane borders = new BorderPane();
-        Pane root = new Pane(mapView, cardback00View, tab1View, tab2View, tab3View, tab4View, tab5View, mydashboardView);
+        Pane root = new Pane(mapView, mytabView, mydashboardView);
 
         borders.setCenter(root);
 
@@ -118,8 +113,20 @@ public class ImageExample extends Application {
 
 
         //Adding scene to the stage
+
         stage.setScene(scene);
-        stage.setMaximized(true);
+        stage.setFullScreen(true);
+        stage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+        stage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable,
+                                Boolean oldValue, Boolean newValue) {
+                if(newValue != null && !newValue.booleanValue())
+                    stage.setFullScreen(true);
+
+            }
+        });
         stage.setResizable(false);
         //Displaying the contents of the stage
         stage.show();
@@ -150,19 +157,12 @@ public class ImageExample extends Application {
         double ammoSize = (width16*0.055);
         double dropletSize = (width16*0.0149);
       //  double boardinoSize = (width16-getWidth(mapView));
-        double mydashboardSize =(width16-getWidth(tab5View));
+        double mydashboardSize =(width16-getWidth(mytabView));
 
         // position on X and Y
 
         double mapX=0;
         double mapY=0;
-
-        double tab1Y=(height9*0.175*0);
-        double tab2Y=(height9*0.175*1);
-        double tab3Y=(height9*0.175*2);
-        double tab4Y=(height9*0.175*3);
-      //  double boardinoY=(height9*0.175*4);
-      //  double boardinoX=
         double tab0X=0;//my tab X
         double tab0Y=(mapH); //my tab Y
         double powerupsDeckX= (width16*0.54);
@@ -171,72 +171,81 @@ public class ImageExample extends Application {
         double ammoDeckY= (height9*0.1905);
 
 
-
-
-
-
-
         //Setting the position of the map
 
-        cardback00View.setX(powerupsDeckX);
-        cardback00View.setY(powerupsDeckY);
-       // cardback01View.setX(ammo2X);
-       // cardback01View.setY(ammo2_2Y);
+      //  cardback00View.setX(powerupsDeckX);
+      //  cardback00View.setY(powerupsDeckY);
+
         mapView.setX(mapX);
         mapView.setY(mapY);
 
-        tab5View.setX(tab0X);
-        tab5View.setY(tab0Y);
-
-
-
+        mytabView.setX(tab0X);
+        mytabView.setY(tab0Y);
 
         //Setting the preserve ratio of the map view
         mapView.setPreserveRatio(true);
-        tab1View.setPreserveRatio(true);
-        tab2View.setPreserveRatio(true);
-        tab3View.setPreserveRatio(true);
-        tab4View.setPreserveRatio(true);
-        tab5View.setPreserveRatio(true);
-        cardback00View.setPreserveRatio(true);
+      //  cardback00View.setPreserveRatio(true);
         mydashboardView.setPreserveRatio(true);
-     //   boardinoView.setPreserveRatio(true);
-        //cardback01View.setPreserveRatio(true);
-        //setting the fit height and width of the map view
-
+        mytabView.setPreserveRatio(true);
 
         mapView.setFitHeight(mapH);
-
-        double tab1size= (width16-getWidth(mapView));
-        double tab2Size =(width16-getWidth(mapView));
-        double tab3Size = (width16-getWidth(mapView));
-        double tab4Size =(width16-getWidth(mapView));
-
-        double tabOthers=(getWidth(mapView));
-        tab1View.setX(tabOthers);
-        tab1View.setY(tab1Y);
-        tab2View.setX(tabOthers);
-        tab2View.setY(tab2Y);
-        tab3View.setX(tabOthers);
-        tab3View.setY(tab3Y);
-        tab4View.setX(tabOthers);
-        tab4View.setY(tab4Y);
-      //  boardinoView.setX(tabOthers);
-      //  boardinoView.setY(boardinoY);
-
-
-        tab1View.setFitWidth(tab1size);
-        tab2View.setFitWidth(tab2Size);
-        tab3View.setFitWidth(tab3Size);
-        tab4View.setFitWidth(tab4Size);
-        tab5View.setFitHeight(height9-mapH);
-        cardback00View.setFitWidth(powerupsSize);
+        mytabView.setFitHeight(height9-mapH);
+       // cardback00View.setFitWidth(powerupsSize);
        // boardinoView.setFitWidth(tab4Size);
-        mydashboardView.setFitWidth(width16-getWidth(tab5View));
-        mydashboardView.setX(getWidth(tab5View));
+        mydashboardView.setFitWidth(width16-getWidth(mytabView));
+        mydashboardView.setX(getWidth(mytabView));
         mydashboardView.setY(mapH);
 
-        //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
+        //others's tab for
+        double tabLeftOffsetY = height9 * 0.175;
+        double tabLeftBaseX = getWidth(mapView);
+        double tabLeftBaseY = 0;
+        double tabLeftSize= (width16-getWidth(mapView));
+        for (int i=0; i<4; i++){
+            {
+                ImageView tab1View = new ImageView(tab1);
+                tab1View.setX(tabLeftBaseX);
+                tab1View.setY(tabLeftBaseY+tabLeftOffsetY*i);
+                tab1View.setFitWidth(tabLeftSize);
+                tab1View.setPreserveRatio(true);
+                root.getChildren().add(tab1View);
+
+
+            }
+        }
+
+
+        //droplet for
+        double dropletOffsetX = height9 * 0.045;
+        double dropletOffsetX2 = height9 * 0.008;
+        double dropletBaseX = width16*0.042;
+        double dropletBaseY = height9*0.032;
+        double dropletSize1= width16*0.024;
+        for (int i=0; i<8; i++){
+            {
+                ImageView dropletView  = new ImageView(droplet);
+                ImageView droplet2View = new ImageView(droplet);
+                droplet2View.setY(dropletBaseY);
+                droplet2View.setX(dropletBaseX+dropletOffsetX*i+dropletOffsetX2);
+                dropletView.setY(dropletBaseY);
+                dropletView.setX(dropletBaseX+dropletOffsetX*i);
+                dropletView.setFitWidth(dropletSize1);
+                droplet2View.setFitWidth(dropletSize1);
+                droplet2View.setPreserveRatio(true);
+                dropletView.setPreserveRatio(true);
+                root.getChildren().add(droplet2View);
+                root.getChildren().add(dropletView);
+
+
+            }
+        }
+
+
+
+
+
+
+         //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
         //double tab1droplet1X = (width16*((0.6220+(0.0215*6)))); //colonna fino a 10
         double tabDropletY0 = height9*0.07;
         double tabDropletX0 = width16*0.64;
@@ -244,15 +253,55 @@ public class ImageExample extends Application {
         double tabDropletOffX = width16*0.022;
 
         for(int i = 0; i<4; i++){
-            for(int j = 0 ; j <10;j++){
+            for(int j = 0 ; j <12;j++){
                 ImageView dropletView = new ImageView(droplet);
                 dropletView.setX(tabDropletX0+tabDropletOffX*j);
                 dropletView.setY(tabDropletY0+tabDropletOffY*i);
                 dropletView.setPreserveRatio(true);
-                dropletView.setFitWidth(tab1size*0.04);
+                dropletView.setFitWidth(tabLeftSize*0.04);
                 root.getChildren().add(dropletView);
             }
         }
+
+        double tabDropletUPY0 = height9*0;
+        double tabDropletUPX0 = width16*0.82;
+        double tabDropletOffUPY = height9*0.175;
+        double tabDropletOffUPX = width16*0.022;
+
+        for(int i = 0; i<4; i++){
+            for(int j = 0 ; j <3;j++){
+                ImageView dropletView = new ImageView(droplet);
+                dropletView.setX(tabDropletUPX0+tabDropletOffUPX*j);
+                dropletView.setY(tabDropletUPY0+tabDropletOffUPY*i);
+                dropletView.setPreserveRatio(true);
+                dropletView.setFitWidth(tabLeftSize*0.04);
+                root.getChildren().add(dropletView);
+            }
+        }
+
+        double tabSkullY0 = height9*0.125;
+        double tabSkullX0 = width16*0.675;
+        double tabSkullOffY = height9*0.175;
+        double tabSkullOffX = width16*0.022;
+        double tabSkullSize= tabLeftSize*0.08;
+
+        for(int i = 0; i<4; i++){
+            for(int j = 0 ; j <6;j++){
+                ImageView skullView = new ImageView(skull);
+                skullView.setX(tabSkullX0+tabSkullOffX*j);
+                skullView.setY(tabSkullY0+tabSkullOffY*i);
+                skullView.setPreserveRatio(true);
+                skullView.setFitWidth(tabSkullSize);
+                root.getChildren().add(skullView);
+            }
+        }
+
+
+
+
+
+
+
 
 
 // weapon box
@@ -267,11 +316,6 @@ public class ImageExample extends Application {
         double ammo1Y = 0;
         double ammo1rotation = 0;
         double weaponBase1X = width16*0.318;
-        // offset x check if is = a offset Y
-
-      //  double ammo1_1X = (width16*0.317);
-      //  double ammo1_2X = (width16*0.383);
-      //  double ammo1_3X = (width16*0.449);
 
         for(int i = 0; i<3; i++){
             {
@@ -306,6 +350,42 @@ public class ImageExample extends Application {
                 cardback01View.setFitWidth(ammoSize);
                 cardback01View.setRotate(ammo1rotation);
                 root.getChildren().add(cardback01View);
+            }
+        }
+
+        //weapon my dashboard
+
+        double weaponOffsetMyDashboardX = height9 * 0.145;
+        double weaponBaseMyDashboardX=width16*0.725;
+        double weaponBaseMyDashboardY=height9*0.815;
+
+
+        for(int i = 0; i<3; i++){
+            {
+                ImageView cardback01View = new ImageView(cardback01);
+                cardback01View.setY(weaponBaseMyDashboardY);
+                cardback01View.setX(weaponBaseMyDashboardX+weaponOffsetMyDashboardX*i);
+                cardback01View.setPreserveRatio(true);
+                cardback01View.setFitWidth(ammoSize);
+                root.getChildren().add(cardback01View);
+            }
+        }
+
+        //powerups my dashboard
+
+        double powerupOffsetMyDashboardX = height9 * 0.15;
+        double powerupMyDashboardX=width16*0.48;
+        double powerupBaseMyDashboardY=height9*0.815;
+
+
+        for(int i = 0; i<3; i++){
+            {
+                ImageView cardback00View = new ImageView(cardback00);
+                cardback00View.setY(powerupBaseMyDashboardY);
+                cardback00View.setX(powerupMyDashboardX+powerupOffsetMyDashboardX*i);
+                cardback00View.setPreserveRatio(true);
+                cardback00View.setFitWidth(ammoSize);
+                root.getChildren().add(cardback00View);
             }
         }
 
