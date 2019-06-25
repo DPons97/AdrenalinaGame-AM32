@@ -565,7 +565,13 @@ public class CliView extends ClientView {
      */
     @Override
     public Point selectCell(List<Point> selectables) {
-        return null;
+        StringBuilder messageToPrint = new StringBuilder();
+        messageToPrint.append(CELL_SELECTION);
+
+        for (int i = 0; i < selectables.size(); i++) {
+            messageToPrint.append("[").append(i+1).append("] ").append("< ").append(selectables.get(i).getX()).append(", ").append(selectables.get(i).getY()).append(">").append("\n");
+        }
+        return getIndexedResponse(selectables, messageToPrint);
     }
 
     /**
@@ -883,6 +889,13 @@ public class CliView extends ClientView {
         drawCorner(charMap, startingX,startingY + CELL_CHAR_WIDTH, xSize, ySize);   // North-East
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY, xSize, ySize);   // South-West
         drawCorner(charMap, startingX + CELL_CHAR_HEIGHT, startingY + CELL_CHAR_WIDTH, xSize, ySize); // South-East
+
+        // Draw cell coordinates
+        charMap[startingX + CELL_CHAR_HEIGHT-2][startingY+CELL_CHAR_WIDTH-6] = "<";
+        charMap[startingX + CELL_CHAR_HEIGHT-2][startingY+CELL_CHAR_WIDTH-5] = String.valueOf(toDraw.getCoordX());
+        charMap[startingX + CELL_CHAR_HEIGHT-2][startingY+CELL_CHAR_WIDTH-4] = ",";
+        charMap[startingX + CELL_CHAR_HEIGHT-2][startingY+CELL_CHAR_WIDTH-3] = String.valueOf(toDraw.getCoordY());
+        charMap[startingX + CELL_CHAR_HEIGHT-2][startingY+CELL_CHAR_WIDTH-2] = ">";
 
         // Draw players
         drawPlayers(charMap, toDraw, startingX, startingY);
