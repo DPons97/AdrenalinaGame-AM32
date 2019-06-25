@@ -211,7 +211,6 @@ public class SocketClient extends ServerConnection {
 	 */
 	private void parseMessage(JSONObject message) throws InvalidSelectionTypeException {
 		switch (message.get("function").toString()){
-			//TODO implement toJSON and fromJSON in weapon selection then complete this
 			case "select":
 				switch (message.get("type").toString()){
 					case "player":

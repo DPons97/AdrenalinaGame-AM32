@@ -66,7 +66,7 @@ public class Launcher{
                 if(res == 1){
                     System.out.println("Error connecting: ip/port not valid");
                 }else if (res == 2){
-                    System.out.println("Error connecting: username arlready in use");
+                    System.out.println("Error connecting: username already in use");
                 }
             }while(res != 0);
         }
@@ -230,7 +230,6 @@ public class Launcher{
             });
 
             btnServer.setOnAction(new EventHandler<ActionEvent>() {
-
                 @Override
                 public void handle(ActionEvent e) {
                     LoginHandler server = startServer();

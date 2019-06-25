@@ -307,15 +307,15 @@ public class CliView extends ClientView {
                 "Current players online: " + nPlayers + "%n%n");
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
-        System.out.print(MATCH_INFO_CLOSER);
+        System.out.printf(MATCH_INFO_CLOSER);
         System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
-        System.out.print(MATCH_INFO_CLOSER);
+        System.out.printf(MATCH_INFO_CLOSER);
 
         String response;
 
         if(matches.isEmpty()){
-            System.out.println("Wow, such empty...");
-            System.out.println("CREATE [N]ew match. [Any key to reload]");
+            System.out.printf("Wow, such empty...%n");
+            System.out.printf("CREATE [N]ew match. [Any key to reload]%n");
 
             // Retreive next command
             response = getResponse();
@@ -327,9 +327,10 @@ public class CliView extends ClientView {
                 return;
             }
         }
+
         for(int i = 0; i < matches.size(); i++){
             // Print header table
-            System.out.format(MATCH_INFO_CLOSER + "%n" + MATCH_INFO_HEADER);
+            System.out.format(MATCH_INFO_HEADER + MATCH_INFO_CLOSER);
 
             // Print table
             JSONObject match = (JSONObject) matches.get(i);
@@ -503,7 +504,7 @@ public class CliView extends ClientView {
                         (p.isReadyToStart()) ? "Ready" : "Not Ready");
             }
 
-            System.out.print(LOBBY_CLOSER);
+            System.out.printf(LOBBY_CLOSER);
 
             lobbyNextCommand(isReady);
         } else if (match.getState() == MatchState.PLAYER_TURN) {
@@ -523,7 +524,7 @@ public class CliView extends ClientView {
             drawMap(match);
 
             // Print alerts
-            System.out.println(alertMessage);
+            System.out.printf(alertMessage);
         }
     }
 
