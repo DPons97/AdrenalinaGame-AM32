@@ -27,17 +27,17 @@ public class ImageExample extends Application {
 
     private final static String TAB1 = "/img/tabs/purple.png";
     private final static String TAB2 = "/img/tabs/green.png";
-    private final static String TAB3 = "/img/tabs/grey.png";
+    private final static String TAB3 = "/img/tabs/white.png";
     private final static String TAB4 = "/img/tabs/yellow.png";
     private final static String TAB5 = "/img/tabs/blue.png";
     //private final static String TAB6 = "/img/tabs/purpleback.png";
     //private final static String TAB7 = "/img/tabs/greenback.png";
-    //private final static String TAB8 = "/img/tabs/greyback.png";
+    //private final static String TAB8 = "/img/tabs/whiteback.png";
     //private final static String TAB9 = "/img/tabs/yellowback.png";
     // private final static String TAB10 = "/img/tabs/blueback.png";
    // private final static String TAB11 = "/img/tabs/purpleback.png";
    // private final static String TAB12 = "/img/tabs/greenback.png";
-   // private final static String TAB13 = "/img/tabs/greyback.png";
+   // private final static String TAB13 = "/img/tabs/whiteback.png";
    // private final static String TAB14 = "/img/tabs/yellowback.png";
    // private final static String TAB15 = "/img/tabs/blueback.png";
     private final static String CARDBACK00 = "/img/cards/AD_powerups_IT_02.png";
@@ -304,7 +304,7 @@ public class ImageExample extends Application {
 
 
 
-// weapon box
+        // weapon box
 
         double weaponOffsetY = height9*0.115;
         double weaponBase2Y = height9*0.26;
@@ -316,6 +316,7 @@ public class ImageExample extends Application {
         double ammo1Y = 0;
         double ammo1rotation = 0;
         double weaponBase1X = width16*0.318;
+
 
         for(int i = 0; i<3; i++){
             {

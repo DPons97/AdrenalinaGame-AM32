@@ -17,6 +17,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -35,6 +37,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public class GuiView extends ClientView{
@@ -45,17 +48,19 @@ public class GuiView extends ClientView{
     public static final int DELEYED_RESIZE = 2;
     public static final double DELAY_OUT = 0.3;
 
+    // map constants
     private final static String MAP = "/img/maps/";
     private final static String MAP_EXTENSION = ".png";
     private final static double MAP_X = 0;
     private final static double MAP_Y = 0;
     public static final double RELATIVE_MAP_HEIGHT = 0.8;
 
+    //
     private final static String TAB = "/img/tabs/";
     private final static String TAB_EXTENSION = ".png";
     private final static String TAB_BACK = "back";
     private final static double TAB_OFFSET = 0.175;
-    public static final double RELATIVE_TAB_HEIGHT = 0.20;
+    private static final double RELATIVE_TAB_HEIGHT = 0.20;
 
 
     private double width;
@@ -72,6 +77,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public void showLobby(String lobby) {
+
         JSONObject lobbiObj = (JSONObject) JSONValue.parse(lobby);
         int nPlayers = Integer.parseInt(lobbiObj.get("n_players").toString());
         JSONArray matchesArray = (JSONArray) lobbiObj.get("matches");
@@ -79,7 +85,7 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
-
+            setEscExit();
             initGrid(grid);
 
             Text scenetitle = new Text("Lobby");
@@ -287,12 +293,10 @@ public class GuiView extends ClientView{
     private void showGameBoard() {
         AdrenalinaMatch match= player.getMatch();
         Platform.runLater(()-> {
-            Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
-
-            initGrid(grid);
 
             loadLayout();
+
+            setEscExit();
 
         });
     }
@@ -459,7 +463,6 @@ public class GuiView extends ClientView{
         Pane root = new Pane();
 
         Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
-
         borders.setCenter(root);
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -585,4 +588,26 @@ public class GuiView extends ClientView{
 
         });
     }
+
+
+    private void setEscExit() {
+        FXWindow.getStage().getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode().equals(KeyCode.ESCAPE)){
+                    ButtonType canc = new ButtonType("OK, LET'S GO BACK TO FIGHT", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType quit = new ButtonType("I'M LAME, I WANNA QUIT AND CRY", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION, "", canc, quit);
+                    exitAlert.setTitle("RAGE QUIT IS LAME");
+                    exitAlert.setHeaderText("You sure you waanna quit this amazing game?");
+
+                    Optional<ButtonType> option = exitAlert.showAndWait();
+                    if (option.get().equals(quit)) {
+                        System.out.println("pressed exit");
+                        FXWindow.getStage().close();
+                    }
+                    event.consume();
+                }
+            }
+        );
+    }
+
 }

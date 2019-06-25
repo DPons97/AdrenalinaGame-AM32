@@ -3,6 +3,7 @@ package it.polimi.ingsw.client.controller;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.custom_exceptions.InvalidSelectionTypeException;
 import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
+import it.polimi.ingsw.server.controller.TurnAction;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
@@ -211,7 +212,6 @@ public class SocketClient extends ServerConnection {
 	 */
 	private void parseMessage(JSONObject message) throws InvalidSelectionTypeException {
 		switch (message.get("function").toString()){
-			//TODO implement toJSON and fromJSON in weapon selection then complete this
 			case "select":
 				switch (message.get("type").toString()){
 					case "player":
@@ -272,7 +272,9 @@ public class SocketClient extends ServerConnection {
 						sendAnswer(player.shootSelection(shootableWeapons).toJSON());
 						break;
 					case "action":
-						sendAnswer(player.actionSelection().toString());
+						TurnAction selectedAction = player.actionSelection();
+						if(selectedAction!= null)
+						sendAnswer(selectedAction.toString());
 						break;
 					case "powerup":
 						List<String> selectablePowerup = new ArrayList<>();
