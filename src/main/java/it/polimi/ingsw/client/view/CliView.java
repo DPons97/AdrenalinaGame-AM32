@@ -20,9 +20,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -213,7 +211,7 @@ public class CliView extends ClientView {
      */
     private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |  Ammos  |";
     private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
-    private static final String PLAYER_REWARD_HEADER =  "|                          | %-24s|         |";
+    private static final String PLAYER_REWARD_HEADER =  "|::::::::::::::::::::::::::| %-24s|:::::::::|:::::::::|";
     private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-6s |";
     private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-6s |";
     private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------+";
@@ -268,6 +266,11 @@ public class CliView extends ClientView {
     private static final String WEAPON_SELECTION = "Select one of weapons listed above: \n";
 
     /**
+     * Effect selection
+     */
+    private static final String EFFECT_SELECTION = "Select one of listed effects to apply ([X] will confirm selection): \n";
+
+    /**
      * Powerup selection
      */
     private static final String POWERUP_SELECTION = "Select one of powerups listed above: \n";
@@ -279,10 +282,13 @@ public class CliView extends ClientView {
 
     private String selectionMessage;
 
+    private String alertMessage;
+
     public CliView(ClientPlayer player) {
         super(player);
         parseCliAssets();
         selectionMessage = IDLE_MESSAGE;
+        alertMessage = "";
         cmdReader = new CommandReader();
         cmdReader.start();
     }
@@ -339,7 +345,7 @@ public class CliView extends ClientView {
             for(Object o: players) {
                 if (!o.toString().equals(players.get(0).toString()))
                     System.out.format(MATCH_PLAYER_FORMAT, o.toString());
-            };
+            }
             System.out.format(MATCH_INFO_CLOSER);
         }
 
@@ -351,7 +357,7 @@ public class CliView extends ClientView {
 
         try {
             choice = Integer.parseInt(response) - 1;
-        } catch (NumberFormatException e) {}
+        } catch (NumberFormatException ignored) {}
 
         if (response.equals("N") || response.equals("n")) createNewGame();
         else if(choice >= 0 && choice <  matches.size()) {
@@ -381,6 +387,7 @@ public class CliView extends ClientView {
         return response;
     }
 
+    // TODO Remove once finished testing
     public static void main(String[] args) {
         it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.AdrenalinaMatch(5, 8, 120, 1);
 
@@ -496,33 +503,9 @@ public class CliView extends ClientView {
                         (p.isReadyToStart()) ? "Ready" : "Not Ready");
             }
 
-            System.out.printf(LOBBY_CLOSER);
+            System.out.print(LOBBY_CLOSER);
 
-            String response;
-            if (isReady) {
-                System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
-
-                // Retreive next command
-                response = getResponse();
-
-                if (response.equals("R") || response.equals("r")) {
-                    player.setReady();
-                } else if (response.equals("E") || response.equals("e")) {
-                    player.backToLobby();
-                    player.updateLobby();
-                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
-
-            } else {
-                System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
-
-                response = getResponse();
-
-                if (response.equals("E") || response.equals("e")) {
-                    player.backToLobby();
-                    player.updateLobby();
-                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
-
-            }
+            lobbyNextCommand(isReady);
         } else if (match.getState() == MatchState.PLAYER_TURN) {
             // Print players
             System.out.printf("%n      ");
@@ -539,6 +522,39 @@ public class CliView extends ClientView {
             // Print map
             drawMap(match);
 
+            // Print alerts
+            System.out.println(alertMessage);
+        }
+    }
+
+    /**
+     * Retreive and handles next command given by player
+     * @param isReady true if player is ready
+     */
+    private void lobbyNextCommand(boolean isReady) {
+        String response;
+        if (isReady) {
+            System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
+
+            // Retreive next command
+            response = getResponse();
+
+            if (response.equals("R") || response.equals("r")) {
+                player.setReady();
+            } else if (response.equals("E") || response.equals("e")) {
+                player.backToLobby();
+                player.updateLobby();
+            } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
+
+        } else {
+            System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
+
+            response = getResponse();
+
+            if (response.equals("E") || response.equals("e")) {
+                player.backToLobby();
+                player.updateLobby();
+            } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
         }
     }
 
@@ -594,8 +610,206 @@ public class CliView extends ClientView {
         return getIndexedResponse(selectables, messageToPrint);
     }
 
+    /**
+     * Lets client select a weapon and effect from a list
+     * @param selectables list of weapons
+     * @return selected weapon and effect
+     */
+    @Override
+    public WeaponSelection selectShoot(List<String> selectables) {
+        WeaponSelection selection = new WeaponSelection();
+
+        selection.setWeapon(selectWeapon(selectables));
+        if (selection.getWeapon() == null) return selection;
+
+        WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
+
+        // Let player select effects to apply
+        selection.setEffectID(selectEffects(selectedWeapon));
+
+        // Select powerups to use as discount
+        List<Resource> totalCost = new ArrayList<>();
+        for (Integer eff : selection.getEffectID()) {
+            totalCost.addAll(selectedWeapon.getEffects().get(eff).getCost());
+        }
+
+        selection.setDiscount(selectDiscount(totalCost));
+
+        return selection;
+    }
+
+    /**
+     * Lets client select a weapon to reload from a list
+     * @param selectables list of weapons
+     * @return selected weapon and effect
+     */
+    @Override
+    public WeaponSelection selectReload(List<String> selectables) {
+        WeaponSelection selection = new WeaponSelection();
+
+        selection.setWeapon(selectWeapon(selectables));
+        if (selection.getWeapon() == null) return selection;
+
+        WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
+
+        // Select powerups to use as discount
+        List<Resource> totalCost = new ArrayList<>();
+        for (Integer eff : selection.getEffectID()) {
+            totalCost.addAll(selectedWeapon.getEffects().get(eff).getCost());
+        }
+
+        selection.setDiscount(selectDiscount(totalCost));
+
+        return selection;
+    }
+
+    /**
+     * Lets client select effects to use given a already selected weapon
+     * @param selectedWeapon selected weapon
+     * @return List of integer representing ready-to-send effects IDs
+     */
+    private List<Integer> selectEffects(WeaponCard selectedWeapon) {
+        StringBuilder messageToPrint = new StringBuilder();
+        List<WeaponCard.Effect> effects = selectedWeapon.getEffects();
+        List<WeaponCard.Effect> selectedEffects = new ArrayList<>();
+        WeaponCard.Effect selectedEffect;
+        do {
+            for (int i = 0; i < effects.size(); i++) {
+                messageToPrint.append(EFFECT_SELECTION);
+
+                // Print selected weapon
+                messageToPrint.append("You selected: ").append(selectedWeapon.getName()).append("\n");
+
+                // Print name and description
+                messageToPrint.append("[").append(i+1).append("] ")
+                        .append(effects.get(i).getName()).append(" - ").append(effects.get(i).getDescription()).append("\n\t Cost = ");
+
+                // Print cost
+                for (Resource res : effects.get(i).getCost())
+                    messageToPrint.append(getANSIColor(res)).append(AMMO_BLOCK).append(" ");
+
+                messageToPrint.append("\n");
+            }
+            messageToPrint.append("\n");
+
+            // Print already selected effects
+            messageToPrint.append("Selected effects: \n");
+            for (WeaponCard.Effect eff : selectedEffects)
+                messageToPrint.append(eff.getName()).append("\n");
+
+            selectedEffect = getIndexedResponse(effects, messageToPrint);
+            if (!selectedEffects.contains(selectedEffect)) selectedEffects.add(selectedEffect);
+
+        } while (selectedEffect == null || !selectedWeapon.isEffect());
+
+        // Transform selected effects in integers to be sent through network
+        List<Integer> effectsInteger = new ArrayList<>();
+        for (WeaponCard.Effect eff : selectedEffects) {
+            effectsInteger.add(selectedWeapon.getEffects().indexOf(eff));
+        }
+        return effectsInteger;
+    }
+
+    /**
+     * Lets client select powerups to use as discount in different payment operations
+     * @param toBePayed amount of resources to be payed
+     * @return list of powerups used as discount
+     */
+    private List<Powerup> selectDiscount(List<Resource> toBePayed) {
+        StringBuilder messageToPrint = new StringBuilder();
+        List<Powerup> selectedDiscount = new ArrayList<>();
+        Powerup selectedPowerup;
+
+        do {
+            messageToPrint.append(POWERUP_SELECTION);
+
+            // Print only powerups that can be used as discount
+            List<Powerup> powerups = player.getThisPlayer().getPowerups().stream()
+                    .filter(powerup -> toBePayed.contains(powerup.getBonusResource())).collect(Collectors.toList());
+
+            if (powerups.isEmpty()) return selectedDiscount;
+
+            for (int i = 0; i < powerups.size(); i++) {
+                messageToPrint.append("[ ").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
+                        .append(getANSIColor(powerups.get(i).getBonusResource())).append("\n");
+            }
+            messageToPrint.append("\n");
+
+            // Print already selected powerups
+            messageToPrint.append("Selected powerups: \n");
+            for (Powerup pow : selectedDiscount)
+                messageToPrint.append(getANSIColor(pow.getBonusResource())).append(" ");
+
+            messageToPrint.append("\n");
+
+            selectedPowerup = getIndexedResponse(powerups, messageToPrint);
+            if (!selectedDiscount.contains(selectedPowerup)) selectedDiscount.add(selectedPowerup);
+
+        } while (selectedPowerup == null);
+
+        return selectedDiscount;
+    }
+
+    /**
+     * Lets client select a weapon  from a list
+     * @param selectables list of weapons
+     * @return selected weapon and effect
+     */
+    @Override
+    public String selectWeapon(List<String> selectables) {
+        StringBuilder messageToPrint = new StringBuilder();
+
+        // Let player select a weapon
+        messageToPrint.append(WEAPON_SELECTION);
+
+        List<WeaponCard> selectableCards = new ArrayList<>();
+        for (String selectable : selectables) {
+            selectableCards.add(player.getThisPlayer().getWeapon(selectable));
+        }
+
+        for (int i = 0; i < selectableCards.size(); i++) {
+            messageToPrint.append("[").append(i+1).append("] ")
+                    .append(selectableCards.get(i).getName()).append("\n");
+
+            // Print all weapon infos
+            for (WeaponCard.Effect eff : selectableCards.get(i).getEffects())
+                messageToPrint.append("\t").append(eff.getName()).append(" - ")
+                        .append(eff.getDescription()).append(" - ")
+                        .append(eff.getCost()).append("\n");
+
+            messageToPrint.append("\n");
+        }
+
+        return getIndexedResponse(selectables, messageToPrint);
+    }
+
+    /**
+     * Lets client select a powerup from a list
+     * @param selectables list of powerups
+     * @return selected powerup
+     */
+    @Override
+    public Powerup selectPowerup(List<Powerup> selectables) {
+        StringBuilder messageToPrint = new StringBuilder();
+
+        // Print powerups that can be choosen
+        for (int i = 0; i < selectables.size(); i++) {
+            messageToPrint.append("[ ").append(i+1).append("] ").append(selectables.get(i).getName()).append(" - ")
+                    .append(getANSIColor(selectables.get(i).getBonusResource())).append(" - ").append("\n");
+        }
+
+        return getIndexedResponse(selectables, messageToPrint);
+    }
+
+    /**
+     * Retreive a response from user given a selectable list
+     * @param selectables list of selectable options
+     * @param messageToPrint additional message to print
+     * @param <T> type of selectable
+     * @return T selected from user
+     */
     private <T> T getIndexedResponse(List<T> selectables, StringBuilder messageToPrint) {
-        messageToPrint.append("\n [X] to STOP selection (turn action could be lost!)");
+        messageToPrint.append("\n [X] to STOP selection");
 
         selectionMessage = messageToPrint.toString();
         String response = getResponse();
@@ -618,46 +832,6 @@ public class CliView extends ClientView {
                 response = getResponse();
             }
         }
-        return null;
-    }
-
-    /**
-     * Lets client select a weapon and effect from a list
-     * @param selectables list of weapons
-     * @return selected weapon and effect
-     */
-    @Override
-    public WeaponSelection selectShoot(List<String> selectables) {
-        return null;
-    }
-
-    /**
-     * Lets client select a weapon to reload from a list
-     * @param selectables list of weapons
-     * @return selected weapon and effect
-     */
-    @Override
-    public WeaponSelection selectReload(List<String> selectables) {
-        return null;
-    }
-
-    /**
-     * Lets client select a weapon  from a list
-     * @param selectables list of weapons
-     * @return selected weapon and effect
-     */
-    @Override
-    public String selectWeapon(List<String> selectables) {
-        return null;
-    }
-
-    /**
-     * Lets client select a powerup from a list
-     * @param selectables list of powerups
-     * @return selected powerup
-     */
-    @Override
-    public String selectPowerup(List<String> selectables) {
         return null;
     }
 
@@ -749,7 +923,15 @@ public class CliView extends ClientView {
 
     @Override
     public void showAlert(String message) {
+        alertMessage = "ALERT: " + message;
 
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                alertMessage = "";
+            }
+        }, ALERT_DURATION * 1000);
     }
 
     /**

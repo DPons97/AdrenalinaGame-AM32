@@ -308,25 +308,28 @@ public class Turn {
 
         // Pick weapon
         WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickedSpawn.getWeapons());
+        Weapon selectedWeapon = getWeapon(pickedWeapon.getWeapon(), playing);
 
         // Stop action if player can't pay weapon's cost with chosen powerups
-        if (!playing.canPay(pickedWeapon.getWeapon().getCost(), pickedWeapon.getPowerups())) return false;
+        if (!playing.canPay(selectedWeapon.getCost(), pickedWeapon.getPowerups())) return false;
 
         try {
-            playing.pickWeapon(pickedWeapon.getWeapon());
-            pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
+            playing.pickWeapon(selectedWeapon);
+            pickedSpawn.removeWeapon(selectedWeapon);
             return true;
         } catch (InventoryFullException invFullE) {
             // Player has too many weapons. Ask for one to change
             WeaponSelection toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
+
             if (toChange == null) return false;
+            Weapon weaponToChange = getWeapon(pickedWeapon.getWeapon(), playing);
 
             try {
                 // Change chosen weapons
-                playing.dropWeapon(toChange.getWeapon());
-                playing.pickWeapon(pickedWeapon.getWeapon());
-                pickedSpawn.removeWeapon(pickedWeapon.getWeapon());
-                pickedSpawn.addWeapon(toChange.getWeapon());
+                playing.dropWeapon(weaponToChange);
+                playing.pickWeapon(selectedWeapon);
+                pickedSpawn.removeWeapon(selectedWeapon);
+                pickedSpawn.addWeapon(weaponToChange);
                 return true;
             } catch (NoItemInInventoryException | InventoryFullException | InsufficientResourcesException noItemE) {
                 noItemE.printStackTrace();
@@ -369,19 +372,19 @@ public class Turn {
         List<Integer> effectIds = pickedWeapon.getEffectID();
 
         // Check all chosen effects are valid
-        if (!pickedWeapon.getWeapon().isValidActionSequence(effectIds)) return false;
+        if (!getWeapon(pickedWeapon.getWeapon(), playing).isValidActionSequence(effectIds)) return false;
 
         // Check player can pay all the effects' cost
         List<Resource> totalCost = new ArrayList<>();
         for (Integer id : effectIds) {
-            totalCost.addAll(pickedWeapon.getWeapon().getAction(id).getCost());
+            totalCost.addAll(getWeapon(pickedWeapon.getWeapon(), playing).getAction(id).getCost());
         }
         if (!playing.canPay(totalCost, pickedWeapon.getPowerups())) return false;
 
         // IDs' order matter!
         try {
             for (Integer id : effectIds) {
-                playing.shoot(pickedWeapon.getWeapon(), id, pickedWeapon.getPowerups());
+                playing.shoot(getWeapon(pickedWeapon.getWeapon(), playing), id, pickedWeapon.getPowerups());
             }
             return true;
         } catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
@@ -396,15 +399,16 @@ public class Turn {
      */
     private void reloadWeapon(Player playing) {
         List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+
         while (!canBeReloaded.isEmpty()) {
             WeaponSelection toReload = playing.getConnection().reload(canBeReloaded);
             if (toReload.getWeapon() == null) return;
 
             // Stop action if player can't pay reload cost with chosen powerups
-            if (playing.canPay( toReload.getWeapon().getCost(), toReload.getPowerups())) {
+            if (playing.canPay(getWeapon(toReload.getWeapon(), playing).getCost(), toReload.getPowerups())) {
                 // Do reload
                 try {
-                    playing.reload(toReload.getWeapon(), toReload.getPowerups());
+                    playing.reload(getWeapon(toReload.getWeapon(), playing), toReload.getPowerups());
                 } catch (NoItemInInventoryException | InsufficientResourcesException e) {
                     e.printStackTrace();
                 }
@@ -481,6 +485,13 @@ public class Turn {
 
         // Discard chosen card
         match.getPowerupDeck().discardCard(toDiscard);
+    }
+
+    private Weapon getWeapon(String weaponName, Player playing){
+        return match.getPlayers().stream().
+                filter(p-> p.getNickname().equals(playing.getNickname())).map(Player::getWeapons).
+                flatMap(List::stream).filter(w->w.getName().equals(weaponName)).
+                collect(Collectors.toList()).get(0);
     }
 
     /**

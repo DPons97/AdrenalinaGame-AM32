@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.Powerup;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -259,7 +260,7 @@ public class GuiView extends ClientView{
                 }
             });
             popup.show(stage);
-            PauseTransition wait = new PauseTransition(Duration.seconds(5));
+            PauseTransition wait = new PauseTransition(Duration.seconds(ALERT_DURATION));
             wait.setOnFinished((e) -> {
                 popup.hide();
             });
@@ -437,7 +438,7 @@ public class GuiView extends ClientView{
      * @return selected powerup
      */
     @Override
-    public String selectPowerup(List<String> selectables) {
+    public Powerup selectPowerup(List<Powerup> selectables) {
         return null;
     }
 

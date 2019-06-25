@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.client.view.CliView;
 import it.polimi.ingsw.client.view.ClientView;
@@ -88,6 +89,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	public void setMatch(AdrenalinaMatch match) {
 		this.match = match;
+	}
+
+	public Player getThisPlayer() {
+		return match.getPlayers().stream().filter(player -> player.getNickname().equals(nickname))
+				.collect(Collectors.toList()).get(0);
 	}
 
 	/**

@@ -4,16 +4,19 @@ import it.polimi.ingsw.client.controller.ClientPlayer;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.Powerup;
 
 import java.util.List;
 
 public abstract class ClientView {
+    protected static final int ALERT_DURATION = 5;
 
     protected ClientPlayer player;
 
     public ClientView(ClientPlayer player){
         this.player = player;
     }
+
     /**
      * Shows the lobby
      */
@@ -71,7 +74,7 @@ public abstract class ClientView {
      * @param selectables list of powerups
      * @return selected powerup
      */
-    public abstract String selectPowerup (List<String> selectables);
+    public abstract Powerup selectPowerup (List<Powerup> selectables);
 
     /**
      * Select an action to make
