@@ -48,7 +48,7 @@ public interface ServerFunctionalities extends Remote {
 	/**
 	 * Allow user to communicate that is ready
 	 */
-	void ready(String name) throws RemoteException;
+	void ready(String name, boolean isReady) throws RemoteException;
 
 	/**
 	 * Updates the lobby view

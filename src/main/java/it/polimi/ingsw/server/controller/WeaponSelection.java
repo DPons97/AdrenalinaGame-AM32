@@ -15,7 +15,7 @@ public class WeaponSelection {
     /**
      * Weapon that was chosen
      */
-    private Weapon weapon;
+    private String weapon;
 
     /**
      * Effect chosen. empty list if reloading
@@ -30,7 +30,7 @@ public class WeaponSelection {
     /**
      * Default constructor
      */
-    WeaponSelection() {
+    public WeaponSelection() {
         weapon = null;
         effectID = new ArrayList<>();
         powerups = new ArrayList<>();
@@ -39,7 +39,7 @@ public class WeaponSelection {
     /**
      * constructor for JSON parsing
      */
-    public WeaponSelection(Weapon weapon, List<Integer> effectID, List<Powerup> powerups) {
+    public WeaponSelection(String weapon, List<Integer> effectID, List<Powerup> powerups) {
         this.weapon = weapon;
         this.effectID = effectID;
         this.powerups = powerups;
@@ -48,14 +48,14 @@ public class WeaponSelection {
     /**
      * @return Weapon in selection
      */
-    public Weapon getWeapon() {
+    public String getWeapon() {
         return weapon;
     }
 
     /**
      * @param weapon weapon to set as selected
      */
-    public void setWeapon(Weapon weapon) {
+    public void setWeapon(String weapon) {
         this.weapon = weapon;
     }
 
@@ -92,12 +92,12 @@ public class WeaponSelection {
      * @return json representation of object
      */
     public JSONObject toJSON(){
-        JSONObject repr = new JSONObject();
-        repr.put("weapon", this.weapon);
+        JSONObject obj = new JSONObject();
+        obj.put("weapon", this.weapon);
 
         JSONArray effectArray = new JSONArray();
         effectArray.addAll(effectID);
-        repr.put("effectID", effectArray);
+        obj.put("effectID", effectArray);
 
         JSONArray discArray = new JSONArray();
 
@@ -108,8 +108,8 @@ public class WeaponSelection {
             discArray.add(item);
         }
 
-        repr.put("discount", discArray);
-        return repr;
+        obj.put("discount", discArray);
+        return obj;
     }
 
 }

@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.controller;
 
 import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.client.view.CliView;
 import it.polimi.ingsw.client.view.ClientView;
@@ -9,10 +10,13 @@ import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.MatchState;
+import it.polimi.ingsw.server.model.Powerup;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -46,6 +50,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Reference to client view
 	 */
 	private ClientView view;
+
+	/**
+	 * Reference to last thread that updated view
+	 */
+	private Thread lastUpdater;
 
 
 	/**
@@ -90,6 +99,11 @@ public class ClientPlayer implements ClientFunctionalities{
 		this.match = match;
 	}
 
+	public Player getThisPlayer() {
+		return match.getPlayers().stream().filter(player -> player.getNickname().equals(nickname))
+				.collect(Collectors.toList()).get(0);
+	}
+
 	/**
 	 * @return string with nickname
 	 */
@@ -109,7 +123,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
     @Override
     public String playerSelection(List<String> selectable) {
-        return null;
+        return view.selectPlayer(selectable);
     }
 
 	/**
@@ -119,7 +133,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
     @Override
     public Point cellSelection(List<Point> selectable) {
-        return null;
+        return view.selectCell(selectable);
     }
 
 	/**
@@ -129,7 +143,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public List<Point> roomSelection(List<List<Point>> selectable){
-		return null;
+		return view.selectRoom(selectable);
 	}
 
 	/**
@@ -139,7 +153,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public WeaponSelection reloadSelection(List<String> canLoad){
-		return null;
+		return view.selectReload(canLoad);
 	}
 
 	/**
@@ -148,9 +162,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * @return WeaponSelection with weapon to shoot with
 	 */
 	@Override
-	public WeaponSelection shootSelection(List<String> loaded){
-		return null;
-	}
+	public WeaponSelection shootSelection(List<String> loaded){ return view.selectShoot(loaded); }
 
 	/**
 	 * select a weapon from a list
@@ -158,18 +170,22 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * @return WeaponSelection with weapon to shoot with
 	 */
 	@Override
-	public String weaponSelection(List<String> weapon) {
-		return null;
-	}
+	public WeaponSelection weaponSelection(List<String> weapon) { return view.selectWeapon(weapon); }
 
 	/**
 	 * select a weapon from a list
-	 * @param powerup list of selectable weapons
+	 * @param powerup list of selectable weapons as json strings
 	 * @return WeaponSelection with weapon to shoot with
 	 */
 	@Override
 	public String powerupSelection(List<String> powerup) {
-		return null;
+	    List<Powerup> selectables = new ArrayList<>();
+
+	    // From json string to powerups
+	    for (String jsonStr : powerup)
+	        selectables.add(Powerup.parseJSON((JSONObject) JSONValue.parse(jsonStr)));
+
+		return view.selectPowerup(selectables).toJSON().toString();
 	}
 
 	/**
@@ -177,16 +193,16 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * @return action to make
 	 */
     @Override
-    public TurnAction actionSelection(){
-        return null;
-    }
+    public TurnAction actionSelection(){ return view.actionSelection(); }
 
 	/**
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		Thread updater = new Thread(() -> view.showLobby(server.updateLobby()));
-		updater.start();
+		if (lastUpdater != null) lastUpdater.interrupt();
+
+		lastUpdater = new Thread(() -> view.showLobby(server.updateLobby()));
+		lastUpdater.start();
 	}
 
 	/**
@@ -195,18 +211,22 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
+		if (lastUpdater != null) lastUpdater.interrupt();
 
 		if(match == null){
 			match = new AdrenalinaMatch();
 		}
 
 		match.update(toGetUpdateFrom);
-        Thread updater = new Thread(() -> view.showMatch());
-        updater.start();
+		lastUpdater = new Thread(() -> view.showMatch());
+		lastUpdater.start();
 		if (match.getState() == MatchState.LOADING &&
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
 					collect(Collectors.toList()).get(0).isReadyToStart()) {
-			server.setReady();
+			// CLI: Reset input reader
+			view.initMatch();
+
+			server.setReady(true);
 			System.out.println("DONE LOADING");
 		}
 	}
@@ -216,8 +236,8 @@ public class ClientPlayer implements ClientFunctionalities{
 		view.showAlert(message);
 	}
 
-	public void setReady(){
-		server.setReady();
+	public void setReady(boolean isReady){
+		server.setReady(isReady);
 	}
 
 	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID){

@@ -4,16 +4,19 @@ import it.polimi.ingsw.client.controller.ClientPlayer;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.Powerup;
 
 import java.util.List;
 
 public abstract class ClientView {
+    protected static final int ALERT_DURATION = 5;
 
     protected ClientPlayer player;
 
     public ClientView(ClientPlayer player){
         this.player = player;
     }
+
     /**
      * Shows the lobby
      */
@@ -64,14 +67,14 @@ public abstract class ClientView {
      * @param selectables list of weapons
      * @return selected weapon and effect
      */
-    public abstract String selectWeapon (List<String> selectables);
+    public abstract WeaponSelection selectWeapon (List<String> selectables);
 
     /**
      * Lets client select a powerup from a list
      * @param selectables list of powerups
      * @return selected powerup
      */
-    public abstract String selectPowerup (List<String> selectables);
+    public abstract Powerup selectPowerup (List<Powerup> selectables);
 
     /**
      * Select an action to make
@@ -79,6 +82,10 @@ public abstract class ClientView {
      */
     public abstract TurnAction actionSelection();
 
+    /**
+     * Initialization and loading of joined match
+     */
+    public abstract void initMatch();
 
     public abstract void createNewGame();
 

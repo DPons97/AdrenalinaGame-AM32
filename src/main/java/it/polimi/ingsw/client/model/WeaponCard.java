@@ -53,7 +53,7 @@ public class WeaponCard {
         return Objects.hash(getName());
     }
 
-    protected static class Effect {
+    public static class Effect {
         private String name;
         private String description;
         private List<Resource> cost;

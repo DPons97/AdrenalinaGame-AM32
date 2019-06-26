@@ -2,7 +2,13 @@ package it.polimi.ingsw.client.view;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
@@ -29,6 +35,7 @@ public class FXWindow extends Application {
 
         primaryStage.setTitle("Adrenalina: the best game ever made. \"ITS FUN COZ YOU SHOOT\"");
         Scene scene = new Scene(mainGrid,600, 600);
+
         stage.setScene(scene);
         stage.setMaximized(true);
         stage.setResizable(false);
@@ -36,6 +43,19 @@ public class FXWindow extends Application {
             System.out.println("Stage is closing");
             Platform.exit();
         });
+
+        primaryStage.fullScreenProperty().addListener(new ChangeListener<Boolean>() {
+
+            @Override
+            public void changed(ObservableValue<? extends Boolean> observable,
+                                Boolean oldValue, Boolean newValue) {
+                if(newValue != null && !newValue.booleanValue())
+                    primaryStage.setFullScreen(true);
+            }
+        });
+
+        primaryStage.setFullScreenExitKeyCombination(KeyCombination.NO_MATCH);
+
         primaryStage.show();
     }
 

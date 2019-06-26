@@ -264,6 +264,16 @@ public class Player {
 	}
 
 	/**
+	 * Get a particular player's weapon given name
+	 * @param weaponName weapon's name to retreive
+	 * @return weapon with this weapon name
+	 */
+	public WeaponCard getWeapon(String weaponName){
+		return weapons.stream().filter(w->w.getName().equals(weaponName)).
+				collect(Collectors.toList()).get(0);
+	}
+
+	/**
 	 * @param weapons list of the weapons to set
 	 */
 	public void setWeapons(List<WeaponCard> weapons) {

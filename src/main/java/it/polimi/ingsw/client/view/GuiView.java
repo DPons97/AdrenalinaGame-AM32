@@ -1,11 +1,13 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.model.AdrenalinaMatch;
-import it.polimi.ingsw.client.model.Player;
-import it.polimi.ingsw.client.model.Point;
+import it.polimi.ingsw.client.model.*;
+import it.polimi.ingsw.client.model.Cell;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
+import it.polimi.ingsw.server.model.Ammo;
+import it.polimi.ingsw.server.model.Powerup;
+import it.polimi.ingsw.server.model.Resource;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -16,6 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -34,6 +38,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 public class GuiView extends ClientView{
@@ -43,23 +48,99 @@ public class GuiView extends ClientView{
     public static final double DELAY_IN = 0.4;
     public static final int DELEYED_RESIZE = 2;
     public static final double DELAY_OUT = 0.3;
+    public static final String RESOURCE_STRING_FIX = "_BOX";
 
+    // map constants
     private final static String MAP = "/img/maps/";
     private final static String MAP_EXTENSION = ".png";
     private final static double MAP_X = 0;
     private final static double MAP_Y = 0;
     public static final double RELATIVE_MAP_HEIGHT = 0.8;
 
+    // player tabs
     private final static String TAB = "/img/tabs/";
     private final static String TAB_EXTENSION = ".png";
     private final static String TAB_BACK = "back";
     private final static double TAB_OFFSET = 0.175;
-    public static final double RELATIVE_TAB_HEIGHT = 0.20;
+    private static final double RELATIVE_TAB_HEIGHT = 0.20;
+    private static final double PLAYER_TAB_X = 0;
+    private static final double PLAYER_TAB_Y = RELATIVE_MAP_HEIGHT;
+
+    // signs
+    private static final String SKULL_PATH = "/img/others/skull.png";
+    private static final double ENEMY_SKULL_DROPLET_Y0 = 0.125;
+    private static final double ENEMY_SKULL_DROPLET_X0 = 0.675;
+    private static final double ENEMY_SKULL_DROPLET_OFFSET_Y = 0.175;
+    private static final double ENEMY_SKULL_DROPLET_OFFSET_X = 0.022;
+    private static final double ENEMY_SKULL_SIZE = 0.08;
+    private static final String DROPLET_DIR = "/img/droplets/drop";
+    private static final String DROPLET_EXTENSION = ".png";
+    private static final double ENEMY_DAMAGE_DROPLET_Y0 = 0.07;
+    private static final double ENEMY_DAMAGE_DROPLET_X0 = 0.64;
+    private static final double ENEMY_DAMAGE_DROPLET_OFFSET_Y = 0.175;
+    private static final double ENEMY_DAMAGE_DROPLET_OFFSET_X = 0.022;
+    private static final double ENEMY_MARK_DROPLET_Y0 = 0;
+    private static final double ENEMY_MARK_DROPLET_X0 = 0.82;
+    private static final double ENEMY_MARK_DROPLET_OFFSET_Y = 0.175;
+    private static final double ENEMY_MARK_DROPLET_OFFSET_X = 0.022;
+    private static final double ENEMY_DROPLET_SIZE = 0.04;
+    private static final double DEATHTRACK_DROPLET_Y0 = 0.032;
+    private static final double DEATHTRACK_DROPLET_X0 = 0.042;
+    private static final double DEATHTRACK_DROPLET_OFFSET_X = 0.045;
+    private static final double DEATHTRACK_DROPLET_OFFSET_X2 = 0.008;
+    private static final double DEATHTRACK_DROPLET_SIZE = 0.024;
+
+
+    // weapons
+    private final static String WEAPON_DIR = "/img/cards/";
+    private final static String WEAPON_EXTENSION = ".png";
+    private final static double WEAPON_CARD_SIZE = 0.055;
+    // spawn points weapon cards
+    private static final double SPAWN_POINT_OFF = 0.115;
+    private static final double SPAWN_POINT_1_BASE_X = 0.318;
+    private static final double SPAWN_POINT_1_BASE_Y = 0;
+    private static final double SPAWN_POINT_1_ROTATION = 0;
+    private static final double SPAWN_POINT_2_BASE_X = 0.017;
+    private static final double SPAWN_POINT_2_BASE_Y = 0.26;
+    private static final double SPAWN_POINT_2_ROTATION = 90;
+    private static final double SPAWN_POINT_3_BASE_X = 0.524;
+    private static final double SPAWN_POINT_3_BASE_Y = 0.422;
+    private static final double SPAWN_POINT_3_ROTATION = -90;
+
+    // Player pawns
+    private static final double PAWN_X0 = 0.1;
+    private static final double PAWN_Y0 = 0.18;
+    private static final double PAWN_OFFSET = 0.19;
+    private static final double PAWN_INTERNAL_OFFSET = 0.042;
+    private static final double PAWN_SIZE = 0.045;
+    private static final String PAWN_DIR = "/img/pawns/";
+    private static final String PAWN_EXTENSION = ".png";
+
+    // User dashboard
+    private static final double DASHBOARD_WEAPON_OFFSET_X = 0.145;
+    private static final double DASHBOARD_WEAPON_X= 0.725;
+    private static final double DASHBOARD_WEAPON_Y = 0.815;
+    private static final double DASHBOARD_POWERUP_X = 0.48;
+    private static final double DASHBOARD_POWERUP_Y = 0.815;
+    private static final double DASHBOARD_POWERUP_OFFSET = 0.15;
+    private static final double DASHBOARD_CARDS_SIZE  =0.055;
+    private static final String DASHBOARD_PATH  ="/img/tabs/mydashboard.png";
+
+    // Ammo cards
+    private static final String AMMO_DIR = "/img/ammo/";
+    private static final String AMMO_EXTENSION = ".png";
+    private static final double AMMO_X0 = 0.12;
+    private static final double AMMO_Y0 = 0.27;
+    private static final double AMMO_OFFSET = 0.19;
+    private static final double AMMO_SIZE = 0.05;
+
+
 
 
     private double width;
     private double height;
 
+    private List<Clickable> spawnWeapons;
 
 
     public GuiView(ClientPlayer player) {
@@ -71,6 +152,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public void showLobby(String lobby) {
+
         JSONObject lobbiObj = (JSONObject) JSONValue.parse(lobby);
         int nPlayers = Integer.parseInt(lobbiObj.get("n_players").toString());
         JSONArray matchesArray = (JSONArray) lobbiObj.get("matches");
@@ -78,7 +160,7 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
             GridPane grid = FXWindow.getGrid();
-
+            setEscExit();
             initGrid(grid);
 
             Text scenetitle = new Text("Lobby");
@@ -259,12 +341,17 @@ public class GuiView extends ClientView{
                 }
             });
             popup.show(stage);
-            PauseTransition wait = new PauseTransition(Duration.seconds(5));
+            PauseTransition wait = new PauseTransition(Duration.seconds(ALERT_DURATION));
             wait.setOnFinished((e) -> {
                 popup.hide();
             });
             wait.play();
         });
+    }
+
+    @Override
+    public void initMatch() {
+        // TODO remove todo if not needed
     }
 
     /**
@@ -286,12 +373,10 @@ public class GuiView extends ClientView{
     private void showGameBoard() {
         AdrenalinaMatch match= player.getMatch();
         Platform.runLater(()-> {
-            Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
-
-            initGrid(grid);
 
             loadLayout();
+
+            setEscExit();
 
         });
     }
@@ -348,7 +433,7 @@ public class GuiView extends ClientView{
             btnReady.setOnAction(e -> {
                 actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setText("Waiting for other players");
-                player.setReady();
+                player.setReady(true);
             });
 
             btnBack.setOnAction(e -> {
@@ -427,7 +512,7 @@ public class GuiView extends ClientView{
      * @return selected weapon and effect
      */
     @Override
-    public String selectWeapon(List<String> selectables) {
+    public WeaponSelection selectWeapon(List<String> selectables) {
         return null;
     }
 
@@ -437,7 +522,7 @@ public class GuiView extends ClientView{
      * @return selected powerup
      */
     @Override
-    public String selectPowerup(List<String> selectables) {
+    public Powerup selectPowerup(List<Powerup> selectables) {
         return null;
     }
 
@@ -458,7 +543,6 @@ public class GuiView extends ClientView{
         Pane root = new Pane();
 
         Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
-
         borders.setCenter(root);
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -484,7 +568,7 @@ public class GuiView extends ClientView{
         borders.setPrefSize(scene.getWidth(),scene.getHeight());
 
         borders.setStyle("-fx-background-color: #222");
-        root.setStyle("-fx-background-color: red");
+        root.setStyle("-fx-background-color: #222");
 
         root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
 
@@ -492,22 +576,209 @@ public class GuiView extends ClientView{
         root.getChildren().add(map);
 
         loadPlayersTabs(root, map);
+        loadSpawnPointCards(root);
+        loadBoardItems(root);
 
+    }
+
+    private void loadBoardItems(Pane root) {
+        Map map = player.getMatch().getBoardMap();
+        loadDeathTrack(root);
+        for(int i = 0; i<map.getYSize(); i++){
+            for(int j = 0; j<map.getXSize(); j++){
+                Cell cell =  map.getCell(j,i);
+                if(cell != null) {
+                    int k = 0;
+
+                    // players
+                    for (Player player : cell.getPlayers()) {
+                        String path = PAWN_DIR + player.getColor().toString().toLowerCase() + PAWN_EXTENSION;
+                        ImageView pawn = loadImage(path);
+                        pawn.setX(PAWN_X0*width+PAWN_OFFSET*height*i+PAWN_INTERNAL_OFFSET*height*(k%3));
+                        pawn.setY(PAWN_Y0*height+PAWN_OFFSET*height*j+PAWN_INTERNAL_OFFSET*height*(k/3));
+                        pawn.setPreserveRatio(true);
+                        pawn.setFitWidth(PAWN_SIZE*height);
+                        root.getChildren().add(pawn);
+                        k++;
+                    }
+
+                    // ammo
+                    if(!cell.isSpawn()) {
+                        ImageView ammo = getAmmoImage(((AmmoCell)cell).getResource());
+                        ammo.setX(AMMO_X0*width+AMMO_OFFSET*height*i);
+                        ammo.setY(AMMO_Y0*height+AMMO_OFFSET*height*j);
+                        ammo.setPreserveRatio(true);
+                        ammo.setFitWidth(AMMO_SIZE*height);
+                        root.getChildren().add(ammo);
+                    }
+                }
+
+            }
+        }
+    }
+
+    private void loadDeathTrack(Pane root) {
+        List<Player> deathtrack = player.getMatch().getDeathTrack();
+        List<Boolean> overkills = player.getMatch().getOverkills();
+        for(int i = 0, j = 0; i<overkills.size(); i++, j++){
+            ImageView droplet = getDropletImage(deathtrack.get(i));
+            droplet.setY(DEATHTRACK_DROPLET_Y0*height);
+            droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*j);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            if(overkills.get(j)){
+                i++;
+                ImageView additionalDroplet = getDropletImage(deathtrack.get(i));
+                additionalDroplet.setY(DEATHTRACK_DROPLET_Y0*height);
+                additionalDroplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j+DEATHTRACK_DROPLET_OFFSET_X2*height);
+                additionalDroplet.setPreserveRatio(true);
+                additionalDroplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+                root.getChildren().add(additionalDroplet);
+            }
+        }
+    }
+
+    private void loadSpawnPointCards(Pane root) {
+        for(SpawnCell spawnCell: player.getMatch().getBoardMap().getSpawnPoints()){
+            int i = 0;
+            switch(spawnCell.getColor()){
+                case BLUE:
+                    for(WeaponCard weapon : spawnCell.getWeapons()){
+                        ImageView weaponView = getWeaponImage(weapon.getName());
+                        weaponView.setY(SPAWN_POINT_1_BASE_Y*height);
+                        weaponView.setX(SPAWN_POINT_1_BASE_X*width+SPAWN_POINT_OFF*height*i);
+                        weaponView.setPreserveRatio(true);
+                        weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
+                        weaponView.setRotate(SPAWN_POINT_1_ROTATION);
+                        root.getChildren().add(weaponView);
+                        //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        i++;
+                    }
+                    break;
+                case RED:
+                    for(WeaponCard weapon : spawnCell.getWeapons()){
+                        ImageView weaponView = getWeaponImage(weapon.getName());
+                        weaponView.setY(SPAWN_POINT_2_BASE_Y*height+SPAWN_POINT_OFF*height*i);
+                        weaponView.setX(SPAWN_POINT_2_BASE_X*width);
+                        weaponView.setPreserveRatio(true);
+                        weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
+                        weaponView.setRotate(SPAWN_POINT_2_ROTATION);
+                        root.getChildren().add(weaponView);
+                        //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        i++;
+                    }
+                    break;
+                case YELLOW:
+                    for(WeaponCard weapon : spawnCell.getWeapons()){
+                        ImageView weaponView = getWeaponImage(weapon.getName());
+                        weaponView.setY(SPAWN_POINT_3_BASE_Y*height+SPAWN_POINT_OFF*height*i);
+                        weaponView.setX(SPAWN_POINT_3_BASE_X*width);
+                        weaponView.setPreserveRatio(true);
+                        weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
+                        weaponView.setRotate(SPAWN_POINT_3_ROTATION);
+                        root.getChildren().add(weaponView);
+                        //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        i++;
+                    }
+                    break;
+            }
+        }
     }
 
     private void loadPlayersTabs(Pane root, ImageView map) {
         double tabSize =(width - getWidth(map));
         int i = 0;
         for(Player p: player.getMatch().getPlayers()){
-            if(p.getNickname().equals(player.getNickname())){ continue;}
-            ImageView tab = loadImage(TAB+p.getColor().toString().toLowerCase()+
-                    (p.isFrenzyPlayer()?"":TAB_BACK)+TAB_EXTENSION);
-            tab.setPreserveRatio(true);
-            tab.setFitWidth(tabSize);
-            tab.setX(getWidth(map));
-            tab.setY(height*TAB_OFFSET*i);
-            root.getChildren().add(tab);
-            i++;
+            if(p.getNickname().equals(player.getNickname())){
+                ImageView tab = loadImage(TAB+p.getColor().toString().toLowerCase()+
+                        (p.isFrenzyPlayer()?"":TAB_BACK)+TAB_EXTENSION);
+                tab.setX(PLAYER_TAB_X*width);
+                tab.setY(PLAYER_TAB_Y*height);
+                tab.setPreserveRatio(true);
+                tab.setFitHeight(height*RELATIVE_TAB_HEIGHT);
+                root.getChildren().add(tab);
+                loadPlayerDashboard(root, tab);
+            } else {
+                ImageView tab = loadImage(TAB + p.getColor().toString().toLowerCase() +
+                        (p.isFrenzyPlayer() ? "" : TAB_BACK) + TAB_EXTENSION);
+                tab.setPreserveRatio(true);
+                tab.setFitWidth(tabSize);
+                tab.setX(getWidth(map));
+                tab.setY(height * TAB_OFFSET * i);
+                root.getChildren().add(tab);
+                loadEnemySigns(root,tab, p, i);
+                i++;
+            }
+        }
+    }
+
+    private void loadEnemySigns(Pane root,ImageView tab, Player player, int i) {
+        int k = 0;
+        //damage
+        for(Player p: player.getDmgPoints()){
+            ImageView droplet = getDropletImage(p);
+            droplet.setX(ENEMY_DAMAGE_DROPLET_X0 *width+ ENEMY_DAMAGE_DROPLET_OFFSET_X *width*k);
+            droplet.setY(ENEMY_DAMAGE_DROPLET_Y0 *height+ ENEMY_DAMAGE_DROPLET_OFFSET_Y *height*i);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            k++;
+        }
+        //marks
+        k = 0;
+        for(Player p: player.getMarks()){
+            ImageView droplet = getDropletImage(p);
+            droplet.setX(ENEMY_MARK_DROPLET_X0 *width+ ENEMY_MARK_DROPLET_OFFSET_X *width*k);
+            droplet.setY(ENEMY_MARK_DROPLET_Y0 *height+ ENEMY_MARK_DROPLET_OFFSET_Y *height*i);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            k++;
+        }
+        //deaths
+        k = 0;
+        for(int j = 0; j<player.getDeaths(); j++){
+            ImageView skull = loadImage(SKULL_PATH);
+            skull.setX(ENEMY_SKULL_DROPLET_X0*width+ENEMY_SKULL_DROPLET_OFFSET_X*width*k);
+            skull.setY(ENEMY_SKULL_DROPLET_Y0*height+ENEMY_SKULL_DROPLET_OFFSET_Y*height*i);
+            skull.setPreserveRatio(true);
+            skull.setFitWidth(ENEMY_SKULL_SIZE);
+            root.getChildren().add(skull);
+            k++;
+        }
+    }
+
+    private void loadPlayerDashboard(Pane root, ImageView tab) {
+        ImageView dashboard = loadImage(DASHBOARD_PATH);
+        dashboard.setPreserveRatio(true);
+        dashboard.setY(PLAYER_TAB_Y*height);
+        dashboard.setX(getWidth(tab));
+        dashboard.setFitWidth(width-getWidth(tab));
+        root.getChildren().add(dashboard);
+        loadPlayerWeapons(root);
+        loadPlayerPowerups(root);
+    }
+
+    private void loadPlayerPowerups(Pane root) {
+        for(Powerup powerup: player.getMatch().getPlayerByName(player.getNickname()).getPowerups()){
+            ImageView powerupImg = getPowerupImage(powerup);
+            powerupImg.setPreserveRatio(true);
+            powerupImg.setY(DASHBOARD_POWERUP_Y*height);
+            powerupImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
+            powerupImg.setX(DASHBOARD_POWERUP_X*width+DASHBOARD_POWERUP_OFFSET*height);
+            root.getChildren().add(powerupImg);
+        }
+    }
+
+    private void loadPlayerWeapons(Pane root) {
+        for(WeaponCard weapon: player.getMatch().getPlayerByName(player.getNickname()).getWeapons()){
+            ImageView weaponImg = getWeaponImage(weapon.getName());
+            weaponImg.setPreserveRatio(true);
+            weaponImg.setY(DASHBOARD_WEAPON_Y*height);
+            weaponImg.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height);
+            weaponImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
+            root.getChildren().add(weaponImg);
         }
     }
 
@@ -583,5 +854,58 @@ public class GuiView extends ClientView{
             }
 
         });
+    }
+
+
+    private void setEscExit() {
+        FXWindow.getStage().getScene().addEventFilter(KeyEvent.KEY_PRESSED, event -> {
+            if (event.getCode().equals(KeyCode.ESCAPE)){
+                    ButtonType canc = new ButtonType("OK, LET'S GO BACK TO FIGHT", ButtonBar.ButtonData.OK_DONE);
+                    ButtonType quit = new ButtonType("I'M LAME, I WANNA QUIT AND CRY", ButtonBar.ButtonData.CANCEL_CLOSE);
+                    Alert exitAlert = new Alert(Alert.AlertType.CONFIRMATION, "", canc, quit);
+                    exitAlert.setTitle("RAGE QUIT IS LAME");
+                    exitAlert.setHeaderText("You sure you waanna quit this amazing game?");
+
+                    Optional<ButtonType> option = exitAlert.showAndWait();
+                    if (option.get().equals(quit)) {
+                        System.out.println("pressed exit");
+                        FXWindow.getStage().close();
+                    }
+                    event.consume();
+                }
+            }
+        );
+    }
+
+    private ImageView getWeaponImage(String name){
+        String file = WEAPON_DIR+name.toLowerCase()+WEAPON_EXTENSION;
+        System.out.println(file);
+
+        return loadImage(file);
+    }
+
+    private ImageView getPowerupImage(Powerup powerup){
+        String file = WEAPON_DIR+powerup.getName().toLowerCase()+"-" +
+                powerup.getBonusResource().toString().replace(RESOURCE_STRING_FIX, "").toLowerCase() +
+                WEAPON_EXTENSION;
+        System.out.println(file);
+        return loadImage(file);
+    }
+
+    private ImageView getAmmoImage(Ammo ammo){
+
+        String file = AMMO_DIR;
+        for (Resource resource: ammo.getResources()){
+            file += resource.toString().replace(RESOURCE_STRING_FIX, "");
+        }
+        file+=AMMO_EXTENSION;
+        System.out.println(file);
+        return loadImage(file);
+    }
+
+    private ImageView getDropletImage(Player p){
+        String file = DROPLET_DIR+p.getColor().toString().toLowerCase()+DROPLET_EXTENSION;
+        System.out.println(file);
+        return loadImage(file);
     }
 }

@@ -58,6 +58,7 @@ public class PlayerSocket extends PlayerConnection {
 		while(true){
 			try {
 				message = input.readLine();
+
 				if(message.equals("disconnect")){
 					Thread t = new Thread(this::disconnect);
 					t.start();
@@ -121,7 +122,10 @@ public class PlayerSocket extends PlayerConnection {
 				}
 				break;
 			case "ready":
-				getCurrentMatch().setPlayerReady(this);
+				getCurrentMatch().setPlayerReady(this, true);
+				break;
+			case "not_ready":
+				getCurrentMatch().setPlayerReady(this, false);
 				break;
 			case "update_lobby":
 				this.updateLobby(getServerLobby().lobby);
@@ -437,13 +441,6 @@ public class PlayerSocket extends PlayerConnection {
 		this.sendInstruction(msg);
 	}
 
-	private Weapon getWeapon(String weaponName){
-		return getCurrentMatch().getMatch().getPlayers().stream().
-				filter(p-> p.getNickname().equals(getName())).map(Player::getWeapons).
-				flatMap(List::stream).filter(w->w.getName().equals(weaponName)).
-				collect(Collectors.toList()).get(0);
-	}
-
 	private Powerup getPowerup(String name, Resource r){
 		return  getCurrentMatch().getMatch().getPlayers().stream().
 				filter(p-> p.getNickname().equals(getName())).map(Player::getPowerups).
@@ -452,7 +449,7 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	private WeaponSelection parseWeaponSelection(JSONObject weaponJSON){
-		Weapon  weapon = getWeapon(weaponJSON.get("weapon").toString());
+		String weapon = weaponJSON.get("weapon").toString();
 
 		// Parse effect ids
 		List<Integer> effectID = new ArrayList<>();

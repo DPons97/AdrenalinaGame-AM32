@@ -66,7 +66,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		serverSocket= new ServerSocket(socketPort);
 
 		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
-		String addresses="";
+		StringBuilder addresses = new StringBuilder();
 		for (;n.hasMoreElements();){
 			NetworkInterface e = n.nextElement();
 			Enumeration<InetAddress> a = e.getInetAddresses();
@@ -74,11 +74,11 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			if(a.hasMoreElements()) {
 				InetAddress addr = a.nextElement();
 				if(addr.getHostAddress().length() > 15) continue;
-				addresses = addresses + "     " + addr.getHostAddress();
+				addresses.append("     ").append(addr.getHostAddress());
 			}
 
 		}
-		address = addresses;
+		address = addresses.toString();
 		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+" / Port socket= "+socketPort);
 
 		registry = LocateRegistry.createRegistry(rmiPort);
@@ -94,7 +94,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		serverSocket= new ServerSocket(socketPort);
 
 		Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
-		String addresses="";
+		StringBuilder addresses = new StringBuilder();
 		for (;n.hasMoreElements();){
 			NetworkInterface e = n.nextElement();
 			Enumeration<InetAddress> a = e.getInetAddresses();
@@ -102,18 +102,17 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			if(a.hasMoreElements()) {
 				InetAddress addr = a.nextElement();
 				if(addr.getHostAddress().length() > 15) continue;
-				addresses = addresses + "     " + addr.getHostAddress();
+				addresses.append("     ").append(addr.getHostAddress());
 			}
 
 		}
-
-		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+"Port socket= "+socketPort);
+		address = addresses.toString();
+		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+" / Port socket= "+socketPort);
 
 		registry = LocateRegistry.createRegistry(rmiPort);
 		registry.rebind("rmiServer", this);
 
 	}
-
 
 	/**
 	 * listen socket connection
@@ -266,8 +265,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * Allow user to communicate that is ready
 	 */
 	@Override
-	public void ready(String name) {
-		lobby.getMatchByPlayerConnection(lobby.getPlayerInGameByName(name)).setPlayerReady(lobby.getPlayerInGameByName(name));
+	public void ready(String name, boolean isReady) {
+		lobby.getMatchByPlayerConnection(lobby.getPlayerInGameByName(name)).setPlayerReady(lobby.getPlayerInGameByName(name), isReady);
 	}
 
 	@Override

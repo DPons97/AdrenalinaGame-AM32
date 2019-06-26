@@ -17,6 +17,9 @@ import java.util.stream.Collectors;
  *
  */
 public class AdrenalinaMatch {
+
+	private static final Color[] PLAYER_COLORS = {Color.YELLOW, Color.PURPLE, Color.BLUE, Color.WHITE, Color.GREEN};
+
 	/**
 	 *  Point reward to give to players inside death track
 	 */
@@ -51,6 +54,11 @@ public class AdrenalinaMatch {
 	 * Ordered list of player that simulate the death track.
 	 */
 	private List<Player> deathTrack;
+	/**
+	 *  Ordered list parallel to deathtrack to keep track of overkills
+	 */
+	private List<Boolean> overkills;
+
 
 	/**
 	 * Deck of weapon cards
@@ -108,6 +116,11 @@ public class AdrenalinaMatch {
 	private MatchState state;
 
 	/**
+	 * List of available colors
+	 */
+	private List<Color> availableColors= new ArrayList<>(Arrays.asList(PLAYER_COLORS));
+
+	/**
 	 * @param nPlayers number of players [3,5].
 	 * @param maxDeaths maximum number of deaths before frenzy.
 	 * 					the same as skulls in the manual
@@ -130,6 +143,7 @@ public class AdrenalinaMatch {
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
+		this.overkills = new ArrayList<>();
 		this.initAmmoDeck();
 		this.initPowerupDeck();
 		this.initWeaponDeck();
@@ -314,7 +328,12 @@ public class AdrenalinaMatch {
 						throw new PlayerAlreadyExistsException();
 					}
 				}
+				Random r = new Random();
+				int randomIndex = r.nextInt(availableColors.size());
+				toAdd.setColor(availableColors.get(randomIndex));
+				availableColors.remove(randomIndex);
 				players.add(toAdd);
+				if(firstPlayer == null) firstPlayer = toAdd;
 			} else {
 				throw new TooManyPlayersException();
 			}
@@ -331,6 +350,7 @@ public class AdrenalinaMatch {
 		if(state == MatchState.NOT_STARTED){
 			if(!players.contains(toKick))throw new PlayerNotExistsException();
 			players.remove(toKick);
+			availableColors.add(toKick.getColor());
 			toKick.setMatch(null);
 			for (Player p : players) {
 				p.setReady(false);
@@ -451,6 +471,13 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @return the death track as a list of players.
+	 */
+	public List<Boolean> getOverkills() {
+		return overkills;
+	}
+
+	/**
 	 * @return the maximum time for a turn.
 	 */
 	public int getTurnDuration() {
@@ -499,7 +526,8 @@ public class AdrenalinaMatch {
 		if(players.contains(killer)) {
 			currentDeaths++;
 			deathTrack.add(killer);
-			if (isOverkill) deathTrack.add(killer);
+			if(isOverkill)deathTrack.add(killer);
+			overkills.add(isOverkill);
 			if (currentDeaths>= maxDeaths) {
 				state = MatchState.FRENZY_TURN;
 				// All players without damage change their rewards to frenzy, and reset their deaths to 0
@@ -896,7 +924,10 @@ public class AdrenalinaMatch {
 		toRet.put("players", playersArray);
 		JSONArray deathTrackAray = new JSONArray();
 		deathTrack.forEach(p->deathTrackAray.add(p.getNickname()));
+		JSONArray overkillAray = new JSONArray();
+		overkills.forEach(p->overkillAray.add(p.booleanValue()));
 		toRet.put("deathTrack", deathTrackAray);
+		toRet.put("overkills", overkillAray);
 		toRet.put("turnDuration", turnDuration);
 		return toRet;
 	}

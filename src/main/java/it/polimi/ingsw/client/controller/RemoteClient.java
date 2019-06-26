@@ -83,9 +83,9 @@ public class RemoteClient extends ServerConnection {
 	 * Tells server that this client is ready
 	 */
 	@Override
-	public void setReady() {
+	public void setReady(boolean isReady) {
 		try {
-			server.ready(player.getNickname());
+			server.ready(player.getNickname(), isReady);
 		} catch (RemoteException e) {
 			// the disconnection is handled elsewhere
 			return;
