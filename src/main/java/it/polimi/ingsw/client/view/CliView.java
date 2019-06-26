@@ -73,16 +73,19 @@ public class CliView extends ClientView {
     /**
      * Reader class
      */
-    private class CommandReader extends Thread {
+    private static class CommandReader extends Thread {
         private final Scanner stringReader;
 
         private boolean stopReader;
 
         private String buffer;
 
+        private boolean pendingReading;
+
         CommandReader() {
             stringReader = new Scanner(System.in);
             this.stopReader = false;
+            this.pendingReading = false;
             this.buffer = "";
         }
 
@@ -90,7 +93,10 @@ public class CliView extends ClientView {
         public void run() {
             while (!stopReader)
                 synchronized (stringReader) {
-                    if (buffer.isEmpty()) buffer = stringReader.nextLine();
+                    if (buffer.isEmpty()) {
+                        buffer = stringReader.nextLine();
+                        stringReader.notifyAll();
+                    }
                 }
         }
 
@@ -107,9 +113,17 @@ public class CliView extends ClientView {
          */
         String nextLine() {
             String toReturn;
+
+            // Do not read buffer if someone else is doing it already
+            if (pendingReading) return null;
+            pendingReading = true;
+
             synchronized (stringReader) {
                 toReturn = buffer;
                 buffer = "";
+                stringReader.notifyAll();
+
+                pendingReading = false;
             }
             return toReturn;
         }
@@ -278,7 +292,7 @@ public class CliView extends ClientView {
     /**
      *  Command Line reader
      */
-    private static CommandReader cmdReader;
+    private CommandReader cmdReader = new CommandReader();
 
     private String selectionMessage;
 
@@ -289,8 +303,30 @@ public class CliView extends ClientView {
         parseCliAssets();
         selectionMessage = IDLE_MESSAGE;
         alertMessage = "";
-        cmdReader = new CommandReader();
         cmdReader.start();
+    }
+
+    /**
+     * Retreive last response (waiting if none is provided)
+     * @return Last player's response
+     */
+    private String getResponse() {
+        String response;
+        response = cmdReader.nextLine();
+
+        if (response == null) return null;
+
+        while (response.isEmpty()) {
+            System.out.println("Response empty, asking again...");
+            response = cmdReader.nextLine();
+            if (response == null) return null;
+            try {
+                TimeUnit.MILLISECONDS.sleep(TIMEOUT);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        return response;
     }
 
     /**
@@ -307,29 +343,13 @@ public class CliView extends ClientView {
                 "Current players online: " + nPlayers + "%n%n");
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
-        System.out.print(MATCH_INFO_CLOSER);
+        System.out.printf(MATCH_INFO_CLOSER);
         System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
-        System.out.print(MATCH_INFO_CLOSER);
+        System.out.printf(MATCH_INFO_CLOSER);
 
-        String response;
-
-        if(matches.isEmpty()){
-            System.out.println("Wow, such empty...");
-            System.out.println("CREATE [N]ew match. [Any key to reload]");
-
-            // Retreive next command
-            response = getResponse();
-
-            if(response.equals("N") || response.equals("n"))
-                createNewGame();
-            else {
-                player.updateLobby();
-                return;
-            }
-        }
         for(int i = 0; i < matches.size(); i++){
             // Print header table
-            System.out.format(MATCH_INFO_CLOSER + "%n" + MATCH_INFO_HEADER);
+            System.out.format(MATCH_INFO_HEADER + MATCH_INFO_CLOSER);
 
             // Print table
             JSONObject match = (JSONObject) matches.get(i);
@@ -349,42 +369,33 @@ public class CliView extends ClientView {
             System.out.format(MATCH_INFO_CLOSER);
         }
 
-        System.out.printf("Do you want to CREATE [N]ew match, or JOIN an existing one?%n" +
-                            "(Specify match's ID to join) [Any key to reload]");
+        if(matches.isEmpty()){
+            System.out.printf("Wow, such empty...%n");
+            System.out.printf("CREATE [N]ew match. [Any key to reload]%n");
+        } else {
+            System.out.printf("Do you want to CREATE [N]ew match, or JOIN an existing one?%n" +
+                    "(Specify match's ID to join) [Any key to reload]%n");
+        }
 
+        String response;
         response = getResponse();
-        int choice = 0;
+        if (response == null) return;
 
+        int choice;
         try {
             choice = Integer.parseInt(response) - 1;
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException e) {
+            if (response.equals("N") || response.equals("n")) createNewGame();
+            else player.updateLobby();
+            return;
+        }
 
-        if (response.equals("N") || response.equals("n")) createNewGame();
-        else if(choice >= 0 && choice <  matches.size()) {
+        if(choice >= 0 && choice <  matches.size()) {
             player.joinGame(choice);
             clearConsole();
+        } else {
+            player.updateLobby();
         }
-        else {
-            showLobby(lobby);
-        }
-    }
-
-    /**
-     * Retreive last response (waiting if none is provided)
-     * @return Last player's response
-     */
-    private String getResponse() {
-        String response;
-        response = cmdReader.nextLine();
-        while (response.isEmpty()) {
-            response = cmdReader.nextLine();
-            try {
-                TimeUnit.MILLISECONDS.sleep(TIMEOUT);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
-        return response;
     }
 
     // TODO Remove once finished testing
@@ -479,6 +490,16 @@ public class CliView extends ClientView {
         }
     }
 
+    @Override
+    public void initMatch() {
+        // Shutdown and restart input reader (read pending from showMatch
+        cmdReader.shutdownReader();
+        cmdReader.interrupt();
+
+        cmdReader = new CommandReader();
+        cmdReader.start();
+    }
+
     /**
      * Shows the launcher options
      */
@@ -503,7 +524,7 @@ public class CliView extends ClientView {
                         (p.isReadyToStart()) ? "Ready" : "Not Ready");
             }
 
-            System.out.print(LOBBY_CLOSER);
+            System.out.printf(LOBBY_CLOSER);
 
             lobbyNextCommand(isReady);
         } else if (match.getState() == MatchState.PLAYER_TURN) {
@@ -523,7 +544,7 @@ public class CliView extends ClientView {
             drawMap(match);
 
             // Print alerts
-            System.out.println(alertMessage);
+            System.out.printf(alertMessage);
         }
     }
 
@@ -533,14 +554,15 @@ public class CliView extends ClientView {
      */
     private void lobbyNextCommand(boolean isReady) {
         String response;
-        if (isReady) {
+        if (!isReady) {
             System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
 
             // Retreive next command
             response = getResponse();
+            if (response == null) return;
 
             if (response.equals("R") || response.equals("r")) {
-                player.setReady();
+                player.setReady(true);
             } else if (response.equals("E") || response.equals("e")) {
                 player.backToLobby();
                 player.updateLobby();
@@ -550,11 +572,14 @@ public class CliView extends ClientView {
             System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
             response = getResponse();
+            if (response == null) return;
 
             if (response.equals("E") || response.equals("e")) {
                 player.backToLobby();
                 player.updateLobby();
-            } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
+            } else if (response.equals("N") || response.equals("n")) {
+                player.setReady(false);
+            }else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
         }
     }
 

@@ -349,6 +349,11 @@ public class GuiView extends ClientView{
         });
     }
 
+    @Override
+    public void initMatch() {
+        // TODO remove todo if not needed
+    }
+
     /**
      * Shows the launcher options
      */
@@ -428,7 +433,7 @@ public class GuiView extends ClientView{
             btnReady.setOnAction(e -> {
                 actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setText("Waiting for other players");
-                player.setReady();
+                player.setReady(true);
             });
 
             btnBack.setOnAction(e -> {

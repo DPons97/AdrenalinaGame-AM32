@@ -51,6 +51,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	private ClientView view;
 
+	/**
+	 * Reference to last thread that updated view
+	 */
+	private Thread lastUpdater;
+
 
 	/**
 	 * Constructor
@@ -194,8 +199,10 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		Thread updater = new Thread(() -> view.showLobby(server.updateLobby()));
-		updater.start();
+		if (lastUpdater != null) lastUpdater.interrupt();
+
+		lastUpdater = new Thread(() -> view.showLobby(server.updateLobby()));
+		lastUpdater.start();
 	}
 
 	/**
@@ -204,18 +211,22 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
+		if (lastUpdater != null) lastUpdater.interrupt();
 
 		if(match == null){
 			match = new AdrenalinaMatch();
 		}
 
 		match.update(toGetUpdateFrom);
-        Thread updater = new Thread(() -> view.showMatch());
-        updater.start();
+		lastUpdater = new Thread(() -> view.showMatch());
+		lastUpdater.start();
 		if (match.getState() == MatchState.LOADING &&
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
 					collect(Collectors.toList()).get(0).isReadyToStart()) {
-			server.setReady();
+			// CLI: Reset input reader
+			view.initMatch();
+
+			server.setReady(true);
 			System.out.println("DONE LOADING");
 		}
 	}
@@ -225,8 +236,8 @@ public class ClientPlayer implements ClientFunctionalities{
 		view.showAlert(message);
 	}
 
-	public void setReady(){
-		server.setReady();
+	public void setReady(boolean isReady){
+		server.setReady(isReady);
 	}
 
 	public void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID){

@@ -108,7 +108,7 @@ public class LobbyController {
 		    player.alert("Cannot join: Match not exists");
 		    return;
         }
-	    lobby.joinMatch(lobby.getPlayer(player),lobby.getJoinableMatches().get(gameID));
+	    lobby.joinMatch(lobby.getPlayer(player), lobby.getJoinableMatches().get(gameID));
 		players.remove(player);
 		lobby.removePlayer(lobby.getPlayer(player));
 	}
