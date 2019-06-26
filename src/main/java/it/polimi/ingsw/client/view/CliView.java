@@ -82,6 +82,8 @@ public class CliView extends ClientView {
 
         private boolean pendingReading;
 
+        private CommandReader restartedReader;
+
         CommandReader() {
             stringReader = new Scanner(System.in);
             this.stopReader = false;
@@ -94,7 +96,13 @@ public class CliView extends ClientView {
             while (!stopReader)
                 synchronized (stringReader) {
                     if (buffer.isEmpty()) {
-                        buffer = stringReader.nextLine();
+                        String inputBuffer = stringReader.nextLine();
+
+                        if (restartedReader != null) {
+                            restartedReader.setBuffer(inputBuffer);
+                            restartedReader.start();
+                        } else buffer = inputBuffer;
+
                         stringReader.notifyAll();
                     }
                 }
@@ -108,6 +116,22 @@ public class CliView extends ClientView {
         }
 
         /**
+         * Force new buffer into this reader
+         * @param buffer new buffer
+         */
+        public void setBuffer(String buffer) { this.buffer = buffer; }
+
+        /**
+         * Restart this reader creating a new one
+         * @return new reader
+         */
+        public CommandReader restartReader() {
+            restartedReader = new CommandReader();
+            shutdownReader();
+            return restartedReader;
+        }
+
+        /**
          * Retreive next line read and reset buffer
          * @return last read line
          */
@@ -115,16 +139,23 @@ public class CliView extends ClientView {
             String toReturn;
 
             // Do not read buffer if someone else is doing it already
-            if (pendingReading) return null;
+            if (pendingReading || stopReader) return null;
             pendingReading = true;
 
             synchronized (stringReader) {
+                // If reader is restarting or shutting down, don't use buffer
+                if (stopReader) {
+                    stringReader.notifyAll();
+                    return null;
+                }
+
                 toReturn = buffer;
                 buffer = "";
-                stringReader.notifyAll();
 
                 pendingReading = false;
+                stringReader.notifyAll();
             }
+
             return toReturn;
         }
     }
@@ -208,7 +239,8 @@ public class CliView extends ClientView {
      */
     private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |%n";
     private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |%n";
-    private static final String MATCH_PLAYER_FORMAT =    "|      |               |              |         |  %-13s  |%n%n";
+    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-13s  |%n" +
+                                                        "|      |               |              |         |                 |%n";
     private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+%n";
 
     private static final int INFO_OFFSET = 20;
@@ -248,15 +280,15 @@ public class CliView extends ClientView {
 
     private static final String FRENZY_ACTION_BEFORE_FIRST =
             "FREEEEEEEENZYYYYY! Now it's your last chance to get those points! Here's what you can do: \n\n" +
-            "[1] Move up to 1 cell, reload (if you want), then SHOOT! \n" +
-            "[2] Move up to 4 cells \n" +
-            "[3] Move up to 2 cell, then pick something \n\n" +
+            "[S] Move up to 1 cell, reload (if you want), then SHOOT! \n" +
+            "[R] Move up to 4 cells \n" +
+            "[P] Move up to 2 cell, then pick something \n\n" +
             "What's your choice?  ";
 
     private static final String FRENZY_ACTION_AFTER_FIRST =
             "FREEEEEEEENZYYYYY! Now it's your last chance to get those points! Here's what you can do: \n\n" +
-            "[1] Move up to 2 cell, reload (if you want), then SHOOT! \n" +
-            "[2] Move up to 3 cell, then pick something \n\n" +
+            "[S] Move up to 2 cell, reload (if you want), then SHOOT! \n" +
+            "[P] Move up to 3 cell, then pick something \n\n" +
             "What's your choice?  ";
 
     /**
@@ -317,7 +349,6 @@ public class CliView extends ClientView {
         if (response == null) return null;
 
         while (response.isEmpty()) {
-            System.out.println("Response empty, asking again...");
             response = cmdReader.nextLine();
             if (response == null) return null;
             try {
@@ -493,11 +524,7 @@ public class CliView extends ClientView {
     @Override
     public void initMatch() {
         // Shutdown and restart input reader (read pending from showMatch
-        cmdReader.shutdownReader();
-        cmdReader.interrupt();
-
-        cmdReader = new CommandReader();
-        cmdReader.start();
+        cmdReader = cmdReader.restartReader();
     }
 
     /**
@@ -559,7 +586,7 @@ public class CliView extends ClientView {
 
             // Retreive next command
             response = getResponse();
-            if (response == null) return;
+            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
             if (response.equals("R") || response.equals("r")) {
                 player.setReady(true);
@@ -572,7 +599,7 @@ public class CliView extends ClientView {
             System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
             response = getResponse();
-            if (response == null) return;
+            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
             if (response.equals("E") || response.equals("e")) {
                 player.backToLobby();
@@ -708,7 +735,7 @@ public class CliView extends ClientView {
 
                 // Print cost
                 for (Resource res : effects.get(i).getCost())
-                    messageToPrint.append(getANSIColor(res)).append(AMMO_BLOCK).append(" ");
+                    messageToPrint.append(getANSIColor(res)).append(AMMO_BLOCK).append(" ").append(ANSI_RESET);
 
                 messageToPrint.append("\n");
             }
@@ -753,14 +780,15 @@ public class CliView extends ClientView {
 
             for (int i = 0; i < powerups.size(); i++) {
                 messageToPrint.append("[ ").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
-                        .append(getANSIColor(powerups.get(i).getBonusResource())).append("\n");
+                        .append(getANSIColor(powerups.get(i).getBonusResource())).append(AMMO_BLOCK).append(ANSI_RESET)
+                        .append("\n");
             }
             messageToPrint.append("\n");
 
             // Print already selected powerups
             messageToPrint.append("Selected powerups: \n");
             for (Powerup pow : selectedDiscount)
-                messageToPrint.append(getANSIColor(pow.getBonusResource())).append(" ");
+                messageToPrint.append(getANSIColor(pow.getBonusResource())).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
 
             messageToPrint.append("\n");
 
@@ -819,8 +847,9 @@ public class CliView extends ClientView {
 
         // Print powerups that can be choosen
         for (int i = 0; i < selectables.size(); i++) {
-            messageToPrint.append("[ ").append(i+1).append("] ").append(selectables.get(i).getName()).append(" - ")
-                    .append(getANSIColor(selectables.get(i).getBonusResource())).append(" - ").append("\n");
+            messageToPrint.append("[").append(i+1).append("] ").append(selectables.get(i).getName()).append(" - ")
+                    .append(getANSIColor(selectables.get(i).getBonusResource())).append(AMMO_BLOCK).append(ANSI_RESET)
+                    .append("\n");
         }
 
         return getIndexedResponse(selectables, messageToPrint);
@@ -834,10 +863,13 @@ public class CliView extends ClientView {
      * @return T selected from user
      */
     private <T> T getIndexedResponse(List<T> selectables, StringBuilder messageToPrint) {
-        messageToPrint.append("\n [X] to STOP selection");
+        messageToPrint.append("\n[X] to STOP selection");
 
         selectionMessage = messageToPrint.toString();
+        showMatch();
+
         String response = getResponse();
+        if (response == null) return null;
 
         while (!response.equals("X") && !response.equals("x")) {
             int choice;
@@ -846,15 +878,19 @@ public class CliView extends ClientView {
             } catch (NumberFormatException e) {
                 System.out.println(INVALID_SELECTION);
                 response = getResponse();
+                if (response == null) return null;
                 continue;
             }
 
             if (choice >= 0 && choice < selectables.size()) {
                 selectionMessage = IDLE_MESSAGE;
+                showMatch();
+
                 return selectables.get(choice);
             } else {
                 System.out.println(INVALID_SELECTION);
                 response = getResponse();
+                if (response == null) return null;
             }
         }
         return null;
@@ -868,18 +904,29 @@ public class CliView extends ClientView {
     public TurnAction actionSelection() {
         if (!player.getMatch().isFrenzyEnabled()) {
             selectionMessage = ACTION_SELECTION;
-            String response = getResponse();
 
+            String response = getResponse();
             while (true) {
+                if (response == null) return null;
+
                 switch (response) {
                     case "R":
+                    case "r":
                         selectionMessage = IDLE_MESSAGE;
+                        System.out.println(IDLE_MESSAGE);
+
                         return TurnAction.MOVE;
                     case "P":
+                    case "p":
                         selectionMessage = IDLE_MESSAGE;
+                        System.out.println(IDLE_MESSAGE);
+
                         return TurnAction.PICK;
                     case "S":
+                    case "s":
                         selectionMessage = IDLE_MESSAGE;
+                        System.out.println(IDLE_MESSAGE);
+
                         return TurnAction.SHOOT;
                     default:
                         System.out.println(INVALID_SELECTION);
@@ -889,18 +936,29 @@ public class CliView extends ClientView {
         } else {
             if (!player.getMatch().isFirstPlayedFrenzy()) {
                 selectionMessage = FRENZY_ACTION_BEFORE_FIRST;
-                String response = getResponse();
 
+                String response = getResponse();
                 while (true) {
+                    if (response == null) return null;
+
                     switch (response) {
-                        case "1":
+                        case "S":
+                        case "s":
                             selectionMessage = IDLE_MESSAGE;
+                            System.out.println(IDLE_MESSAGE);
+
                             return TurnAction.SHOOT;
-                        case "2":
+                        case "R":
+                        case "r":
                             selectionMessage = IDLE_MESSAGE;
+                            System.out.println(IDLE_MESSAGE);
+
                             return TurnAction.MOVE;
-                        case "3":
+                        case "P":
+                        case "p":
                             selectionMessage = IDLE_MESSAGE;
+                            System.out.println(IDLE_MESSAGE);
+
                             return TurnAction.PICK;
                         default:
                             System.out.println(INVALID_SELECTION);
@@ -909,15 +967,23 @@ public class CliView extends ClientView {
                 }
             } else {
                 selectionMessage = FRENZY_ACTION_AFTER_FIRST;
-                String response = getResponse();
 
+                String response = getResponse();
                 while (true) {
+                    if (response == null) return null;
+
                     switch (response) {
-                        case "1":
+                        case "S":
+                        case "s":
                             selectionMessage = IDLE_MESSAGE;
+                            System.out.println(IDLE_MESSAGE);
+
                             return TurnAction.SHOOT;
-                        case "2":
+                        case "P":
+                        case "p":
                             selectionMessage = IDLE_MESSAGE;
+                            System.out.println(IDLE_MESSAGE);
+
                             return TurnAction.PICK;
                         default:
                             System.out.println(INVALID_SELECTION);
@@ -1407,7 +1473,8 @@ public class CliView extends ClientView {
             charMap[startingX+i][startingY] = PLAYER_INFO_CLOSER;
             i++;
             charMap[startingX+i][startingY] = String.format(PLAYER_INFO_FORMAT,
-                    getANSIColor(p), p.getNickname(), ANSI_RESET, dmgTrack, marks, ammos);
+                    getANSIColor(p), p.getNickname() + ((p.getNickname().equals(player.getNickname())) ? " (YOU)" : "" ),
+                    ANSI_RESET, dmgTrack, marks, ammos);
             i++;
             charMap[startingX+i][startingY] = String.format(PLAYER_REWARD_HEADER, rewards);
             i = drawPlayerWeapon(charMap, startingX, startingY, i, p);
