@@ -40,8 +40,8 @@ public class ImageExample extends Application {
    // private final static String TAB13 = "/img/tabs/whiteback.png";
    // private final static String TAB14 = "/img/tabs/yellowback.png";
    // private final static String TAB15 = "/img/tabs/blueback.png";
-    private final static String CARDBACK00 = "/img/cards/AD_powerups_IT_02.png";
-    private final static String CARDBACK01 = "/img/cards/AD_weapons_IT_0212.png";
+    private final static String CARDBACK00 = "/img/cards/powerup-back.png";
+    private final static String CARDBACK01 = "/img/cards/grenade launcher.png";
     private final static String DROPLET = "/img/droplets/dropblue.png";
     private final static String PAWN = "/img/pawns/blue.png";
     private final static String AMMO = "/img/ammo/AD_ammo_0434.png";
@@ -245,7 +245,7 @@ public class ImageExample extends Application {
 
 
 
-         //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
+        //double tab1droplet1Y = (getHeight(tab1View)*0.2); //riga fino a 4
         //double tab1droplet1X = (width16*((0.6220+(0.0215*6)))); //colonna fino a 10
         double tabDropletY0 = height9*0.07;
         double tabDropletX0 = width16*0.64;
@@ -467,10 +467,6 @@ public class ImageExample extends Application {
 
 
     }
-    public static void main(String args[]) {
-        launch(args);
-    }
-
 
     private Double getWidth(ImageView i){
         double ar = i.getImage().getWidth()/i.getImage().getHeight();

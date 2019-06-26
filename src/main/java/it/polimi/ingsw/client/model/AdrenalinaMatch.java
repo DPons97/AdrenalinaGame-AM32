@@ -170,6 +170,13 @@ public class AdrenalinaMatch {
     }
 
     /**
+     *
+     */
+    public Player getPlayerByName(String name){
+        return players.stream().filter(p->p.getNickname().equals(name)).collect(Collectors.toList()).get(0);
+    }
+
+    /**
      * @param players players to set
      */
     public void setPlayers(List<Player> players) {
