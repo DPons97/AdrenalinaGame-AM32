@@ -618,8 +618,25 @@ public class GuiView extends ClientView{
     }
 
     private void loadDeathTrack(Pane root) {
-        // TODO: fix deathrtrack in model and comminication
-        // for(Player p: player.getMatch().getDeathTrack())
+        List<Player> deathtrack = player.getMatch().getDeathTrack();
+        List<Boolean> overkills = player.getMatch().getOverkills();
+        for(int i = 0, j = 0; i<overkills.size(); i++, j++){
+            ImageView droplet = getDropletImage(deathtrack.get(i));
+            droplet.setY(DEATHTRACK_DROPLET_Y0*height);
+            droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*j);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            if(overkills.get(j)){
+                i++;
+                ImageView additionalDroplet = getDropletImage(deathtrack.get(i));
+                additionalDroplet.setY(DEATHTRACK_DROPLET_Y0*height);
+                additionalDroplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j+DEATHTRACK_DROPLET_OFFSET_X2*height);
+                additionalDroplet.setPreserveRatio(true);
+                additionalDroplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+                root.getChildren().add(additionalDroplet);
+            }
+        }
     }
 
     private void loadSpawnPointCards(Pane root) {

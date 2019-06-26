@@ -54,6 +54,11 @@ public class AdrenalinaMatch {
 	 * Ordered list of player that simulate the death track.
 	 */
 	private List<Player> deathTrack;
+	/**
+	 *  Ordered list parallel to deathtrack to keep track of overkills
+	 */
+	private List<Boolean> overkills;
+
 
 	/**
 	 * Deck of weapon cards
@@ -138,6 +143,7 @@ public class AdrenalinaMatch {
 		this.state = MatchState.NOT_STARTED;
 		this.currentDeaths = 0;
 		this.deathTrack = new ArrayList<>();
+		this.overkills = new ArrayList<>();
 		this.initAmmoDeck();
 		this.initPowerupDeck();
 		this.initWeaponDeck();
@@ -465,6 +471,13 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @return the death track as a list of players.
+	 */
+	public List<Boolean> getOverkills() {
+		return overkills;
+	}
+
+	/**
 	 * @return the maximum time for a turn.
 	 */
 	public int getTurnDuration() {
@@ -513,7 +526,8 @@ public class AdrenalinaMatch {
 		if(players.contains(killer)) {
 			currentDeaths++;
 			deathTrack.add(killer);
-			if (isOverkill) deathTrack.add(killer);
+			if(isOverkill)deathTrack.add(killer);
+			overkills.add(isOverkill);
 			if (currentDeaths>= maxDeaths) {
 				state = MatchState.FRENZY_TURN;
 				// All players without damage change their rewards to frenzy, and reset their deaths to 0
@@ -910,7 +924,10 @@ public class AdrenalinaMatch {
 		toRet.put("players", playersArray);
 		JSONArray deathTrackAray = new JSONArray();
 		deathTrack.forEach(p->deathTrackAray.add(p.getNickname()));
+		JSONArray overkillAray = new JSONArray();
+		overkills.forEach(p->overkillAray.add(p.booleanValue()));
 		toRet.put("deathTrack", deathTrackAray);
+		toRet.put("overkills", overkillAray);
 		toRet.put("turnDuration", turnDuration);
 		return toRet;
 	}

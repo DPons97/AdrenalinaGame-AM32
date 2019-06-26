@@ -28,6 +28,7 @@ class AdrenalinaMatchTest {
         testMatch.addDeath(testMatch.getPlayers().get(1), true);
         assertEquals(2, testMatch.getCurrentDeaths());
         assertEquals(2, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(1)));
+        assertTrue(testMatch.getOverkills().get(1));
         assertEquals(1, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(0)));
 
         testMatch.addDeath(testMatch.getPlayers().get(1), true);
@@ -36,6 +37,7 @@ class AdrenalinaMatchTest {
         assertEquals(5, testMatch.getCurrentDeaths());
         assertEquals(5, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(1)));
         assertEquals(3, Collections.frequency(testMatch.getDeathTrack(),testMatch.getPlayers().get(0)));
+        assertEquals(3, Collections.frequency(testMatch.getOverkills(),true));
         assertSame(MatchState.FRENZY_TURN, testMatch.getMatchState());
     }
 

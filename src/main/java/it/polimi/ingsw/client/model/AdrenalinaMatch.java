@@ -50,6 +50,11 @@ public class AdrenalinaMatch {
 	private List<Player> deathTrack;
 
 	/**
+     * keep track of overkills
+     */
+    private List<Boolean> overkills;
+
+	/**
 	 * number of the players
 	 */
 	private int nPlayers;
@@ -97,6 +102,14 @@ public class AdrenalinaMatch {
      */
     public Map getBoardMap() {
         return map;
+    }
+
+    public List<Boolean> getOverkills() {
+        return overkills;
+    }
+
+    public void setOverkills(List<Boolean> overkills) {
+        this.overkills = overkills;
     }
 
     /**
@@ -277,6 +290,13 @@ public class AdrenalinaMatch {
         for(Object player: deathTrackArray){
             deathTrack.add(players.stream().filter(p->p.getNickname().equals(player.toString())).collect(Collectors.toList()).get(0));
         }
+
+        JSONArray overkillArray = (JSONArray) o.get("overkills");
+        overkills = new ArrayList<>();
+        for(Object overkill: overkillArray){
+            overkills.add(Boolean.parseBoolean(overkill.toString()));
+        }
+
         System.out.println("match model updated");
     }
 
