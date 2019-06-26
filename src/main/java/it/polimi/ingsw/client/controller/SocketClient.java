@@ -115,8 +115,9 @@ public class SocketClient extends ServerConnection {
 	 * Tells server that this client is ready
 	 */
 	@Override
-	public void setReady() {
-		output.println("{\"function\":\"PUSH\", \"type\":\"ready\"}");
+	public void setReady(boolean isReady) {
+		if (isReady) output.println("{\"function\":\"PUSH\", \"type\":\"ready\"}");
+		else output.println("{\"function\":\"PUSH\", \"type\":\"not_ready\"}");
 	}
 
 	/**

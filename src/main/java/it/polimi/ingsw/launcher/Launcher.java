@@ -32,7 +32,7 @@ import java.util.function.UnaryOperator;
  * Will be the main method for the jar from which will be launched the right process
  */
 public class Launcher{
-    //   -m s/c -s serverAddress -p serverPort -cli/-gui -n nickname -c r/s -cfg configFIlePath
+    //   -m s/c -s [serverAddress] -p [serverPort] -cli/-gui -n [nickname] -c [r/s] -cfg [configFIlePath]
     private static final String MODE = "-m";
     private static final String SERVER = "-s";
     private static final String PORT = "-p";

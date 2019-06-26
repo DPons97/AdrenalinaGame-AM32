@@ -136,14 +136,6 @@ public abstract class PlayerConnection {
 	}
 
 	/**
-	 * Start this player's match, only if he's the host
-	 */
-	public void startMatch() throws PlayerNotReadyException, MatchAlreadyStartedException, NotEnoughPlayersException {
-		if (name.equals(currentMatch.getHostName()))
-			currentMatch.startMatch();		// TODO Manage returned leaderboard
-	}
-
-	/**
 	 * Send player message to start loading
 	 */
 	public abstract void beginLoading();

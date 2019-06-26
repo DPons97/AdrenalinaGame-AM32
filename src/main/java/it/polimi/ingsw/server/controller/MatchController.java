@@ -74,6 +74,8 @@ public class MatchController {
 		// Start model's side
 		match.startMatch();
 
+		System.out.println("Everyone is ready... starting match!");
+
 		// Make players load
 		loadAndStart();
 
@@ -123,6 +125,7 @@ public class MatchController {
 				this.notifyAll();
 			}
 		}
+
 		for (Player p : match.getPlayers()) {
 			p.getConnection().updateMatch(match);
 		}
@@ -220,12 +223,13 @@ public class MatchController {
 	 *	set correspondent player object state to ready
 	 * @param player player connection object of the player to set ready
 	 */
-	public void setPlayerReady(PlayerConnection player) {
+	public void setPlayerReady(PlayerConnection player, boolean isReady) {
 		synchronized (this) {
-			getPlayer(player.getName()).setReady(true);
-			System.out.println(player.getName()+" ready");
+			getPlayer(player.getName()).setReady(isReady);
+			System.out.println(player.getName() + ((isReady) ? " ready" : " not ready"));
 			this.notifyAll();
 		}
+
 		if(match.getMatchState()== MatchState.NOT_STARTED) {
 			for (Player p : match.getPlayers()) {
 				if (!p.isReadyToStart()){
@@ -234,19 +238,16 @@ public class MatchController {
 				}
 			}
 
-			Thread t = new Thread(()-> {
+			new Thread(()-> {
 				try {
-					System.out.println("Everyone is ready... starting match!");
 					startMatch();
-				} catch (PlayerNotReadyException e) {
+					// TODO Manage returned leaderboard
+				} catch (PlayerNotReadyException | MatchAlreadyStartedException e) {
 					e.printStackTrace();
 				} catch (NotEnoughPlayersException e) {
-					e.printStackTrace();
-				} catch (MatchAlreadyStartedException e) {
-					e.printStackTrace();
+					match.getPlayers().forEach(pl -> pl.getConnection().updateMatch(match));
 				}
-			});
-			t.start();
+			}).start();
 
 		}
 	}

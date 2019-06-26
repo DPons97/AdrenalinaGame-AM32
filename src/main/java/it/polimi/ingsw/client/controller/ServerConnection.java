@@ -34,7 +34,7 @@ public abstract class ServerConnection {
 	 */
 	public abstract void disconnect();
 
-    public abstract void setReady();
+    public abstract void setReady(boolean isReady);
 
 	public abstract void createGame(int maxPlayers, int maxDeaths, int turnDuration, int mapID);
 

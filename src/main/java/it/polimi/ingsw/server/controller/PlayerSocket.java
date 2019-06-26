@@ -122,7 +122,10 @@ public class PlayerSocket extends PlayerConnection {
 				}
 				break;
 			case "ready":
-				getCurrentMatch().setPlayerReady(this);
+				getCurrentMatch().setPlayerReady(this, true);
+				break;
+			case "not_ready":
+				getCurrentMatch().setPlayerReady(this, false);
 				break;
 			case "update_lobby":
 				this.updateLobby(getServerLobby().lobby);

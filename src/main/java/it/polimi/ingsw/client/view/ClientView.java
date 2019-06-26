@@ -82,6 +82,10 @@ public abstract class ClientView {
      */
     public abstract TurnAction actionSelection();
 
+    /**
+     * Initialization and loading of joined match
+     */
+    public abstract void initMatch();
 
     public abstract void createNewGame();
 

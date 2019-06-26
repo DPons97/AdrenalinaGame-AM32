@@ -265,8 +265,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	 * Allow user to communicate that is ready
 	 */
 	@Override
-	public void ready(String name) {
-		lobby.getMatchByPlayerConnection(lobby.getPlayerInGameByName(name)).setPlayerReady(lobby.getPlayerInGameByName(name));
+	public void ready(String name, boolean isReady) {
+		lobby.getMatchByPlayerConnection(lobby.getPlayerInGameByName(name)).setPlayerReady(lobby.getPlayerInGameByName(name), isReady);
 	}
 
 	@Override
