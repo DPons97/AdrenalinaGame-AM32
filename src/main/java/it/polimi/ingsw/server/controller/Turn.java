@@ -307,12 +307,17 @@ public class Turn {
         SpawnCell pickedSpawn = match.getBoardMap().getSpawnCell(picked);
         if (pickedSpawn == null) return false;
 
-        // Pick weapon
-        WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickedSpawn.getWeapons());
-        Weapon selectedWeapon = getWeapon(pickedWeapon.getWeapon(), playing);
+        // Remove not pickable weapons
+        List<Weapon> pickable = new ArrayList<>();
+        for (Weapon weapon : pickedSpawn.getWeapons()) {
+            if (playing.canPay(weapon.getCost(), playing.getPowerups())) {
+                pickable.add(weapon);
+            }
+        }
 
-        // Stop action if player can't pay weapon's cost with chosen powerups
-        if (!playing.canPay(selectedWeapon.getCost(), pickedWeapon.getPowerups())) return false;
+        // Pick weapon
+        WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickable);
+        Weapon selectedWeapon = getWeapon(pickedWeapon.getWeapon(), playing);
 
         try {
             playing.pickWeapon(selectedWeapon);
@@ -351,6 +356,26 @@ public class Turn {
         // PICK management
         canPick.add(playing.getPosition());
         removeEmptyCells(canPick);
+
+        // Remove cells with no pickable weapons
+        List<Cell> cNotPickable = new ArrayList<>();
+        for (Cell cell : canPick) {
+            if (cell.isSpawn()) {
+                List<Weapon> wNotPickable = new ArrayList<>();
+                SpawnCell spawn = (SpawnCell) cell;
+
+                for (Weapon weapon : spawn.getWeapons()) {
+                    if (!playing.canPay(weapon.getCost(), playing.getPowerups())) {
+                        wNotPickable.add(weapon);
+                    }
+                }
+
+                if (wNotPickable.containsAll(spawn.getWeapons())) cNotPickable.add(cell);
+            }
+        }
+
+        canPick.removeAll(cNotPickable);
+
 
         // Player choosing and grabbing
         Cell pickedCell = playing.getConnection().selectCell(canPick);

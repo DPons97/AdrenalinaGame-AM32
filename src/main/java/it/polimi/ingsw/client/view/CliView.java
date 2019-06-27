@@ -812,9 +812,12 @@ public class CliView extends ClientView {
         // Let player select a weapon
         messageToPrint.append(WEAPON_SELECTION);
 
+        // Get all weapon cards with given names
         List<WeaponCard> selectableCards = new ArrayList<>();
         for (String selectable : selectables) {
-            selectableCards.add(player.getThisPlayer().getWeapon(selectable));
+            selectableCards.add(player.getMatch().getWeapons().stream()
+                    .filter(weaponCard -> weaponCard.getName().equals(selectable))
+                    .collect(Collectors.toList()).get(0));
         }
 
         for (int i = 0; i < selectableCards.size(); i++) {
@@ -822,13 +825,20 @@ public class CliView extends ClientView {
                     .append(selectableCards.get(i).getName()).append("\n");
 
             // Print all weapon infos
-            for (WeaponCard.Effect eff : selectableCards.get(i).getEffects())
-                messageToPrint.append("\t").append(eff.getName()).append(" - ")
-                        .append(eff.getDescription()).append(" - ")
-                        .append(eff.getCost()).append("\n");
+            for (WeaponCard.Effect eff : selectableCards.get(i).getEffects()) {
+                StringBuilder formattedCost = new StringBuilder();
+
+                for (Resource res : eff.getCost()) {
+                    formattedCost.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+                }
+
+                messageToPrint.append("\t").append(eff.getName()).append(" - ").append(" ( ")
+                        .append(formattedCost).append(")\n");
+            }
 
             messageToPrint.append("\n");
         }
+        messageToPrint.delete(messageToPrint.length()-1, messageToPrint.length()-1);
 
         WeaponSelection toReturn = new WeaponSelection();
         toReturn.setWeapon(getIndexedResponse(selectables, messageToPrint));
@@ -1101,7 +1111,7 @@ public class CliView extends ClientView {
         drawPlayerInfo(mapToReturn, match, 15, printWidth - 1);
 
         // Write selection message
-        int k = match.getBoardMap().getYSize() * (CELL_CHAR_HEIGHT-1);
+        int k = ((match.getBoardMap().getYSize() - 1) * CELL_CHAR_HEIGHT) + 2;
         int w = 0;
         for (char c : selectionMessage.toCharArray()) {
             if (c != '\n') {
