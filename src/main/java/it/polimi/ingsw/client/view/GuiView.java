@@ -89,7 +89,29 @@ public class GuiView extends ClientView{
     private static final double DEATHTRACK_DROPLET_OFFSET_X = 0.045;
     private static final double DEATHTRACK_DROPLET_OFFSET_X2 = 0.008;
     private static final double DEATHTRACK_DROPLET_SIZE = 0.024;
+    private static final double PLAYER_SKULL_DROPLET_Y0 = 0.94;
+    private static final double PLAYER_SKULL_DROPLET_X0 = 0.1;
+    private static final double PLAYER_SKULL_DROPLET_OFFSET_Y = 0.175;
+    private static final double PLAYER_SKULL_DROPLET_OFFSET_X = 0.022;
+    private static final double PLAYER_SKULL_SIZE = 0.08;
+    private static final double PLAYER_DAMAGE_DROPLET_Y0 = 0.875;
+    private static final double PLAYER_DAMAGE_DROPLET_X0 = 0.05;
+    private static final double PLAYER_DAMAGE_DROPLET_OFFSET_X = 0.025;
+    private static final double PLAYER_MARK_DROPLET_Y0 = 0.8;
+    private static final double PLAYER_MARK_DROPLET_X0 = 0.26;
+    private static final double PLAYER_MARK_DROPLET_OFFSET_Y = 0.175;
+    private static final double PLAYER_MARK_DROPLET_OFFSET_X = 0.022;
+    private static final double PLAYER_DAMAGE_DROPLET_SIZE = 0.045;
+    private static final double PLAYER_MARK_DROPLET_SIZE = 0.04;
 
+    // enemy cards
+    private static final double ENEMY_WEAPON_CARD_Y0 = 0.005;
+    private static final double ENEMY_WEAPON_CARD_X0 = 0.63;
+    private static final double ENEMY_POWERUP_CARD_Y0 = 0.005;
+    private static final double ENEMY_POWERUP_CARD_X0 = 0.7;
+    private static final double ENEMY_CARD_OFFSET_Y = 0.175;
+    private static final double ENEMY_CARD_OFFSET_X = 0.022;
+    private static final double ENEMY_CARD_SIZE = 0.004;
 
     // weapons
     private final static String WEAPON_DIR = "/img/cards/";
@@ -134,8 +156,15 @@ public class GuiView extends ClientView{
     private static final double AMMO_OFFSET = 0.19;
     private static final double AMMO_SIZE = 0.05;
 
-
-
+    // Decks
+    private static final String DECK_POWERUP_PATH = "/img/cards/powerup-back.png";
+    private static final String DECK_WEAPON_PATH = "/img/cards/weapon-back.png";
+    private static final double DECK_POWERUP_SIZE = 0.07;
+    private static final double DECK_WEAPON_SIZE = 0.1;
+    private static final double DECK_POWERUP_X = 0.54;
+    private static final double DECK_POWERUP_Y = 0.04;
+    private static final double DECK_WEAPON_X = 0.523;
+    private static final double DECK_WEAPON_Y = 0.215;
 
     private double width;
     private double height;
@@ -549,6 +578,7 @@ public class GuiView extends ClientView{
         stage.setResizable(false);
 
         double pV, pH;
+        // set fixed proportions
         if(root.getHeight() > root.getWidth()*9/16){
             pH = 0;
             pV = (root.getHeight()- root.getWidth()*9/16)/2;
@@ -584,6 +614,26 @@ public class GuiView extends ClientView{
     private void loadBoardItems(Pane root) {
         Map map = player.getMatch().getBoardMap();
         loadDeathTrack(root);
+        loadCellItems(root, map);
+        loadDeckImages(root);
+    }
+
+    private void loadDeckImages(Pane root) {
+        ImageView weaponDeck = loadImage(DECK_WEAPON_PATH);
+        ImageView powerupDeck = loadImage(DECK_POWERUP_PATH);
+        powerupDeck.setX(DECK_POWERUP_X*width);
+        powerupDeck.setY(DECK_POWERUP_Y*height);
+        powerupDeck.setPreserveRatio(true);
+        powerupDeck.setFitWidth(DECK_POWERUP_SIZE*height);
+        weaponDeck.setX(DECK_WEAPON_X*width);
+        weaponDeck.setY(DECK_WEAPON_Y*height);
+        weaponDeck.setPreserveRatio(true);
+        weaponDeck.setFitWidth(DECK_WEAPON_SIZE*height);
+        root.getChildren().add(weaponDeck);
+        root.getChildren().add(powerupDeck);
+    }
+
+    private void loadCellItems(Pane root, Map map) {
         for(int i = 0; i<map.getYSize(); i++){
             for(int j = 0; j<map.getXSize(); j++){
                 Cell cell =  map.getCell(j,i);
@@ -697,8 +747,10 @@ public class GuiView extends ClientView{
                 tab.setY(PLAYER_TAB_Y*height);
                 tab.setPreserveRatio(true);
                 tab.setFitHeight(height*RELATIVE_TAB_HEIGHT);
+                Tooltip.install(tab, new Tooltip(p.getNickname()));
                 root.getChildren().add(tab);
                 loadPlayerDashboard(root, tab);
+                loadPlayerSigns(root, tab);
             } else {
                 ImageView tab = loadImage(TAB + p.getColor().toString().toLowerCase() +
                         (p.isFrenzyPlayer() ? "" : TAB_BACK) + TAB_EXTENSION);
@@ -706,10 +758,46 @@ public class GuiView extends ClientView{
                 tab.setFitWidth(tabSize);
                 tab.setX(getWidth(map));
                 tab.setY(height * TAB_OFFSET * i);
+                Tooltip.install(tab, new Tooltip(p.getNickname()));
                 root.getChildren().add(tab);
                 loadEnemySigns(root,tab, p, i);
                 i++;
             }
+        }
+    }
+
+    private void loadPlayerSigns(Pane root, ImageView tab) {
+        int i = 0;
+        //damage
+        for(Player p: player.getMatch().getPlayerByName(player.getNickname()).getDmgPoints()){
+            ImageView droplet = getDropletImage(p);
+            droplet.setX(PLAYER_DAMAGE_DROPLET_X0*width+PLAYER_DAMAGE_DROPLET_OFFSET_X*width*i);
+            droplet.setY(PLAYER_DAMAGE_DROPLET_Y0*height);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(PLAYER_DAMAGE_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            i++;
+        }
+        //marks
+        i = 0;
+        for(Player p: player.getMatch().getPlayerByName(player.getNickname()).getMarks()){
+            ImageView droplet = getDropletImage(p);
+            droplet.setX(PLAYER_MARK_DROPLET_X0*width+PLAYER_MARK_DROPLET_OFFSET_X*width*i);
+            droplet.setY(PLAYER_MARK_DROPLET_Y0*height);
+            droplet.setPreserveRatio(true);
+            droplet.setFitWidth(PLAYER_MARK_DROPLET_SIZE);
+            root.getChildren().add(droplet);
+            i++;
+        }
+        //deaths
+        for(int j = 0; j < player.getMatch().getPlayerByName(player.getNickname()).getDeaths(); j++){
+            ImageView skull = loadImage(SKULL_PATH);
+            skull.setX(PLAYER_SKULL_DROPLET_X0*width+PLAYER_SKULL_DROPLET_OFFSET_X*width*i);
+            skull.setY(PLAYER_SKULL_DROPLET_Y0*height);
+            skull.setPreserveRatio(true);
+            skull.setFitWidth(PLAYER_SKULL_SIZE);
+            root.getChildren().add(skull);
+            i++;
         }
     }
 
@@ -725,6 +813,7 @@ public class GuiView extends ClientView{
             root.getChildren().add(droplet);
             k++;
         }
+
         //marks
         k = 0;
         for(Player p: player.getMarks()){
@@ -736,6 +825,7 @@ public class GuiView extends ClientView{
             root.getChildren().add(droplet);
             k++;
         }
+
         //deaths
         k = 0;
         for(int j = 0; j<player.getDeaths(); j++){
@@ -746,6 +836,32 @@ public class GuiView extends ClientView{
             skull.setFitWidth(ENEMY_SKULL_SIZE);
             root.getChildren().add(skull);
             k++;
+        }
+
+        //weapons
+        k = 0;
+        for(WeaponCard w: player.getWeapons()){
+            ImageView weapon;
+            if(player.getLoadedWeapons().contains(w)){
+                weapon = loadImage(DECK_WEAPON_PATH);
+            }else {
+                weapon = getWeaponImage(w.getName());
+            }
+            weapon.setX(ENEMY_WEAPON_CARD_X0*width+ENEMY_CARD_OFFSET_X*width*k);
+            weapon.setY(ENEMY_WEAPON_CARD_Y0*height+ENEMY_CARD_OFFSET_Y*height*i);
+            weapon.setPreserveRatio(true);
+            weapon.setFitWidth(ENEMY_CARD_SIZE*getWidth(tab));
+            root.getChildren().add(weapon);
+        }
+
+        //powerup
+        for(Powerup powerup: player.getPowerups()){
+            ImageView powerupImage = getPowerupImage(powerup);
+            powerupImage.setX(ENEMY_POWERUP_CARD_X0*width+ENEMY_CARD_OFFSET_X*width*k);
+            powerupImage.setY(ENEMY_POWERUP_CARD_Y0*height+ENEMY_CARD_OFFSET_Y*height*i);
+            powerupImage.setPreserveRatio(true);
+            powerupImage.setFitWidth(ENEMY_CARD_SIZE*getWidth(tab));
+            root.getChildren().add(powerupImage);
         }
     }
 
@@ -794,6 +910,7 @@ public class GuiView extends ClientView{
     }
 
     private ImageView loadImage(String filePath){
+        System.out.println(filePath);
         URL url = getClass().getResource(filePath);
         try {
             Image img = new Image(new FileInputStream(url.getFile().replace("%20", " ")));
