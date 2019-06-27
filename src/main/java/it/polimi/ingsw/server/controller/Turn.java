@@ -513,6 +513,7 @@ public class Turn {
      * Sends a broadcast message to all players to update their model
      */
     public void updatePlayers() {
-        match.getPlayers().forEach(p-> p.getConnection().updateMatch(match));
+        match.getPlayers().stream().filter(player -> player.getConnection() != null)
+                .forEach(p -> p.getConnection().updateMatch(match));
     }
 }
