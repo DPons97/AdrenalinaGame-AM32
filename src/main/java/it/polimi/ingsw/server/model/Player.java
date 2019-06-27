@@ -152,7 +152,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.BLUE; // TODO: give the right color here
+		color = Color.BLUE;
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.BLUE; // TODO: give the right color here
+		color = Color.BLUE;
 
 	}
 
@@ -207,7 +207,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.RED; // TODO: give the right color here
+		color = Color.BLUE;
 
 	}
 
@@ -340,7 +340,11 @@ public class Player {
 	 * Add ammo to player, if inventory not full
 	 * @param toAdd
 	 */
-	public void addAmmo(Resource toAdd) { if (ammos.size() < 3) ammos.add(toAdd); }
+	public void addAmmo(Resource toAdd) {
+		long ammoQty = ammos.stream().filter(resource -> resource.equals(toAdd)).count();
+
+		if (ammos.size() < 9 && ammoQty < 3) ammos.add(toAdd);
+	}
 
 	/**
 	 * @return true if player is dead

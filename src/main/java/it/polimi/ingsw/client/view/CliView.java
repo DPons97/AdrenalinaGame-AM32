@@ -255,12 +255,12 @@ public class CliView extends ClientView {
     /**
      * Standard format for text inside player info table
      */
-    private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |  Ammos  |";
-    private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
-    private static final String PLAYER_REWARD_HEADER =  "|::::::::::::::::::::::::::| %-24s|:::::::::|:::::::::|";
-    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-6s |";
-    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-6s |";
-    private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------+";
+    private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |        Ammos        |";
+    private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-18s |";
+    private static final String PLAYER_REWARD_HEADER =  "|::::::::::::::::::::::::::| %-24s|:::::::::|:::::::::::::::::::::|";
+    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-18s |";
+    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-18s |";
+    private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------------------+";
 
     /**
      * Default action selection messages
@@ -491,14 +491,20 @@ public class CliView extends ClientView {
             newPlayer2.takeDamage(newPlayer1);
 
             newPlayer1.addAmmo(Resource.BLUE_BOX);
+            newPlayer1.addAmmo(Resource.BLUE_BOX);
+            newPlayer1.addAmmo(Resource.BLUE_BOX);
             newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.YELLOW_BOX);
+            newPlayer1.addAmmo(Resource.YELLOW_BOX);
             newPlayer1.addAmmo(Resource.YELLOW_BOX);
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
             newPlayer5.addAmmo(Resource.RED_BOX);
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
-            newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
+            //newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
             newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0));
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
@@ -1398,6 +1404,8 @@ public class CliView extends ClientView {
                 true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
 
         // Write Ammos
+        if (ammoToDraw == null) return;
+
         charMap[startingX+boxXOffset +1][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(0)) + AMMO_BLOCK +ANSI_RESET;
         charMap[startingX+boxXOffset+2][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(1)) +AMMO_BLOCK+ANSI_RESET;
 
@@ -1553,7 +1561,7 @@ public class CliView extends ClientView {
         }
         stringLen = ammos.length() - colorLength;
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        ammos.append(" ".repeat(6-stringLen));
+        ammos.append(" ".repeat(18-stringLen));
         return ammos;
     }
 

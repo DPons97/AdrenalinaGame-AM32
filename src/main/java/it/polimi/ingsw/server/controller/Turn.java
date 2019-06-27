@@ -317,7 +317,9 @@ public class Turn {
 
         // Pick weapon
         WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickable);
-        Weapon selectedWeapon = getWeapon(pickedWeapon.getWeapon(), playing);
+        Weapon selectedWeapon = pickedSpawn.getWeapons().stream()
+                .filter(weapon -> weapon.getName().equals(pickedWeapon.getWeapon()))
+                .collect(Collectors.toList()).get(0);
 
         try {
             playing.pickWeapon(selectedWeapon);
@@ -516,6 +518,12 @@ public class Turn {
         updatePlayers();
     }
 
+    /**
+     * Get a weapon by its name
+     * @param weaponName name of searched weapon
+     * @param playing player who has this weapon
+     * @return Searched weapon
+     */
     private Weapon getWeapon(String weaponName, Player playing){
         return match.getPlayers().stream().
                 filter(p-> p.getNickname().equals(playing.getNickname())).map(Player::getWeapons).
