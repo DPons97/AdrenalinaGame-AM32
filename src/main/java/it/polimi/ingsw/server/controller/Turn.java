@@ -133,7 +133,8 @@ public class Turn {
                     if (executeShooting(playing, pickedWeapon)) remainingActions--;
                     break;
             }
-            updatePlayers();
+
+            if (remainingActions > 0) updatePlayers();
         }
 
         // RELOAD management
@@ -485,6 +486,9 @@ public class Turn {
 
         // Discard chosen card
         match.getPowerupDeck().discardCard(toDiscard);
+
+        // Update clients to view new player's position
+        updatePlayers();
     }
 
     private Weapon getWeapon(String weaponName, Player playing){
