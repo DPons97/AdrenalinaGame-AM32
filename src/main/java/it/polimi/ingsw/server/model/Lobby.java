@@ -57,7 +57,8 @@ public class Lobby {
     public List<MatchController> getLobbyMatches() { return new ArrayList<>(matches); }
 
     public List<Player> getPlayersInGame(){
-        return matches.stream().map(m->m.getMatch().getPlayers()).flatMap(List::stream).collect(Collectors.toList());
+        return matches.stream().map(m->m.getMatch().getPlayers()).flatMap(List::stream)
+                .filter(player -> player.getConnection() != null).collect(Collectors.toList());
     }
 
     /**

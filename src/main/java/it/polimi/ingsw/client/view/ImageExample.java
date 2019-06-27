@@ -29,7 +29,7 @@ public class ImageExample extends Application {
     private final static String TAB2 = "/img/tabs/green.png";
     private final static String TAB3 = "/img/tabs/white.png";
     private final static String TAB4 = "/img/tabs/yellow.png";
-    private final static String TAB5 = "/img/tabs/blue.png";
+    private final static String TAB5 = "/img/tabs/blueback.png";
     //private final static String TAB6 = "/img/tabs/purpleback.png";
     //private final static String TAB7 = "/img/tabs/greenback.png";
     //private final static String TAB8 = "/img/tabs/whiteback.png";
@@ -525,6 +525,127 @@ public class ImageExample extends Application {
                 root.getChildren().add(cardback00View);
             }
         }
+
+    /*
+        //my tab button trasparent PURPLE & PURBLEBACKFIRE
+        double tabButtonSizeX = height9*0.05;
+        double tabButtonSizeY= height9*0.02;
+        double tabButtonX0 = width16*0;
+        double tabButtonY0 = height9*0.83;
+        double tabButtonPadding = height9*0.025;
+
+        // cell tabButtons PURPLE & PURBLEBACKFIRE
+            for(int j = 0; j< 3; j++) {
+                Button celltabButton = new Button();
+                celltabButton.setLayoutX(tabButtonX0);
+                celltabButton.setLayoutY(tabButtonY0 + (tabButtonPadding)*j);
+                celltabButton.setMinHeight(0);
+                celltabButton.setPrefHeight(tabButtonSizeY);
+                celltabButton.setPrefWidth(tabButtonSizeX);
+                root.getChildren().add(celltabButton);
+                celltabButton.setStyle("-fx-background-color: rgba(20,20,20,0)");
+                celltabButton.setOnMouseEntered(mouseEvent ->
+                        celltabButton.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                                "-fx-cursor: hand;"));
+                celltabButton.setOnMouseExited(mouseEvent ->
+                        celltabButton.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                                "-fx-cursor: arrow"));
+                //int finalI = i;
+                int finalJ = j;
+                celltabButton.setOnMouseClicked(mouseEvent ->
+                        System.out.println("myTabButton " + "," + finalJ +" pressed"));
+            }
+
+        //my tab Button2 trasparent
+        double tabButton2SizeX = height9*0.05;
+        double tabButton2SizeY= height9*0.02;
+        double tabButton2X0 = width16*0;
+        double tabButton2Y0 = height9*0.94;
+        double tabButton2Padding = height9*0.025;
+
+        // cell tabButton2s
+        for(int j = 0; j< 2; j++) {
+            Button celltabButton2 = new Button();
+            celltabButton2.setLayoutX(tabButton2X0);
+            celltabButton2.setLayoutY(tabButton2Y0 + (tabButton2Padding)*j);
+            celltabButton2.setMinHeight(0);
+            celltabButton2.setPrefHeight(tabButton2SizeY);
+            celltabButton2.setPrefWidth(tabButton2SizeX);
+            root.getChildren().add(celltabButton2);
+            celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,0)");
+            celltabButton2.setOnMouseEntered(mouseEvent ->
+                    celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                            "-fx-cursor: hand;"));
+            celltabButton2.setOnMouseExited(mouseEvent ->
+                    celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                            "-fx-cursor: arrow"));
+            //int finalI = i;
+            int finalJ = j;
+            celltabButton2.setOnMouseClicked(mouseEvent ->
+                    System.out.println("myTabButton2 " + "," + finalJ +" pressed"));
+        }
+*/
+
+        //my tab button trasparent PURPLEBACK
+        double tabButtonSizeX = height9*0.05;
+        double tabButtonSizeY= height9*0.03;
+        double tabButtonX0 = width16*0;
+        double tabButtonY0 = height9*0.845;
+        double tabButtonPadding = height9*0.03;
+
+        // cell tabButtons PURPLEBACK
+        for(int j = 0; j< 3; j++) {
+            Button celltabButton = new Button();
+            celltabButton.setLayoutX(tabButtonX0);
+            celltabButton.setLayoutY(tabButtonY0 + (tabButtonPadding)*j);
+            celltabButton.setMinHeight(0);
+            celltabButton.setPrefHeight(tabButtonSizeY);
+            celltabButton.setPrefWidth(tabButtonSizeX);
+            root.getChildren().add(celltabButton);
+            celltabButton.setStyle("-fx-background-color: rgba(20,20,20,1)");
+            celltabButton.setOnMouseEntered(mouseEvent ->
+                    celltabButton.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                            "-fx-cursor: hand;"));
+            celltabButton.setOnMouseExited(mouseEvent ->
+                    celltabButton.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                            "-fx-cursor: arrow"));
+            //int finalI = i;
+            int finalJ = j;
+            celltabButton.setOnMouseClicked(mouseEvent ->
+                    System.out.println("myTabButton " + "," + finalJ +" pressed"));
+        }
+
+        //my tab Button2 trasparent PURPLEBACK
+        double tabButton2SizeX = height9*0.03;
+        double tabButton2SizeY= height9*0.03;
+        double tabButton2X0 = width16*0.01;
+        double tabButton2Y0 = height9*0.95;
+        double tabButton2Padding = height9*0.025;
+
+        // cell tabButton2s PURPLE BACK
+        for(int j = 0; j< 1; j++) {
+            Button celltabButton2 = new Button();
+            celltabButton2.setLayoutX(tabButton2X0);
+            celltabButton2.setLayoutY(tabButton2Y0 + (tabButton2Padding)*j);
+            celltabButton2.setMinHeight(0);
+            celltabButton2.setPrefHeight(tabButton2SizeY);
+            celltabButton2.setPrefWidth(tabButton2SizeX);
+            root.getChildren().add(celltabButton2);
+            celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,1)");
+            celltabButton2.setOnMouseEntered(mouseEvent ->
+                    celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                            "-fx-cursor: hand;"));
+            celltabButton2.setOnMouseExited(mouseEvent ->
+                    celltabButton2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                            "-fx-cursor: arrow"));
+            //int finalI = i;
+            int finalJ = j;
+            celltabButton2.setOnMouseClicked(mouseEvent ->
+                    System.out.println("myTabButton2 " + "," + finalJ +" pressed"));
+        }
+
+
+
 
 
 
