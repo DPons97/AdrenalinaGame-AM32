@@ -166,6 +166,18 @@ public class GuiView extends ClientView{
     private static final double DECK_WEAPON_X = 0.523;
     private static final double DECK_WEAPON_Y = 0.215;
 
+    // resources
+    private static final String RESOURCE_DIR = "/img/squares/";
+    private static final String RESOURCE_EXTENSION = ".png";
+    private static final double RESOURCE_ENEMY_X0 = 0.93;
+    private static final double RESOURCE_ENEMY_Y0 = 0.07;
+    private static final double RESOURCE_PLAYER_X0 = 0.38;
+    private static final double RESOURCE_PLAYER_Y0 = 0.9;
+    private static final double RESOURCE_OFFSET_X = 0.02;
+    private static final double RESOURCE_OFFSET_Y = 0.0175;
+    private static final double RESOURCE_OFFSET_Y2 = 0.03;
+    private static final double RESOURCE_SIZE = 0.043;
+
     private double width;
     private double height;
 
@@ -799,6 +811,17 @@ public class GuiView extends ClientView{
             root.getChildren().add(skull);
             i++;
         }
+
+        //resources
+        i = 0;
+        for(Resource r: player.getMatch().getPlayerByName(player.getNickname()).getAmmos()){
+            ImageView resource = getResourceImage(r);
+            resource.setX(RESOURCE_PLAYER_X0*width+RESOURCE_OFFSET_X*width*(i%3));
+            resource.setX(RESOURCE_PLAYER_Y0*width+RESOURCE_OFFSET_Y*height*(i/3));
+            resource.setPreserveRatio(true);
+            resource.setFitWidth(RESOURCE_SIZE*getWidth(tab));
+            root.getChildren().add(resource);
+        }
     }
 
     private void loadEnemySigns(Pane root,ImageView tab, Player player, int i) {
@@ -855,6 +878,7 @@ public class GuiView extends ClientView{
         }
 
         //powerup
+        k = 0;
         for(Powerup powerup: player.getPowerups()){
             ImageView powerupImage = getPowerupImage(powerup);
             powerupImage.setX(ENEMY_POWERUP_CARD_X0*width+ENEMY_CARD_OFFSET_X*width*k);
@@ -862,6 +886,17 @@ public class GuiView extends ClientView{
             powerupImage.setPreserveRatio(true);
             powerupImage.setFitWidth(ENEMY_CARD_SIZE*getWidth(tab));
             root.getChildren().add(powerupImage);
+        }
+
+        //resources
+        k = 0;
+        for(Resource r: player.getAmmos()){
+            ImageView resource = getResourceImage(r);
+            resource.setX(RESOURCE_ENEMY_X0*width+RESOURCE_OFFSET_X*width*(k%3));
+            resource.setX(RESOURCE_ENEMY_Y0*width+RESOURCE_OFFSET_Y*height*(k/3));
+            resource.setPreserveRatio(true);
+            resource.setFitWidth(RESOURCE_SIZE*getWidth(tab));
+            root.getChildren().add(resource);
         }
     }
 
@@ -1005,7 +1040,6 @@ public class GuiView extends ClientView{
         String file = WEAPON_DIR+powerup.getName().toLowerCase()+"-" +
                 powerup.getBonusResource().toString().replace(RESOURCE_STRING_FIX, "").toLowerCase() +
                 WEAPON_EXTENSION;
-        System.out.println(file);
         return loadImage(file);
     }
 
@@ -1013,16 +1047,19 @@ public class GuiView extends ClientView{
 
         String file = AMMO_DIR;
         for (Resource resource: ammo.getResources()){
-            file += resource.toString().replace(RESOURCE_STRING_FIX, "");
+            file += resource.toString().replace(RESOURCE_STRING_FIX, "").toLowerCase();
         }
         file+=AMMO_EXTENSION;
-        System.out.println(file);
+        return loadImage(file);
+    }
+
+    private ImageView getResourceImage(Resource r){
+        String file =RESOURCE_DIR+ r.toString().replace(RESOURCE_STRING_FIX, "").toLowerCase()+RESOURCE_EXTENSION;
         return loadImage(file);
     }
 
     private ImageView getDropletImage(Player p){
         String file = DROPLET_DIR+p.getColor().toString().toLowerCase()+DROPLET_EXTENSION;
-        System.out.println(file);
         return loadImage(file);
     }
 }
