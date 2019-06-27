@@ -48,7 +48,7 @@ public class ImageExample extends Application {
     private final static String BOARDINO = "/img/tabs/boardino.png";
     private final static String MYDASHBOARD = "/img/tabs/mydashboard.png";
     public static final String SKULL = "/img/others/skull.png";
-    public static final String SQUARE = "/img/squares/yellowcube.png";
+    public static final String SQUARE = "/img/squares/yellow.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -415,6 +415,24 @@ public class ImageExample extends Application {
             dropletView.setFitWidth(tabLeftSize*0.045);
             root.getChildren().add(dropletView);
         }
+
+        //Squares my tab
+        double myTabSquareY0 = height9*0.9;
+        double myTabSquareX0 = width16*0.38;
+        double myTabSquareOffY = height9*0.175;
+        double myTabSquareOffX = width16*0.022;
+        double myTabSquareOffY2 = height9*0.03;
+
+            for(int j = 0 ; j <3;j++){
+                for(int k =0; k<3; k++){
+                    ImageView SquareView = new ImageView(square);
+                    SquareView.setX(myTabSquareX0+myTabSquareOffX*j);
+                    SquareView.setY(myTabSquareY0+myTabSquareOffY2*k);
+                    SquareView.setPreserveRatio(true);
+                    SquareView.setFitWidth(tabLeftSize*0.04);
+                    root.getChildren().add(SquareView);
+                }
+            }
 
 
 
