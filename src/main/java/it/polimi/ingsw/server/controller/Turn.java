@@ -307,7 +307,7 @@ public class Turn {
         SpawnCell pickedSpawn = match.getBoardMap().getSpawnCell(picked);
         if (pickedSpawn == null) return false;
 
-        // Remove not pickable weapons
+        // Add only pickable weapons
         List<Weapon> pickable = new ArrayList<>();
         for (Weapon weapon : pickedSpawn.getWeapons()) {
             if (playing.canPay(weapon.getCost(), playing.getPowerups())) {
@@ -322,7 +322,7 @@ public class Turn {
                 .collect(Collectors.toList()).get(0);
 
         try {
-            playing.pickWeapon(selectedWeapon, new ArrayList<>());      // TODO Complete with payment
+            playing.pickWeapon(selectedWeapon, pickedWeapon.getPowerups());
             pickedSpawn.removeWeapon(selectedWeapon);
             return true;
         } catch (InventoryFullException invFullE) {
@@ -335,7 +335,7 @@ public class Turn {
             try {
                 // Change chosen weapons
                 playing.dropWeapon(weaponToChange);
-                playing.pickWeapon(selectedWeapon, new ArrayList<>());         // TODO Complete with payment
+                playing.pickWeapon(selectedWeapon, pickedWeapon.getPowerups());
                 pickedSpawn.removeWeapon(selectedWeapon);
                 pickedSpawn.addWeapon(weaponToChange);
                 return true;

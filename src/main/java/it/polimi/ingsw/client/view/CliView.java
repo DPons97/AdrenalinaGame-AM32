@@ -237,11 +237,12 @@ public class CliView extends ClientView {
     /**
      * Standard format for text inside match table
      */
-    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |%n";
-    private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |%n";
-    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-13s  |%n" +
-                                                        "|      |               |              |         |                 |%n";
-    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+%n";
+    public static final String MATCHES_HEADER =         "|         Matches:       %-4s                                         |%n";
+    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |       Players       |%n";
+    private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-17s  |%n";
+    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-17s  |%n" +
+                                                        "|      |               |              |         |                     |%n";
+    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+---------------------+%n";
 
     private static final int INFO_OFFSET = 20;
 
@@ -251,6 +252,13 @@ public class CliView extends ClientView {
     private static final String WEAPON_INFO_HEADER =    "|  Spawn  |        Weapon        |  Reload cost  |";
     private static final String WEAPON_INFO_FORMAT =    "|    %-2s    | %-20s |  %-3s %-3s %-3s  |";
     private static final String WEAPON_INFO_CLOSER =    "+---------+----------------------+---------------+";
+
+    /**
+     * Standard format for player powerups
+     */
+    private static final String PLAYER_POWERUP_HEADER =    "|        Powerup        |  Resource  |";
+    private static final String PLAYER_POWERUP_FORMAT =    "|  %-19s  |      %-3s     |";
+    private static final String PLAYER_POWERUP_CLOSER =    "+-----------------------+------------+";
 
     /**
      * Standard format for text inside player info table
@@ -375,7 +383,7 @@ public class CliView extends ClientView {
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
         System.out.printf(MATCH_INFO_CLOSER);
-        System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
+        System.out.format(MATCHES_HEADER, matches.size());
         System.out.printf(MATCH_INFO_CLOSER);
 
         for(int i = 0; i < matches.size(); i++){
@@ -789,7 +797,7 @@ public class CliView extends ClientView {
             if (powerups.isEmpty()) return selectedDiscount;
 
             for (int i = 0; i < powerups.size(); i++) {
-                messageToPrint.append("[ ").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
+                messageToPrint.append("[").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
                         .append(getANSIColor(powerups.get(i).getBonusResource())).append(AMMO_BLOCK).append(ANSI_RESET)
                         .append("\n");
             }
@@ -832,7 +840,13 @@ public class CliView extends ClientView {
 
         for (int i = 0; i < selectableCards.size(); i++) {
             messageToPrint.append("[").append(i+1).append("] ")
-                    .append(selectableCards.get(i).getName()).append("\n");
+                    .append(selectableCards.get(i).getName()).append(" ( ");
+
+            // Print weapon cost
+            for (Resource res : selectableCards.get(i).getCost()) {
+                messageToPrint.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+            }
+            messageToPrint.append(")\n");
 
             // Print all weapon infos
             for (WeaponCard.Effect eff : selectableCards.get(i).getEffects()) {
@@ -851,7 +865,15 @@ public class CliView extends ClientView {
         messageToPrint.delete(messageToPrint.length()-1, messageToPrint.length()-1);
 
         WeaponSelection toReturn = new WeaponSelection();
-        toReturn.setWeapon(getIndexedResponse(selectables, messageToPrint));
+        String selection = getIndexedResponse(selectables, messageToPrint);
+
+        WeaponCard selectedWeapon = player.getMatch().getWeapons().stream()
+                .filter(weaponCard -> weaponCard.getName().equals(selection))
+                .collect(Collectors.toList()).get(0);
+
+        // Select weapon to pick and discount
+        toReturn.setWeapon(selectedWeapon.getName());
+        toReturn.setDiscount(selectDiscount(selectedWeapon.getCost()));
 
         return toReturn;
     }
@@ -1115,10 +1137,13 @@ public class CliView extends ClientView {
         }
 
         // Draw weapon info table
-        drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - 1);
+        drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - INFO_OFFSET/2);
 
         // Draw player infos
-        drawPlayerInfo(mapToReturn, match, 15, printWidth - 1);
+        drawPlayerInfo(mapToReturn, match, 15, printWidth - INFO_OFFSET/2);
+
+        // Draw player's powerups
+        drawPlayerPowerups(mapToReturn, match, 0, printWidth - 3);
 
         // Write selection message
         int k = ((match.getBoardMap().getYSize() - 1) * CELL_CHAR_HEIGHT) + 2;
@@ -1457,7 +1482,7 @@ public class CliView extends ClientView {
         int i = 3;
         for (SpawnCell spawn : map.getSpawnPoints()) {
             for (WeaponCard weapon : spawn.getWeapons()) {
-                String cost1 = "";
+                String cost1;
                 String cost2 = "";
                 String cost3 = "";
 
@@ -1545,6 +1570,28 @@ public class CliView extends ClientView {
             }
         }
         return i;
+    }
+
+    /**
+     * Draw player powerups
+     * @param charMap map of strings to print
+     * @param match to get player info from
+     * @param startingX starting X coord of table
+     * @param startingY starting Y coord of table
+     */
+    private void drawPlayerPowerups(String[][] charMap, AdrenalinaMatch match, int startingX, int startingY) {
+        if (player.getThisPlayer().getPowerups().isEmpty()) return;
+
+        charMap[startingX][startingY] = PLAYER_POWERUP_CLOSER;
+        charMap[startingX+1][startingY] = PLAYER_POWERUP_HEADER;
+        charMap[startingX+2][startingY] = PLAYER_POWERUP_CLOSER;
+
+        int i = 3;
+        for (Powerup powerup : player.getThisPlayer().getPowerups()) {
+            charMap[startingX+i][startingY] = String.format(PLAYER_POWERUP_FORMAT, powerup.getName(), getANSIColor(powerup.getBonusResource()) + AMMO_BLOCK + ANSI_RESET);
+            i++;
+        }
+        charMap[startingX+i][startingY] = PLAYER_POWERUP_CLOSER;
     }
 
     /**
