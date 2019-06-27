@@ -505,13 +505,13 @@ public class CliView extends ClientView {
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
             //newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
-            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0));
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0), new ArrayList<>());
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
             newPlayer5.addAmmo(Resource.RED_BOX);
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
-            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(1));
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(1), new ArrayList<>());
 
             AdrenalinaMatch clientMatch = new AdrenalinaMatch();
             clientMatch.update(match.toJSON());
@@ -523,6 +523,8 @@ public class CliView extends ClientView {
 
             view.showMatch();
         } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException | InventoryFullException | InsufficientResourcesException e) {
+            e.printStackTrace();
+        } catch (NoItemInInventoryException e) {
             e.printStackTrace();
         }
     }
@@ -537,7 +539,7 @@ public class CliView extends ClientView {
      * Shows the launcher options
      */
     @Override
-    public synchronized void showMatch() {
+    public void showMatch() {
         AdrenalinaMatch match = player.getMatch();
         boolean isReady = match.getPlayers().stream().
                 filter(p -> p.getNickname().equals(player.getNickname())).
@@ -561,23 +563,25 @@ public class CliView extends ClientView {
 
             lobbyNextCommand(isReady);
         } else if (match.getState() == MatchState.PLAYER_TURN) {
-            // Print players
-            System.out.printf("%n      ");
-            for (Player p : match.getPlayers()) {
-                String playerString;
-                if (p.isDead())
-                    playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
-                else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
+            synchronized (this) {
+                // Print players
+                System.out.printf("%n      ");
+                for (Player p : match.getPlayers()) {
+                    String playerString;
+                    if (p.isDead())
+                        playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
+                    else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
 
-                System.out.print(playerString + "      ");
+                    System.out.print(playerString + "      ");
+                }
+                System.out.printf("%n%n");
+
+                // Print map
+                drawMap(match);
+
+                // Print alerts
+                System.out.printf(alertMessage);
             }
-            System.out.printf("%n%n");
-
-            // Print map
-            drawMap(match);
-
-            // Print alerts
-            System.out.printf(alertMessage);
         }
     }
 

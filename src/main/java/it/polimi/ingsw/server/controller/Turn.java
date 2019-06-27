@@ -322,7 +322,7 @@ public class Turn {
                 .collect(Collectors.toList()).get(0);
 
         try {
-            playing.pickWeapon(selectedWeapon);
+            playing.pickWeapon(selectedWeapon, new ArrayList<>());      // TODO Complete with payment
             pickedSpawn.removeWeapon(selectedWeapon);
             return true;
         } catch (InventoryFullException invFullE) {
@@ -335,7 +335,7 @@ public class Turn {
             try {
                 // Change chosen weapons
                 playing.dropWeapon(weaponToChange);
-                playing.pickWeapon(selectedWeapon);
+                playing.pickWeapon(selectedWeapon, new ArrayList<>());         // TODO Complete with payment
                 pickedSpawn.removeWeapon(selectedWeapon);
                 pickedSpawn.addWeapon(weaponToChange);
                 return true;
@@ -426,7 +426,7 @@ public class Turn {
      * @param playing player
      */
     private void reloadWeapon(Player playing) {
-        List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+        List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(weapon -> !weapon.isLoaded()).collect(Collectors.toList());
 
         while (!canBeReloaded.isEmpty()) {
             WeaponSelection toReload = playing.getConnection().reload(canBeReloaded);
@@ -453,8 +453,9 @@ public class Turn {
      */
     private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
         int deadPlayers = 0;
+
         for (Player p : match.getPlayers()) {
-            if (p.isDead()) {
+            if (p.isDead() && !p.getDmgPoints().isEmpty()) {
                 // First to damage deadPlayer gets 1 point (First Blood)
                 if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
                 match.rewardPlayers(p.getDmgPoints(), p.getReward());

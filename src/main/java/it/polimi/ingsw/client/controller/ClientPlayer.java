@@ -199,7 +199,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		if (lastUpdater != null) lastUpdater.interrupt();
+		//if (lastUpdater != null) lastUpdater.interrupt();
 
 		lastUpdater = new Thread(() -> view.showLobby(server.updateLobby()));
 		lastUpdater.start();
@@ -211,7 +211,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	@Override
 	public void updateMatch(JSONObject toGetUpdateFrom) {
-		if (lastUpdater != null) lastUpdater.interrupt();
+		//if (lastUpdater != null) lastUpdater.interrupt();
 
 		if(match == null){
 			match = new AdrenalinaMatch();

@@ -58,6 +58,7 @@ public class PlayerSocket extends PlayerConnection {
 		while(true){
 			try {
 				message = input.readLine();
+				if (message == null) continue;
 
 				if(message.equals("disconnect")){
 					Thread t = new Thread(this::disconnect);

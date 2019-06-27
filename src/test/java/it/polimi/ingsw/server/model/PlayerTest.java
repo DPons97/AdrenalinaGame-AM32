@@ -70,7 +70,7 @@ class PlayerTest {
         for (Resource res : testWeapon.getCost()) testPlayer.addAmmo(res);
 
         // Add weapons
-        testPlayer.pickWeapon(testWeapon);
+        testPlayer.pickWeapon(testWeapon, new ArrayList<>());
 
         // Check player cannot reaload if he doesn't have ammos
         assertThrows(InsufficientResourcesException.class, () -> testPlayer.reload(testWeapon));
@@ -429,7 +429,7 @@ class PlayerTest {
     }
 
     @Test
-    void pickWeapon() throws InventoryFullException, InsufficientResourcesException, AmmoAlreadyOnCellException {
+    void pickWeapon() throws InventoryFullException, InsufficientResourcesException, AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
         Weapon testWeaponMode = newMatch.getWeaponDeck().drawCard();
         Weapon testWeaponEffect = newMatch.getWeaponDeck().drawCard();
@@ -439,20 +439,20 @@ class PlayerTest {
         for (Resource res : testWeaponEffect.getCost()) testPlayer.addAmmo(res);
 
         // Add weapon (effect) and check successful add
-        testPlayer.pickWeapon(testWeaponEffect);
+        testPlayer.pickWeapon(testWeaponEffect, new ArrayList<>());
         assertTrue(testPlayer.getWeapons().contains(testWeaponEffect));
 
         // Add enough resources to player's inventory to pick weapon
         for (Resource res : testWeaponMode.getCost()) testPlayer.addAmmo(res);
 
         // Add weapon (mode) and check successful add
-        testPlayer.pickWeapon(testWeaponMode);
+        testPlayer.pickWeapon(testWeaponMode, new ArrayList<>());
         assertTrue(testPlayer.getWeapons().contains(testWeaponMode));
 
         for (Resource res : testWeaponEffect.getCost()) testPlayer.addAmmo(res);
 
         // Try to add 2 same weapons
-        testPlayer.pickWeapon(testWeaponEffect);
+        testPlayer.pickWeapon(testWeaponEffect, new ArrayList<>());
         assertFalse(Collections.frequency(testPlayer.getWeapons(), testWeaponEffect) > 1);
 
         // Try to add 4 weapons
@@ -460,11 +460,11 @@ class PlayerTest {
         Weapon testWeapon4 = newMatch.getWeaponDeck().drawCard();
 
         for (Resource res : testWeapon3.getCost()) testPlayer.addAmmo(res);
-        testPlayer.pickWeapon(testWeapon3);
+        testPlayer.pickWeapon(testWeapon3, new ArrayList<>());
 
         for (Resource res : testWeapon4.getCost()) testPlayer.addAmmo(res);
 
-        assertThrows(InventoryFullException.class, () -> testPlayer.pickWeapon(testWeapon4));
+        assertThrows(InventoryFullException.class, () -> testPlayer.pickWeapon(testWeapon4, new ArrayList<>()));
     }
 
     @Test
