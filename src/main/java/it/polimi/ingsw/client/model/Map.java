@@ -94,7 +94,7 @@ public class Map {
                 i % ySize
         );
         try {
-            if (!(cellObj.get("ammo").toString() == "none"))
+            if (!(cellObj.get("ammo").toString().equals("none")))
                 cellToAdd.setAmmo(Ammo.parseJSON((JSONObject) cellObj.get("ammo")));
 
         } catch (AmmoAlreadyOnCellException e) {

@@ -537,7 +537,7 @@ public class CliView extends ClientView {
      * Shows the launcher options
      */
     @Override
-    public void showMatch() {
+    public synchronized void showMatch() {
         AdrenalinaMatch match = player.getMatch();
         boolean isReady = match.getPlayers().stream().
                 filter(p -> p.getNickname().equals(player.getNickname())).
