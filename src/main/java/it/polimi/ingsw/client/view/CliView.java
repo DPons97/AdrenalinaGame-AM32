@@ -751,9 +751,13 @@ public class CliView extends ClientView {
                 messageToPrint.append(eff.getName()).append("\n");
 
             selectedEffect = getIndexedResponse(effects, messageToPrint);
-            if (!selectedEffects.contains(selectedEffect)) selectedEffects.add(selectedEffect);
+            messageToPrint = new StringBuilder();
 
-        } while (selectedEffect == null || !selectedWeapon.isEffect());
+            if (!selectedEffects.contains(selectedEffect)) {
+                selectedEffects.add(selectedEffect);
+                effects.remove(selectedEffect);
+            }
+        } while (selectedEffect == null || !selectedWeapon.isEffect() || !effects.isEmpty());
 
         // Transform selected effects in integers to be sent through network
         List<Integer> effectsInteger = new ArrayList<>();
