@@ -727,12 +727,12 @@ public class CliView extends ClientView {
         List<WeaponCard.Effect> selectedEffects = new ArrayList<>();
         WeaponCard.Effect selectedEffect;
         do {
+            messageToPrint.append(EFFECT_SELECTION);
+
+            // Print selected weapon
+            messageToPrint.append("You selected: ").append(selectedWeapon.getName()).append("\n");
+
             for (int i = 0; i < effects.size(); i++) {
-                messageToPrint.append(EFFECT_SELECTION);
-
-                // Print selected weapon
-                messageToPrint.append("You selected: ").append(selectedWeapon.getName()).append("\n");
-
                 // Print name and description
                 messageToPrint.append("[").append(i+1).append("] ")
                         .append(effects.get(i).getName()).append("\n\t- Cost = ");
@@ -753,7 +753,7 @@ public class CliView extends ClientView {
             selectedEffect = getIndexedResponse(effects, messageToPrint);
             messageToPrint = new StringBuilder();
 
-            if (!selectedEffects.contains(selectedEffect)) {
+            if (selectedEffect != null && !selectedEffects.contains(selectedEffect)) {
                 selectedEffects.add(selectedEffect);
                 effects.remove(selectedEffect);
             }
@@ -801,7 +801,7 @@ public class CliView extends ClientView {
             messageToPrint.append("\n");
 
             selectedPowerup = getIndexedResponse(powerups, messageToPrint);
-            if (!selectedDiscount.contains(selectedPowerup)) {
+            if (selectedPowerup != null && !selectedDiscount.contains(selectedPowerup)) {
                 selectedDiscount.add(selectedPowerup);
                 powerups.remove(selectedPowerup);
             }
