@@ -86,13 +86,15 @@ public class CliView extends ClientView {
 
         CommandReader() {
             stringReader = new Scanner(System.in);
-            this.stopReader = false;
+            this.stopReader = true;
             this.pendingReading = false;
             this.buffer = "";
         }
 
         @Override
         public void run() {
+            stopReader = false;
+
             while (!stopReader)
                 synchronized (stringReader) {
                     if (buffer.isEmpty()) {
@@ -126,6 +128,7 @@ public class CliView extends ClientView {
          * @return new reader
          */
         public CommandReader restartReader() {
+            if (stopReader) return this;
             restartedReader = new CommandReader();
             shutdownReader();
             return restartedReader;

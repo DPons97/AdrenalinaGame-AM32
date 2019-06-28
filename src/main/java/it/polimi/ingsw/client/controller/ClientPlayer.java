@@ -56,6 +56,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
 	private Thread lastUpdater;
 
+	/**
+	 * True if player has loaded game
+	 */
+	private boolean loaded;
+
 
 	/**
 	 * Constructor
@@ -70,6 +75,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		if(gui) view = new GuiView(this);
 		else view = new CliView(this);
 		this.match = null;
+		loaded = false;
 		server.connect(ip, port);
 
 		updateLobby();
@@ -82,6 +88,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	public ClientPlayer(String nickname) {
 		this.nickname = nickname;
 		this.match = null;
+		loaded = false;
 	}
 
 	/**
@@ -216,13 +223,14 @@ public class ClientPlayer implements ClientFunctionalities{
 		match.update(toGetUpdateFrom);
 		lastUpdater = new Thread(() -> view.showMatch());
 		lastUpdater.start();
-		if (match.getState() == MatchState.LOADING &&
+		if (!loaded && match.getState() == MatchState.LOADING &&
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
 					collect(Collectors.toList()).get(0).isReadyToStart()) {
 			// CLI: Reset input reader
 			view.initMatch();
 
 			server.setReady(true);
+			loaded = true;
 			System.out.println("DONE LOADING");
 		}
 	}
