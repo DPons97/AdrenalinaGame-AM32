@@ -49,6 +49,7 @@ public class ImageExample extends Application {
     private final static String MYDASHBOARD = "/img/tabs/mydashboard.png";
     public static final String SKULL = "/img/others/skull.png";
     public static final String SQUARE = "/img/squares/yellow.png";
+    public static final String SELECTSPAWN = "/img/others/spawn.jpeg";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -93,6 +94,8 @@ public class ImageExample extends Application {
         Image skull = new Image(new FileInputStream(urlSkull.getFile().replace("%20", " ")));
         URL urlSquare = getClass().getResource(SQUARE);
         Image square = new Image(new FileInputStream(urlSquare.getFile().replace("%20"," ")));
+        URL urlSelectSpawn = getClass().getResource(SELECTSPAWN);
+        Image selectspawn = new Image (new FileInputStream(urlSelectSpawn.getFile().replace("%20", " ")));
 
 
         ImageView mapView = new ImageView(map);
@@ -645,13 +648,6 @@ public class ImageExample extends Application {
         }
 
 
-
-
-
-
-
-
-
         double buttonEdge = height9*0.16;
         double buttonX0 = width16*0.1;
         double buttonY0 = height9*0.18;
@@ -701,6 +697,41 @@ public class ImageExample extends Application {
                 }
             }
         }
+
+// select spawn popup
+        ImageView selectspawnView = new ImageView(selectspawn);
+        double selectSpawnSize = width16*0.6;
+        double selectSpawnX0= (width16-selectSpawnSize)/2;
+        selectspawnView.setFitWidth(selectSpawnSize);
+        selectspawnView.setX(selectSpawnX0);
+
+
+        double selectSpawnY0= (height9-getHeight(selectspawnView))/2;
+        selectspawnView.setY(selectSpawnY0);
+
+        selectspawnView.setPreserveRatio(true);
+        root.getChildren().add(selectspawnView);
+
+        //powerups select spawn
+
+        double powerupOffsetSelectSpawnX = height9* 0.215;
+        double powerupSelectSpawnX=width16*0.21;
+        double powerupBaseSelectSpawnY=height9*0.45;
+        double powerupSelectSpawnSize=height9*0.17;
+
+
+        for(int i = 0; i<5; i++){
+            {
+                ImageView cardback00SelectSpawnView = new ImageView(cardback00);
+                cardback00SelectSpawnView.setY(powerupBaseSelectSpawnY);
+                cardback00SelectSpawnView.setX(powerupSelectSpawnX+powerupOffsetSelectSpawnX*i);
+                cardback00SelectSpawnView.setPreserveRatio(true);
+                cardback00SelectSpawnView.setFitWidth(powerupSelectSpawnSize);
+                root.getChildren().add(cardback00SelectSpawnView);
+            }
+        }
+
+
 
 
         // ammo cards
