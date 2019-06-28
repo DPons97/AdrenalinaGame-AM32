@@ -735,7 +735,7 @@ public class CliView extends ClientView {
 
                 // Print name and description
                 messageToPrint.append("[").append(i+1).append("] ")
-                        .append(effects.get(i).getName()).append(" - ").append(effects.get(i).getDescription()).append("\n\t Cost = ");
+                        .append(effects.get(i).getName()).append("\n\t- Cost = ");
 
                 // Print cost
                 for (Resource res : effects.get(i).getCost())
