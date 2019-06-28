@@ -1432,6 +1432,8 @@ public class CliView extends ClientView {
         charMap[startingX + boxXOffset + 4][startingY+boxYOffset + 4] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
 
+        if(ammoToDraw == null) return;
+
         // Write Ammos
         if (ammoToDraw == null) return;
 

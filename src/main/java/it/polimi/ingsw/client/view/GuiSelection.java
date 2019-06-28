@@ -1,6 +1,7 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.model.Map;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
@@ -42,18 +43,25 @@ public class GuiSelection {
     }
 
     public void setNodeClickable(Node node, String value){
-        node.setOnMouseClicked(new EventHandler<MouseEvent>() {
+        Platform.runLater(()->{
+            node.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
-            @Override
-            public void handle(MouseEvent t) {
-                setValue(value);
-            }
+                @Override
+                public void handle(MouseEvent t) {
+                    setValue(value);
+                }
 
+            });
         });
+
+
     }
 
     public void setNodeNotClickable(Node node){
-        node.setOnMouseClicked(null);
+        Platform.runLater(()->{
+            node.setOnMouseClicked(null);
+        });
+
     }
 
 }

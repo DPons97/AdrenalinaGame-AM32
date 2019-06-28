@@ -4,17 +4,15 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class FXWindow extends Application {
     private static Stage primaryStage;
-    private static GridPane mainGrid;
+    private static Pane mainPane;
     public static Object lock = new Object();
     private static boolean running = false;
     public FXWindow(){
@@ -28,13 +26,13 @@ public class FXWindow extends Application {
             lock.notifyAll();
         }
         synchronized (lock){
-            mainGrid = new GridPane();
+            mainPane = new GridPane();
             lock.notifyAll();
             running = true;
         }
 
         primaryStage.setTitle("Adrenalina: the best game ever made. \"ITS FUN COZ YOU SHOOT\"");
-        Scene scene = new Scene(mainGrid,600, 600);
+        Scene scene = new Scene(mainPane,600, 600);
 
         stage.setScene(scene);
         stage.setMaximized(true);
@@ -65,10 +63,14 @@ public class FXWindow extends Application {
 
     }
 
-    public static GridPane getGrid(){
+    public static Pane getPane(){
 
-            return mainGrid;
+            return mainPane;
 
+    }
+
+    public static void setPane(Pane toSet){
+        mainPane = toSet;
     }
 
     public static boolean isRunning(){

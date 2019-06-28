@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -37,6 +38,7 @@ import org.json.simple.JSONValue;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.UnaryOperator;
@@ -178,14 +180,51 @@ public class GuiView extends ClientView{
     private static final double RESOURCE_OFFSET_Y2 = 0.03;
     private static final double RESOURCE_SIZE = 0.043;
 
+    // cell buttons
+    private static final double CELL_BUTTON_EDGE = 0.16;
+    private static final double CELL_BUTTON_X0 = 0.1;
+    private static final double CELL_BUTTON_Y0 = 0.18;
+    private static final double CELL_BUTTON_PADDING = 0.019;
+
+    // tab buttons
+    private static final double ACTION_BTN_SIZE_X = 0.05;
+    private static final double ACTION_BTN_NO_FRENZY_SIZE_Y = 0.03;
+    private static final double ACTION_BTN_FRENZY_SIZE_Y = 0.02;
+    private static final double ACTION_BTN_X0 = 0;
+    private static final double ACTION_BTN_NO_FRENZY_Y0 = 0.845;
+    private static final double ACTION_BTN_FRENZY_Y0 = 0.83;
+    private static final double ACTION_BTN_FRENZY_DOWN_SIZE_Y0 = 0.94;
+    private static final double ACTION_BTN_NO_FRENZY_PADDING = 0.03;
+    private static final double ACTION_BTN_FRENZY_PADDING = 0.025;
+
+    // css effects
+    private static final String STANDARD_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 0, 0, 0, 0);" +
+                                                  "-fx-cursor: arrow";
+    private static final String CLICKABLE_EFFECT =
+            "-fx-effect: dropshadow(three-pass-box, rgba(225,280,82,0.85), 0, 0, 4, 4);" +
+            "-fx-cursor: hand;";
+    private static final String BUTTONS_EFFECT = "-fx-background-color: rgba(0,255,0,0.3);" +
+                                                 "-fx-cursor: hand;";
+
     private double width;
     private double height;
 
-    private List<Clickable> spawnWeapons;
+    private List<ImageView> players;
+    private List<ImageView> weapons;
+    private List<ImageView> spawnWeapons;
+    private List<ImageView> powerups;
+    private List<ImageView> resources;
 
+    private GuiSelection selection;
 
     public GuiView(ClientPlayer player) {
         super(player);
+        players = new ArrayList<>();
+        weapons = new ArrayList<>();
+        powerups = new ArrayList<>();
+        resources = new ArrayList<>();
+        spawnWeapons = new ArrayList<>();
+        selection = new GuiSelection();
     }
 
     /**
@@ -200,7 +239,7 @@ public class GuiView extends ClientView{
 
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
+            GridPane grid = (GridPane) FXWindow.getPane();
             setEscExit();
             initGrid(grid);
 
@@ -277,7 +316,7 @@ public class GuiView extends ClientView{
 
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
+            GridPane grid = (GridPane) FXWindow.getPane();
             initGrid(grid);
 
 
@@ -426,7 +465,7 @@ public class GuiView extends ClientView{
         AdrenalinaMatch match= player.getMatch();
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
+            GridPane grid = (GridPane) FXWindow.getPane();
 
             initGrid(grid);
 
@@ -505,7 +544,34 @@ public class GuiView extends ClientView{
      */
     @Override
     public String selectPlayer(List<String> selectables) {
-        return null;
+        // set buttons
+        Platform.runLater(()-> {
+                    selectables.forEach(selectable -> {
+                        players.stream().filter(p -> p.getImage().getUrl().
+                                contains(player.getMatch().getPlayerByName(selectable).getColor().toString().toLowerCase() + PAWN_EXTENSION)).
+                                forEach(pawnImg -> {
+                                    selection.setNodeClickable(pawnImg, selectable);
+                                    setClickableEffects(pawnImg);
+                                });
+                    });
+        });
+
+        //wait for selection
+        String selected = selection.getValue();
+
+        //remove buttons
+        Platform.runLater(()-> {
+            selectables.forEach(selectable -> {
+                players.stream().filter(p->p.getImage().getUrl().
+                        contains(player.getMatch().getPlayerByName(selectable).getColor().toString().toLowerCase()+PAWN_EXTENSION)).
+                        forEach(pawnImg -> {
+                            selection.setNodeNotClickable(pawnImg);
+                            setNotClickableEffects(pawnImg);
+                        });
+            });
+        });
+
+        return selected;
     }
 
     /**
@@ -515,7 +581,27 @@ public class GuiView extends ClientView{
      */
     @Override
     public Point selectCell(List<Point> selectables) {
-        return null;
+        List<Button> buttons = new ArrayList<>();
+        Platform.runLater(()->{
+            int i = 0;
+            for(Point p: selectables){
+                Button cellButton = new Button();
+                cellButton.setLayoutX(CELL_BUTTON_X0*width + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getX());
+                cellButton.setLayoutY(CELL_BUTTON_Y0*height + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getY());
+                cellButton.setPrefWidth(CELL_BUTTON_EDGE*height);
+                cellButton.setPrefHeight(CELL_BUTTON_EDGE*height);
+                setButtonEffects(cellButton);
+                selection.setNodeClickable(cellButton, String.valueOf(i));
+                FXWindow.getPane().getChildren().add(cellButton);
+                buttons.add(cellButton);
+                i++;
+            }
+        });
+        int selected = Integer.parseInt(selection.getValue());
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(buttons);
+        });
+        return selectables.get(selected);
     }
 
     /**
@@ -564,7 +650,77 @@ public class GuiView extends ClientView{
      */
     @Override
     public Powerup selectPowerup(List<Powerup> selectables) {
+        if(player.getMatch().getPlayerByName(player.getNickname()).getPowerups().containsAll(selectables)) { // is a standard selection
+            // set buttons
+            Platform.runLater(()->{
+                selectables.forEach(selectable -> {
+                    String fileName = getPowerupFileName(selectable);
+                    powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                        selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
+                        setClickableEffects(p);
+                    });
+                });
+            });
+
+
+            // wait for selection
+            int selected = Integer.parseInt(selection.getValue());
+
+            // remove buttons
+            Platform.runLater(()->{
+                selectables.forEach(selectable -> {
+                    String fileName = getPowerupFileName(selectable);
+                    powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                        selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
+                        setClickableEffects(p);
+                    });
+                });
+            });
+
+            return selectables.get(selected);
+        }else {
+            return spawnSelection(selectables);
+        }
+    }
+
+    private Powerup spawnSelection(List<Powerup> selectables) {
+        // show spawn
+        // put cards
+        // set buttons
+        // get value
+        // remove all
         return null;
+    }
+
+    private Resource resourceSelection(List<Resource> selectables) {
+        // set buttons
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                String fileName = getResourceFileName(selectable);
+                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                    selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
+                    setClickableEffects(p);
+                });
+            });
+        });
+
+
+
+        // wait for selection
+        int selected = Integer.parseInt(selection.getValue());
+
+        // remove buttons
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                String fileName = getResourceFileName(selectable);
+                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                    selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
+                    setClickableEffects(p);
+                });
+            });
+        });
+
+        return selectables.get(selected);
     }
 
     /**
@@ -573,16 +729,41 @@ public class GuiView extends ClientView{
      */
     @Override
     public TurnAction actionSelection() {
-        return null;
+        List<Button> buttons = new ArrayList<>();
+        Platform.runLater(()->{
+            if(!player.getMatch().isFrenzyEnabled()){
+                int i = 0;
+                for(TurnAction t: TurnAction.values()){
+                    Button actionButton = new Button();
+                    actionButton.setLayoutX(ACTION_BTN_X0*width);
+                    actionButton.setLayoutY(ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*i);
+                    actionButton.setMinHeight(0);
+                    actionButton.setPrefHeight(ACTION_BTN_NO_FRENZY_SIZE_Y);
+                    actionButton.setPrefWidth(ACTION_BTN_SIZE_X);
+                    setButtonEffects(actionButton);
+                    selection.setNodeClickable(actionButton, t.toString());
+                    FXWindow.getPane().getChildren().add(actionButton);
+                    buttons.add(actionButton);
+                    i++;
+                }
+            }
+            //TODO FRENZY ENABLED BUTTONS
+        });
+
+        String selected = selection.getValue();
+
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(buttons);
+        });
+
+        return TurnAction.valueOf(selected);
     }
-
-
 
     private void loadLayout(){
         Stage stage = FXWindow.getStage();
         BorderPane borders = new BorderPane();
         Pane root = new Pane();
-
+        FXWindow.setPane(root);
         Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
         borders.setCenter(root);
         stage.setScene(scene);
@@ -593,9 +774,9 @@ public class GuiView extends ClientView{
         // set fixed proportions
         if(root.getHeight() > root.getWidth()*9/16){
             pH = 0;
-            pV = (root.getHeight()- root.getWidth()*9/16)/2;
+            pV = (root.getHeight() - root.getWidth()*9/16)/2;
             System.out.println("stagew h: " + stage.getHeight());
-            System.out.println("margin v: "+pV);
+            System.out.println("margin v: " + pV);
         } else {
             pV = 0;
             pH =  (root.getWidth()-root.getHeight()*16/9)/2;
@@ -653,6 +834,7 @@ public class GuiView extends ClientView{
                     int k = 0;
 
                     // players
+                    players.clear();
                     for (Player player : cell.getPlayers()) {
                         String path = PAWN_DIR + player.getColor().toString().toLowerCase() + PAWN_EXTENSION;
                         ImageView pawn = loadImage(path);
@@ -661,11 +843,13 @@ public class GuiView extends ClientView{
                         pawn.setPreserveRatio(true);
                         pawn.setFitWidth(PAWN_SIZE*height);
                         root.getChildren().add(pawn);
+                        players.add(pawn);
                         k++;
                     }
 
                     // ammo
-                    if(!cell.isSpawn()) {
+
+                    if(!cell.isSpawn() && ((AmmoCell)cell).getResource()!= null) {
                         ImageView ammo = getAmmoImage(((AmmoCell)cell).getResource());
                         ammo.setX(AMMO_X0*width+AMMO_OFFSET*height*i);
                         ammo.setY(AMMO_Y0*height+AMMO_OFFSET*height*j);
@@ -704,6 +888,7 @@ public class GuiView extends ClientView{
     private void loadSpawnPointCards(Pane root) {
         for(SpawnCell spawnCell: player.getMatch().getBoardMap().getSpawnPoints()){
             int i = 0;
+            spawnWeapons.clear();
             switch(spawnCell.getColor()){
                 case BLUE:
                     for(WeaponCard weapon : spawnCell.getWeapons()){
@@ -715,6 +900,7 @@ public class GuiView extends ClientView{
                         weaponView.setRotate(SPAWN_POINT_1_ROTATION);
                         root.getChildren().add(weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        spawnWeapons.add(weaponView);
                         i++;
                     }
                     break;
@@ -728,6 +914,7 @@ public class GuiView extends ClientView{
                         weaponView.setRotate(SPAWN_POINT_2_ROTATION);
                         root.getChildren().add(weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        spawnWeapons.add(weaponView);
                         i++;
                     }
                     break;
@@ -741,6 +928,7 @@ public class GuiView extends ClientView{
                         weaponView.setRotate(SPAWN_POINT_3_ROTATION);
                         root.getChildren().add(weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
+                        spawnWeapons.add(weaponView);
                         i++;
                     }
                     break;
@@ -753,8 +941,7 @@ public class GuiView extends ClientView{
         int i = 0;
         for(Player p: player.getMatch().getPlayers()){
             if(p.getNickname().equals(player.getNickname())){
-                ImageView tab = loadImage(TAB+p.getColor().toString().toLowerCase()+
-                        (p.isFrenzyPlayer()?"":TAB_BACK)+TAB_EXTENSION);
+                ImageView tab = getTabImage(p);
                 tab.setX(PLAYER_TAB_X*width);
                 tab.setY(PLAYER_TAB_Y*height);
                 tab.setPreserveRatio(true);
@@ -764,8 +951,7 @@ public class GuiView extends ClientView{
                 loadPlayerDashboard(root, tab);
                 loadPlayerSigns(root, tab);
             } else {
-                ImageView tab = loadImage(TAB + p.getColor().toString().toLowerCase() +
-                        (p.isFrenzyPlayer() ? "" : TAB_BACK) + TAB_EXTENSION);
+                ImageView tab = getTabImage(p);
                 tab.setPreserveRatio(true);
                 tab.setFitWidth(tabSize);
                 tab.setX(getWidth(map));
@@ -777,6 +963,7 @@ public class GuiView extends ClientView{
             }
         }
     }
+
 
     private void loadPlayerSigns(Pane root, ImageView tab) {
         int i = 0;
@@ -814,6 +1001,7 @@ public class GuiView extends ClientView{
 
         //resources
         i = 0;
+        resources.clear();
         for(Resource r: player.getMatch().getPlayerByName(player.getNickname()).getAmmos()){
             ImageView resource = getResourceImage(r);
             resource.setX(RESOURCE_PLAYER_X0*width+RESOURCE_OFFSET_X*width*(i%3));
@@ -821,6 +1009,7 @@ public class GuiView extends ClientView{
             resource.setPreserveRatio(true);
             resource.setFitWidth(RESOURCE_SIZE*getWidth(tab));
             root.getChildren().add(resource);
+            resources.add(resource);
         }
     }
 
@@ -911,7 +1100,9 @@ public class GuiView extends ClientView{
         loadPlayerPowerups(root);
     }
 
+
     private void loadPlayerPowerups(Pane root) {
+        powerups.clear();
         for(Powerup powerup: player.getMatch().getPlayerByName(player.getNickname()).getPowerups()){
             ImageView powerupImg = getPowerupImage(powerup);
             powerupImg.setPreserveRatio(true);
@@ -919,10 +1110,12 @@ public class GuiView extends ClientView{
             powerupImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
             powerupImg.setX(DASHBOARD_POWERUP_X*width+DASHBOARD_POWERUP_OFFSET*height);
             root.getChildren().add(powerupImg);
+            powerups.add(powerupImg);
         }
     }
 
     private void loadPlayerWeapons(Pane root) {
+        weapons.clear();
         for(WeaponCard weapon: player.getMatch().getPlayerByName(player.getNickname()).getWeapons()){
             ImageView weaponImg = getWeaponImage(weapon.getName());
             weaponImg.setPreserveRatio(true);
@@ -930,6 +1123,7 @@ public class GuiView extends ClientView{
             weaponImg.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height);
             weaponImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
             root.getChildren().add(weaponImg);
+            weapons.add(weaponImg);
         }
     }
 
@@ -1037,10 +1231,14 @@ public class GuiView extends ClientView{
     }
 
     private ImageView getPowerupImage(Powerup powerup){
-        String file = WEAPON_DIR+powerup.getName().toLowerCase()+"-" +
+        String file = getPowerupFileName(powerup);
+        return loadImage(file);
+    }
+
+    private String getPowerupFileName(Powerup powerup) {
+        return WEAPON_DIR+powerup.getName().toLowerCase()+"-" +
                 powerup.getBonusResource().toString().replace(RESOURCE_STRING_FIX, "").toLowerCase() +
                 WEAPON_EXTENSION;
-        return loadImage(file);
     }
 
     private ImageView getAmmoImage(Ammo ammo){
@@ -1054,12 +1252,33 @@ public class GuiView extends ClientView{
     }
 
     private ImageView getResourceImage(Resource r){
-        String file =RESOURCE_DIR+ r.toString().replace(RESOURCE_STRING_FIX, "").toLowerCase()+RESOURCE_EXTENSION;
+        String file = getResourceFileName(r);
         return loadImage(file);
+    }
+    private ImageView getTabImage(Player player) {
+        String file = TAB + player.getColor().toString().toLowerCase() +
+                (player.isFrenzyPlayer() ? "" : TAB_BACK) + TAB_EXTENSION;
+        return loadImage(file);
+    }
+
+    private String getResourceFileName(Resource r) {
+        return RESOURCE_DIR+ r.toString().replace(RESOURCE_STRING_FIX, "").toLowerCase()+RESOURCE_EXTENSION;
     }
 
     private ImageView getDropletImage(Player p){
         String file = DROPLET_DIR+p.getColor().toString().toLowerCase()+DROPLET_EXTENSION;
         return loadImage(file);
+    }
+
+    public void setClickableEffects(Node n){
+        n.setStyle(CLICKABLE_EFFECT);
+    }
+
+    public void setNotClickableEffects(Node n){
+        n.setStyle(STANDARD_EFFECT);
+    }
+
+    public void setButtonEffects(Node n){
+        n.setStyle(BUTTONS_EFFECT);
     }
 }

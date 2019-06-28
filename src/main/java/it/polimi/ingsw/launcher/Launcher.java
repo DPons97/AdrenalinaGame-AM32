@@ -77,7 +77,7 @@ public class Launcher{
         Platform.setImplicitExit(false);
         Platform.runLater(()->{
             Stage primaryStage = FXWindow.getStage();
-            GridPane grid = FXWindow.getGrid();
+            GridPane grid = (GridPane) FXWindow.getPane();
             grid.setAlignment(Pos.CENTER);
             grid.setHgap(10);
             grid.setVgap(10);
