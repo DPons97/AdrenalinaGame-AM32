@@ -152,7 +152,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.BLUE; // TODO: give the right color here
+		color = Color.BLUE;
 	}
 
 	/**
@@ -179,7 +179,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.BLUE; // TODO: give the right color here
+		color = Color.BLUE;
 
 	}
 
@@ -207,7 +207,7 @@ public class Player {
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
 		ammos = new ArrayList<>();
-		color = Color.RED; // TODO: give the right color here
+		color = Color.BLUE;
 
 	}
 
@@ -340,7 +340,11 @@ public class Player {
 	 * Add ammo to player, if inventory not full
 	 * @param toAdd
 	 */
-	public void addAmmo(Resource toAdd) { if (ammos.size() < 3) ammos.add(toAdd); }
+	public void addAmmo(Resource toAdd) {
+		long ammoQty = ammos.stream().filter(resource -> resource.equals(toAdd)).count();
+
+		if (ammos.size() < 9 && ammoQty < 3) ammos.add(toAdd);
+	}
 
 	/**
 	 * @return true if player is dead
@@ -678,14 +682,29 @@ public class Player {
 	 * @param toPick Weapon to pick
 	 * @throws InventoryFullException if player has already 3 weapons
 	 */
-	public void pickWeapon(Weapon toPick) throws InventoryFullException, InsufficientResourcesException {
+	public void pickWeapon(Weapon toPick, List<Powerup> discountPowerups) throws InventoryFullException, InsufficientResourcesException, NoItemInInventoryException {
 		// Can't add weapons if inventory's full
 		if (weapons.size() >= 3) throw new InventoryFullException();
 		else {
+			List<Resource> weaponCost = toPick.getCost();
+			List<Powerup> usedResources = new ArrayList<>();
+
+			// Apply discount from powerups used
+			for (Powerup pow : discountPowerups) {
+				if (weaponCost.contains(pow.getBonusResource())) {
+					usePowerupResource(pow);
+					weaponCost.remove(pow.getBonusResource());
+					usedResources.add(pow);
+				}
+			}
+
+			// Remove used powerups from discountPowerups
+			discountPowerups.removeAll(usedResources);
+
 			// Add weapon only if it's not already in inventory
 			if(!weapons.contains(toPick)) {
 				weapons.add(toPick);
-				pay(toPick.getCost());
+				pay(weaponCost);
 			}
 		}
 	}

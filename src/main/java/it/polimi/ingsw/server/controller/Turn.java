@@ -307,15 +307,22 @@ public class Turn {
         SpawnCell pickedSpawn = match.getBoardMap().getSpawnCell(picked);
         if (pickedSpawn == null) return false;
 
-        // Pick weapon
-        WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickedSpawn.getWeapons());
-        Weapon selectedWeapon = getWeapon(pickedWeapon.getWeapon(), playing);
+        // Add only pickable weapons
+        List<Weapon> pickable = new ArrayList<>();
+        for (Weapon weapon : pickedSpawn.getWeapons()) {
+            if (playing.canPay(weapon.getCost(), playing.getPowerups())) {
+                pickable.add(weapon);
+            }
+        }
 
-        // Stop action if player can't pay weapon's cost with chosen powerups
-        if (!playing.canPay(selectedWeapon.getCost(), pickedWeapon.getPowerups())) return false;
+        // Pick weapon
+        WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickable);
+        Weapon selectedWeapon = pickedSpawn.getWeapons().stream()
+                .filter(weapon -> weapon.getName().equals(pickedWeapon.getWeapon()))
+                .collect(Collectors.toList()).get(0);
 
         try {
-            playing.pickWeapon(selectedWeapon);
+            playing.pickWeapon(selectedWeapon, pickedWeapon.getPowerups());
             pickedSpawn.removeWeapon(selectedWeapon);
             return true;
         } catch (InventoryFullException invFullE) {
@@ -328,7 +335,7 @@ public class Turn {
             try {
                 // Change chosen weapons
                 playing.dropWeapon(weaponToChange);
-                playing.pickWeapon(selectedWeapon);
+                playing.pickWeapon(selectedWeapon, pickedWeapon.getPowerups());
                 pickedSpawn.removeWeapon(selectedWeapon);
                 pickedSpawn.addWeapon(weaponToChange);
                 return true;
@@ -351,6 +358,26 @@ public class Turn {
         // PICK management
         canPick.add(playing.getPosition());
         removeEmptyCells(canPick);
+
+        // Remove cells with no pickable weapons
+        List<Cell> cNotPickable = new ArrayList<>();
+        for (Cell cell : canPick) {
+            if (cell.isSpawn()) {
+                List<Weapon> wNotPickable = new ArrayList<>();
+                SpawnCell spawn = (SpawnCell) cell;
+
+                for (Weapon weapon : spawn.getWeapons()) {
+                    if (!playing.canPay(weapon.getCost(), playing.getPowerups())) {
+                        wNotPickable.add(weapon);
+                    }
+                }
+
+                if (wNotPickable.containsAll(spawn.getWeapons())) cNotPickable.add(cell);
+            }
+        }
+
+        canPick.removeAll(cNotPickable);
+
 
         // Player choosing and grabbing
         Cell pickedCell = playing.getConnection().selectCell(canPick);
@@ -399,7 +426,7 @@ public class Turn {
      * @param playing player
      */
     private void reloadWeapon(Player playing) {
-        List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
+        List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(weapon -> !weapon.isLoaded()).collect(Collectors.toList());
 
         while (!canBeReloaded.isEmpty()) {
             WeaponSelection toReload = playing.getConnection().reload(canBeReloaded);
@@ -426,8 +453,9 @@ public class Turn {
      */
     private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
         int deadPlayers = 0;
+
         for (Player p : match.getPlayers()) {
-            if (p.isDead()) {
+            if (p.isDead() && !p.getDmgPoints().isEmpty()) {
                 // First to damage deadPlayer gets 1 point (First Blood)
                 if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
                 match.rewardPlayers(p.getDmgPoints(), p.getReward());
@@ -491,6 +519,12 @@ public class Turn {
         updatePlayers();
     }
 
+    /**
+     * Get a weapon by its name
+     * @param weaponName name of searched weapon
+     * @param playing player who has this weapon
+     * @return Searched weapon
+     */
     private Weapon getWeapon(String weaponName, Player playing){
         return match.getPlayers().stream().
                 filter(p-> p.getNickname().equals(playing.getNickname())).map(Player::getWeapons).

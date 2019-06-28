@@ -85,7 +85,6 @@ public class Map {
     }
 
     private static AmmoCell initAmmoCell(int xSize, int ySize, int i, JSONObject cellObj, Color color) {
-        JSONObject ammoObj =(JSONObject) cellObj.get("ammo");
         AmmoCell cellToAdd = new AmmoCell(Side.valueOf(cellObj.get("north").toString()),
                 Side.valueOf(cellObj.get("south").toString()),
                 Side.valueOf(cellObj.get("west").toString()),
@@ -95,7 +94,9 @@ public class Map {
                 i % ySize
         );
         try {
-            cellToAdd.setAmmo(Ammo.parseJSON(ammoObj));
+            if (!(cellObj.get("ammo").toString().equals("none")))
+                cellToAdd.setAmmo(Ammo.parseJSON((JSONObject) cellObj.get("ammo")));
+
         } catch (AmmoAlreadyOnCellException e) {
             e.printStackTrace();
         }

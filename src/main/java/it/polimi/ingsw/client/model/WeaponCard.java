@@ -138,7 +138,7 @@ public class WeaponCard {
             for(Object res: effCostJSON){
                 effCost.add(stringToResource(res.toString()));
             }
-            effects.add(new Effect("base effect", effect.get("description").toString(),
+            effects.add(new Effect(toParse.get("secondaryMode").toString(), effect.get("description").toString(),
                     effCost));
         }
         return effects;

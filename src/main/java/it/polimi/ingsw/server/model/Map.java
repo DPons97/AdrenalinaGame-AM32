@@ -300,7 +300,10 @@ public class Map {
                         currCell.put("weapons", weapons);
                     }else {
                         currCell.put("type", "ammo");
-                        currCell.put("ammo", ((AmmoCell) cell).getResource().toJSON());
+
+                        if (((AmmoCell) cell).getResource() != null)
+                            currCell.put("ammo", ((AmmoCell) cell).getResource().toJSON());
+                        else currCell.put("ammo", "none");
                     }
                     JSONArray players = new JSONArray();
                     cell.getPlayers().forEach(p -> players.add(p.getNickname()));

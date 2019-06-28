@@ -237,11 +237,12 @@ public class CliView extends ClientView {
     /**
      * Standard format for text inside match table
      */
-    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |     Players     |%n";
-    private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-13s  |%n";
-    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-13s  |%n" +
-                                                        "|      |               |              |         |                 |%n";
-    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+-----------------+%n";
+    public static final String MATCHES_HEADER =         "|         Matches:       %-4s                                         |%n";
+    private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |       Players       |%n";
+    private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-17s  |%n";
+    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-17s  |%n" +
+                                                        "|      |               |              |         |                     |%n";
+    private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+---------------------+%n";
 
     private static final int INFO_OFFSET = 20;
 
@@ -253,14 +254,21 @@ public class CliView extends ClientView {
     private static final String WEAPON_INFO_CLOSER =    "+---------+----------------------+---------------+";
 
     /**
+     * Standard format for player powerups
+     */
+    private static final String PLAYER_POWERUP_HEADER =    "|        Powerup        |  Resource  |";
+    private static final String PLAYER_POWERUP_FORMAT =    "|  %-19s  |      %-3s     |";
+    private static final String PLAYER_POWERUP_CLOSER =    "+-----------------------+------------+";
+
+    /**
      * Standard format for text inside player info table
      */
-    private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |  Ammos  |";
-    private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-6s |";
-    private static final String PLAYER_REWARD_HEADER =  "|::::::::::::::::::::::::::| %-24s|:::::::::|:::::::::|";
-    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-6s |";
-    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-6s |";
-    private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------+";
+    private static final String PLAYER_INFO_HEADER =    "|         Nickname         |       Life points       |  Marks  |        Ammos        |";
+    private static final String PLAYER_INFO_FORMAT =    "|   %s%-20s%s   | %-24s|  %-6s |  %-18s |";
+    private static final String PLAYER_REWARD_HEADER =  "|::::::::::::::::::::::::::| %-24s|:::::::::|:::::::::::::::::::::|";
+    private static final String PLAYER_WEAPON_HEADER =  "|              Weapons:    | %-33s |  %-18s |";
+    private static final String PLAYER_WEAPON_FORMAT =  "|                          | %-33s |  %-18s |";
+    private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------------------+";
 
     /**
      * Default action selection messages
@@ -375,7 +383,7 @@ public class CliView extends ClientView {
 
         JSONArray matches = (JSONArray) lobbiObj.get("matches");
         System.out.printf(MATCH_INFO_CLOSER);
-        System.out.format("|         Matches:       %-4s                                     |%n", matches.size());
+        System.out.format(MATCHES_HEADER, matches.size());
         System.out.printf(MATCH_INFO_CLOSER);
 
         for(int i = 0; i < matches.size(); i++){
@@ -491,21 +499,27 @@ public class CliView extends ClientView {
             newPlayer2.takeDamage(newPlayer1);
 
             newPlayer1.addAmmo(Resource.BLUE_BOX);
+            newPlayer1.addAmmo(Resource.BLUE_BOX);
+            newPlayer1.addAmmo(Resource.BLUE_BOX);
             newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.RED_BOX);
+            newPlayer1.addAmmo(Resource.YELLOW_BOX);
+            newPlayer1.addAmmo(Resource.YELLOW_BOX);
             newPlayer1.addAmmo(Resource.YELLOW_BOX);
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
             newPlayer5.addAmmo(Resource.RED_BOX);
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
-            newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
-            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0));
+            //newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0), new ArrayList<>());
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
             newPlayer5.addAmmo(Resource.RED_BOX);
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
-            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(1));
+            newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(1), new ArrayList<>());
 
             AdrenalinaMatch clientMatch = new AdrenalinaMatch();
             clientMatch.update(match.toJSON());
@@ -517,6 +531,8 @@ public class CliView extends ClientView {
 
             view.showMatch();
         } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException | InventoryFullException | InsufficientResourcesException e) {
+            e.printStackTrace();
+        } catch (NoItemInInventoryException e) {
             e.printStackTrace();
         }
     }
@@ -555,23 +571,25 @@ public class CliView extends ClientView {
 
             lobbyNextCommand(isReady);
         } else if (match.getState() == MatchState.PLAYER_TURN) {
-            // Print players
-            System.out.printf("%n      ");
-            for (Player p : match.getPlayers()) {
-                String playerString;
-                if (p.isDead())
-                    playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
-                else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
+            synchronized (this) {
+                // Print players
+                System.out.printf("%n      ");
+                for (Player p : match.getPlayers()) {
+                    String playerString;
+                    if (p.isDead())
+                        playerString = ANSI_RED + DEAD_PLAYER + " " + p.getNickname() + " [DEAD] " + DEAD_PLAYER + ANSI_RESET;
+                    else playerString = getANSIColor(p) + p.getNickname() + ANSI_RESET;
 
-                System.out.print(playerString + "      ");
+                    System.out.print(playerString + "      ");
+                }
+                System.out.printf("%n%n");
+
+                // Print map
+                drawMap(match);
+
+                // Print alerts
+                System.out.printf(alertMessage);
             }
-            System.out.printf("%n%n");
-
-            // Print map
-            drawMap(match);
-
-            // Print alerts
-            System.out.printf(alertMessage);
         }
     }
 
@@ -669,7 +687,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectShoot(List<String> selectables) {
-        WeaponSelection selection = selectWeapon(selectables);
+        WeaponSelection selection = selectWeaponFree(selectables);
         if (selection.getWeapon() == null) return selection;
 
         WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
@@ -695,21 +713,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
-        WeaponSelection selection = selectWeapon(selectables);
-
-        if (selection.getWeapon() == null) return selection;
-
-        WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
-
-        // Select powerups to use as discount
-        List<Resource> totalCost = new ArrayList<>();
-        for (Integer eff : selection.getEffectID()) {
-            totalCost.addAll(selectedWeapon.getEffects().get(eff).getCost());
-        }
-
-        selection.setDiscount(selectDiscount(totalCost));
-
-        return selection;
+        return selectWeapon(selectables);
     }
 
     /**
@@ -731,7 +735,7 @@ public class CliView extends ClientView {
 
                 // Print name and description
                 messageToPrint.append("[").append(i+1).append("] ")
-                        .append(effects.get(i).getName()).append(" - ").append(effects.get(i).getDescription()).append("\n\t Cost = ");
+                        .append(effects.get(i).getName()).append("\n\t- Cost = ");
 
                 // Print cost
                 for (Resource res : effects.get(i).getCost())
@@ -779,7 +783,7 @@ public class CliView extends ClientView {
             if (powerups.isEmpty()) return selectedDiscount;
 
             for (int i = 0; i < powerups.size(); i++) {
-                messageToPrint.append("[ ").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
+                messageToPrint.append("[").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
                         .append(getANSIColor(powerups.get(i).getBonusResource())).append(AMMO_BLOCK).append(ANSI_RESET)
                         .append("\n");
             }
@@ -806,33 +810,63 @@ public class CliView extends ClientView {
      * @return selected weapon and effect
      */
     @Override
-    public WeaponSelection selectWeapon(List<String> selectables) {
+    public WeaponSelection selectWeaponFree(List<String> selectables) {
         StringBuilder messageToPrint = new StringBuilder();
 
         // Let player select a weapon
         messageToPrint.append(WEAPON_SELECTION);
 
+        // Get all weapon cards with given names
         List<WeaponCard> selectableCards = new ArrayList<>();
         for (String selectable : selectables) {
-            selectableCards.add(player.getThisPlayer().getWeapon(selectable));
+            selectableCards.add(player.getMatch().getWeapons().stream()
+                    .filter(weaponCard -> weaponCard.getName().equals(selectable))
+                    .collect(Collectors.toList()).get(0));
         }
 
         for (int i = 0; i < selectableCards.size(); i++) {
             messageToPrint.append("[").append(i+1).append("] ")
-                    .append(selectableCards.get(i).getName()).append("\n");
+                    .append(selectableCards.get(i).getName()).append(" ( ");
+
+            // Print weapon cost
+            for (Resource res : selectableCards.get(i).getCost()) {
+                messageToPrint.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+            }
+            messageToPrint.append(")\n");
 
             // Print all weapon infos
-            for (WeaponCard.Effect eff : selectableCards.get(i).getEffects())
-                messageToPrint.append("\t").append(eff.getName()).append(" - ")
-                        .append(eff.getDescription()).append(" - ")
-                        .append(eff.getCost()).append("\n");
+            for (WeaponCard.Effect eff : selectableCards.get(i).getEffects()) {
+                StringBuilder formattedCost = new StringBuilder();
+
+                for (Resource res : eff.getCost()) {
+                    formattedCost.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+                }
+
+                messageToPrint.append("\t").append(eff.getName()).append(" - ").append(" ( ")
+                        .append(formattedCost).append(")\n");
+            }
 
             messageToPrint.append("\n");
         }
+        messageToPrint.delete(messageToPrint.length()-1, messageToPrint.length()-1);
 
         WeaponSelection toReturn = new WeaponSelection();
         toReturn.setWeapon(getIndexedResponse(selectables, messageToPrint));
+        return toReturn;
+    }
 
+    /**
+     * Lets client select a weapon from a list (for buy and reload)
+     * @param selectables list of weapons
+     * @return selected weapon and discount
+     */
+    @Override
+    public WeaponSelection selectWeapon(List<String> selectables) {
+        WeaponSelection toReturn = selectWeapon(selectables);
+        WeaponCard selectedWeapon = player.getMatch().getWeaponByName(toReturn.getWeapon());
+
+        // Select weapon to pick and discount
+        toReturn.setDiscount(selectDiscount(selectedWeapon.getCost()));
         return toReturn;
     }
 
@@ -1095,13 +1129,16 @@ public class CliView extends ClientView {
         }
 
         // Draw weapon info table
-        drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - 1);
+        drawWeaponInfo(mapToReturn, match.getBoardMap(), 0, printWidth - INFO_OFFSET/2);
 
         // Draw player infos
-        drawPlayerInfo(mapToReturn, match, 15, printWidth - 1);
+        drawPlayerInfo(mapToReturn, match, 15, printWidth - INFO_OFFSET/2);
+
+        // Draw player's powerups
+        drawPlayerPowerups(mapToReturn, match, 0, printWidth - 3);
 
         // Write selection message
-        int k = match.getBoardMap().getYSize() * (CELL_CHAR_HEIGHT-1);
+        int k = ((match.getBoardMap().getYSize() - 1) * CELL_CHAR_HEIGHT) + 2;
         int w = 0;
         for (char c : selectionMessage.toCharArray()) {
             if (c != '\n') {
@@ -1387,7 +1424,11 @@ public class CliView extends ClientView {
         charMap[startingX + boxXOffset + 4][startingY+boxYOffset + 4] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
 
+        if(ammoToDraw == null) return;
+
         // Write Ammos
+        if (ammoToDraw == null) return;
+
         charMap[startingX+boxXOffset +1][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(0)) + AMMO_BLOCK +ANSI_RESET;
         charMap[startingX+boxXOffset+2][startingY+boxYOffset+2] = getANSIColor(ammoToDraw.getResources().get(1)) +AMMO_BLOCK+ANSI_RESET;
 
@@ -1435,7 +1476,7 @@ public class CliView extends ClientView {
         int i = 3;
         for (SpawnCell spawn : map.getSpawnPoints()) {
             for (WeaponCard weapon : spawn.getWeapons()) {
-                String cost1 = "";
+                String cost1;
                 String cost2 = "";
                 String cost3 = "";
 
@@ -1526,6 +1567,28 @@ public class CliView extends ClientView {
     }
 
     /**
+     * Draw player powerups
+     * @param charMap map of strings to print
+     * @param match to get player info from
+     * @param startingX starting X coord of table
+     * @param startingY starting Y coord of table
+     */
+    private void drawPlayerPowerups(String[][] charMap, AdrenalinaMatch match, int startingX, int startingY) {
+        if (player.getThisPlayer().getPowerups().isEmpty()) return;
+
+        charMap[startingX][startingY] = PLAYER_POWERUP_CLOSER;
+        charMap[startingX+1][startingY] = PLAYER_POWERUP_HEADER;
+        charMap[startingX+2][startingY] = PLAYER_POWERUP_CLOSER;
+
+        int i = 3;
+        for (Powerup powerup : player.getThisPlayer().getPowerups()) {
+            charMap[startingX+i][startingY] = String.format(PLAYER_POWERUP_FORMAT, powerup.getName(), getANSIColor(powerup.getBonusResource()) + AMMO_BLOCK + ANSI_RESET);
+            i++;
+        }
+        charMap[startingX+i][startingY] = PLAYER_POWERUP_CLOSER;
+    }
+
+    /**
      * Draw a defined player's resources infos
      * @param p player to get info from
      * @return string builder initialized with infos
@@ -1543,7 +1606,7 @@ public class CliView extends ClientView {
         }
         stringLen = ammos.length() - colorLength;
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        ammos.append(" ".repeat(6-stringLen));
+        ammos.append(" ".repeat(18-stringLen));
         return ammos;
     }
 
