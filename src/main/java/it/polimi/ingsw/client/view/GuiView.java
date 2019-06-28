@@ -113,7 +113,7 @@ public class GuiView extends ClientView{
     private static final double ENEMY_POWERUP_CARD_X0 = 0.7;
     private static final double ENEMY_CARD_OFFSET_Y = 0.175;
     private static final double ENEMY_CARD_OFFSET_X = 0.022;
-    private static final double ENEMY_CARD_SIZE = 0.004;
+    private static final double ENEMY_CARD_SIZE = 0.04;
 
     // weapons
     private final static String WEAPON_DIR = "/img/cards/";
@@ -197,11 +197,21 @@ public class GuiView extends ClientView{
     private static final double ACTION_BTN_NO_FRENZY_PADDING = 0.03;
     private static final double ACTION_BTN_FRENZY_PADDING = 0.025;
 
+    // spawn selection popup
+    private static final String SPAWN_POPUP_PATH = "/img/others/spawn.jpeg";
+    private static final double SPAWN_POPUP_SIZE = 0.6;
+    private static final double SPAWN_POPUP_X0 = 0.5;
+    private static final double SPAWN_POPUP_Y0 = 0.5;
+    private static final double SPAWN_POWERUP_X0 = 0.21;
+    private static final double SPAWN_POWERUP_Y0 = 0.45;
+    private static final double SPAWN_POWERUP_OFFSET_X = 0.215;
+    private static final double SPAWN_POWERUP_SIZE = 0.17;
+
     // css effects
     private static final String STANDARD_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 0, 0, 0, 0);" +
                                                   "-fx-cursor: arrow";
     private static final String CLICKABLE_EFFECT =
-            "-fx-effect: dropshadow(three-pass-box, rgba(225,280,82,0.85), 0, 0, 4, 4);" +
+            "-fx-effect: dropshadow(three-pass-box, rgba(225,280,82,0.85), 2, 2, 2, 2);" +
             "-fx-cursor: hand;";
     private static final String BUTTONS_EFFECT = "-fx-background-color: rgba(0,255,0,0.3);" +
                                                  "-fx-cursor: hand;";
@@ -586,8 +596,8 @@ public class GuiView extends ClientView{
             int i = 0;
             for(Point p: selectables){
                 Button cellButton = new Button();
-                cellButton.setLayoutX(CELL_BUTTON_X0*width + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getX());
-                cellButton.setLayoutY(CELL_BUTTON_Y0*height + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getY());
+                cellButton.setLayoutX(CELL_BUTTON_X0*width + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getY());
+                cellButton.setLayoutY(CELL_BUTTON_Y0*height + (CELL_BUTTON_PADDING*height + CELL_BUTTON_EDGE*height)*p.getX());
                 cellButton.setPrefWidth(CELL_BUTTON_EDGE*height);
                 cellButton.setPrefHeight(CELL_BUTTON_EDGE*height);
                 setButtonEffects(cellButton);
@@ -738,11 +748,32 @@ public class GuiView extends ClientView{
 
     private Powerup spawnSelection(List<Powerup> selectables) {
         // show spawn
-        // put cards
-        // set buttons
+        Platform.runLater(()->{
+            Pane root = FXWindow.getPane();
+            ImageView spawnPopUp = loadImage(SPAWN_POPUP_PATH);
+            spawnPopUp.setPreserveRatio(true);
+            spawnPopUp.setFitWidth(SPAWN_POPUP_SIZE*width);
+            spawnPopUp.setX((width-width*SPAWN_POPUP_SIZE)*SPAWN_POPUP_X0);
+            spawnPopUp.setY((height-getHeight(spawnPopUp))*SPAWN_POPUP_Y0);
+            root.getChildren().add(spawnPopUp);
+            // put cards and put buttons
+            int i = 0;
+            for(Powerup powerup: selectables){
+                ImageView powerupImg = getPowerupImage(powerup);
+                powerupImg.setY(SPAWN_POWERUP_Y0*height);
+                powerupImg.setX(SPAWN_POWERUP_X0*width+ SPAWN_POWERUP_OFFSET_X*height*i);
+                powerupImg.setPreserveRatio(true);
+                powerupImg.setFitWidth(SPAWN_POWERUP_SIZE*height);
+                setClickableEffects(powerupImg);
+                root.getChildren().add(powerupImg);
+                selection.setNodeClickable(powerupImg,String.valueOf(i));
+                i++;
+            }
+        });
         // get value
-        // remove all
-        return null;
+        int selected = Integer.parseInt(selection.getValue());
+        // remove all HOPEFULLY IT'S DONE BY AN UPDATE
+        return selectables.get(selected);
     }
 
     private Resource resourceSelection(List<Resource> selectables) {
@@ -782,6 +813,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public TurnAction actionSelection() {
+        System.out.println("ACTION SELECTION");
         List<Button> buttons = new ArrayList<>();
         Platform.runLater(()->{
             if(!player.getMatch().isFrenzyEnabled()){
@@ -789,10 +821,10 @@ public class GuiView extends ClientView{
                 for(TurnAction t: TurnAction.values()){
                     Button actionButton = new Button();
                     actionButton.setLayoutX(ACTION_BTN_X0*width);
-                    actionButton.setLayoutY(ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*i);
+                    actionButton.setLayoutY(ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*height*i);
                     actionButton.setMinHeight(0);
-                    actionButton.setPrefHeight(ACTION_BTN_NO_FRENZY_SIZE_Y);
-                    actionButton.setPrefWidth(ACTION_BTN_SIZE_X);
+                    actionButton.setPrefHeight(ACTION_BTN_NO_FRENZY_SIZE_Y*height);
+                    actionButton.setPrefWidth(ACTION_BTN_SIZE_X*height);
                     setButtonEffects(actionButton);
                     selection.setNodeClickable(actionButton, t.toString());
                     FXWindow.getPane().getChildren().add(actionButton);

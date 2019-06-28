@@ -757,7 +757,7 @@ public class CliView extends ClientView {
                 selectedEffects.add(selectedEffect);
                 effects.remove(selectedEffect);
             }
-        } while (selectedEffect != null || !selectedWeapon.isEffect() || !effects.isEmpty());
+        } while (selectedEffect != null && selectedWeapon.isEffect() && !effects.isEmpty());
 
         // Transform selected effects in integers to be sent through network
         List<Integer> effectsInteger = new ArrayList<>();
