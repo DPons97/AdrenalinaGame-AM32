@@ -655,7 +655,7 @@ public class CliView extends ClientView {
         messageToPrint.append(CELL_SELECTION);
 
         for (int i = 0; i < selectables.size(); i++) {
-            messageToPrint.append("[").append(i+1).append("] ").append("< ").append(selectables.get(i).getX()).append(", ").append(selectables.get(i).getY()).append(">").append("\n");
+            messageToPrint.append("[").append(i+1).append("] ").append("<").append(selectables.get(i).getX()).append(", ").append(selectables.get(i).getY()).append(">").append("\n");
         }
         return getIndexedResponse(selectables, messageToPrint);
     }
@@ -934,6 +934,8 @@ public class CliView extends ClientView {
                 if (response == null) return null;
             }
         }
+        selectionMessage = IDLE_MESSAGE;
+        showMatch();
         return null;
     }
 
