@@ -862,7 +862,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectWeapon(List<String> selectables) {
-        WeaponSelection toReturn = selectWeapon(selectables);
+        WeaponSelection toReturn = selectWeaponFree(selectables);
         WeaponCard selectedWeapon = player.getMatch().getWeaponByName(toReturn.getWeapon());
 
         // Select weapon to pick and discount
