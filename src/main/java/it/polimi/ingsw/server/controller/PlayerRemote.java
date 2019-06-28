@@ -111,7 +111,11 @@ public class PlayerRemote extends PlayerConnection {
 	@Override
 	public Powerup choosePowerup(List<Powerup> selectable) {
 		try {
-			String selection = remotePlayer.powerupSelection(selectable.stream().map(p->p.toJSON().toString()).collect(Collectors.toList()));
+			String selection = remotePlayer.powerupSelection(selectable.stream()
+					.map(p->p.toJSON().toString()).collect(Collectors.toList()));
+
+			if (selection.isEmpty()) return null;
+
 			return selectable.stream().filter(s->selection.equals(s.toJSON().toString())).collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
 			Thread t = new Thread(this::disconnectPlayer);

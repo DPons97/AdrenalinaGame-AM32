@@ -86,15 +86,13 @@ public class CliView extends ClientView {
 
         CommandReader() {
             stringReader = new Scanner(System.in);
-            this.stopReader = true;
+            this.stopReader = false;
             this.pendingReading = false;
             this.buffer = "";
         }
 
         @Override
         public void run() {
-            stopReader = false;
-
             while (!stopReader)
                 synchronized (stringReader) {
                     if (buffer.isEmpty()) {
@@ -128,7 +126,6 @@ public class CliView extends ClientView {
          * @return new reader
          */
         public CommandReader restartReader() {
-            if (stopReader) return this;
             restartedReader = new CommandReader();
             shutdownReader();
             return restartedReader;
@@ -690,7 +687,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectShoot(List<String> selectables) {
-        WeaponSelection selection = selectWeapon(selectables);
+        WeaponSelection selection = selectWeaponFree(selectables);
         if (selection.getWeapon() == null) return selection;
 
         WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
@@ -716,21 +713,7 @@ public class CliView extends ClientView {
      */
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
-        WeaponSelection selection = selectWeapon(selectables);
-
-        if (selection.getWeapon() == null) return selection;
-
-        WeaponCard selectedWeapon = player.getThisPlayer().getWeapon(selection.getWeapon());
-
-        // Select powerups to use as discount
-        List<Resource> totalCost = new ArrayList<>();
-        for (Integer eff : selection.getEffectID()) {
-            totalCost.addAll(selectedWeapon.getEffects().get(eff).getCost());
-        }
-
-        selection.setDiscount(selectDiscount(totalCost));
-
-        return selection;
+        return selectWeapon(selectables);
     }
 
     /**
@@ -827,7 +810,7 @@ public class CliView extends ClientView {
      * @return selected weapon and effect
      */
     @Override
-    public WeaponSelection selectWeapon(List<String> selectables) {
+    public WeaponSelection selectWeaponFree(List<String> selectables) {
         StringBuilder messageToPrint = new StringBuilder();
 
         // Let player select a weapon
@@ -868,14 +851,22 @@ public class CliView extends ClientView {
         messageToPrint.delete(messageToPrint.length()-1, messageToPrint.length()-1);
 
         WeaponSelection toReturn = new WeaponSelection();
-        String selection = getIndexedResponse(selectables, messageToPrint);
+        toReturn.setWeapon(getIndexedResponse(selectables, messageToPrint));
+        return toReturn;
+    }
 
-        WeaponCard selectedWeapon = player.getMatch().getWeaponByName(selection);
+    /**
+     * Lets client select a weapon from a list (for buy and reload)
+     * @param selectables list of weapons
+     * @return selected weapon and discount
+     */
+    @Override
+    public WeaponSelection selectWeapon(List<String> selectables) {
+        WeaponSelection toReturn = selectWeapon(selectables);
+        WeaponCard selectedWeapon = player.getMatch().getWeaponByName(toReturn.getWeapon());
 
         // Select weapon to pick and discount
-        toReturn.setWeapon(selectedWeapon.getName());
         toReturn.setDiscount(selectDiscount(selectedWeapon.getCost()));
-
         return toReturn;
     }
 

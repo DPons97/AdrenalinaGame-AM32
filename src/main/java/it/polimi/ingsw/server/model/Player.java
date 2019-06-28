@@ -704,7 +704,7 @@ public class Player {
 			// Add weapon only if it's not already in inventory
 			if(!weapons.contains(toPick)) {
 				weapons.add(toPick);
-				pay(toPick.getCost());
+				pay(weaponCost);
 			}
 		}
 	}

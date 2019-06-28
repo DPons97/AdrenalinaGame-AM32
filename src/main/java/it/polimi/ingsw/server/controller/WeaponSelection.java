@@ -103,7 +103,7 @@ public class WeaponSelection {
 
         for(int i = 0; i < powerups.size(); i++){
             JSONObject item = new JSONObject();
-            item.put("name", powerups.get(i));
+            item.put("name", powerups.get(i).getName());
             item.put("resource", powerups.get(i).getBonusResource().toString());
             discArray.add(item);
         }

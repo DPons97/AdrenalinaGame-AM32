@@ -192,7 +192,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	    for (String jsonStr : powerup)
 	        selectables.add(Powerup.parseJSON((JSONObject) JSONValue.parse(jsonStr)));
 
-		return view.selectPowerup(selectables).toJSON().toString();
+	    Powerup selected = view.selectPowerup(selectables);
+
+	    if (selected != null)
+			return selected.toJSON().toString();
+	    else return "";
 	}
 
 	/**

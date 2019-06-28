@@ -691,6 +691,11 @@ public class GuiView extends ClientView{
         return selected;
     }
 
+    @Override
+    public WeaponSelection selectWeaponFree(List<String> selectables) {
+        return null;
+    }
+
     /**
      * Lets client select a powerup from a list
      * @param selectables list of powerups
