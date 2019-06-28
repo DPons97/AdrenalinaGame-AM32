@@ -35,11 +35,11 @@ public class ImageExample extends Application {
     //private final static String TAB8 = "/img/tabs/whiteback.png";
     //private final static String TAB9 = "/img/tabs/yellowback.png";
     // private final static String TAB10 = "/img/tabs/blueback.png";
-   // private final static String TAB11 = "/img/tabs/purpleback.png";
-   // private final static String TAB12 = "/img/tabs/greenback.png";
-   // private final static String TAB13 = "/img/tabs/whiteback.png";
-   // private final static String TAB14 = "/img/tabs/yellowback.png";
-   // private final static String TAB15 = "/img/tabs/blueback.png";
+    // private final static String TAB11 = "/img/tabs/purpleback.png";
+    // private final static String TAB12 = "/img/tabs/greenback.png";
+    // private final static String TAB13 = "/img/tabs/whiteback.png";
+    // private final static String TAB14 = "/img/tabs/yellowback.png";
+    // private final static String TAB15 = "/img/tabs/blueback.png";
     private final static String CARDBACK00 = "/img/cards/powerup-back.png";
     private final static String CARDBACK01 = "/img/cards/grenade launcher.png";
     private final static String DROPLET = "/img/droplets/dropblue.png";
@@ -50,6 +50,7 @@ public class ImageExample extends Application {
     public static final String SKULL = "/img/others/skull.png";
     public static final String SQUARE = "/img/squares/yellow.png";
     public static final String SELECTSPAWN = "/img/others/spawn.jpeg";
+    public static final String BUTTONRESOURCES= "/img/others/buttonresources.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -59,7 +60,7 @@ public class ImageExample extends Application {
     @Override
     public void start(Stage stage) throws FileNotFoundException {
         //Creating an map
-       // Image map = new Image (new FileInputStream = getClass().getResource("C:/Users/miche/IdeaProjects/ing-sw-2019-Collini-Pons-Colazzo/src/main/resources/img/maps/1.png"));
+        // Image map = new Image (new FileInputStream = getClass().getResource("C:/Users/miche/IdeaProjects/ing-sw-2019-Collini-Pons-Colazzo/src/main/resources/img/maps/1.png"));
         //FileInputStream map = getClass().getResource("C:/Users/miche/IdeaProjects/ing-sw-2019-Collini-Pons-Colazzo/src/main/resources/img/maps/1.png");
         //InputStream map = getClass().getResourceAsStream("/resources/maps/1.png");
 
@@ -96,11 +97,15 @@ public class ImageExample extends Application {
         Image square = new Image(new FileInputStream(urlSquare.getFile().replace("%20"," ")));
         URL urlSelectSpawn = getClass().getResource(SELECTSPAWN);
         Image selectspawn = new Image (new FileInputStream(urlSelectSpawn.getFile().replace("%20", " ")));
+        URL urlButtonResource= getClass().getResource(BUTTONRESOURCES);
+        Image buttonresources= new Image(new FileInputStream(urlButtonResource.getFile().replace("%20", " ")));
+
+
 
 
         ImageView mapView = new ImageView(map);
         ImageView mytabView = new ImageView(tab5);
-       // ImageView cardback00View = new ImageView(cardback00);
+        // ImageView cardback00View = new ImageView(cardback00);
         ImageView mydashboardView = new ImageView(mydashboard);
         BorderPane borders = new BorderPane();
         Pane root = new Pane(mapView, mytabView, mydashboardView);
@@ -164,7 +169,7 @@ public class ImageExample extends Application {
         double powerupsSize = (width16*0.038);
         double ammoSize = (width16*0.055);
         double dropletSize = (width16*0.0149);
-      //  double boardinoSize = (width16-getWidth(mapView));
+        //  double boardinoSize = (width16-getWidth(mapView));
         double mydashboardSize =(width16-getWidth(mytabView));
 
         // position on X and Y
@@ -204,14 +209,14 @@ public class ImageExample extends Application {
 
         //Setting the preserve ratio of the map view
         mapView.setPreserveRatio(true);
-      //  cardback00View.setPreserveRatio(true);
+        //  cardback00View.setPreserveRatio(true);
         mydashboardView.setPreserveRatio(true);
         mytabView.setPreserveRatio(true);
 
         mapView.setFitHeight(mapH);
         mytabView.setFitHeight(height9-mapH);
-       // cardback00View.setFitWidth(powerupsSize);
-       // boardinoView.setFitWidth(tab4Size);
+        // cardback00View.setFitWidth(powerupsSize);
+        // boardinoView.setFitWidth(tab4Size);
         mydashboardView.setFitWidth(width16-getWidth(mytabView));
         mydashboardView.setX(getWidth(mytabView));
         mydashboardView.setY(mapH);
@@ -260,7 +265,7 @@ public class ImageExample extends Application {
             }
         }
 
-  //droplets status bar x4
+        //droplets status bar x4
         double tabDropletY0 = height9*0.07;
         double tabDropletX0 = width16*0.64;
         double tabDropletOffY = height9*0.175;
@@ -287,13 +292,13 @@ public class ImageExample extends Application {
         for(int i = 0; i<4; i++){
             for(int j = 0 ; j <3;j++){
                 for(int k =0; k<3; k++){
-                ImageView SquareView = new ImageView(square);
-                SquareView.setX(tabSquareX0+tabSquareOffX*j);
-                SquareView.setY(tabSquareY0+tabSquareOffY*i+tabSquareOffY2*k);
-                SquareView.setPreserveRatio(true);
-                SquareView.setFitWidth(tabLeftSize*0.04);
-                root.getChildren().add(SquareView);
-            }
+                    ImageView SquareView = new ImageView(square);
+                    SquareView.setX(tabSquareX0+tabSquareOffX*j);
+                    SquareView.setY(tabSquareY0+tabSquareOffY*i+tabSquareOffY2*k);
+                    SquareView.setPreserveRatio(true);
+                    SquareView.setFitWidth(tabLeftSize*0.04);
+                    root.getChildren().add(SquareView);
+                }
             }
         }
 //droplet up side
@@ -354,7 +359,7 @@ public class ImageExample extends Application {
 
 
 
-         //skull others tab
+        //skull others tab
         double tabSkullY0 = height9*0.125;
         double tabSkullX0 = width16*0.675;
         double tabSkullOffY = height9*0.175;
@@ -380,29 +385,29 @@ public class ImageExample extends Application {
         double mytabSkullOffX = width16*0.022;
         double mytabSkullSize= tabLeftSize*0.08;
 
-            for(int j = 0 ; j <6;j++){
-                ImageView skullView = new ImageView(skull);
-                skullView.setX(mytabSkullX0+mytabSkullOffX*j);
-                skullView.setY(mytabSkullY0);
-                skullView.setPreserveRatio(true);
-                skullView.setFitWidth(tabSkullSize);
-                root.getChildren().add(skullView);
-            }
+        for(int j = 0 ; j <6;j++){
+            ImageView skullView = new ImageView(skull);
+            skullView.setX(mytabSkullX0+mytabSkullOffX*j);
+            skullView.setY(mytabSkullY0);
+            skullView.setPreserveRatio(true);
+            skullView.setFitWidth(tabSkullSize);
+            root.getChildren().add(skullView);
+        }
 
-            //droplet mex 3 up my tab
+        //droplet mex 3 up my tab
         double mytabDropletUPY0 = height9*0.8;
         double mytabDropletUPX0 = width16*0.26;
         double mytabDropletOffUPY = height9*0.175;
         double mytabDropletOffUPX = width16*0.022;
 
-            for(int j = 0 ; j <3;j++){
-                ImageView dropletView = new ImageView(droplet);
-                dropletView.setX(mytabDropletUPX0+mytabDropletOffUPX*j);
-                dropletView.setY(mytabDropletUPY0);
-                dropletView.setPreserveRatio(true);
-                dropletView.setFitWidth(tabLeftSize*0.04);
-                root.getChildren().add(dropletView);
-            }
+        for(int j = 0 ; j <3;j++){
+            ImageView dropletView = new ImageView(droplet);
+            dropletView.setX(mytabDropletUPX0+mytabDropletOffUPX*j);
+            dropletView.setY(mytabDropletUPY0);
+            dropletView.setPreserveRatio(true);
+            dropletView.setFitWidth(tabLeftSize*0.04);
+            root.getChildren().add(dropletView);
+        }
 
         //droplet my tab max 12
         double mytabDropletY0 = height9*0.875;
@@ -426,16 +431,16 @@ public class ImageExample extends Application {
         double myTabSquareOffX = width16*0.022;
         double myTabSquareOffY2 = height9*0.03;
 
-            for(int j = 0 ; j <3;j++){
-                for(int k =0; k<3; k++){
-                    ImageView SquareView = new ImageView(square);
-                    SquareView.setX(myTabSquareX0+myTabSquareOffX*j);
-                    SquareView.setY(myTabSquareY0+myTabSquareOffY2*k);
-                    SquareView.setPreserveRatio(true);
-                    SquareView.setFitWidth(tabLeftSize*0.04);
-                    root.getChildren().add(SquareView);
-                }
+        for(int j = 0 ; j <3;j++){
+            for(int k =0; k<3; k++){
+                ImageView SquareView = new ImageView(square);
+                SquareView.setX(myTabSquareX0+myTabSquareOffX*j);
+                SquareView.setY(myTabSquareY0+myTabSquareOffY2*k);
+                SquareView.setPreserveRatio(true);
+                SquareView.setFitWidth(tabLeftSize*0.04);
+                root.getChildren().add(SquareView);
             }
+        }
 
 
 
@@ -665,10 +670,10 @@ public class ImageExample extends Application {
                 cellButton.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
                 cellButton.setOnMouseEntered(mouseEvent ->
                         cellButton.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
-                                            "-fx-cursor: hand;"));
+                                "-fx-cursor: hand;"));
                 cellButton.setOnMouseExited(mouseEvent ->
                         cellButton.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
-                                            "-fx-cursor: arrow"));
+                                "-fx-cursor: arrow"));
                 int finalI = i;
                 int finalJ = j;
                 cellButton.setOnMouseClicked(mouseEvent ->
@@ -676,7 +681,7 @@ public class ImageExample extends Application {
             }
         }
 
-                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+        BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
 
         //lplayer pawns
         double pawnX0 = width16*0.1;
@@ -697,6 +702,19 @@ public class ImageExample extends Application {
                 }
             }
         }
+
+        //button resources
+        ImageView buttonresourceView = new ImageView(buttonresources);
+        double buttonresourcesSize= width16*0.1;
+        double buttonresourcesX=width16*0.03;
+        double buttonresourcesY=height9*0.73;
+        buttonresourceView.setFitWidth(buttonresourcesSize);
+        buttonresourceView.setX(buttonresourcesX);
+        buttonresourceView.setY(buttonresourcesY);
+        buttonresourceView.setPreserveRatio(true);
+        root.getChildren().add(buttonresourceView);
+
+
 
 // select spawn popup
         ImageView selectspawnView = new ImageView(selectspawn);
