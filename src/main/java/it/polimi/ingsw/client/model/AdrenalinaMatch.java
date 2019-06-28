@@ -329,4 +329,10 @@ public class AdrenalinaMatch {
         }
     }
 
+
+    public WeaponCard getWeaponByName(String weaponName) {
+        return weapons.stream()
+                .filter(weaponCard -> weaponCard.getName().equals(weaponName))
+                .collect(Collectors.toList()).get(0);
+    }
 }

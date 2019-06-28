@@ -867,9 +867,7 @@ public class CliView extends ClientView {
         WeaponSelection toReturn = new WeaponSelection();
         String selection = getIndexedResponse(selectables, messageToPrint);
 
-        WeaponCard selectedWeapon = player.getMatch().getWeapons().stream()
-                .filter(weaponCard -> weaponCard.getName().equals(selection))
-                .collect(Collectors.toList()).get(0);
+        WeaponCard selectedWeapon = player.getMatch().getWeaponByName(selection);
 
         // Select weapon to pick and discount
         toReturn.setWeapon(selectedWeapon.getName());

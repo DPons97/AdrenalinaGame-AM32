@@ -630,7 +630,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
-        return null;
+        return selectWeapon(selectables);
     }
 
     /**
@@ -640,7 +640,55 @@ public class GuiView extends ClientView{
      */
     @Override
     public WeaponSelection selectWeapon(List<String> selectables) {
-        return null;
+        // set weapon buttons
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                String fileName = getWeaponFileName(selectable);
+                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                    selection.setNodeClickable(p, selectable);
+                    setClickableEffects(p);
+                });
+            });
+        });
+        // get selected weapon
+        String weaponSelected = selection.getValue();
+        WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponSelected);
+        // remove weapon  button
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                String fileName = getWeaponFileName(selectable);
+                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                    selection.setNodeNotClickable(p);
+                    setNotClickableEffects(p);
+                });
+            });
+        });
+
+        // set powerup discuont buttons
+
+        List<Resource> toPay = weaponCardSelected.getCost();
+        List<Powerup> selectedPowerups = new ArrayList<>();
+        while(!toPay.isEmpty()&& !player.getMatch().getPlayerByName(player.getNickname()).getPowerups().isEmpty()) {
+            List<Powerup> usable = new ArrayList<>();
+            player.getMatch().getPlayerByName(player.getNickname()).getPowerups().forEach(powerup -> {
+                if (toPay.contains(powerup.getBonusResource())) {
+                    usable.add(powerup);
+                }
+            });
+            if(usable.isEmpty())break;
+            Powerup selectedPowerup = selectPowerup(usable);
+            if(selectedPowerup != null){
+                selectedPowerups.add(selectedPowerup);
+                player.getMatch().getPlayerByName(player.getNickname()).getPowerups().remove(selectedPowerup);
+                toPay.remove(selectedPowerup.getBonusResource());
+            }
+            else break;
+        }
+
+        WeaponSelection selected= new WeaponSelection();
+        selected.setWeapon(weaponSelected);
+        selected.setDiscount(selectedPowerups);
+        return selected;
     }
 
     /**
@@ -1224,10 +1272,12 @@ public class GuiView extends ClientView{
     }
 
     private ImageView getWeaponImage(String name){
-        String file = WEAPON_DIR+name.toLowerCase()+WEAPON_EXTENSION;
-        System.out.println(file);
-
+        String file = getWeaponFileName(name);
         return loadImage(file);
+    }
+
+    private String getWeaponFileName(String name) {
+        return WEAPON_DIR+name.toLowerCase()+WEAPON_EXTENSION;
     }
 
     private ImageView getPowerupImage(Powerup powerup){
