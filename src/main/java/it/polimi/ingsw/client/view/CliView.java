@@ -757,7 +757,7 @@ public class CliView extends ClientView {
                 selectedEffects.add(selectedEffect);
                 effects.remove(selectedEffect);
             }
-        } while (selectedEffect == null || !selectedWeapon.isEffect() || !effects.isEmpty());
+        } while (selectedEffect != null || !selectedWeapon.isEffect() || !effects.isEmpty());
 
         // Transform selected effects in integers to be sent through network
         List<Integer> effectsInteger = new ArrayList<>();
@@ -777,14 +777,14 @@ public class CliView extends ClientView {
         List<Powerup> selectedDiscount = new ArrayList<>();
         Powerup selectedPowerup;
 
+        // Print only powerups that can be used as discount
+        List<Powerup> powerups = player.getThisPlayer().getPowerups().stream()
+                .filter(powerup -> toBePayed.contains(powerup.getBonusResource())).collect(Collectors.toList());
+
+        if (powerups.isEmpty()) return selectedDiscount;
+
         do {
             messageToPrint.append(POWERUP_SELECTION);
-
-            // Print only powerups that can be used as discount
-            List<Powerup> powerups = player.getThisPlayer().getPowerups().stream()
-                    .filter(powerup -> toBePayed.contains(powerup.getBonusResource())).collect(Collectors.toList());
-
-            if (powerups.isEmpty()) return selectedDiscount;
 
             for (int i = 0; i < powerups.size(); i++) {
                 messageToPrint.append("[").append(i+1).append("] ").append(powerups.get(i).getName()).append(" - ")
@@ -801,9 +801,12 @@ public class CliView extends ClientView {
             messageToPrint.append("\n");
 
             selectedPowerup = getIndexedResponse(powerups, messageToPrint);
-            if (!selectedDiscount.contains(selectedPowerup)) selectedDiscount.add(selectedPowerup);
-
-        } while (selectedPowerup == null);
+            if (!selectedDiscount.contains(selectedPowerup)) {
+                selectedDiscount.add(selectedPowerup);
+                powerups.remove(selectedPowerup);
+            }
+            messageToPrint = new StringBuilder();
+        } while (selectedPowerup != null);
 
         return selectedDiscount;
     }
