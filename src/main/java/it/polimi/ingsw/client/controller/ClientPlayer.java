@@ -231,6 +231,7 @@ public class ClientPlayer implements ClientFunctionalities{
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
 					collect(Collectors.toList()).get(0).isReadyToStart()) {
 			// CLI: Reset input reader
+			// VIEW: change scene
 			view.initMatch();
 
 			server.setReady(true);

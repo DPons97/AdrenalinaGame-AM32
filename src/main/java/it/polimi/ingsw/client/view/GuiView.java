@@ -41,6 +41,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.UnaryOperator;
 
 public class GuiView extends ClientView{
@@ -107,13 +108,13 @@ public class GuiView extends ClientView{
     private static final double PLAYER_MARK_DROPLET_SIZE = 0.04;
 
     // enemy cards
-    private static final double ENEMY_WEAPON_CARD_Y0 = 0.005;
-    private static final double ENEMY_WEAPON_CARD_X0 = 0.63;
+    private static final double ENEMY_WEAPON_CARD_Y0 = 0;
+    private static final double ENEMY_WEAPON_CARD_X0 = 0.7;
     private static final double ENEMY_POWERUP_CARD_Y0 = 0.005;
-    private static final double ENEMY_POWERUP_CARD_X0 = 0.7;
+    private static final double ENEMY_POWERUP_CARD_X0 = 0.63;
     private static final double ENEMY_CARD_OFFSET_Y = 0.175;
-    private static final double ENEMY_CARD_OFFSET_X = 0.022;
-    private static final double ENEMY_CARD_SIZE = 0.04;
+    private static final double ENEMY_CARD_OFFSET_X = 0.0155;
+    private static final double ENEMY_CARD_SIZE = 0.015;
 
     // weapons
     private final static String WEAPON_DIR = "/img/cards/";
@@ -174,11 +175,11 @@ public class GuiView extends ClientView{
     private static final double RESOURCE_ENEMY_X0 = 0.93;
     private static final double RESOURCE_ENEMY_Y0 = 0.07;
     private static final double RESOURCE_PLAYER_X0 = 0.38;
-    private static final double RESOURCE_PLAYER_Y0 = 0.9;
-    private static final double RESOURCE_OFFSET_X = 0.02;
-    private static final double RESOURCE_OFFSET_Y = 0.0175;
-    private static final double RESOURCE_OFFSET_Y2 = 0.03;
-    private static final double RESOURCE_SIZE = 0.043;
+    private static final double RESOURCE_PLAYER_Y0 = 0.87;
+    private static final double RESOURCE_OFFSET_X = 0.022;
+    private static final double RESOURCE_OFFSET_Y = 0.03;
+    private static final double RESOURCE_OFFSET_Y2 = 0.175;
+    private static final double RESOURCE_SIZE = 0.02;
 
     // cell buttons
     private static final double CELL_BUTTON_EDGE = 0.16;
@@ -225,7 +226,13 @@ public class GuiView extends ClientView{
     private List<ImageView> powerups;
     private List<ImageView> resources;
 
+    private boolean loading;
+
+    private List<ImageView> nodes;
+
     private GuiSelection selection;
+
+    private Object lock = new Object();
 
     public GuiView(ClientPlayer player) {
         super(player);
@@ -235,6 +242,7 @@ public class GuiView extends ClientView{
         resources = new ArrayList<>();
         spawnWeapons = new ArrayList<>();
         selection = new GuiSelection();
+        nodes = new ArrayList<>();
     }
 
     /**
@@ -441,7 +449,42 @@ public class GuiView extends ClientView{
 
     @Override
     public void initMatch() {
-        // TODO remove todo if not needed
+        Platform.runLater(()->{
+            Stage stage = FXWindow.getStage();
+            BorderPane borders = new BorderPane();
+            Pane root = new Pane();
+            FXWindow.setPane(root);
+            Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
+            borders.setCenter(root);
+            stage.setScene(scene);
+            stage.setMaximized(true);
+            stage.setResizable(false);
+
+            double pV, pH;
+            // set fixed proportions
+            if(root.getHeight() > root.getWidth()*9/16){
+                pH = 0;
+                pV = (root.getHeight() - root.getWidth()*9/16)/2;
+                System.out.println("stagew h: " + stage.getHeight());
+                System.out.println("margin v: " + pV);
+            } else {
+                pV = 0;
+                pH =  (root.getWidth()-root.getHeight()*16/9)/2;
+            }
+
+            width = root.getWidth()-2*pH;
+            height = root.getHeight()-2*pV;
+
+            BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+
+            //Creating a scene object
+            borders.setPrefSize(scene.getWidth(),scene.getHeight());
+
+            borders.setStyle("-fx-background-color: #222");
+            root.setStyle("-fx-background-color: #222");
+
+            root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
+        });
     }
 
     /**
@@ -455,7 +498,9 @@ public class GuiView extends ClientView{
                 break;
             case LOADING:
             case PLAYER_TURN:
+                loading = true;
                 showGameBoard();
+                loading = false;
                 break;
         }
     }
@@ -545,6 +590,19 @@ public class GuiView extends ClientView{
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
         grid.getChildren().clear();
+    }
+
+    private void waitLoading(){
+        System.out.println("WAITING LOADING");
+        do {
+            try {
+                TimeUnit.MILLISECONDS.sleep(50);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        }while(loading == true);
+        System.out.println("DONE LOADING");
     }
 
     /**
@@ -650,13 +708,21 @@ public class GuiView extends ClientView{
      */
     @Override
     public WeaponSelection selectWeapon(List<String> selectables) {
+        System.out.println("SELECT WEAPON");
+        waitLoading();
         // set weapon buttons
+        ArrayList<ImageView> weaponsOnScreen = new ArrayList<>();
+        weaponsOnScreen.addAll(weapons);
+        weaponsOnScreen.addAll(spawnWeapons);
         Platform.runLater(()->{
             selectables.forEach(selectable -> {
-                String fileName = getWeaponFileName(selectable);
-                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
-                    selection.setNodeClickable(p, selectable);
-                    setClickableEffects(p);
+                //String fileName = getWeaponFileName(selectable);
+                weaponsOnScreen.stream().
+                        filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).
+                        forEach(w -> {
+                            selection.setNodeClickable(w, selectable);
+                            setClickableEffects(w);
+                            System.out.println("SETTING CLICKABLE"+selectable);
                 });
             });
         });
@@ -666,8 +732,8 @@ public class GuiView extends ClientView{
         // remove weapon  button
         Platform.runLater(()->{
             selectables.forEach(selectable -> {
-                String fileName = getWeaponFileName(selectable);
-                powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
+                //String fileName = getWeaponFileName(selectable);
+                weapons.stream().filter(p -> p.getImage().getUrl().contains(selectable.toLowerCase())).forEach(p -> {
                     selection.setNodeNotClickable(p);
                     setNotClickableEffects(p);
                 });
@@ -675,8 +741,11 @@ public class GuiView extends ClientView{
         });
 
         // set powerup discuont buttons
-
         List<Resource> toPay = weaponCardSelected.getCost();
+        if(!player.getThisPlayer().getWeapons().contains(weaponCardSelected)){
+          toPay.remove(0);
+        }
+
         List<Powerup> selectedPowerups = new ArrayList<>();
         while(!toPay.isEmpty()&& !player.getMatch().getPlayerByName(player.getNickname()).getPowerups().isEmpty()) {
             List<Powerup> usable = new ArrayList<>();
@@ -713,6 +782,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public Powerup selectPowerup(List<Powerup> selectables) {
+        waitLoading();
         if(player.getMatch().getPlayerByName(player.getNickname()).getPowerups().containsAll(selectables)) { // is a standard selection
             // set buttons
             Platform.runLater(()->{
@@ -748,6 +818,7 @@ public class GuiView extends ClientView{
 
     private Powerup spawnSelection(List<Powerup> selectables) {
         // show spawn
+        List<Node> toRemove = new ArrayList<>();
         Platform.runLater(()->{
             Pane root = FXWindow.getPane();
             ImageView spawnPopUp = loadImage(SPAWN_POPUP_PATH);
@@ -756,6 +827,7 @@ public class GuiView extends ClientView{
             spawnPopUp.setX((width-width*SPAWN_POPUP_SIZE)*SPAWN_POPUP_X0);
             spawnPopUp.setY((height-getHeight(spawnPopUp))*SPAWN_POPUP_Y0);
             root.getChildren().add(spawnPopUp);
+            toRemove.add(spawnPopUp);
             // put cards and put buttons
             int i = 0;
             for(Powerup powerup: selectables){
@@ -766,6 +838,7 @@ public class GuiView extends ClientView{
                 powerupImg.setFitWidth(SPAWN_POWERUP_SIZE*height);
                 setClickableEffects(powerupImg);
                 root.getChildren().add(powerupImg);
+                toRemove.add(powerupImg);
                 selection.setNodeClickable(powerupImg,String.valueOf(i));
                 i++;
             }
@@ -773,6 +846,9 @@ public class GuiView extends ClientView{
         // get value
         int selected = Integer.parseInt(selection.getValue());
         // remove all HOPEFULLY IT'S DONE BY AN UPDATE
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
         return selectables.get(selected);
     }
 
@@ -836,7 +912,7 @@ public class GuiView extends ClientView{
         });
 
         String selected = selection.getValue();
-
+        System.out.println("DONE SELECT ACTION:..... REMOVING BUTTONS");
         Platform.runLater(()->{
             FXWindow.getPane().getChildren().removeAll(buttons);
         });
@@ -845,48 +921,23 @@ public class GuiView extends ClientView{
     }
 
     private void loadLayout(){
-        Stage stage = FXWindow.getStage();
-        BorderPane borders = new BorderPane();
-        Pane root = new Pane();
-        FXWindow.setPane(root);
-        Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
-        borders.setCenter(root);
-        stage.setScene(scene);
-        stage.setMaximized(true);
-        stage.setResizable(false);
-
-        double pV, pH;
-        // set fixed proportions
-        if(root.getHeight() > root.getWidth()*9/16){
-            pH = 0;
-            pV = (root.getHeight() - root.getWidth()*9/16)/2;
-            System.out.println("stagew h: " + stage.getHeight());
-            System.out.println("margin v: " + pV);
-        } else {
-            pV = 0;
-            pH =  (root.getWidth()-root.getHeight()*16/9)/2;
-        }
-
-        width = root.getWidth()-2*pH;
-        height = root.getHeight()-2*pV;
-
-        BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
-
-        //Creating a scene object
-        borders.setPrefSize(scene.getWidth(),scene.getHeight());
-
-        borders.setStyle("-fx-background-color: #222");
-        root.setStyle("-fx-background-color: #222");
-
-        root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
-
+        Pane root = FXWindow.getPane();
+        clearView(root);
         ImageView map = loadMap();
-        root.getChildren().add(map);
-
+        addNode(root,map);
         loadPlayersTabs(root, map);
         loadSpawnPointCards(root);
         loadBoardItems(root);
 
+    }
+
+    private void addNode(Pane root, ImageView node) {
+        root.getChildren().add(node);
+        nodes.add(node);
+    }
+
+    private void clearView(Pane root) {
+        root.getChildren().removeAll(nodes);
     }
 
     private void loadBoardItems(Pane root) {
@@ -907,8 +958,8 @@ public class GuiView extends ClientView{
         weaponDeck.setY(DECK_WEAPON_Y*height);
         weaponDeck.setPreserveRatio(true);
         weaponDeck.setFitWidth(DECK_WEAPON_SIZE*height);
-        root.getChildren().add(weaponDeck);
-        root.getChildren().add(powerupDeck);
+        addNode(root,weaponDeck);
+        addNode(root,powerupDeck);
     }
 
     private void loadCellItems(Pane root, Map map) {
@@ -927,7 +978,7 @@ public class GuiView extends ClientView{
                         pawn.setY(PAWN_Y0*height+PAWN_OFFSET*height*j+PAWN_INTERNAL_OFFSET*height*(k/3));
                         pawn.setPreserveRatio(true);
                         pawn.setFitWidth(PAWN_SIZE*height);
-                        root.getChildren().add(pawn);
+                        addNode(root,pawn);
                         players.add(pawn);
                         k++;
                     }
@@ -940,7 +991,7 @@ public class GuiView extends ClientView{
                         ammo.setY(AMMO_Y0*height+AMMO_OFFSET*height*j);
                         ammo.setPreserveRatio(true);
                         ammo.setFitWidth(AMMO_SIZE*height);
-                        root.getChildren().add(ammo);
+                        addNode(root,ammo);
                     }
                 }
 
@@ -957,7 +1008,7 @@ public class GuiView extends ClientView{
             droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*j);
             droplet.setPreserveRatio(true);
             droplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
-            root.getChildren().add(droplet);
+            addNode(root,droplet);
             if(overkills.get(j)){
                 i++;
                 ImageView additionalDroplet = getDropletImage(deathtrack.get(i));
@@ -965,15 +1016,15 @@ public class GuiView extends ClientView{
                 additionalDroplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j+DEATHTRACK_DROPLET_OFFSET_X2*height);
                 additionalDroplet.setPreserveRatio(true);
                 additionalDroplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
-                root.getChildren().add(additionalDroplet);
+                addNode(root,additionalDroplet);
             }
         }
     }
 
     private void loadSpawnPointCards(Pane root) {
+        spawnWeapons.clear();
         for(SpawnCell spawnCell: player.getMatch().getBoardMap().getSpawnPoints()){
             int i = 0;
-            spawnWeapons.clear();
             switch(spawnCell.getColor()){
                 case BLUE:
                     for(WeaponCard weapon : spawnCell.getWeapons()){
@@ -983,7 +1034,7 @@ public class GuiView extends ClientView{
                         weaponView.setPreserveRatio(true);
                         weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
                         weaponView.setRotate(SPAWN_POINT_1_ROTATION);
-                        root.getChildren().add(weaponView);
+                        addNode(root,weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
                         spawnWeapons.add(weaponView);
                         i++;
@@ -997,7 +1048,7 @@ public class GuiView extends ClientView{
                         weaponView.setPreserveRatio(true);
                         weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
                         weaponView.setRotate(SPAWN_POINT_2_ROTATION);
-                        root.getChildren().add(weaponView);
+                        addNode(root,weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
                         spawnWeapons.add(weaponView);
                         i++;
@@ -1011,7 +1062,7 @@ public class GuiView extends ClientView{
                         weaponView.setPreserveRatio(true);
                         weaponView.setFitWidth(width*WEAPON_CARD_SIZE);
                         weaponView.setRotate(SPAWN_POINT_3_ROTATION);
-                        root.getChildren().add(weaponView);
+                        addNode(root,weaponView);
                         //setHoverEffect(weaponView, width*WEAPON_CARD_SIZE);
                         spawnWeapons.add(weaponView);
                         i++;
@@ -1032,7 +1083,7 @@ public class GuiView extends ClientView{
                 tab.setPreserveRatio(true);
                 tab.setFitHeight(height*RELATIVE_TAB_HEIGHT);
                 Tooltip.install(tab, new Tooltip(p.getNickname()));
-                root.getChildren().add(tab);
+                addNode(root,tab);
                 loadPlayerDashboard(root, tab);
                 loadPlayerSigns(root, tab);
             } else {
@@ -1042,7 +1093,7 @@ public class GuiView extends ClientView{
                 tab.setX(getWidth(map));
                 tab.setY(height * TAB_OFFSET * i);
                 Tooltip.install(tab, new Tooltip(p.getNickname()));
-                root.getChildren().add(tab);
+                addNode(root,tab);
                 loadEnemySigns(root,tab, p, i);
                 i++;
             }
@@ -1059,7 +1110,7 @@ public class GuiView extends ClientView{
             droplet.setY(PLAYER_DAMAGE_DROPLET_Y0*height);
             droplet.setPreserveRatio(true);
             droplet.setFitWidth(PLAYER_DAMAGE_DROPLET_SIZE);
-            root.getChildren().add(droplet);
+            addNode(root,droplet);
             i++;
         }
         //marks
@@ -1070,7 +1121,7 @@ public class GuiView extends ClientView{
             droplet.setY(PLAYER_MARK_DROPLET_Y0*height);
             droplet.setPreserveRatio(true);
             droplet.setFitWidth(PLAYER_MARK_DROPLET_SIZE);
-            root.getChildren().add(droplet);
+            addNode(root,droplet);
             i++;
         }
         //deaths
@@ -1080,7 +1131,7 @@ public class GuiView extends ClientView{
             skull.setY(PLAYER_SKULL_DROPLET_Y0*height);
             skull.setPreserveRatio(true);
             skull.setFitWidth(PLAYER_SKULL_SIZE);
-            root.getChildren().add(skull);
+            addNode(root,skull);
             i++;
         }
 
@@ -1090,11 +1141,12 @@ public class GuiView extends ClientView{
         for(Resource r: player.getMatch().getPlayerByName(player.getNickname()).getAmmos()){
             ImageView resource = getResourceImage(r);
             resource.setX(RESOURCE_PLAYER_X0*width+RESOURCE_OFFSET_X*width*(i%3));
-            resource.setX(RESOURCE_PLAYER_Y0*width+RESOURCE_OFFSET_Y*height*(i/3));
+            resource.setY(RESOURCE_PLAYER_Y0*height+RESOURCE_OFFSET_Y*height*(i/3));
             resource.setPreserveRatio(true);
-            resource.setFitWidth(RESOURCE_SIZE*getWidth(tab));
-            root.getChildren().add(resource);
+            resource.setFitWidth(RESOURCE_SIZE*width);
+            addNode(root,resource);
             resources.add(resource);
+            i++;
         }
     }
 
@@ -1107,7 +1159,7 @@ public class GuiView extends ClientView{
             droplet.setY(ENEMY_DAMAGE_DROPLET_Y0 *height+ ENEMY_DAMAGE_DROPLET_OFFSET_Y *height*i);
             droplet.setPreserveRatio(true);
             droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
-            root.getChildren().add(droplet);
+            addNode(root,droplet);
             k++;
         }
 
@@ -1119,7 +1171,7 @@ public class GuiView extends ClientView{
             droplet.setY(ENEMY_MARK_DROPLET_Y0 *height+ ENEMY_MARK_DROPLET_OFFSET_Y *height*i);
             droplet.setPreserveRatio(true);
             droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
-            root.getChildren().add(droplet);
+            addNode(root,droplet);
             k++;
         }
 
@@ -1131,7 +1183,7 @@ public class GuiView extends ClientView{
             skull.setY(ENEMY_SKULL_DROPLET_Y0*height+ENEMY_SKULL_DROPLET_OFFSET_Y*height*i);
             skull.setPreserveRatio(true);
             skull.setFitWidth(ENEMY_SKULL_SIZE);
-            root.getChildren().add(skull);
+            addNode(root,skull);
             k++;
         }
 
@@ -1147,19 +1199,21 @@ public class GuiView extends ClientView{
             weapon.setX(ENEMY_WEAPON_CARD_X0*width+ENEMY_CARD_OFFSET_X*width*k);
             weapon.setY(ENEMY_WEAPON_CARD_Y0*height+ENEMY_CARD_OFFSET_Y*height*i);
             weapon.setPreserveRatio(true);
-            weapon.setFitWidth(ENEMY_CARD_SIZE*getWidth(tab));
-            root.getChildren().add(weapon);
+            weapon.setFitWidth(ENEMY_CARD_SIZE*width);
+            addNode(root,weapon);
+            k++;
         }
 
         //powerup
         k = 0;
         for(Powerup powerup: player.getPowerups()){
-            ImageView powerupImage = getPowerupImage(powerup);
+            ImageView powerupImage = loadImage(DECK_POWERUP_PATH);
             powerupImage.setX(ENEMY_POWERUP_CARD_X0*width+ENEMY_CARD_OFFSET_X*width*k);
             powerupImage.setY(ENEMY_POWERUP_CARD_Y0*height+ENEMY_CARD_OFFSET_Y*height*i);
             powerupImage.setPreserveRatio(true);
-            powerupImage.setFitWidth(ENEMY_CARD_SIZE*getWidth(tab));
-            root.getChildren().add(powerupImage);
+            powerupImage.setFitWidth(ENEMY_CARD_SIZE*width);
+            addNode(root,powerupImage);
+            k++;
         }
 
         //resources
@@ -1167,10 +1221,11 @@ public class GuiView extends ClientView{
         for(Resource r: player.getAmmos()){
             ImageView resource = getResourceImage(r);
             resource.setX(RESOURCE_ENEMY_X0*width+RESOURCE_OFFSET_X*width*(k%3));
-            resource.setX(RESOURCE_ENEMY_Y0*width+RESOURCE_OFFSET_Y*height*(k/3));
+            resource.setY(RESOURCE_ENEMY_Y0*height+RESOURCE_OFFSET_Y*height*(k/3)+RESOURCE_OFFSET_Y2*height*i);
             resource.setPreserveRatio(true);
-            resource.setFitWidth(RESOURCE_SIZE*getWidth(tab));
-            root.getChildren().add(resource);
+            resource.setFitWidth(RESOURCE_SIZE*width);
+            addNode(root,resource);
+            k++;
         }
     }
 
@@ -1180,7 +1235,7 @@ public class GuiView extends ClientView{
         dashboard.setY(PLAYER_TAB_Y*height);
         dashboard.setX(getWidth(tab));
         dashboard.setFitWidth(width-getWidth(tab));
-        root.getChildren().add(dashboard);
+        addNode(root,dashboard);
         loadPlayerWeapons(root);
         loadPlayerPowerups(root);
     }
@@ -1188,27 +1243,31 @@ public class GuiView extends ClientView{
 
     private void loadPlayerPowerups(Pane root) {
         powerups.clear();
+        int i = 0;
         for(Powerup powerup: player.getMatch().getPlayerByName(player.getNickname()).getPowerups()){
             ImageView powerupImg = getPowerupImage(powerup);
             powerupImg.setPreserveRatio(true);
             powerupImg.setY(DASHBOARD_POWERUP_Y*height);
             powerupImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
-            powerupImg.setX(DASHBOARD_POWERUP_X*width+DASHBOARD_POWERUP_OFFSET*height);
-            root.getChildren().add(powerupImg);
+            powerupImg.setX(DASHBOARD_POWERUP_X*width+DASHBOARD_POWERUP_OFFSET*height*i);
+            addNode(root,powerupImg);
             powerups.add(powerupImg);
+            i++;
         }
     }
 
     private void loadPlayerWeapons(Pane root) {
         weapons.clear();
+        int i = 0;
         for(WeaponCard weapon: player.getMatch().getPlayerByName(player.getNickname()).getWeapons()){
             ImageView weaponImg = getWeaponImage(weapon.getName());
             weaponImg.setPreserveRatio(true);
             weaponImg.setY(DASHBOARD_WEAPON_Y*height);
-            weaponImg.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height);
+            weaponImg.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height*i);
             weaponImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
-            root.getChildren().add(weaponImg);
+            addNode(root,weaponImg);
             weapons.add(weaponImg);
+            i++;
         }
     }
 
@@ -1226,14 +1285,16 @@ public class GuiView extends ClientView{
     private ImageView loadImage(String filePath){
         System.out.println(filePath);
         URL url = getClass().getResource(filePath);
-        try {
-            Image img = new Image(new FileInputStream(url.getFile().replace("%20", " ")));
+        System.out.println(url.toString());
+        //try {
+            //Image img = new Image(new FileInputStream(url.getFile().replace("%20", " ")));
+            Image img = new Image(url.toString().replace("%20", " "));
             return new ImageView(img);
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
+        //} catch (FileNotFoundException e) {
+        //    e.printStackTrace();
+        //}
+        //return null;
     }
 
     private Double getWidth(ImageView i){
