@@ -194,9 +194,9 @@ public class ClientPlayer implements ClientFunctionalities{
 
 	    Powerup selected = view.selectPowerup(selectables);
 
-	    if (selected != null)
+	    if (selected != null){
 			return selected.toJSON().toString();
-	    else return "";
+		} else return "";
 	}
 
 	/**

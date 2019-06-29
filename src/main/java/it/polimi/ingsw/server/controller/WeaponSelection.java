@@ -93,7 +93,9 @@ public class WeaponSelection {
      */
     public JSONObject toJSON(){
         JSONObject obj = new JSONObject();
-        obj.put("weapon", this.weapon);
+
+        if (this.weapon == null) obj.put("weapon", "none");
+        else obj.put("weapon", this.weapon);
 
         JSONArray effectArray = new JSONArray();
         effectArray.addAll(effectID);

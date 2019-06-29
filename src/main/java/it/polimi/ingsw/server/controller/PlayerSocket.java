@@ -452,11 +452,13 @@ public class PlayerSocket extends PlayerConnection {
 	private WeaponSelection parseWeaponSelection(JSONObject weaponJSON){
 		String weapon = weaponJSON.get("weapon").toString();
 
+		if (weapon.equals("none")) weapon = null;
+
 		// Parse effect ids
 		List<Integer> effectID = new ArrayList<>();
 		JSONArray effectIDArray = (JSONArray) weaponJSON.get("effectID");
 		for (Object o : effectIDArray) {
-			Integer id = (Integer) o;
+			Integer id = Integer.parseInt(o.toString());
 			effectID.add(id);
 		}
 
