@@ -334,10 +334,6 @@ public class ImageExample extends Application {
             }
         }
 
-
-
-
-
         //cardback01 up side
         double tabCardback01Y0 = height9*0.005;
         double tabCardback01X0 = width16*0.70;
