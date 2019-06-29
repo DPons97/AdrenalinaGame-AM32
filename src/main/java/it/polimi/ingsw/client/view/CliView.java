@@ -570,6 +570,7 @@ public class CliView extends ClientView {
             System.out.printf(LOBBY_CLOSER);
 
             lobbyNextCommand(isReady);
+
         } else if (match.getState() == MatchState.PLAYER_TURN) {
             synchronized (this) {
                 // Print players
@@ -602,29 +603,37 @@ public class CliView extends ClientView {
         if (!isReady) {
             System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
 
-            // Retreive next command
-            response = getResponse();
-            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
+            while (true) {
+                // Retreive next command
+                response = getResponse();
+                if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
-            if (response.equals("R") || response.equals("r")) {
-                player.setReady(true);
-            } else if (response.equals("E") || response.equals("e")) {
-                player.backToLobby();
-                player.updateLobby();
-            } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
+                if (response.equals("R") || response.equals("r")) {
+                    player.setReady(true);
+                    break;
+                } else if (response.equals("E") || response.equals("e")) {
+                    player.backToLobby();
+                    player.updateLobby();
+                    break;
+                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
+            }
 
         } else {
             System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
-            response = getResponse();
-            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
+            while (true) {
+                response = getResponse();
+                if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
-            if (response.equals("E") || response.equals("e")) {
-                player.backToLobby();
-                player.updateLobby();
-            } else if (response.equals("N") || response.equals("n")) {
-                player.setReady(false);
-            }else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
+                if (response.equals("E") || response.equals("e")) {
+                    player.backToLobby();
+                    player.updateLobby();
+                    break;
+                } else if (response.equals("N") || response.equals("n")) {
+                    player.setReady(false);
+                    break;
+                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
+            }
         }
     }
 
@@ -1568,7 +1577,11 @@ public class CliView extends ClientView {
                     weaponsString.append(currentWeapon.getName()).append(!weaponLoaded ? " (Unloaded)" : "");
                 } else if (!weaponLoaded) {
                     weaponsString.append(currentWeapon.getName()).append(" (Unloaded)");
-                } else weaponsString.append("[Hidden weapon]");
+                } else {
+                    weaponsString.append("[Hidden weapon]");
+                    charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString, weaponCost);
+                    continue;
+                }
 
                 int colorLength = 0;
                 for (Resource res : currentWeapon.getCost()) {

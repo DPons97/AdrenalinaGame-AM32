@@ -130,7 +130,9 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
     @Override
     public String playerSelection(List<String> selectable) {
-        return view.selectPlayer(selectable);
+        String selected = view.selectPlayer(selectable);
+        if (selected == null) return "";
+        return selected;
     }
 
 	/**

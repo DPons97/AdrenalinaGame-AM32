@@ -194,8 +194,11 @@ public class PlayerSocket extends PlayerConnection {
         selectable.forEach(s->jArray.add(s.getNickname()));
 	    message.put("list", jArray);
 	    this.sendInstruction(message);
+
 	    String selected = this.getResponse();
-	    return selectable.stream().filter(p->p.getNickname().equals(selected))
+
+		if (selected == null || selected.isEmpty()) return null;
+		return selectable.stream().filter(p->p.getNickname().equals(selected))
                             .collect(Collectors.toList()).get(0);
 	}
 
@@ -279,7 +282,10 @@ public class PlayerSocket extends PlayerConnection {
 		selectable.forEach(s->jArray.add(s.toJSON()));
 		message.put("list", jArray);
 		this.sendInstruction(message);
+
 		String selected = this.getResponse();
+
+		if (selected == null || selectable.isEmpty()) return null;
 		return selectable.stream().filter(p->p.toJSON().toString().equals(selected))
 				.collect(Collectors.toList()).get(0);
 	}
