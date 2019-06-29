@@ -722,7 +722,7 @@ public class GuiView extends ClientView{
                         forEach(w -> {
                             selection.setNodeClickable(w, selectable);
                             setClickableEffects(w);
-                            System.out.println("SETTING CLICKABLE"+selectable);
+                            System.out.println("SETTING CLICKABLE "+selectable);
                 });
             });
         });
@@ -733,9 +733,10 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             selectables.forEach(selectable -> {
                 //String fileName = getWeaponFileName(selectable);
-                weapons.stream().filter(p -> p.getImage().getUrl().contains(selectable.toLowerCase())).forEach(p -> {
-                    selection.setNodeNotClickable(p);
-                    setNotClickableEffects(p);
+                weaponsOnScreen.stream().filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).forEach(w -> {
+                    selection.setNodeNotClickable(w);
+                    setNotClickableEffects(w);
+                    System.out.println("REMOVING CLICKABLE "+selectable);
                 });
             });
         });
@@ -804,8 +805,8 @@ public class GuiView extends ClientView{
                 selectables.forEach(selectable -> {
                     String fileName = getPowerupFileName(selectable);
                     powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
-                        selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
-                        setClickableEffects(p);
+                        selection.setNodeNotClickable(p);
+                        setNotClickableEffects(p);
                     });
                 });
             });
