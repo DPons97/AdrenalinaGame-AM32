@@ -279,7 +279,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			lobby.getPlayers().forEach(this::checkPlayerPingStatus);
 			lobby.getPlayersInGame().forEach(this::checkPlayerPingStatus);
 			try {
-				TimeUnit.SECONDS.sleep(10);
+				TimeUnit.SECONDS.sleep(15);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -291,7 +291,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		if (p.getPinged())
 			p.setPinged(false);
 		else
-		// if not received ping in last 10 seconds try to ping. if fails it automatically disconnects p
+		// if not received ping in last 15 seconds try to ping. if fails it automatically disconnects p
 		{
 			try {
 				Thread t = p.ping();
