@@ -208,6 +208,18 @@ public class GuiView extends ClientView{
     private static final double SPAWN_POWERUP_OFFSET_X = 0.215;
     private static final double SPAWN_POWERUP_SIZE = 0.17;
 
+    // use resources button
+    private static final String USE_RESOURCES_PATH = "/img/others/buttonresources.png";
+    private static final double USE_RESOURCES_SIZE = 0.1;
+    private static final double USE_RESOURCES_Y= 0.73;
+    private static final double USE_RESOURCES_X = 0.03;
+
+    // button no reload
+    private static final String NO_RELOAD_PATH = "/img/others/buttonnoreload.png";
+    private static final double NO_RELOAD_SIZE = 0.1;
+    private static final double NO_RELOAD_Y= 0.73;
+    private static final double NO_RELOAD_X = 0.03;
+
     // css effects
     private static final String STANDARD_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 0, 0, 0, 0);" +
                                                   "-fx-cursor: arrow";
@@ -698,6 +710,20 @@ public class GuiView extends ClientView{
      */
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
+        // show button no reload
+        List<ImageView> toRemove = new ArrayList<>();
+        Platform.runLater(()-> {
+            ImageView buttonNoReload = loadImage(NO_RELOAD_PATH);
+            buttonNoReload.setPreserveRatio(true);
+            buttonNoReload.setFitWidth(NO_RELOAD_SIZE*width);
+            buttonNoReload.setX(NO_RELOAD_X*width);
+            buttonNoReload.setY(NO_RELOAD_Y*height);
+            FXWindow.getPane().getChildren().add(buttonNoReload);
+            toRemove.add(buttonNoReload);
+            selection.setNodeClickable(buttonNoReload, "");
+            setButtonEffects(buttonNoReload);
+        });
+
         return selectWeapon(selectables);
     }
 
@@ -722,20 +748,23 @@ public class GuiView extends ClientView{
                         forEach(w -> {
                             selection.setNodeClickable(w, selectable);
                             setClickableEffects(w);
-                            System.out.println("SETTING CLICKABLE"+selectable);
+                            System.out.println("SETTING CLICKABLE "+selectable);
                 });
             });
         });
         // get selected weapon
         String weaponSelected = selection.getValue();
+        if(weaponSelected.equals(""))return new WeaponSelection("",new ArrayList<>(), new ArrayList<>());
+
         WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponSelected);
         // remove weapon  button
         Platform.runLater(()->{
             selectables.forEach(selectable -> {
                 //String fileName = getWeaponFileName(selectable);
-                weapons.stream().filter(p -> p.getImage().getUrl().contains(selectable.toLowerCase())).forEach(p -> {
-                    selection.setNodeNotClickable(p);
-                    setNotClickableEffects(p);
+                weaponsOnScreen.stream().filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).forEach(w -> {
+                    selection.setNodeNotClickable(w);
+                    setNotClickableEffects(w);
+                    System.out.println("REMOVING CLICKABLE "+selectable);
                 });
             });
         });
@@ -745,6 +774,21 @@ public class GuiView extends ClientView{
         if(!player.getThisPlayer().getWeapons().contains(weaponCardSelected)){
           toPay.remove(0);
         }
+
+        List<ImageView> toRemove = new ArrayList<>();
+        // show button to stop using powerups
+        Platform.runLater(()-> {
+            ImageView buttonResources = loadImage(USE_RESOURCES_PATH);
+            buttonResources.setPreserveRatio(true);
+            buttonResources.setFitWidth(USE_RESOURCES_SIZE*width);
+            buttonResources.setX(USE_RESOURCES_X*width);
+            buttonResources.setY(USE_RESOURCES_Y*height);
+            FXWindow.getPane().getChildren().add(buttonResources);
+            toRemove.add(buttonResources);
+            selection.setNodeClickable(buttonResources, "-1");
+            setButtonEffects(buttonResources);
+        });
+
 
         List<Powerup> selectedPowerups = new ArrayList<>();
         while(!toPay.isEmpty()&& !player.getMatch().getPlayerByName(player.getNickname()).getPowerups().isEmpty()) {
@@ -763,6 +807,10 @@ public class GuiView extends ClientView{
             }
             else break;
         }
+
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
 
         WeaponSelection selected= new WeaponSelection();
         selected.setWeapon(weaponSelected);
@@ -798,14 +846,14 @@ public class GuiView extends ClientView{
 
             // wait for selection
             int selected = Integer.parseInt(selection.getValue());
-
+            if(selected == -1) return null;
             // remove buttons
             Platform.runLater(()->{
                 selectables.forEach(selectable -> {
                     String fileName = getPowerupFileName(selectable);
                     powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
-                        selection.setNodeClickable(p, String.valueOf(selectables.indexOf(selectable)));
-                        setClickableEffects(p);
+                        selection.setNodeNotClickable(p);
+                        setNotClickableEffects(p);
                     });
                 });
             });

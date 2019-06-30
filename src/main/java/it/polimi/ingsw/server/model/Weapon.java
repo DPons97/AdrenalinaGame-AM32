@@ -5,13 +5,14 @@ import it.polimi.ingsw.custom_exceptions.WeaponNotLoadedException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * 
  */
-public abstract class Weapon {
+public abstract class Weapon implements Serializable {
 	/**
 	 * weapon name
 	 */

@@ -2,10 +2,14 @@ package it.polimi.ingsw.server.model;
 
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
+import java.util.Objects;
+
 /**
  * 
  */
-public class Powerup {
+public class Powerup implements Serializable {
+
 	/**
 	 * Powerup name
 	 */
@@ -87,5 +91,19 @@ public class Powerup {
 		Resource resource = Resource.valueOf(toParse.get("bonusResource").toString());
 		return new Powerup(name, description, resource, null);
 
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Powerup powerup = (Powerup) o;
+		return Objects.equals(getName(), powerup.getName()) &&
+				getBonusResource() == powerup.getBonusResource();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(getName(), getBonusResource());
 	}
 }

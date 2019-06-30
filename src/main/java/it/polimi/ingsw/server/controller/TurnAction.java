@@ -1,5 +1,7 @@
 package it.polimi.ingsw.server.controller;
 
+import java.io.Serializable;
+
 /**
  * 
  */
