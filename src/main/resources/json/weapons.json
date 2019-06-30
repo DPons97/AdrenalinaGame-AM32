@@ -736,7 +736,7 @@
       "name": "Hellion",
       "cost": [
         "R",
-        "B"
+        "Y"
       ],
       "type": "MODE",
       "base-mode": {
@@ -836,8 +836,7 @@
     {
       "name": "Flame Thrower",
       "cost": [
-        "R",
-        "B"
+        "R"
       ],
       "type": "MODE",
       "base-mode": {
@@ -1066,6 +1065,10 @@
             ]
           },
           {
+            "type": "DAMAGE",
+            "value": 2
+          },
+          {
             "type": "SELECT",
             "ID": 10,
             "target": "CELL",
@@ -1081,12 +1084,8 @@
             ]
           },
           {
-            "type": "DAMAGE",
-            "value": 2
-          },
-          {
             "type": "SELECT",
-            "ID": 2,
+            "ID": -2,
             "target": "CELL",
             "from": "1",
             "differentCells": false,

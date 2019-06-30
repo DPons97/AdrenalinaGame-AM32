@@ -14,7 +14,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": "[Select ID (-1 if not needed)]",
+            "ID": "[Select ID (-1 if not needed, -2 to keep current id)]",
             "notID": "id to exclude",
             "target": "PLAYER / CELL / ROOM / SELF",
             "from": "VISIBLE / NOT_VISIBLE / TARGET_VISIBLE / DIRECTION / DIRECTION_VISIBLE/ PREV_TARGET / [int selectID] / ANY",

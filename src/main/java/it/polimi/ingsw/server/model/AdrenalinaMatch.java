@@ -693,12 +693,6 @@ public class AdrenalinaMatch {
 								flatMap(List::stream).
 								collect(Collectors.toList()));
 
-			break;
-			case "ATTACKER":
-				// TODO: implement here
-				break;
-			case "DAMAGED":
-				// TODO: implement here
 				break;
 			case "ANY":
 				toReturn.addAll(caller.getCellAtDistance(minDistance,maxDistance).stream().map(Cell::getPlayers)
@@ -714,7 +708,7 @@ public class AdrenalinaMatch {
 
 				// if none were found, the id should be a cell id
 				if(toReturn.isEmpty()){
-					//look for cells with id
+					// look for cells with id
 					List<Cell> foundCells = boardMap.getCellsByID(id);
 
 					for(Cell c: foundCells){
@@ -723,13 +717,15 @@ public class AdrenalinaMatch {
 						}
 					}
 				} else {
+					// look for players at given distance
 					toReturn = intersection(toReturn,
-							caller.getCellAtDistance(minDistance,maxDistance).stream().
+							toReturn.get(0).getCellAtDistance(minDistance,maxDistance).stream().
 									map(Cell::getPlayers).
 									flatMap(List::stream).
 									collect(Collectors.toList()));
 				}
 		}
+
 		// filter notID
 		toReturn.removeIf(p -> p.getID() == notID);
 		//there is an apposite call to get yourself
@@ -816,12 +812,12 @@ public class AdrenalinaMatch {
 						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
 					}
 				} else {
-					toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
+					List<Player> playersWithID = getPlayersByID(id);
+
+					if (!playersWithID.isEmpty()) toReturn = intersection(toReturn, playersWithID.get(0).getCellAtDistance(minDistance,maxDistance));
 				}
-
-
-
 		}
+
 		// filter notID
 		toReturn.removeIf(p -> p.getID() == notID);
 		return toReturn;

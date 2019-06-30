@@ -221,6 +221,8 @@ public class Action {
 
 						if (selected.isEmpty()) {
 							nSelected++;
+
+							// Set ids to selected players
 							couldBeAdded.remove(selected);
 						} else if (nSelected >= minQty) {
 							break;
@@ -254,13 +256,6 @@ public class Action {
 
 			couldBeAdded.remove(caller);
 
-			// Set ids to selected players
-			try {
-				for (Player player : couldBeAdded) player.setID(Integer.parseInt(baseActionJSON.get("ID").toString()));
-			} catch (NumberFormatException e) {
-				for (Player player : couldBeAdded) player.setID(-1);
-			}
-
 			if((!diffCells && maxQty == -1) || (minQty == maxQty && minQty >= couldBeAdded.size()))
 				// if there is no choice -> add all you could add
 				targetPlayers.addAll(couldBeAdded);
@@ -273,6 +268,14 @@ public class Action {
 
 						if (selected != null) {
 							nSelected++;
+
+							// Set ids to selected players
+							int id = Integer.parseInt(baseActionJSON.get("ID").toString());
+							if (id != -2) {
+								selected.setID(id);
+								selected.getPosition().setID(id);
+							}
+
 							couldBeAdded.remove(selected);
 						} else if (nSelected >= minQty) {
 							break;
@@ -295,13 +298,6 @@ public class Action {
 							targetPlayers
 					);
 
-			// Set ids to selected players
-			try {
-				for (Cell cell : couldBeAdded) cell.setID(Integer.parseInt(baseActionJSON.get("ID").toString()));
-			} catch (NumberFormatException e) {
-				for (Cell cell : couldBeAdded) cell.setID(-1);
-			}
-
 			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
 				// if there is no choice -> add all you could add
 				targetCells.addAll(couldBeAdded);
@@ -314,6 +310,11 @@ public class Action {
 
 						if (selected != null) {
 							nSelected++;
+
+							// Set ids to selected players
+							int id = Integer.parseInt(baseActionJSON.get("ID").toString());
+							if (id != -2) selected.setID(id);
+
 							couldBeAdded.remove(selected);
 						} else if (nSelected >= minQty) {
 							break;
