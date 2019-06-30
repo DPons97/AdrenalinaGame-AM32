@@ -652,7 +652,7 @@ public class ImageExample extends Application {
                     System.out.println("myTabButton2 " + "," + finalJ +" pressed"));
         }
 
-
+/*
         double buttonEdge = height9*0.16;
         double buttonX0 = width16*0.1;
         double buttonY0 = height9*0.18;
@@ -680,8 +680,420 @@ public class ImageExample extends Application {
                         System.out.println("Button " + finalI + "," + finalJ +" pressed"));
             }
         }
+        */
 
-        BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+        //rooms button
+
+        //size of type button
+        double n123buttonH= height9*0.16;
+        double n3buttonW = height9*0.537;
+        double n2buttonW = height9*0.358;
+        double n1buttonW = height9*0.16;
+        double n2x2buttonWH= height9*0.358;
+        double n2rotatebuttonH=height9*0.358; //vertical button
+
+        //position square map 1
+        double blue1X= width16*0.1; //x=0
+        double blue1Y= height9*0.18;// y=0
+        double red1X= width16*0.1; // x=0
+        double red1Y= height9*0.179+height9*0.18;// y=1
+        double grey1X=(width16*0.1)+(height9*0.16); // x=1
+        double grey1Y=height9*0.538; //y=2
+        double yellow1X=(height9*0.537)+(width16*0.1); //x=3
+        double yellow1Y=height9*0.359; //y=1
+        //position square map 2
+        double blue2X= width16*0.1; //x=0
+        double blue2Y= height9*0.18;// y=0
+        double red2X=width16*0.1; //x=1
+        double red2Y=height9*0.179+height9*0.18;// y=1
+        double green2X=(height9*0.537)+(width16*0.1);
+        double green2Y=height9*0.18;
+        double grey2X=(width16*0.1)+(height9*0.16);
+        double grey2Y=height9*0.538;
+        double yellow2X=(height9*0.358)+(width16*0.1);
+        double yellow2Y=(height9*0.179)+(height9*0.18);
+        //position square map 3
+        double red3X=width16*0.1;
+        double red3Y=height9*0.18;
+        double blue3X=(width16*0.1)+(height9*0.16);
+        double blue3Y=height9*0.18;
+        double green3X=(height9*0.537)+(width16*0.1);
+        double green3Y=height9*0.18;
+        double yellow3X=(height9*0.358)+(width16*0.1);
+        double yellow3Y=(height9*0.179)+(height9*0.18);
+        double grey3X=width16*0.1;
+        double grey3Y=height9*0.538;
+        double purple3X=(width16*0.1)+(height9*0.16);
+        double purple3Y=height9*0.179+height9*0.18;
+        //position square map 4
+        double red4X=width16*0.1;
+        double red4Y=height9*0.18;
+        double blue4X=(width16*0.1)+(height9*0.16);
+        double blue4Y=height9*0.18;
+        double purple4X=(width16*0.1)+(height9*0.16);
+        double purple4Y=height9*0.179+height9*0.18;
+        double yellow4X=(height9*0.537)+(width16*0.1);
+        double yellow4Y=height9*0.359;
+        double grey4X=width16*0.1;
+        double grey4Y=height9*0.538;
+
+/*
+ //MAP 1
+        //red button map 1
+        Button red1 = new Button();
+        red1.setLayoutX(red1X);
+        red1.setLayoutY(red1Y);
+        red1.setPrefWidth(n3buttonW);
+        red1.setPrefHeight(n123buttonH);
+        root.getChildren().add(red1);
+        red1.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        red1.setOnMouseEntered(mouseEvent ->
+                red1.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        red1.setOnMouseExited(mouseEvent ->
+                red1.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        red1.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //blue button map 1
+        Button blue1 = new Button();
+        blue1.setLayoutX(blue1X);
+        blue1.setLayoutY(blue1Y);
+        blue1.setPrefWidth(n3buttonW);
+        blue1.setPrefHeight(n123buttonH);
+        root.getChildren().add(blue1);
+        blue1.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        blue1.setOnMouseEntered(mouseEvent ->
+                blue1.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        blue1.setOnMouseExited(mouseEvent ->
+                blue1.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        blue1.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //grey button map 1
+        Button grey1 = new Button();
+        grey1.setLayoutX(grey1X);
+        grey1.setLayoutY(grey1Y);
+        grey1.setPrefWidth(n2buttonW);
+        grey1.setPrefHeight(n123buttonH);
+        root.getChildren().add(grey1);
+        grey1.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        grey1.setOnMouseEntered(mouseEvent ->
+                grey1.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        grey1.setOnMouseExited(mouseEvent ->
+                grey1.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        grey1.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //yellow button map 1
+        Button yellow1 = new Button();
+        yellow1.setLayoutX(yellow1X);
+        yellow1.setLayoutY(yellow1Y);
+        yellow1.setPrefWidth(n123buttonH);
+        yellow1.setPrefHeight(n2rotatebuttonH);
+        root.getChildren().add(yellow1);
+        yellow1.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        yellow1.setOnMouseEntered(mouseEvent ->
+                yellow1.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        yellow1.setOnMouseExited(mouseEvent ->
+                yellow1.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        yellow1.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+*/
+
+/*
+//MAP 2
+        //grey button map 2
+        Button grey2 = new Button();
+        grey2.setLayoutX(grey2X);
+        grey2.setLayoutY(grey2Y);
+        grey2.setPrefWidth(n123buttonH);
+        grey2.setPrefHeight(n123buttonH);
+        root.getChildren().add(grey2);
+        grey2.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        grey2.setOnMouseEntered(mouseEvent ->
+                grey2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        grey2.setOnMouseExited(mouseEvent ->
+                grey2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        grey2.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+
+
+        //yellow button map 2
+        Button yellow2 = new Button();
+        yellow2.setLayoutX(yellow2X);
+        yellow2.setLayoutY(yellow2Y);
+        yellow2.setPrefWidth(n2x2buttonWH);
+        yellow2.setPrefHeight(n2x2buttonWH);
+        root.getChildren().add(yellow2);
+        yellow2.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        yellow2.setOnMouseEntered(mouseEvent ->
+                yellow2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        yellow2.setOnMouseExited(mouseEvent ->
+                yellow2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        yellow2.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+//green button map 2
+        Button green2 = new Button();
+        green2.setLayoutX(green2X);
+        green2.setLayoutY(green2Y);
+        green2.setPrefWidth(n123buttonH);
+        green2.setPrefHeight(n123buttonH);
+        root.getChildren().add(green2);
+        green2.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        green2.setOnMouseEntered(mouseEvent ->
+                green2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        green2.setOnMouseExited(mouseEvent ->
+                green2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        green2.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+//red button map 2
+        Button red2 = new Button();
+        red2.setLayoutX(red2X);
+        red2.setLayoutY(red2Y);
+        red2.setPrefWidth(n2buttonW);
+        red2.setPrefHeight(n123buttonH);
+        root.getChildren().add(red2);
+        red2.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        red2.setOnMouseEntered(mouseEvent ->
+                red2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        red2.setOnMouseExited(mouseEvent ->
+                red2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        red2.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //blue button map 2
+        Button blue2 = new Button();
+        blue2.setLayoutX(blue2X);
+        blue2.setLayoutY(blue2Y);
+        blue2.setPrefWidth(n3buttonW);
+        blue2.setPrefHeight(n123buttonH);
+        root.getChildren().add(blue2);
+        blue2.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        blue2.setOnMouseEntered(mouseEvent ->
+                blue2.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        blue2.setOnMouseExited(mouseEvent ->
+                blue2.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        blue2.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+*/
+/*
+//MAP 3
+        //grey button map 3
+        Button grey3 = new Button();
+        grey3.setLayoutX(grey3X);
+        grey3.setLayoutY(grey3Y);
+        grey3.setPrefWidth(n2buttonW);
+        grey3.setPrefHeight(n123buttonH);
+        root.getChildren().add(grey3);
+        grey3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        grey3.setOnMouseEntered(mouseEvent ->
+                grey3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        grey3.setOnMouseExited(mouseEvent ->
+                grey3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        grey3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+
+        //purple button map 3
+        Button purple3 = new Button();
+        purple3.setLayoutX(purple3X);
+        purple3.setLayoutY(purple3Y);
+        purple3.setPrefWidth(n123buttonH);
+        purple3.setPrefHeight(n123buttonH);
+        root.getChildren().add(purple3);
+        purple3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        purple3.setOnMouseEntered(mouseEvent ->
+                purple3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        purple3.setOnMouseExited(mouseEvent ->
+                purple3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        purple3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //green button map 3
+        Button green3 = new Button();
+        green3.setLayoutX(green3X);
+        green3.setLayoutY(green3Y);
+        green3.setPrefWidth(n123buttonH);
+        green3.setPrefHeight(n123buttonH);
+        root.getChildren().add(green3);
+        green3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        green3.setOnMouseEntered(mouseEvent ->
+                green3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        green3.setOnMouseExited(mouseEvent ->
+                green3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        green3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+  //blue button map 3
+        Button blue3 = new Button();
+        blue3.setLayoutX(blue3X);
+        blue3.setLayoutY(blue3Y);
+        blue3.setPrefWidth(n2buttonW);
+        blue3.setPrefHeight(n123buttonH);
+        root.getChildren().add(blue3);
+        blue3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        blue3.setOnMouseEntered(mouseEvent ->
+                blue3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        blue3.setOnMouseExited(mouseEvent ->
+                blue3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        blue3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+
+        //red button map 3
+        Button red3 = new Button();
+        red3.setLayoutX(red3X);
+        red3.setLayoutY(red3Y);
+        red3.setPrefWidth(n123buttonH);
+        red3.setPrefHeight(n2rotatebuttonH);
+        root.getChildren().add(red3);
+        red3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        red3.setOnMouseEntered(mouseEvent ->
+                red3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        red3.setOnMouseExited(mouseEvent ->
+                red3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        red3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //yellow button map 3
+        Button yellow3 = new Button();
+        yellow3.setLayoutX(yellow3X);
+        yellow3.setLayoutY(yellow3Y);
+        yellow3.setPrefWidth(n2x2buttonWH);
+        yellow3.setPrefHeight(n2x2buttonWH);
+        root.getChildren().add(yellow3);
+        yellow3.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        yellow3.setOnMouseEntered(mouseEvent ->
+                yellow3.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        yellow3.setOnMouseExited(mouseEvent ->
+                yellow3.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        yellow3.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+*/
+
+//MAP 4
+        //blue button map 4
+        Button blue4 = new Button();
+        blue4.setLayoutX(blue4X);
+        blue4.setLayoutY(blue4Y);
+        blue4.setPrefWidth(n2buttonW);
+        blue4.setPrefHeight(n123buttonH);
+        root.getChildren().add(blue4);
+        blue4.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        blue4.setOnMouseEntered(mouseEvent ->
+                blue4.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        blue4.setOnMouseExited(mouseEvent ->
+                blue4.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        blue4.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //purple button map 4
+        Button purple4 = new Button();
+        purple4.setLayoutX(purple4X);
+        purple4.setLayoutY(purple4Y);
+        purple4.setPrefWidth(n2buttonW);
+        purple4.setPrefHeight(n123buttonH);
+        root.getChildren().add(purple4);
+        purple4.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        purple4.setOnMouseEntered(mouseEvent ->
+                purple4.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        purple4.setOnMouseExited(mouseEvent ->
+                purple4.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        purple4.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //red button map 4
+        Button red4 = new Button();
+        red4.setLayoutX(red4X);
+        red4.setLayoutY(red4Y);
+        red4.setPrefWidth(n123buttonH);
+        red4.setPrefHeight(n2rotatebuttonH);
+        root.getChildren().add(red4);
+        red4.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        red4.setOnMouseEntered(mouseEvent ->
+                red4.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        red4.setOnMouseExited(mouseEvent ->
+                red4.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        red4.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //yellow button map 4
+        Button yellow4 = new Button();
+        yellow4.setLayoutX(yellow4X);
+        yellow4.setLayoutY(yellow4Y);
+        yellow4.setPrefWidth(n123buttonH);
+        yellow4.setPrefHeight(n2rotatebuttonH);
+        root.getChildren().add(yellow4);
+        yellow4.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        yellow4.setOnMouseEntered(mouseEvent ->
+                yellow4.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        yellow4.setOnMouseExited(mouseEvent ->
+                yellow4.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        yellow4.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+        //grey button map 4
+        Button grey4 = new Button();
+        grey4.setLayoutX(grey4X);
+        grey4.setLayoutY(grey4Y);
+        grey4.setPrefWidth(n3buttonW);
+        grey4.setPrefHeight(n123buttonH);
+        root.getChildren().add(grey4);
+        grey4.setStyle("-fx-background-color: rgba(20,20,20,0.0)");
+        grey4.setOnMouseEntered(mouseEvent ->
+                grey4.setStyle("-fx-background-color: rgba(20,20,20,0.3);" +
+                        "-fx-cursor: hand;"));
+        grey4.setOnMouseExited(mouseEvent ->
+                grey4.setStyle("-fx-background-color: rgba(20,20,20,0.0);" +
+                        "-fx-cursor: arrow"));
+        grey4.setOnMouseClicked(mouseEvent ->
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
+
+
 
         //lplayer pawns
         double pawnX0 = width16*0.1;
@@ -715,6 +1127,7 @@ public class ImageExample extends Application {
         root.getChildren().add(buttonresourceView);
 
 
+        /*
 
 // select spawn popup
         ImageView selectspawnView = new ImageView(selectspawn);
@@ -748,9 +1161,7 @@ public class ImageExample extends Application {
                 root.getChildren().add(cardback00SelectSpawnView);
             }
         }
-
-
-
+           */
 
         // ammo cards
         double ammoX0 = width16*0.12;
