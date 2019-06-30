@@ -251,6 +251,8 @@ public class SocketClient extends ServerConnection {
 						});
 
 						response.put("room", room);
+						sendAnswer(response);
+
 						break;
 					case "load":
 						List<String> reloadableWeapons = new ArrayList<>();
@@ -274,8 +276,7 @@ public class SocketClient extends ServerConnection {
 						break;
 					case "action":
 						TurnAction selectedAction = player.actionSelection();
-						if(selectedAction!= null)
-						sendAnswer(selectedAction.toString());
+						if(selectedAction!= null) sendAnswer(selectedAction.toString());
 						break;
 					case "powerup":
 						List<String> selectablePowerup = new ArrayList<>();

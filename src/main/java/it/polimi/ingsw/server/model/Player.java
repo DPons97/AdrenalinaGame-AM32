@@ -799,7 +799,7 @@ public class Player {
 			resourcesToPay.remove(res);
 		}
 
-		// Return that player can pay the whole amount, and set which powerups can be used as resources
+		// Return that player can pay the whole amount,
 		return resourcesToPay.isEmpty();
 	}
 

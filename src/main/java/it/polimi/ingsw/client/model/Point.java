@@ -1,10 +1,12 @@
 package it.polimi.ingsw.client.model;
 
+import java.io.Serializable;
+
 /**
  * Represents a point in the plane.
  * Used to identify a cell in client/server communications
  */
-public class Point {
+public class Point implements Serializable {
     /**
      *  X coordinate
      */
@@ -21,6 +23,7 @@ public class Point {
      * @param y y coordinate
      */
     public Point(int x,int y){
+        super();
         this.x = x;
         this.y = y;
     }

@@ -49,7 +49,6 @@ public class WeaponMode extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
-		// TODO change this and delegate to controller
 		this.loaded = false;
 	}
 

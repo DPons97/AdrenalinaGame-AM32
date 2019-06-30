@@ -308,12 +308,8 @@ public class Turn {
         if (pickedSpawn == null) return false;
 
         // Add only pickable weapons
-        List<Weapon> pickable = new ArrayList<>();
-        for (Weapon weapon : pickedSpawn.getWeapons()) {
-            if (playing.canPay(weapon.getCost(), playing.getPowerups())) {
-                pickable.add(weapon);
-            }
-        }
+        List<Weapon> pickable = pickedSpawn.getWeapons().stream()
+                .filter(weapon -> playing.canPay(weapon.getCost(), playing.getPowerups())).collect(Collectors.toList());
 
         // Pick weapon
         WeaponSelection pickedWeapon = playing.getConnection().chooseWeapon(pickable);
@@ -428,6 +424,10 @@ public class Turn {
     private void reloadWeapon(Player playing) {
         List<Weapon> canBeReloaded = playing.getWeapons().stream().filter(weapon -> !weapon.isLoaded()).collect(Collectors.toList());
 
+        // Remove all weapons that cannot be loaded due to lack of resources
+        canBeReloaded = canBeReloaded.stream()
+                .filter(weapon -> playing.canPay(weapon.getCost(), playing.getPowerups())).collect(Collectors.toList());
+
         while (!canBeReloaded.isEmpty()) {
             WeaponSelection toReload = playing.getConnection().reload(canBeReloaded);
             if (toReload.getWeapon() == null) return;
@@ -436,13 +436,16 @@ public class Turn {
             if (playing.canPay(getWeapon(toReload.getWeapon(), playing).getCost(), toReload.getPowerups())) {
                 // Do reload
                 try {
-                    playing.reload(getWeapon(toReload.getWeapon(), playing), toReload.getPowerups());
+                    Weapon weaponToReaload = getWeapon(toReload.getWeapon(), playing);
+                    playing.reload(weaponToReaload, toReload.getPowerups());
+                    canBeReloaded.remove(weaponToReaload);
+
+                    canBeReloaded = canBeReloaded.stream()
+                            .filter(weapon -> playing.canPay(weapon.getCost(), playing.getPowerups())).collect(Collectors.toList());
                 } catch (NoItemInInventoryException | InsufficientResourcesException e) {
                     e.printStackTrace();
                 }
             }
-
-            canBeReloaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
         }
     }
 

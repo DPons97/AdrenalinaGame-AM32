@@ -106,7 +106,7 @@ public class WeaponEffect extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
-		//TODO: change this when controller is implemented
+
 		this.loaded = false;
 
 	}

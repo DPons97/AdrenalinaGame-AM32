@@ -5,13 +5,14 @@ import it.polimi.ingsw.server.model.Weapon;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Manages communications about shoot/reload weapon selections
  */
-public class WeaponSelection {
+public class WeaponSelection implements Serializable {
     /**
      * Weapon that was chosen
      */
@@ -31,6 +32,7 @@ public class WeaponSelection {
      * Default constructor
      */
     public WeaponSelection() {
+        super();
         weapon = null;
         effectID = new ArrayList<>();
         powerups = new ArrayList<>();
@@ -40,6 +42,7 @@ public class WeaponSelection {
      * constructor for JSON parsing
      */
     public WeaponSelection(String weapon, List<Integer> effectID, List<Powerup> powerups) {
+        super();
         this.weapon = weapon;
         this.effectID = effectID;
         this.powerups = powerups;
@@ -93,7 +96,9 @@ public class WeaponSelection {
      */
     public JSONObject toJSON(){
         JSONObject obj = new JSONObject();
-        obj.put("weapon", this.weapon);
+
+        if (this.weapon == null) obj.put("weapon", "none");
+        else obj.put("weapon", this.weapon);
 
         JSONArray effectArray = new JSONArray();
         effectArray.addAll(effectID);

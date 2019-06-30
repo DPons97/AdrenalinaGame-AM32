@@ -44,6 +44,7 @@ public class GuiSelection {
 
     public void setNodeClickable(Node node, String value){
         Platform.runLater(()->{
+            node.setViewOrder(-100);
             node.setOnMouseClicked(new EventHandler<MouseEvent>() {
 
                 @Override

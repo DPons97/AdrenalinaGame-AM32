@@ -130,7 +130,9 @@ public class ClientPlayer implements ClientFunctionalities{
 	 */
     @Override
     public String playerSelection(List<String> selectable) {
-        return view.selectPlayer(selectable);
+        String selected = view.selectPlayer(selectable);
+        if (selected == null) return "";
+        return selected;
     }
 
 	/**
@@ -194,9 +196,9 @@ public class ClientPlayer implements ClientFunctionalities{
 
 	    Powerup selected = view.selectPowerup(selectables);
 
-	    if (selected != null)
+	    if (selected != null){
 			return selected.toJSON().toString();
-	    else return "";
+		} else return "";
 	}
 
 	/**
@@ -204,7 +206,9 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * @return action to make
 	 */
     @Override
-    public TurnAction actionSelection(){ return view.actionSelection(); }
+    public TurnAction actionSelection(){
+    	return view.actionSelection();
+    }
 
 	/**
 	 * Updates the lobby view
@@ -231,6 +235,8 @@ public class ClientPlayer implements ClientFunctionalities{
 			!match.getPlayers().stream().filter(p->p.getNickname().equals(nickname)).
 					collect(Collectors.toList()).get(0).isReadyToStart()) {
 			// CLI: Reset input reader
+			// VIEW: change scene
+			// VIEW: change scene
 			view.initMatch();
 
 			server.setReady(true);
