@@ -1,6 +1,5 @@
 package it.polimi.ingsw.server.model;
 
-import it.polimi.ingsw.custom_exceptions.DeadPlayerException;
 import it.polimi.ingsw.custom_exceptions.InvalidJSONException;
 import it.polimi.ingsw.custom_exceptions.InvalidStringException;
 import org.json.simple.JSONArray;
@@ -23,7 +22,7 @@ public class Action {
 		/**
 		 *
 		 */
-		public void applyOn(Player caller);
+		void applyOn(Player caller);
 	}
 
 	/**
@@ -214,6 +213,21 @@ public class Action {
 				// if there is no choice -> add all you could add
 				targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
 			else{
+				if (caller.getConnection() != null) {
+					int nSelected = 0;
+					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
+						List<Cell> selected = caller.getConnection().selectRoom(couldBeAdded);
+						targetCells.addAll(selected);
+
+						if (selected.isEmpty()) {
+							nSelected++;
+							couldBeAdded.remove(selected);
+						} else if (nSelected >= minQty) {
+							break;
+						}
+					}
+				}
+
 				if (caller.getConnection() != null) caller.getConnection().selectRoom(couldBeAdded);
 			}
 		};
@@ -238,11 +252,33 @@ public class Action {
 							targetPlayers
 					);
 
-			if(!diffCells && maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+			couldBeAdded.remove(caller);
+
+			// Set ids to selected players
+			try {
+				for (Player player : couldBeAdded) player.setID(Integer.parseInt(baseActionJSON.get("ID").toString()));
+			} catch (NumberFormatException e) {
+				for (Player player : couldBeAdded) player.setID(-1);
+			}
+
+			if((!diffCells && maxQty == -1) || (minQty == maxQty && minQty >= couldBeAdded.size()))
 				// if there is no choice -> add all you could add
 				targetPlayers.addAll(couldBeAdded);
-			else{
-				if (caller.getConnection() != null) caller.getConnection().selectPlayer(couldBeAdded);
+			else {
+				if (caller.getConnection() != null) {
+					int nSelected = 0;
+					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
+						Player selected = caller.getConnection().selectPlayer(couldBeAdded);
+						targetPlayers.add(selected);
+
+						if (selected != null) {
+							nSelected++;
+							couldBeAdded.remove(selected);
+						} else if (nSelected >= minQty) {
+							break;
+						}
+					}
+				}
 			}
 		};
 	}
@@ -259,11 +295,31 @@ public class Action {
 							targetPlayers
 					);
 
+			// Set ids to selected players
+			try {
+				for (Cell cell : couldBeAdded) cell.setID(Integer.parseInt(baseActionJSON.get("ID").toString()));
+			} catch (NumberFormatException e) {
+				for (Cell cell : couldBeAdded) cell.setID(-1);
+			}
+
 			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
 				// if there is no choice -> add all you could add
 				targetCells.addAll(couldBeAdded);
 			else{
-				if (caller.getConnection() != null) caller.getConnection().selectCell(couldBeAdded);
+				if (caller.getConnection() != null) {
+					int nSelected = 0;
+					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
+						Cell selected = caller.getConnection().selectCell(couldBeAdded);
+						targetCells.add(selected);
+
+						if (selected != null) {
+							nSelected++;
+							couldBeAdded.remove(selected);
+						} else if (nSelected >= minQty) {
+							break;
+						}
+					}
+				}
 			}
 		};
 	}

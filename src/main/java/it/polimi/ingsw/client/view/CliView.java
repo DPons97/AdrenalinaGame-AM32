@@ -237,7 +237,7 @@ public class CliView extends ClientView {
     /**
      * Standard format for text inside match table
      */
-    public static final String MATCHES_HEADER =         "|         Matches:       %-4s                                         |%n";
+    private static final String MATCHES_HEADER =         "|         Matches:       %-4s                                         |%n";
     private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |       Players       |%n";
     private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-17s  |%n";
     private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-17s  |%n" +
@@ -570,6 +570,7 @@ public class CliView extends ClientView {
             System.out.printf(LOBBY_CLOSER);
 
             lobbyNextCommand(isReady);
+
         } else if (match.getState() == MatchState.PLAYER_TURN) {
             synchronized (this) {
                 // Print players
@@ -602,29 +603,37 @@ public class CliView extends ClientView {
         if (!isReady) {
             System.out.printf("Are you [R]eady? ([E] to go back to lobby)%n");
 
-            // Retreive next command
-            response = getResponse();
-            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
+            while (true) {
+                // Retreive next command
+                response = getResponse();
+                if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
-            if (response.equals("R") || response.equals("r")) {
-                player.setReady(true);
-            } else if (response.equals("E") || response.equals("e")) {
-                player.backToLobby();
-                player.updateLobby();
-            } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
+                if (response.equals("R") || response.equals("r")) {
+                    player.setReady(true);
+                    break;
+                } else if (response.equals("E") || response.equals("e")) {
+                    player.backToLobby();
+                    player.updateLobby();
+                    break;
+                } else System.out.printf("Invalid command. Press [R] if you are ready or [E] to go back to lobby%n");
+            }
 
         } else {
             System.out.print("You are now ready to play. Take a snack while waiting to start... ([E]xit or [N]ot-Ready)");
 
-            response = getResponse();
-            if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
+            while (true) {
+                response = getResponse();
+                if (response == null || player.getMatch().getState() != MatchState.NOT_STARTED) return;
 
-            if (response.equals("E") || response.equals("e")) {
-                player.backToLobby();
-                player.updateLobby();
-            } else if (response.equals("N") || response.equals("n")) {
-                player.setReady(false);
-            }else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
+                if (response.equals("E") || response.equals("e")) {
+                    player.backToLobby();
+                    player.updateLobby();
+                    break;
+                } else if (response.equals("N") || response.equals("n")) {
+                    player.setReady(false);
+                    break;
+                } else System.out.printf("Invalid command. Press [E] to go back to lobby or [N]ot-Ready%n");
+            }
         }
     }
 
@@ -730,7 +739,7 @@ public class CliView extends ClientView {
             messageToPrint.append(EFFECT_SELECTION);
 
             // Print selected weapon
-            messageToPrint.append("You selected: ").append(selectedWeapon.getName()).append("\n");
+            messageToPrint.append("Selected weapon: ").append(selectedWeapon.getName()).append("\n");
 
             for (int i = 0; i < effects.size(); i++) {
                 // Print name and description
@@ -870,10 +879,22 @@ public class CliView extends ClientView {
     @Override
     public WeaponSelection selectWeapon(List<String> selectables) {
         WeaponSelection toReturn = selectWeaponFree(selectables);
+        if (toReturn.getWeapon() == null) return toReturn;
+
         WeaponCard selectedWeapon = player.getMatch().getWeaponByName(toReturn.getWeapon());
 
         // Select weapon to pick and discount
-        toReturn.setDiscount(selectDiscount(selectedWeapon.getCost()));
+        if (player.getThisPlayer().getWeapons().contains(selectedWeapon)) {
+            // Reload case (pay all cost)
+            toReturn.setDiscount(selectDiscount(selectedWeapon.getCost()));
+        } else {
+            // Player is buying a new weapon (weapon is reloaded)
+            List<Resource> weaponCost = selectedWeapon.getCost();
+            weaponCost.remove(0);
+
+            toReturn.setDiscount(selectDiscount(weaponCost));
+        }
+
         return toReturn;
     }
 
@@ -1433,8 +1454,6 @@ public class CliView extends ClientView {
         charMap[startingX + boxXOffset + 4][startingY+boxYOffset + 4] = charAssets.stream().filter(charAsset -> charAsset.isRightChar(
                 true, false, false, true)).collect(Collectors.toList()).get(0).getCharacter();
 
-        if(ammoToDraw == null) return;
-
         // Write Ammos
         if (ammoToDraw == null) return;
 
@@ -1552,22 +1571,28 @@ public class CliView extends ClientView {
                 StringBuilder weaponsString = new StringBuilder();
                 StringBuilder weaponCost = new StringBuilder();
                 WeaponCard currentWeapon = p.getWeapons().get(j);
+
+                boolean weaponLoaded = p.getLoadedWeapons().contains(currentWeapon);
                 if (p.getNickname().equals(player.getNickname())) {
-                    weaponsString.append(currentWeapon.getName());
-                } else if (!p.getLoadedWeapons().contains(currentWeapon)) {
+                    weaponsString.append(currentWeapon.getName()).append(!weaponLoaded ? " (Unloaded)" : "");
+                } else if (!weaponLoaded) {
                     weaponsString.append(currentWeapon.getName()).append(" (Unloaded)");
+                } else {
+                    weaponsString.append("[Hidden weapon]");
+                    charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString, weaponCost);
+                    continue;
+                }
 
-                    int colorLength = 0;
-                    for (Resource res : currentWeapon.getCost()) {
-                        weaponCost.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
+                int colorLength = 0;
+                for (Resource res : currentWeapon.getCost()) {
+                    weaponCost.append(getANSIColor(res)).append(AMMO_BLOCK).append(ANSI_RESET).append(" ");
 
-                        colorLength += getANSIColor(res).length() + ANSI_RESET.length();
-                    }
-                    int stringLen = weaponCost.length() - colorLength;
-                    // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-                    weaponCost.append(" ".repeat(6-stringLen));
+                    colorLength += getANSIColor(res).length() + ANSI_RESET.length();
+                }
+                int stringLen = weaponCost.length() - colorLength;
+                // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
+                weaponCost.append(" ".repeat(18-stringLen));
 
-                } else weaponsString.append("[Hidden weapon]");
 
                 charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString, weaponCost);
             }
