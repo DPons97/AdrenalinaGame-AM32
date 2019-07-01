@@ -1,4 +1,5 @@
 package it.polimi.ingsw.client.view;
+
 import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -7,12 +8,14 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -54,6 +57,7 @@ public class ImageExample extends Application {
     public static final String BUTTONRESOURCES= "/img/others/buttonresources.png";
     public static final String SELECTWEAPONEFFECTS= "/img/others/selectweaponeffects.png";
     public static final String GAMEOVER = "/img/others/gameover.png";
+    public static final String TORELOAD = "/img/others/toreload.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -106,6 +110,10 @@ public class ImageExample extends Application {
         Image selectweaponeffects= new Image(new FileInputStream(urlSelectWeaponEffects.getFile().replace("%20", " ")));
         URL urlGameOver= getClass().getResource(GAMEOVER);
         Image gameover= new Image(new FileInputStream(urlGameOver.getFile().replace("%20", " ")));
+        URL urlToreload= getClass().getResource(TORELOAD);
+        Image toreload= new Image(new FileInputStream(urlToreload.getFile().replace("%20", " ")));
+
+
 
 
         ImageView mapView = new ImageView(map);
@@ -514,6 +522,12 @@ public class ImageExample extends Application {
                 cardback01View.setPreserveRatio(true);
                 cardback01View.setFitWidth(ammoSize);
                 root.getChildren().add(cardback01View);
+                ImageView toreloadView = new ImageView(toreload);
+                toreloadView.setY(weaponBaseMyDashboardY);
+                toreloadView.setX(weaponBaseMyDashboardX+weaponOffsetMyDashboardX*i);
+                toreloadView.setPreserveRatio(true);
+                toreloadView.setFitWidth(ammoSize);
+                root.getChildren().add(toreloadView);
             }
         }
 
@@ -1162,7 +1176,7 @@ public class ImageExample extends Application {
             }
         }
            */
-
+/*
 // select weapon effects
         ImageView selectWeaponEffectsView = new ImageView(selectweaponeffects);
         double selectWeaponEffectsSize = width16*0.6;
@@ -1229,9 +1243,8 @@ public class ImageExample extends Application {
         undoButton.setMinWidth(0);
         root.getChildren().add(undoButton);
 
+*/
 
-
-/*
         ImageView gameoverView = new ImageView(gameover);
         double gameoverSize = width16*0.6;
         double gameoverX0= (width16-gameoverSize)/2;
@@ -1246,28 +1259,21 @@ public class ImageExample extends Application {
         root.getChildren().add(gameoverView);
 
 
-        double cardgameoverX=width16*0.27;
-        double cardBasegameoverY=height9*0.34;
-        double cardgameoverSize=height9*0.27;
-        double buttongameoverSizeW= width16*0.10;
-        double buttongameoverSixeH= height9*0.05;
-        double buttongameoverX= width16*0.55;
-        double buttongameoverY= height9*0.35;
-        double buttongameoverOffset= height9*0.12;
-        double buttonShootY= height9*0.76;
 
-        for(int j=0; j<3; j++) {
+        double labelgameoverX= width16*0.45;
+        double labelgameoverY= height9*0.41;
+        double labelgameoverOffset= height9*0.08;
+
+
+        for(int j=0; j<5; j++) {
             Label username = new Label();
-            username.setLayoutX(buttonSelectX);
-            username.setLayoutY(buttonSelectY+(buttonSelectOffset*j));
-            username.setText("Prova " +j );
-            username.setPrefWidth(buttonSelectSizeW);
-            username.setPrefHeight(buttonSelectSixeH);
-            username.setMinHeight(0);
-            username.setMinWidth(0);
+            username.setLayoutX(labelgameoverX);
+            username.setLayoutY(labelgameoverY + (labelgameoverOffset * j));
+            username.setText("Prova " + j);
+            username.setTextFill(Color.web("#ffffff"));
+            username.setStyle("-fx-font: 36 arial;");
             root.getChildren().add(username);
-
-*/
+        }
 
 
 
