@@ -103,6 +103,9 @@ public class Turn {
     public void beginTurn(Player playing) {
         int remainingActions = 2;
 
+        for (Player p : match.getPlayers())
+            p.setDamagedThisTurn(false);
+
         while (remainingActions > 0) {
             // if player disconnected, skip turn
             if (playing.getConnection() == null) return;

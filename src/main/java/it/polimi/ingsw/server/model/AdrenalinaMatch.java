@@ -642,6 +642,8 @@ public class AdrenalinaMatch {
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "TARGET_VISIBLE":
+				if (players.isEmpty()) break;
+
 				for(Cell c: players.get(0).getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
@@ -697,6 +699,15 @@ public class AdrenalinaMatch {
 			case "ANY":
 				toReturn.addAll(caller.getCellAtDistance(minDistance,maxDistance).stream().map(Cell::getPlayers)
 						.flatMap(List::stream).collect(Collectors.toList()));
+				break;
+
+			case "DAMAGED":
+				toReturn.addAll(getPlayers().stream().filter(Player::isDamagedThisTurn).collect(Collectors.toList()));
+				break;
+
+			case "ATTACKER":
+				if (!caller.getDmgPoints().isEmpty())
+					toReturn.add(caller.getDmgPoints().get(caller.getDmgPoints().size()-1));
 				break;
 			default:
 				// from is an integer id

@@ -127,6 +127,11 @@ public class Player {
 	private List<Resource> ammos;
 
 	/**
+	 * Support variables for powerup usage
+	 */
+	private boolean damagedThisTurn;
+
+	/**
 	 * TESTING PURPOSE: Default constructor
 	 * @param 	match Reference to match this player is playing
 	 * @param	nickname This player's nickname
@@ -148,6 +153,7 @@ public class Player {
 		isFrenzyPlayer = false;
 		givenMarks = 0;
 		position = null;
+		damagedThisTurn = false;
 
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
@@ -175,6 +181,7 @@ public class Player {
 		isFrenzyPlayer = false;
 		givenMarks = 0;
 		position = null;
+		damagedThisTurn = false;
 
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
@@ -203,6 +210,7 @@ public class Player {
 		deaths = 0;
 		isFrenzyPlayer = false;
 		givenMarks = 0;
+		damagedThisTurn = false;
 
 		weapons = new ArrayList<>();
 		powerups = new ArrayList<>();
@@ -280,6 +288,14 @@ public class Player {
 	 * @param b value to set
 	 */
 	public void setReady(boolean b) { this.readyToStart = b; }
+
+	public boolean isDamagedThisTurn() {
+		return damagedThisTurn;
+	}
+
+	public void setDamagedThisTurn(boolean damagedThisTurn) {
+		this.damagedThisTurn = damagedThisTurn;
+	}
 
 	/**
 	 *
@@ -481,6 +497,7 @@ public class Player {
 		// Player take damage from source only if not overkilled
 		if (dmgPoints.size() <= maxDamage + 1 ) {
 			dmgPoints.add(source);
+			damagedThisTurn = true;
 
 			if (marks.contains(source)) {
 				// Source has marked this player at least once
@@ -500,6 +517,7 @@ public class Player {
 			deaths++;
 			dead = true;
 			overkilled = false;
+			damagedThisTurn = true;
 			return true;
 		}
 
@@ -630,7 +648,7 @@ public class Player {
 		}
 
 		// Check if there is space for at least one powerup to add. If there are already too many powerups, do not add
-		if (powerups.size() < 3) powerups.add(match.getPowerupDeck().drawCard());
+		if (powerups.size() < 3 && addPowerup) powerups.add(match.getPowerupDeck().drawCard());
 
 		// Discard picked ammo to deck
 		match.getAmmoDeck().discardCard(resourcePicked);

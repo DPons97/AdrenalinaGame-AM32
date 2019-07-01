@@ -1315,7 +1315,7 @@
             "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "TARGET",
+            "from": "VISIBLE",
             "quantity": [
               1,
               1

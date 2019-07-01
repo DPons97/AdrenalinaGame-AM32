@@ -17,9 +17,10 @@ class WeaponTest {
             for (Action a : w.getShootActions()) {
                 int finalI = i;
                 assertDoesNotThrow(() -> w.shoot(finalI, p));
-                w.reload();
                 i++;
             }
+
+            w.reload();
             int finalI1 = i;
             assertThrows(IllegalArgumentException.class, () -> w.shoot(finalI1 + 1, p));
         } while(!tMatch.getWeaponDeck().isDeckEmpty());
