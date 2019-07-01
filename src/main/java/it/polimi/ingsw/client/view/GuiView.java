@@ -296,6 +296,16 @@ public class GuiView extends ClientView{
     private static final double MAP_4_WHITE_ROOM_X = 0.1;
     private static final double MAP_4_WHITE_ROOM_Y = 0.538;
 
+    // leaderboard popup
+    private static final String LEADERBOARD_PATH = "/img/others/gameover.png";
+    private static final double LEADERBOARD_SIZE = 0.6;
+    private static final double LEADERBOARD_X = 0.2;
+    private static final double LEADERBOARD_Y = 0.5;
+    private static final double LEADERBOARD_LABEL_X = 0.45;
+    private static final double LEADERBOARD_LABEL_Y = 0.41;
+    private static final double LEADERBOARD_LABEL_OFF = 0.08;
+    private static final String LEADERBOARD_LABEL_STYLE = "-fx-font: 36 arial; -fx-text-fill: #fff;";
+
     // css effects
     private static final String STANDARD_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 0, 0, 0, 0);" +
                                                   "-fx-cursor: arrow";
@@ -609,7 +619,32 @@ public class GuiView extends ClientView{
 
     @Override
     public void showLeaderboard(List<String> leaderboard) {
-        // TODO Implement here
+        waitLoading();
+        //show popup
+        Platform.runLater(()->{
+            Pane root = FXWindow.getPane();
+            ImageView leaderboardPopup = loadImage(LEADERBOARD_PATH);
+            leaderboardPopup.setPreserveRatio(true);
+            leaderboardPopup.setFitWidth(LEADERBOARD_SIZE*width);
+            leaderboardPopup.setX(LEADERBOARD_X*width);
+            leaderboardPopup.setY(LEADERBOARD_Y*(height-getHeight(leaderboardPopup)));
+            root.getChildren().add(leaderboardPopup);
+
+            int i = 0;
+            for(String s: leaderboard){
+                Label user = new Label();
+                String text = i + ". " + s + ": " +player.getMatch().getPlayerByName(s).getScore();
+                user.setStyle(LEADERBOARD_LABEL_STYLE);
+                if(i == 0)user.setTextFill(Color.web("#f6ff00"));
+                user.setText(text);
+                user.setLayoutX(LEADERBOARD_LABEL_X*width);
+                user.setLayoutY(LEADERBOARD_LABEL_Y*height+ LEADERBOARD_LABEL_OFF*i*height);
+                root.getChildren().add(user);
+                i++;
+            }
+
+        });
+
     }
 
     private void showGameBoard() {
