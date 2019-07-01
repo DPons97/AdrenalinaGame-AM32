@@ -193,6 +193,8 @@ public class LobbyController {
 
 		} else {
 			getMatchByPlayerConnection(player).getPlayer(player.name).setConnection(player);
+			player.setCurrentMatch(getMatchByPlayerConnection(player));
+			player.updateMatch(getMatchByPlayerConnection(player).getMatch());
 		}
 	}
 

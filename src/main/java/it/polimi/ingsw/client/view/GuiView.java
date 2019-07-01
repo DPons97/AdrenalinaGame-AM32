@@ -1294,7 +1294,6 @@ public class GuiView extends ClientView{
 
                     setButtonEffects(actionButton);
                     selection.setNodeClickable(actionButton, t.toString());
-                    FXWindow.getPane().getChildren().add(actionButton);
                     buttons.add(actionButton);
                     i++;
                 }
@@ -1307,7 +1306,6 @@ public class GuiView extends ClientView{
 
                     setButtonEffects(actionButton);
                     selection.setNodeClickable(actionButton, t.toString());
-                    FXWindow.getPane().getChildren().add(actionButton);
                     buttons.add(actionButton);
                     i++;
                 }
@@ -1322,7 +1320,6 @@ public class GuiView extends ClientView{
 
                     setButtonEffects(actionButton);
                     selection.setNodeClickable(actionButton, t.toString());
-                    FXWindow.getPane().getChildren().add(actionButton);
                     buttons.add(actionButton);
                     i++;
                 }
