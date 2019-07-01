@@ -57,6 +57,7 @@ public class ImageExample extends Application {
     public static final String BUTTONRESOURCES= "/img/others/buttonresources.png";
     public static final String SELECTWEAPONEFFECTS= "/img/others/selectweaponeffects.png";
     public static final String GAMEOVER = "/img/others/gameover.png";
+    public static final String TORELOAD = "/img/others/toreload.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -109,6 +110,10 @@ public class ImageExample extends Application {
         Image selectweaponeffects= new Image(new FileInputStream(urlSelectWeaponEffects.getFile().replace("%20", " ")));
         URL urlGameOver= getClass().getResource(GAMEOVER);
         Image gameover= new Image(new FileInputStream(urlGameOver.getFile().replace("%20", " ")));
+        URL urlToreload= getClass().getResource(TORELOAD);
+        Image toreload= new Image(new FileInputStream(urlToreload.getFile().replace("%20", " ")));
+
+
 
 
         ImageView mapView = new ImageView(map);
@@ -517,6 +522,12 @@ public class ImageExample extends Application {
                 cardback01View.setPreserveRatio(true);
                 cardback01View.setFitWidth(ammoSize);
                 root.getChildren().add(cardback01View);
+                ImageView toreloadView = new ImageView(toreload);
+                toreloadView.setY(weaponBaseMyDashboardY);
+                toreloadView.setX(weaponBaseMyDashboardX+weaponOffsetMyDashboardX*i);
+                toreloadView.setPreserveRatio(true);
+                toreloadView.setFitWidth(ammoSize);
+                root.getChildren().add(toreloadView);
             }
         }
 
