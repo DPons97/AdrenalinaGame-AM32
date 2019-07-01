@@ -132,7 +132,9 @@ public class Turn {
                     List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
                     if(!loaded.isEmpty()) {
                         WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
-                        if (executeShooting(playing, pickedWeapon)) remainingActions--;
+                        if (executeShooting(playing, pickedWeapon)) {
+                            remainingActions--;
+                        }
                     }
                     break;
             }
@@ -483,7 +485,7 @@ public class Turn {
                 if (p.isOverkilled()) killshot.takeMark(p);
 
                 // Respawn player
-                respawnPlayer(currentPlayer);
+                respawnPlayer(p);
 
                 // If frenzy enabled, flip dead player's board
                 if (match.getMatchState() == MatchState.FRENZY_TURN) p.enableFrenzy();

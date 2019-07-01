@@ -28,6 +28,12 @@ public abstract class ClientView {
     public abstract void showMatch();
 
     /**
+     * Print/Shows leaderboard at the end of the game
+     * @param leaderboard
+     */
+    public abstract void showLeaderboard(List<String> leaderboard);
+
+    /**
      * Lets client select a player from a list
      * @param selectables list of players
      * @return selected player

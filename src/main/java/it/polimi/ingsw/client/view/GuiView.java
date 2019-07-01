@@ -606,6 +606,11 @@ public class GuiView extends ClientView{
         }
     }
 
+    @Override
+    public void showLeaderboard(List<String> leaderboard) {
+        // TODO Implement here
+    }
+
     private void showGameBoard() {
         AdrenalinaMatch match= player.getMatch();
         Platform.runLater(()-> {
