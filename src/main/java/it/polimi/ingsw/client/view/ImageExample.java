@@ -15,6 +15,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -52,6 +53,7 @@ public class ImageExample extends Application {
     public static final String SELECTSPAWN = "/img/others/spawn.jpeg";
     public static final String BUTTONRESOURCES= "/img/others/buttonresources.png";
     public static final String SELECTWEAPONEFFECTS= "/img/others/selectweaponeffects.png";
+    public static final String GAMEOVER = "/img/others/gameover.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -102,7 +104,8 @@ public class ImageExample extends Application {
         Image buttonresources= new Image(new FileInputStream(urlButtonResource.getFile().replace("%20", " ")));
         URL urlSelectWeaponEffects=getClass().getResource(SELECTWEAPONEFFECTS);
         Image selectweaponeffects= new Image(new FileInputStream(urlSelectWeaponEffects.getFile().replace("%20", " ")));
-
+        URL urlGameOver= getClass().getResource(GAMEOVER);
+        Image gameover= new Image(new FileInputStream(urlGameOver.getFile().replace("%20", " ")));
 
 
         ImageView mapView = new ImageView(map);
@@ -1160,7 +1163,6 @@ public class ImageExample extends Application {
         }
            */
 
-
 // select weapon effects
         ImageView selectWeaponEffectsView = new ImageView(selectweaponeffects);
         double selectWeaponEffectsSize = width16*0.6;
@@ -1184,7 +1186,8 @@ public class ImageExample extends Application {
         double buttonSelectX= width16*0.55;
         double buttonSelectY= height9*0.35;
         double buttonSelectOffset= height9*0.12;
-        double buttonShootY= height9*0.76;
+        double buttonShootY= height9*0.73;
+        double buttonUndoY= height9*0.79;
 
         ImageView cardback01selectWeaponEffectsView = new ImageView(cardback01);
         cardback01selectWeaponEffectsView.setY(cardBaseselectWeaponEffectsY);
@@ -1216,6 +1219,55 @@ public class ImageExample extends Application {
         shootButton.setMinWidth(0);
         root.getChildren().add(shootButton);
 
+        Button undoButton = new Button();
+        undoButton.setLayoutX(buttonSelectX);
+        undoButton.setLayoutY(buttonUndoY);
+        undoButton.setText("Undo");
+        undoButton.setPrefWidth(buttonSelectSizeW);
+        undoButton.setPrefHeight(buttonSelectSixeH);
+        undoButton.setMinHeight(0);
+        undoButton.setMinWidth(0);
+        root.getChildren().add(undoButton);
+
+
+
+/*
+        ImageView gameoverView = new ImageView(gameover);
+        double gameoverSize = width16*0.6;
+        double gameoverX0= (width16-gameoverSize)/2;
+        gameoverView.setFitWidth(gameoverSize);
+        gameoverView.setX(gameoverX0);
+
+
+        double gameoverY0= (height9-getHeight(gameoverView))/2;
+        gameoverView.setY(gameoverY0);
+
+        gameoverView.setPreserveRatio(true);
+        root.getChildren().add(gameoverView);
+
+
+        double cardgameoverX=width16*0.27;
+        double cardBasegameoverY=height9*0.34;
+        double cardgameoverSize=height9*0.27;
+        double buttongameoverSizeW= width16*0.10;
+        double buttongameoverSixeH= height9*0.05;
+        double buttongameoverX= width16*0.55;
+        double buttongameoverY= height9*0.35;
+        double buttongameoverOffset= height9*0.12;
+        double buttonShootY= height9*0.76;
+
+        for(int j=0; j<3; j++) {
+            Label username = new Label();
+            username.setLayoutX(buttonSelectX);
+            username.setLayoutY(buttonSelectY+(buttonSelectOffset*j));
+            username.setText("Prova " +j );
+            username.setPrefWidth(buttonSelectSizeW);
+            username.setPrefHeight(buttonSelectSixeH);
+            username.setMinHeight(0);
+            username.setMinWidth(0);
+            root.getChildren().add(username);
+
+*/
 
 
 
