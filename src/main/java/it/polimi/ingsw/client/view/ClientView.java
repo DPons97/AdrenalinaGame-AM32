@@ -70,13 +70,6 @@ public abstract class ClientView {
     public abstract WeaponSelection selectWeapon (List<String> selectables);
 
     /**
-     * Lets client select a weapon from a list (to reload or pay)
-     * @param selectables
-     * @return
-     */
-    public abstract WeaponSelection selectWeaponFree(List<String> selectables);
-
-    /**
      * Lets client select a powerup from a list
      * @param selectables list of powerups
      * @return selected powerup

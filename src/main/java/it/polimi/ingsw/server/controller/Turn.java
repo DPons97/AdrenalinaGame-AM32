@@ -130,9 +130,10 @@ public class Turn {
 
                     // Get all loaded weapons and pick one
                     List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
-                    WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
-
-                    if (executeShooting(playing, pickedWeapon)) remainingActions--;
+                    if(!loaded.isEmpty()) {
+                        WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
+                        if (executeShooting(playing, pickedWeapon)) remainingActions--;
+                    }
                     break;
             }
 

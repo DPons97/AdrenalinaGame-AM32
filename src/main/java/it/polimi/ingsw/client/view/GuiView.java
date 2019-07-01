@@ -2,13 +2,15 @@ package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
 import it.polimi.ingsw.client.model.*;
+import it.polimi.ingsw.client.model.AdrenalinaMatch;
+import it.polimi.ingsw.client.model.AmmoCell;
 import it.polimi.ingsw.client.model.Cell;
+import it.polimi.ingsw.client.model.Map;
+import it.polimi.ingsw.client.model.Player;
+import it.polimi.ingsw.client.model.SpawnCell;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.Ammo;
-import it.polimi.ingsw.server.model.MatchState;
-import it.polimi.ingsw.server.model.Powerup;
-import it.polimi.ingsw.server.model.Resource;
+import it.polimi.ingsw.server.model.*;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -78,7 +80,7 @@ public class GuiView extends ClientView{
     private static final double ENEMY_SKULL_DROPLET_X0 = 0.675;
     private static final double ENEMY_SKULL_DROPLET_OFFSET_Y = 0.175;
     private static final double ENEMY_SKULL_DROPLET_OFFSET_X = 0.022;
-    private static final double ENEMY_SKULL_SIZE = 0.08;
+    private static final double ENEMY_SKULL_SIZE = 0.030;
     private static final String DROPLET_DIR = "/img/droplets/drop";
     private static final String DROPLET_EXTENSION = ".png";
     private static final double ENEMY_DAMAGE_DROPLET_Y0 = 0.07;
@@ -89,7 +91,7 @@ public class GuiView extends ClientView{
     private static final double ENEMY_MARK_DROPLET_X0 = 0.82;
     private static final double ENEMY_MARK_DROPLET_OFFSET_Y = 0.175;
     private static final double ENEMY_MARK_DROPLET_OFFSET_X = 0.022;
-    private static final double ENEMY_DROPLET_SIZE = 0.04;
+    private static final double ENEMY_DROPLET_SIZE = 0.015;
     private static final double DEATHTRACK_DROPLET_Y0 = 0.032;
     private static final double DEATHTRACK_DROPLET_X0 = 0.042;
     private static final double DEATHTRACK_DROPLET_OFFSET_X = 0.045;
@@ -211,6 +213,22 @@ public class GuiView extends ClientView{
     private static final double SPAWN_POWERUP_OFFSET_X = 0.215;
     private static final double SPAWN_POWERUP_SIZE = 0.17;
 
+    // shoot selection popup
+    private static final String WEAPON_EFFECT_POPUP_PATH = "/img/others/selectweaponeffects.png";
+    private static final double WEAPON_EFFECT_POPUP_SIZE = 0.6;
+    private static final double WEAPON_EFFECT_POPUP_X = 0.2;
+    private static final double WEAPON_EFFECT_POPUP_Y = 0.5;
+    private static final double WEAPON_EFFECT_CARD_X = 0.27;
+    private static final double WEAPON_EFFECT_CARD_Y = 0.34;
+    private static final double WEAPON_EFFECT_CARD_SIZE = 0.27;
+    private static final double WEAPON_EFFECT_BUTTON_SELECT_SIZE_W = 0.1;
+    private static final double WEAPON_EFFECT_BUTTON_SELECT_SIZE_H = 0.05;
+    private static final double WEAPON_EFFECT_BUTTON_SELECT_X0 = 0.55;
+    private static final double WEAPON_EFFECT_BUTTON_SELECT_Y0 = 0.35;
+    private static final double WEAPON_EFFECT_BUTTON_SELECT_OFF = 0.12;
+    private static final double WEAPON_EFFECT_BUTTON_SHOOT_Y = 0.73;
+    private static final double WEAPON_EFFECT_BUTTON_UNDO_Y = 0.79;
+
     // use resources button
     private static final String USE_RESOURCES_PATH = "/img/others/buttonresources.png";
     private static final double USE_RESOURCES_SIZE = 0.1;
@@ -285,6 +303,9 @@ public class GuiView extends ClientView{
             "-fx-cursor: hand;";
     private static final String BUTTONS_EFFECT = "-fx-background-color: rgba(0,255,0,0.3);" +
                                                  "-fx-cursor: hand;";
+
+    private static final String SELECTED_EFFECT = "-fx-background-color: #5af278;";
+    private static final String NOT_SELECTED_EFFECT = "-fx-background-color: #6ea5ff;";
 
     private double width;
     private double height;
@@ -1058,8 +1079,171 @@ public class GuiView extends ClientView{
      */
     @Override
     public WeaponSelection selectShoot(List<String> selectables) {
-        return null;
+        waitLoading();
+        WeaponCard toShootWith = selectWeaponFree(selectables);
+        if(toShootWith == null) return new WeaponSelection("", new ArrayList<>(),new ArrayList<>());
+        WeaponSelection toReturn = new WeaponSelection();
+        toReturn.setWeapon(toShootWith.getName());
+
+        List<Node> toRemove = new ArrayList<>();
+        List<WeaponCard.Effect> selectedEffects = new ArrayList<>();
+        // select effects
+        // show popup
+        Platform.runLater(()->{
+            Pane root = FXWindow.getPane();
+            //load popup
+            ImageView selectEffectPopup = loadImage(WEAPON_EFFECT_POPUP_PATH);
+            selectEffectPopup.setPreserveRatio(true);
+            selectEffectPopup.setFitWidth(WEAPON_EFFECT_POPUP_SIZE*width);
+            selectEffectPopup.setX(WEAPON_EFFECT_POPUP_X*width);
+            selectEffectPopup.setY((height-getHeight(selectEffectPopup))*WEAPON_EFFECT_POPUP_Y);
+            root.getChildren().add(selectEffectPopup);
+            toRemove.add(selectEffectPopup);
+            //load card
+            ImageView selectedCard = getWeaponImage(toShootWith.getName());
+            selectedCard.setY(WEAPON_EFFECT_CARD_Y*height);
+            selectedCard.setX(WEAPON_EFFECT_CARD_X*width);
+            selectedCard.setPreserveRatio(true);
+            selectedCard.setFitWidth(WEAPON_EFFECT_CARD_SIZE*height);
+            root.getChildren().add(selectedCard);
+            toRemove.add(selectedCard);
+            // load effect buttons
+            if(toShootWith.isEffect()){
+                // load effects and remember sequence
+                setEffectButtons(toShootWith, toRemove, root, selectedEffects);
+
+            }else {
+                // show modes and pick one
+                setModeButtons(toShootWith, toRemove, root, selectedEffects);
+            }
+        });
+
+        String selected = selection.getValue();
+
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        if(selected.equals("KO")){
+            //undo was pressed
+            return new WeaponSelection("", new ArrayList<>(), new ArrayList<>());
+        }
+
+        // shoot was pressed -> get cost of effects selected and make player select powerups
+        List<Resource> toPay = new ArrayList<>();
+        selectedEffects.forEach(effect -> toPay.addAll(effect.getCost()));
+        List<Powerup> selectedPowerups = new ArrayList<>();
+        payWithPowerups(toPay, selectedPowerups);
+        List<Integer> effectsID = new ArrayList<>();
+        selectedEffects.forEach(effect -> effectsID.add(toShootWith.getEffects().indexOf(effect)));
+        toReturn.setEffectID(effectsID);
+        toReturn.setDiscount(selectedPowerups);
+
+        return toReturn;
     }
+
+    private void setModeButtons(WeaponCard toShootWith, List<Node> toRemove, Pane root, List<WeaponCard.Effect> selectedEffects) {
+        int i = 0;
+        for(WeaponCard.Effect effect: toShootWith.getEffects()) {
+            Button selectButton = new Button();
+            formatStandardButton(selectButton,
+                    WEAPON_EFFECT_BUTTON_SELECT_X0 * width,
+                    WEAPON_EFFECT_BUTTON_SELECT_Y0 * height+WEAPON_EFFECT_BUTTON_SELECT_OFF*i*height,
+                    WEAPON_EFFECT_BUTTON_SELECT_SIZE_W * width,
+                    WEAPON_EFFECT_BUTTON_SELECT_SIZE_H * height,
+                    effect.getName());
+            selectButton.setTooltip(new Tooltip(effect.getDescription()));
+            root.getChildren().add(selectButton);
+            toRemove.add(selectButton);
+            selectButton.setOnAction(e->selectedEffects.add(effect));
+            selection.setNodeClickable(selectButton, "OK");
+            i++;
+        }
+        // set undo button
+        Button undoButton = new Button();
+        formatStandardButton(undoButton,
+                WEAPON_EFFECT_BUTTON_SELECT_X0*width,
+                WEAPON_EFFECT_BUTTON_UNDO_Y*height,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_W*width,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_H*height,
+                "Undo");
+        root.getChildren().add(undoButton);
+        toRemove.add(undoButton);
+        selection.setNodeClickable(undoButton,"KO");
+    }
+
+    private void setEffectButtons(WeaponCard toShootWith, List<Node> toRemove, Pane root, List<WeaponCard.Effect> selectedEffects) {
+        int i = 0;
+        List<Button> addedButtons = new ArrayList<>();
+        for(WeaponCard.Effect effect: toShootWith.getEffects()) {
+            Button selectButton = new Button();
+            formatStandardButton(selectButton,
+                    WEAPON_EFFECT_BUTTON_SELECT_X0 * width,
+                    WEAPON_EFFECT_BUTTON_SELECT_Y0 * height+WEAPON_EFFECT_BUTTON_SELECT_OFF*i*height,
+                    WEAPON_EFFECT_BUTTON_SELECT_SIZE_W * width,
+                    WEAPON_EFFECT_BUTTON_SELECT_SIZE_H * height,
+                    effect.getName());
+            selectButton.setTooltip(new Tooltip(effect.getDescription()));
+            root.getChildren().add(selectButton);
+            toRemove.add(selectButton);
+            addedButtons.add(selectButton);
+            setNotSelectedEffect(selectButton);
+            selectButton.setOnAction(e -> {
+                if (!selectedEffects.contains(effect)) {
+                    selectedEffects.add(effect);
+                    setSelectedEffect(selectButton);
+                    selectButton.setText(effect.getName() + " (" + (selectedEffects.indexOf(effect) + 1) + ")");
+                } else {
+                    selectedEffects.remove(effect);
+                    setNotSelectedEffect(selectButton);
+                    selectButton.setText(effect.getName());
+                    int t = 0;
+                    for(Button b: addedButtons){
+                        //System.out.println(toShootWith.getEffects().get(t).getName());
+                        if(selectedEffects.contains(toShootWith.getEffects().get(t))){
+                            b.setText(effect.getName() + " (" + (selectedEffects.indexOf(toShootWith.getEffects().get(t)) + 1) + ")");
+                        }
+                        t++;
+                    }
+                }
+            });
+            i++;
+        }
+        // set shoot button
+        Button shootButton = new Button();
+        formatStandardButton(shootButton,
+                WEAPON_EFFECT_BUTTON_SELECT_X0*width,
+                WEAPON_EFFECT_BUTTON_SHOOT_Y*height,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_W*width,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_H*height,
+                "Shoot");
+        root.getChildren().add(shootButton);
+        toRemove.add(shootButton);
+        selection.setNodeClickable(shootButton,"OK");
+
+        // set undo button
+        Button undoButton = new Button();
+        formatStandardButton(undoButton,
+                WEAPON_EFFECT_BUTTON_SELECT_X0*width,
+                WEAPON_EFFECT_BUTTON_UNDO_Y*height,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_W*width,
+                WEAPON_EFFECT_BUTTON_SELECT_SIZE_H*height,
+                "Undo");
+        root.getChildren().add(undoButton);
+        toRemove.add(undoButton);
+        selection.setNodeClickable(undoButton,"KO");
+    }
+
+    private void formatStandardButton(Button toFormat, double X, double Y, double WIDTH, double HEIGHT, String text){
+        toFormat.setLayoutX(X);
+        toFormat.setLayoutY(Y);
+        toFormat.setText(text);
+        toFormat.setPrefWidth(WIDTH);
+        toFormat.setPrefHeight(HEIGHT);
+        toFormat.setMinHeight(0);
+        toFormat.setMinWidth(0);
+    }
+
     /**
      * Lets client select a weapon to reload from a list
      * @param selectables list of weapons
@@ -1068,6 +1252,7 @@ public class GuiView extends ClientView{
     @Override
     public WeaponSelection selectReload(List<String> selectables) {
         // show button no reload
+        waitLoading();
         List<ImageView> toRemove = new ArrayList<>();
         Platform.runLater(()-> {
             ImageView buttonNoReload = loadImage(NO_RELOAD_PATH);
@@ -1093,38 +1278,10 @@ public class GuiView extends ClientView{
     public WeaponSelection selectWeapon(List<String> selectables) {
         System.out.println("SELECT WEAPON");
         waitLoading();
-        // set weapon buttons
-        ArrayList<ImageView> weaponsOnScreen = new ArrayList<>();
-        weaponsOnScreen.addAll(weapons);
-        weaponsOnScreen.addAll(spawnWeapons);
-        Platform.runLater(()->{
-            selectables.forEach(selectable -> {
-                //String fileName = getWeaponFileName(selectable);
-                weaponsOnScreen.stream().
-                        filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).
-                        forEach(w -> {
-                            selection.setNodeClickable(w, selectable);
-                            setClickableEffects(w);
-                            System.out.println("SETTING CLICKABLE "+selectable);
-                });
-            });
-        });
-        // get selected weapon
-        String weaponSelected = selection.getValue();
-        if(weaponSelected.equals(""))return new WeaponSelection("",new ArrayList<>(), new ArrayList<>());
 
-        WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponSelected);
-        // remove weapon  button
-        Platform.runLater(()->{
-            selectables.forEach(selectable -> {
-                //String fileName = getWeaponFileName(selectable);
-                weaponsOnScreen.stream().filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).forEach(w -> {
-                    selection.setNodeNotClickable(w);
-                    setNotClickableEffects(w);
-                    System.out.println("REMOVING CLICKABLE "+selectable);
-                });
-            });
-        });
+        // select a weapon
+        WeaponCard weaponCardSelected = selectWeaponFree(selectables);
+        if(weaponCardSelected == null)return new WeaponSelection("",new ArrayList<>(), new ArrayList<>());
 
         // set powerup discuont buttons
         List<Resource> toPay = weaponCardSelected.getCost();
@@ -1148,6 +1305,19 @@ public class GuiView extends ClientView{
 
 
         List<Powerup> selectedPowerups = new ArrayList<>();
+        payWithPowerups(toPay, selectedPowerups);
+
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        WeaponSelection selected= new WeaponSelection();
+        selected.setWeapon(weaponCardSelected.getName());
+        selected.setDiscount(selectedPowerups);
+        return selected;
+    }
+
+    private void payWithPowerups(List<Resource> toPay, List<Powerup> selectedPowerups) {
         while(!toPay.isEmpty()&& !player.getMatch().getPlayerByName(player.getNickname()).getPowerups().isEmpty()) {
             List<Powerup> usable = new ArrayList<>();
             player.getMatch().getPlayerByName(player.getNickname()).getPowerups().forEach(powerup -> {
@@ -1164,20 +1334,43 @@ public class GuiView extends ClientView{
             }
             else break;
         }
-
-        Platform.runLater(()->{
-            FXWindow.getPane().getChildren().removeAll(toRemove);
-        });
-
-        WeaponSelection selected= new WeaponSelection();
-        selected.setWeapon(weaponSelected);
-        selected.setDiscount(selectedPowerups);
-        return selected;
     }
 
-    @Override
-    public WeaponSelection selectWeaponFree(List<String> selectables) {
-        return null;
+    public WeaponCard selectWeaponFree(List<String> selectables) {
+        // set weapon buttons
+        ArrayList<ImageView> weaponsOnScreen = new ArrayList<>();
+        weaponsOnScreen.addAll(weapons);
+        weaponsOnScreen.addAll(spawnWeapons);
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                //String fileName = getWeaponFileName(selectable);
+                weaponsOnScreen.stream().
+                        filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).
+                        forEach(w -> {
+                            selection.setNodeClickable(w, selectable);
+                            setClickableEffects(w);
+                            System.out.println("SETTING CLICKABLE "+selectable);
+                        });
+            });
+        });
+        // get selected weapon
+        String weaponSelected = selection.getValue();
+        if(weaponSelected.equals(""))return null;
+
+        WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponSelected);
+        // remove weapon  button
+        Platform.runLater(()->{
+            selectables.forEach(selectable -> {
+                //String fileName = getWeaponFileName(selectable);
+                weaponsOnScreen.stream().filter(w -> w.getImage().getUrl().contains(selectable.toLowerCase())).forEach(w -> {
+                    selection.setNodeNotClickable(w);
+                    setNotClickableEffects(w);
+                    System.out.println("REMOVING CLICKABLE "+selectable);
+                });
+            });
+        });
+
+        return weaponCardSelected;
     }
 
     /**
@@ -1584,7 +1777,7 @@ public class GuiView extends ClientView{
             droplet.setX(ENEMY_DAMAGE_DROPLET_X0 *width+ ENEMY_DAMAGE_DROPLET_OFFSET_X *width*k);
             droplet.setY(ENEMY_DAMAGE_DROPLET_Y0 *height+ ENEMY_DAMAGE_DROPLET_OFFSET_Y *height*i);
             droplet.setPreserveRatio(true);
-            droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
+            droplet.setFitWidth(ENEMY_DROPLET_SIZE*width);
             addNode(root,droplet);
             k++;
         }
@@ -1596,7 +1789,7 @@ public class GuiView extends ClientView{
             droplet.setX(ENEMY_MARK_DROPLET_X0 *width+ ENEMY_MARK_DROPLET_OFFSET_X *width*k);
             droplet.setY(ENEMY_MARK_DROPLET_Y0 *height+ ENEMY_MARK_DROPLET_OFFSET_Y *height*i);
             droplet.setPreserveRatio(true);
-            droplet.setFitWidth(getWidth(tab)* ENEMY_DROPLET_SIZE);
+            droplet.setFitWidth(ENEMY_DROPLET_SIZE*width);
             addNode(root,droplet);
             k++;
         }
@@ -1608,7 +1801,7 @@ public class GuiView extends ClientView{
             skull.setX(ENEMY_SKULL_DROPLET_X0*width+ENEMY_SKULL_DROPLET_OFFSET_X*width*k);
             skull.setY(ENEMY_SKULL_DROPLET_Y0*height+ENEMY_SKULL_DROPLET_OFFSET_Y*height*i);
             skull.setPreserveRatio(true);
-            skull.setFitWidth(ENEMY_SKULL_SIZE);
+            skull.setFitWidth(ENEMY_SKULL_SIZE*width);
             addNode(root,skull);
             k++;
         }
@@ -1862,5 +2055,13 @@ public class GuiView extends ClientView{
 
     public void setButtonEffects(Node n){
         n.setStyle(BUTTONS_EFFECT);
+    }
+
+    public void setSelectedEffect(Node n){
+        n.setStyle(SELECTED_EFFECT);
+    }
+
+    public void setNotSelectedEffect(Node n){
+        n.setStyle(NOT_SELECTED_EFFECT);
     }
 }
