@@ -716,14 +716,14 @@ public class AdrenalinaMatch {
 							toReturn.addAll(pC.getPlayers());
 						}
 					}
-				} else {
+				} /*else {
 					// look for players at given distance
 					toReturn = intersection(toReturn,
 							toReturn.get(0).getCellAtDistance(minDistance,maxDistance).stream().
 									map(Cell::getPlayers).
 									flatMap(List::stream).
 									collect(Collectors.toList()));
-				}
+				}*/
 		}
 
 		// filter notID
@@ -811,11 +811,11 @@ public class AdrenalinaMatch {
 					for(Player p: foundPlayers){
 						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
 					}
-				} else {
+				} /*else {
 					List<Player> playersWithID = getPlayersByID(id);
 
 					if (!playersWithID.isEmpty()) toReturn = intersection(toReturn, playersWithID.get(0).getCellAtDistance(minDistance,maxDistance));
-				}
+				}*/
 		}
 
 		// filter notID

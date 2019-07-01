@@ -6,6 +6,7 @@ import it.polimi.ingsw.client.model.Cell;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
 import it.polimi.ingsw.server.model.Ammo;
+import it.polimi.ingsw.server.model.MatchState;
 import it.polimi.ingsw.server.model.Powerup;
 import it.polimi.ingsw.server.model.Resource;
 import javafx.animation.PauseTransition;
@@ -295,6 +296,7 @@ public class GuiView extends ClientView{
     private List<ImageView> resources;
 
     private boolean loading;
+    private boolean initted;
 
     private List<ImageView> nodes;
 
@@ -311,6 +313,7 @@ public class GuiView extends ClientView{
         spawnWeapons = new ArrayList<>();
         selection = new GuiSelection();
         nodes = new ArrayList<>();
+        initted = false;
     }
 
     /**
@@ -517,42 +520,47 @@ public class GuiView extends ClientView{
 
     @Override
     public void initMatch() {
-        Platform.runLater(()->{
-            Stage stage = FXWindow.getStage();
-            BorderPane borders = new BorderPane();
-            Pane root = new Pane();
-            FXWindow.setPane(root);
-            Scene scene = new Scene(borders, stage.getScene().getWidth(),stage.getScene().getHeight());
-            borders.setCenter(root);
-            stage.setScene(scene);
-            stage.setMaximized(true);
-            stage.setResizable(false);
+        if(!initted) {
+            loading = true;
+            Platform.runLater(() -> {
+                Stage stage = FXWindow.getStage();
+                BorderPane borders = new BorderPane();
+                Pane root = new Pane();
+                FXWindow.setPane(root);
+                Scene scene = new Scene(borders, stage.getScene().getWidth(), stage.getScene().getHeight());
+                borders.setCenter(root);
+                stage.setScene(scene);
+                stage.setMaximized(true);
+                stage.setResizable(false);
 
-            double pV, pH;
-            // set fixed proportions
-            if(root.getHeight() > root.getWidth()*9/16){
-                pH = 0;
-                pV = (root.getHeight() - root.getWidth()*9/16)/2;
-                System.out.println("stagew h: " + stage.getHeight());
-                System.out.println("margin v: " + pV);
-            } else {
-                pV = 0;
-                pH =  (root.getWidth()-root.getHeight()*16/9)/2;
-            }
+                double pV, pH;
+                // set fixed proportions
+                if (root.getHeight() > root.getWidth() * 9 / 16) {
+                    pH = 0;
+                    pV = (root.getHeight() - root.getWidth() * 9 / 16) / 2;
+                    System.out.println("stagew h: " + stage.getHeight());
+                    System.out.println("margin v: " + pV);
+                } else {
+                    pV = 0;
+                    pH = (root.getWidth() - root.getHeight() * 16 / 9) / 2;
+                }
 
-            width = root.getWidth()-2*pH;
-            height = root.getHeight()-2*pV;
+                width = root.getWidth() - 2 * pH;
+                height = root.getHeight() - 2 * pV;
 
-            BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
+                BorderPane.setMargin(root, new Insets(pV, pH, pV, pH));
 
-            //Creating a scene object
-            borders.setPrefSize(scene.getWidth(),scene.getHeight());
+                //Creating a scene object
+                borders.setPrefSize(scene.getWidth(), scene.getHeight());
 
-            borders.setStyle("-fx-background-color: #222");
-            root.setStyle("-fx-background-color: #222");
+                borders.setStyle("-fx-background-color: #222");
+                root.setStyle("-fx-background-color: #222");
 
-            root.setPrefSize(stage.getHeight()*16/9, stage.getHeight());
-        });
+                root.setPrefSize(stage.getHeight() * 16 / 9, stage.getHeight());
+            });
+            initted = true;
+            loading = false;
+        }
     }
 
     /**
@@ -560,6 +568,10 @@ public class GuiView extends ClientView{
      */
     @Override
     public void showMatch() {
+        if(!initted && player.getMatch().getState() != MatchState.NOT_STARTED){
+            initMatch();
+            waitLoading();
+        }
         switch (player.getMatch().getState()){
             case NOT_STARTED:
                 showWaitingRoom();

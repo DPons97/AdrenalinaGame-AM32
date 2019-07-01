@@ -22,6 +22,9 @@ public class RemoteClient extends ServerConnection {
 	 */
 	private ServerFunctionalities server;
 
+
+	private static final int PING_SECONDS = 2;
+
 	/**
 	 * RMI registry
 	 */
@@ -124,9 +127,9 @@ public class RemoteClient extends ServerConnection {
 	}
 
 	@Override
-	public String updateLobby() {
+	public String updateLobby(String name) {
 		try {
-			return server.updateLobby();
+			return server.updateLobby(name);
 		} catch (RemoteException e) {
 			// the disconnection is handled elsewhere
 			return null;
@@ -147,7 +150,7 @@ public class RemoteClient extends ServerConnection {
 		while(true){
 			try {
 				server.ping(player.getNickname());
-				TimeUnit.SECONDS.sleep(5);
+				TimeUnit.SECONDS.sleep(PING_SECONDS);
 			} catch (RemoteException e) {
 				System.out.println("Connection lost");
 				while (true){

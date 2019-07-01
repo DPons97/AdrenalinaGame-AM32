@@ -29,6 +29,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	private static String address;
 	private static Registry registry;
 
+	private static final int TIMEOUT_SECONDS = 6;
+
 	/**
 	 *  max connections number
 	 */
@@ -270,8 +272,11 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	}
 
 	@Override
-	public String updateLobby() throws RemoteException {
-		return lobby.updatePlayer();
+	public String updateLobby(String name) throws RemoteException {
+		if(!lobby.getPlayersNameInGame().contains(name)){
+			return lobby.updatePlayer();
+		}
+		return null;
 	}
 
 	public void checkRMIConnections(){
@@ -279,7 +284,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 			lobby.getPlayers().forEach(this::checkPlayerPingStatus);
 			lobby.getPlayersInGame().forEach(this::checkPlayerPingStatus);
 			try {
-				TimeUnit.SECONDS.sleep(15);
+				TimeUnit.SECONDS.sleep(TIMEOUT_SECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

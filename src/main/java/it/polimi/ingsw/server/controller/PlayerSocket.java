@@ -231,6 +231,9 @@ public class PlayerSocket extends PlayerConnection {
 		message.put("list", jArray);
         this.sendInstruction(message);
         JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
+
+        if (selected.get("x").equals("none")) return null;
+
         return selectable.stream().filter(c->c.getCoordX() == Integer.parseInt(selected.get("x").toString()) &&
                 c.getCoordY() == Integer.parseInt(selected.get("y").toString()))
                 .collect(Collectors.toList()).get(0);
@@ -266,7 +269,7 @@ public class PlayerSocket extends PlayerConnection {
         return null;
     }
 
-    /**
+	/**
      * builds a JSONArray of coordinates
      * @param r list of cells
 	 * @return JSONArray of coordinates

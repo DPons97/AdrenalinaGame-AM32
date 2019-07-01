@@ -412,6 +412,15 @@ public class Turn {
             for (Integer id : effectIds) {
                 playing.shoot(getWeapon(pickedWeapon.getWeapon(), playing), id, pickedWeapon.getPowerups());
             }
+
+            // Reset ids
+            for (Player p : match.getPlayers()) p.setID(-1);
+            for (Cell c : match.getBoardMap().getAmmoPoints()) c.setID(-1);
+            for (Cell c : match.getBoardMap().getSpawnPoints()) c.setID(-1);
+
+            // Weapon has to be reloaded
+            getWeapon(pickedWeapon.getWeapon(), playing).setLoaded(false);
+
             return true;
         } catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
             e.printStackTrace();

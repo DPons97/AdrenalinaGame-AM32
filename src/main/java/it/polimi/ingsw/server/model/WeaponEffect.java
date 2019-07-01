@@ -22,12 +22,12 @@ public class WeaponEffect extends Weapon {
 	/**
 	 * Weapon first optional effect (null if not present)
 	 */
-	private Action firstOptional = null;
+	private Action firstOptional;
 
 	/**
 	 * Weapon second optional effect (null if not present)
 	 */
-	private Action secondOptional = null;
+	private Action secondOptional;
 
 
 	/**
@@ -106,9 +106,6 @@ public class WeaponEffect extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
-
-		this.loaded = false;
-
 	}
 
 	/**

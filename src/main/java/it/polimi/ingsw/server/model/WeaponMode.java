@@ -37,6 +37,7 @@ public class WeaponMode extends Weapon {
 	@Override
 	public void shoot(int effectID, Player shooter) throws WeaponNotLoadedException {
 		if(!loaded) throw new WeaponNotLoadedException();
+
 		switch (effectID){
 			case 0:
 				executePrimaryMode(shooter);
@@ -49,7 +50,6 @@ public class WeaponMode extends Weapon {
 			default:
 				throw new IllegalArgumentException();
 		}
-		this.loaded = false;
 	}
 
 	/**
@@ -91,9 +91,7 @@ public class WeaponMode extends Weapon {
 	 * @param sequence list of effect IDs to evaluate execution
 	 * @return True if given sequence can be executed
 	 */
-	public boolean isValidActionSequence(List<Integer> sequence) {
-		return true;
-	}
+	public boolean isValidActionSequence(List<Integer> sequence) { return !sequence.isEmpty(); }
 
 	/**
 	 * @param actions json object to parse

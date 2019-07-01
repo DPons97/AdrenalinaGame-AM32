@@ -70,6 +70,9 @@ public class PlayerRemote extends PlayerConnection {
 			Point p =  remotePlayer.cellSelection(
 				selectable.stream().map(c->new Point(c.getCoordX(), c.getCoordY())).collect(Collectors.toList())
 			);
+
+			if (p == null) return null;
+
 			return selectable.stream().filter(c->c.getCoordX() == p.getX() && c.getCoordY() == p.getY()).
 					collect(Collectors.toList()).get(0);
 		} catch (RemoteException e) {
@@ -256,6 +259,9 @@ public class PlayerRemote extends PlayerConnection {
 
 	private void disconnectPlayer(){
 		System.out.println(name+" disconnected");
-		this.getServerLobby().removePlayer(this);
+		if(getServerLobby() != null)
+			getServerLobby().removePlayer(this);
+		if(getCurrentMatch()!= null)
+			getCurrentMatch().getPlayer(getName()).setConnection(null);
 	}
 }
