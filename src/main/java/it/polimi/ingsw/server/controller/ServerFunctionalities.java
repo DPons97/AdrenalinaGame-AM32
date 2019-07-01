@@ -54,6 +54,6 @@ public interface ServerFunctionalities extends Remote {
 	 * Updates the lobby view
 	 * @return  JSON lobby representation to get update from
 	 */
-	String updateLobby() throws  RemoteException;
+	String updateLobby(String name) throws  RemoteException;
 
 }

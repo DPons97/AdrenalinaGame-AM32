@@ -77,6 +77,16 @@ public class PlayerSocket extends PlayerConnection {
 			} catch (IOException e) {
 				Thread t = new Thread(this::disconnect);
 				t.start();
+				try {
+					t.join();
+				} catch (InterruptedException e1) {
+					e1.printStackTrace();
+				}
+				synchronized (this) {
+					response = null;
+					validResponse = true;
+					notifyAll();
+				}
 				return;
 			}
 		}
@@ -129,7 +139,9 @@ public class PlayerSocket extends PlayerConnection {
 				getCurrentMatch().setPlayerReady(this, false);
 				break;
 			case "update_lobby":
-				this.updateLobby(getServerLobby().lobby);
+				if(getServerLobby()!=null) {
+					this.updateLobby(getServerLobby().lobby);
+				}
 				break;
 			case "back_to_lobby":
 				try {
@@ -177,7 +189,10 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	private void disconnect() {
 		System.out.println(name + " disconnected.");
-		getServerLobby().removePlayer(this);
+		if(getServerLobby() != null)
+			getServerLobby().removePlayer(this);
+		if(getCurrentMatch()!= null)
+			getCurrentMatch().getPlayer(getName()).setConnection(null);
 	}
 
 	/**

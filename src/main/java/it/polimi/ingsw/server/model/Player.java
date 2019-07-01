@@ -617,23 +617,20 @@ public class Player {
 		Ammo resourcePicked = location.pickResource();
 		List<Resource> resourcesInAmmo = resourcePicked.getResources();
 		boolean addPowerup = resourcePicked.hasPowerup();
-		List<Resource> resourcesToAdd = new ArrayList<>();
 
 		// Check if there is space for at least one resource to add. If there are already too many resources, remove from resources to add
 		for (Resource toAdd: resourcesInAmmo ) {
 			// Get player's ammo quantity of toAdd's resource type
 			int thisResourceQty = 0;
-			for (Resource res: ammos) if (res.equals(toAdd)) thisResourceQty++;
-			if (thisResourceQty < 3) resourcesToAdd.add(toAdd);
+			for (Resource res: ammos){
+				if (res.equals(toAdd)) thisResourceQty++;
+			}
+			// if there is space add ammo to player
+			if (thisResourceQty < 3) ammos.add(toAdd);
 		}
 
 		// Check if there is space for at least one powerup to add. If there are already too many powerups, do not add
-		if (powerups.size() >= 3) addPowerup = false;
-
-		// Add resources
-		if (!resourcesToAdd.isEmpty()) ammos.addAll(resourcesToAdd);
-		// Add powerup
-		if (addPowerup) powerups.add(match.getPowerupDeck().drawCard());
+		if (powerups.size() < 3) powerups.add(match.getPowerupDeck().drawCard());
 
 		// Discard picked ammo to deck
 		match.getAmmoDeck().discardCard(resourcePicked);

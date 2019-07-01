@@ -134,7 +134,7 @@ public class AdrenalinaMatch {
 		if (nPlayers < minPlayers ) this.nPlayers = minPlayers;
 		else if (nPlayers > maxPlayers) this.nPlayers = maxPlayers;
 		else this.nPlayers = nPlayers;
-
+		if(mapID > 4 || mapID < 1) mapID = 1;
 		this.maxDeaths = maxDeaths;
 		this.turnDuration = turnDuration;
 		this.turn = 0;
