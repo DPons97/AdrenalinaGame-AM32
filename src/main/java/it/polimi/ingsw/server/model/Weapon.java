@@ -55,6 +55,11 @@ public abstract class Weapon implements Serializable {
 	}
 
 	/**
+	 * @param loaded new loaded state
+	 */
+	public void setLoaded(boolean loaded) {	this.loaded = loaded; }
+
+	/**
 	 * @return weapon effective cost. If weapon's loaded, cost is reduced
 	 */
 	public List<Resource> getCost() {

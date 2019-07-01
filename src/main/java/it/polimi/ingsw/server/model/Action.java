@@ -158,7 +158,12 @@ public class Action {
 		// check what needs to be selected (cell/player/room/self)
 		switch(baseActionJSON.get("target").toString()){
 			case "CELL":
-				actions.add(selectCellLambda(baseActionJSON, notID, distance, minQty, maxQty));
+
+				if (baseActionJSON.get("from").toString().equals("DIRECTION")
+						|| baseActionJSON.get("from").toString().equals("DIRECTION_VISIBLE"))
+					actions.add(selectDirectionLambda(baseActionJSON, notID, distance, minQty, maxQty));
+				else actions.add(selectCellLambda(baseActionJSON, notID, distance, minQty, maxQty));
+
 				break;
 			case "PLAYER":
 				actions.add(selectPlayerLambda(baseActionJSON, notID, distance, diffCells, minQty, maxQty));
@@ -209,10 +214,10 @@ public class Action {
 		return caller -> {
 			targetCells.clear();
 			List<List<Cell>> couldBeAdded = caller.getMatch().getSelectableRooms(caller);
-			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size())) {
 				// if there is no choice -> add all you could add
 				targetCells.addAll(couldBeAdded.stream().flatMap(List::stream).collect(Collectors.toList()));
-			else{
+			} else {
 				if (caller.getConnection() != null) {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
@@ -256,10 +261,17 @@ public class Action {
 
 			couldBeAdded.remove(caller);
 
-			if((!diffCells && maxQty == -1) || (minQty == maxQty && minQty >= couldBeAdded.size()))
+			int id = Integer.parseInt(baseActionJSON.get("ID").toString());
+			if((!diffCells && maxQty == -1) || (minQty == maxQty && minQty >= couldBeAdded.size())) {
 				// if there is no choice -> add all you could add
 				targetPlayers.addAll(couldBeAdded);
-			else {
+
+				if (id != -2) {
+					for (Player selected : couldBeAdded) {
+						selected.setID(id);
+					}
+				}
+			} else {
 				if (caller.getConnection() != null) {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
@@ -270,10 +282,9 @@ public class Action {
 							nSelected++;
 
 							// Set ids to selected players
-							int id = Integer.parseInt(baseActionJSON.get("ID").toString());
 							if (id != -2) {
 								selected.setID(id);
-								selected.getPosition().setID(id);
+								//selected.getPosition().setID(id);
 							}
 
 							couldBeAdded.remove(selected);
@@ -298,10 +309,15 @@ public class Action {
 							targetPlayers
 					);
 
-			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size()))
+			int id = Integer.parseInt(baseActionJSON.get("ID").toString());
+			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size())) {
 				// if there is no choice -> add all you could add
 				targetCells.addAll(couldBeAdded);
-			else{
+
+				if (id != -2)
+					for (Cell selected : couldBeAdded)
+						selected.setID(id);
+			} else {
 				if (caller.getConnection() != null) {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
@@ -312,13 +328,78 @@ public class Action {
 							nSelected++;
 
 							// Set ids to selected players
-							int id = Integer.parseInt(baseActionJSON.get("ID").toString());
 							if (id != -2) selected.setID(id);
 
 							couldBeAdded.remove(selected);
 						} else if (nSelected >= minQty) {
 							break;
 						}
+					}
+				}
+			}
+		};
+	}
+
+	public BaseAction selectDirectionLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, int minQty, int maxQty) {
+		return caller -> {
+			targetCells.clear();
+			List<Cell> couldBeAdded = caller.getMatch().
+					getSelectableCells(caller,
+							baseActionJSON.get("from").toString(),
+							notID != null ? Integer.parseInt(notID.toString()) : -10,
+							Integer.parseInt(distance.get(0).toString()),
+							Integer.parseInt(distance.get(1).toString()),
+							targetPlayers
+					);
+
+			List<Cell> selectables = new ArrayList<>();
+			List<Cell> visibleCells = caller.getVisibleCellsAtDistance(Integer.parseInt(distance.get(0).toString()),
+					Integer.parseInt(distance.get(1).toString()));
+
+			for (Direction dir : Direction.values()) {
+				Cell adjacentCell = caller.getMatch().getBoardMap().getAdjacentCell(caller.getPosition(), dir);
+
+				if (adjacentCell == null ) continue;
+
+				if (baseActionJSON.get("from").toString().equals("DIRECTION") ||
+						(baseActionJSON.get("from").toString().equals("DIRECTION_VISIBLE") && visibleCells.contains(adjacentCell)))
+					selectables.add(adjacentCell);
+
+			}
+
+			int id = Integer.parseInt(baseActionJSON.get("ID").toString());
+
+			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size())) {
+				// if there is no choice -> add all you could add
+				targetCells.addAll(couldBeAdded);
+
+				// Set ids to selected players
+				if (id != -2)
+					for (Cell currCell : targetCells)
+						currCell.setID(id);
+
+			} else {
+				if (caller.getConnection() == null || couldBeAdded.isEmpty()) return;
+
+				Cell selected = caller.getConnection().selectCell(selectables);
+				while (selected == null) selected = caller.getConnection().selectCell(selectables);
+
+				for (Direction dir : Direction.values()) {
+					if (selected == caller.getMatch().getBoardMap().getAdjacentCell(caller.getPosition(), dir)) {
+						// This is the correct direction, get all required cells
+						Cell currCell = caller.getMatch().getBoardMap().getAdjacentCell(caller.getPosition(), dir);
+						while (currCell != null) {
+							if (couldBeAdded.contains(currCell)) {
+								targetCells.add(currCell);
+
+								// Set ids to selected players
+								if (id != -2) {
+									currCell.setID(id);
+								}
+							}
+							currCell = caller.getMatch().getBoardMap().getAdjacentCell(currCell, dir);
+						}
+						break;
 					}
 				}
 			}

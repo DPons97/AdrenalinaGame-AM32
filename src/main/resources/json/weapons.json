@@ -847,7 +847,7 @@
             "type": "SELECT",
             "ID": 1,
             "target": "CELL",
-            "from": "DIRECTION",
+            "from": "DIRECTION_VISIBLE",
             "differentCells": false,
             "quantity": [
               1,
@@ -869,8 +869,8 @@
               2
             ],
             "distance": [
-              1,
-              2
+              0,
+              0
             ]
           },
           {

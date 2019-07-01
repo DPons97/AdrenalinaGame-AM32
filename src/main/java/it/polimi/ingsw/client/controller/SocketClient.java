@@ -225,10 +225,11 @@ public class SocketClient extends ServerConnection {
 
 						break;
 					case "cell":
-						Point selected= player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
+						Point selected = player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
+
 						JSONObject msg = new JSONObject();
-						msg.put("x", selected.getX());
-						msg.put("y", selected.getY());
+						msg.put("x", (selected != null) ? selected.getX() : "none");
+						msg.put("y", (selected != null) ? selected.getY() : "none");
 						sendAnswer(msg);
 
 						break;
