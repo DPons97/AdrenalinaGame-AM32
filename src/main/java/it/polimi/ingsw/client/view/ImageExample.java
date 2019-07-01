@@ -806,7 +806,6 @@ public class ImageExample extends Application {
                 BorderPane.setMargin(root, new Insets(pV, pH, pV, pH)));
 
 */
-
 /*
 //MAP 2
         //grey button map 2

@@ -104,6 +104,8 @@ public class Turn {
         int remainingActions = 2;
 
         while (remainingActions > 0) {
+            // if player disconnected, skip turn
+            if (playing.getConnection() == null) return;
             // Ask player what to do (RUN, PICK, SHOOT)
             TurnAction currentAcion = playing.getConnection().selectAction();
 
@@ -500,6 +502,10 @@ public class Turn {
 
         // Make player choose one to discard. This card's color is the spawn's cell color
         Powerup toDiscard = currentPlayer.getConnection().choosePowerup(spawnCards);
+        if(toDiscard == null) {
+            // player disconnected choose first weapon
+            toDiscard = spawnCards.get(0);
+        }
         spawnCards.remove(toDiscard);
 
         // Update player's powerups
