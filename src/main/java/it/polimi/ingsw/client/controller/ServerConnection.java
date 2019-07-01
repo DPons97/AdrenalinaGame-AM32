@@ -44,7 +44,7 @@ public abstract class ServerConnection {
      * Updates the lobby view
      * @return JSON lobby representation to get update from
      */
-    public abstract String updateLobby();
+    public abstract String updateLobby(String name);
 
     public abstract void backToLobby();
 }

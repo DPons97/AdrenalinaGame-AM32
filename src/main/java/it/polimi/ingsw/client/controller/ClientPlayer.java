@@ -214,8 +214,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	 * Updates the lobby view
 	 */
 	public void updateLobby() {
-		lastUpdater = new Thread(() -> view.showLobby(server.updateLobby()));
-		lastUpdater.start();
+		String lobbyString = server.updateLobby(getNickname());
+		if(lobbyString != null) {
+			lastUpdater = new Thread(() -> view.showLobby(lobbyString));
+			lastUpdater.start();
+		}
 	}
 
 	/**

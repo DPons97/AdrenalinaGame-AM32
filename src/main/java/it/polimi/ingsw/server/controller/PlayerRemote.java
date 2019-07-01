@@ -256,6 +256,9 @@ public class PlayerRemote extends PlayerConnection {
 
 	private void disconnectPlayer(){
 		System.out.println(name+" disconnected");
-		this.getServerLobby().removePlayer(this);
+		if(getServerLobby() != null)
+			getServerLobby().removePlayer(this);
+		if(getCurrentMatch()!= null)
+			getCurrentMatch().getPlayer(getName()).setConnection(null);
 	}
 }

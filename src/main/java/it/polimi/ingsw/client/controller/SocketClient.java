@@ -153,7 +153,7 @@ public class SocketClient extends ServerConnection {
 	}
 
 	@Override
-	public String updateLobby() {
+	public String updateLobby(String name) {
 		JSONObject msg = new JSONObject();
 		msg.put("function", "PUSH");
 		msg.put("type", "update_lobby");
