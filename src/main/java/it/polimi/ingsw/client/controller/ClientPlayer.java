@@ -221,6 +221,11 @@ public class ClientPlayer implements ClientFunctionalities{
 		}
 	}
 
+	@Override
+	public void showLeaderboard(List<String> leaderboard) {
+		view.showLeaderboard(leaderboard);
+	}
+
 	/**
 	 * Updates the lobby view
 	 * @param toGetUpdateFrom JSON match representation to get update from

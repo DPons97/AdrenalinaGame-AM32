@@ -271,6 +271,19 @@ public class CliView extends ClientView {
     private static final String PLAYER_INFO_CLOSER =    "+--------------------------+-------------------------+---------+---------------------+";
 
     /**
+     * Leaderboard format
+     */
+    private static final String LEADERBOARD_INTRO =
+            "    ___    ____  ____  _______   _____    __    _____   _____ %n" +
+            "   /   |  / __ \\/ __ \\/ ____/ | / /   |  / /   /  _/ | / /   |%n" +
+            "  / /| | / / / / /_/ / __/ /  |/ / /| | / /    / //  |/ / /| |%n" +
+            " / ___ |/ /_/ / _, _/ /___/ /|  / ___ |/ /____/ // /|  / ___ |%n" +
+            "/_/  |_/_____/_/ |_/_____/_/ |_/_/  |_/_____/___/_/ |_/_/  |_|%n" +
+            "                                                              ";
+
+    private static final String LEADERBOARD_HEADER = "╔═══╦════════════════════════╦════════╗";
+
+    /**
      * Default action selection messages
      */
     private static final String INVALID_SELECTION = "Invalid selection";
@@ -571,7 +584,7 @@ public class CliView extends ClientView {
 
             lobbyNextCommand(isReady);
 
-        } else if (match.getState() == MatchState.PLAYER_TURN) {
+        } else if (match.getState() == MatchState.PLAYER_TURN || match.getState() == MatchState.FRENZY_TURN) {
             synchronized (this) {
                 // Print players
                 System.out.printf("%n      ");
@@ -590,6 +603,10 @@ public class CliView extends ClientView {
 
                 // Print alerts
                 System.out.printf(alertMessage);
+            }
+        } else if (match.getState() == MatchState.FINAL_SCORING) {
+            synchronized (this) {
+                System.out.printf("Match ended. Retrieving leaderboard...");
             }
         }
     }
@@ -637,7 +654,14 @@ public class CliView extends ClientView {
         }
     }
 
-    /**-
+    @Override
+    public void showLeaderboard(List<String> leaderboard) {
+        clearConsole();
+
+
+    }
+
+    /**
      * Lets client select a player from a list
      * @param selectables list of players
      * @return selected player

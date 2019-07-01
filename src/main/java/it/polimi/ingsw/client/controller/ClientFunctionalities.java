@@ -1,5 +1,6 @@
 package it.polimi.ingsw.client.controller;
 
+import it.polimi.ingsw.client.model.Player;
 import it.polimi.ingsw.client.model.Point;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
@@ -73,6 +74,12 @@ public interface ClientFunctionalities extends Remote {
 	 * @return action to make
 	 */
 	TurnAction actionSelection() throws RemoteException;
+
+	/**
+	 * Shows leaderboard
+	 * @param leaderboard list of players ordered by victory points
+	 */
+	void showLeaderboard(List<String> leaderboard);
 
 	/**
 	 * Updates the match view
