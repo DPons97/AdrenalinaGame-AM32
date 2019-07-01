@@ -765,9 +765,10 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             //check if room is present
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
+                // add room button
                 Button red = new Button();
                 formatButton(red, MAP_1_RED_ROOM_X * width, MAP_1_RED_ROOM_Y * height,
-                        ROOM_3_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                        ROOM_3_BUTTON_W * height, ROOM_123_BUTTON_H * height);
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
@@ -775,7 +776,7 @@ public class GuiView extends ClientView{
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
                 formatButton(blue, MAP_1_BLUE_ROOM_X * width, MAP_1_BLUE_ROOM_Y * height,
-                        ROOM_3_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                        ROOM_3_BUTTON_W * height, ROOM_123_BUTTON_H * height);
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
@@ -783,7 +784,7 @@ public class GuiView extends ClientView{
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
                 Button white = new Button();
                 formatButton(white, MAP_1_WHITE_ROOM_X * width, MAP_1_WHITE_ROOM_Y * height,
-                        ROOM_2_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                        ROOM_2_BUTTON_W * height, ROOM_123_BUTTON_H * height);
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
@@ -791,19 +792,21 @@ public class GuiView extends ClientView{
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
                 Button yellow = new Button();
                 formatButton(yellow, MAP_1_YELLOW_ROOM_X * width, MAP_1_YELLOW_ROOM_Y * height,
-                        ROOM_123_BUTTON_H * width, ROOM_2_ROTATE_BUTTON_H * height);
+                        ROOM_123_BUTTON_H * height, ROOM_2_ROTATE_BUTTON_H * height);
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
             }
         });
-
+        // get selected value
         String selected = selection.getValue();
 
+        // remove buttons
         Platform.runLater(()->{
             FXWindow.getPane().getChildren().removeAll(toRemove);
         });
 
+        //get selected room and return it
         return selectables.get(getRoomIndex(selectables, it.polimi.ingsw.server.model.Color.valueOf(selected)));
     }
 
@@ -830,6 +833,14 @@ public class GuiView extends ClientView{
                 collect(Collectors.toList()).isEmpty();
     }
 
+    /**
+     * Formats a button
+     * @param button to format
+     * @param X coordinate
+     * @param Y cordinate
+     * @param WIDTH size
+     * @param HEIGHT size
+     */
     private void formatButton(Button button, double X, double Y, double WIDTH, double HEIGHT) {
         button.setLayoutX(X);
         button.setLayoutY(Y);
@@ -839,18 +850,191 @@ public class GuiView extends ClientView{
     }
 
     private List<Point> selectRoomMap2(List<List<Point>> selectables) {
-        return null;
+        //Show buttons
+        List<Button> toRemove = new ArrayList<>();
+        Platform.runLater(()->{
+            //check if room is present
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
+                Button white = new Button();
+                formatButton(white, MAP_2_WHITE_ROOM_X * width, MAP_2_WHITE_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(white);
+                selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
+                toRemove.add(white);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
+                Button yellow = new Button();
+                formatButton(yellow, MAP_2_YELLOW_ROOM_X * width, MAP_2_YELLOW_ROOM_Y * height,
+                        ROOM_2X2_BUTTON_WH * height, ROOM_2X2_BUTTON_WH * height);
+                setButtonEffects(yellow);
+                selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
+                toRemove.add(yellow);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
+                Button green = new Button();
+                formatButton(green, MAP_2_GREEN_ROOM_X * width, MAP_2_GREEN_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(green);
+                selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
+                toRemove.add(green);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
+                // add room button
+                Button red = new Button();
+                formatButton(red, MAP_2_RED_ROOM_X * width, MAP_2_RED_ROOM_Y * height,
+                        ROOM_2_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                setButtonEffects(red);
+                selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
+                toRemove.add(red);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
+                Button blue = new Button();
+                formatButton(blue, MAP_2_BLUE_ROOM_X * width, MAP_2_BLUE_ROOM_Y * height,
+                        ROOM_3_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                setButtonEffects(blue);
+                selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
+                toRemove.add(blue);
+            }
 
+        });
+        // get selected value
+        String selected = selection.getValue();
+
+        // remove buttons
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        //get selected room and return it
+        return selectables.get(getRoomIndex(selectables, it.polimi.ingsw.server.model.Color.valueOf(selected)));
     }
 
     private List<Point> selectRoomMap3(List<List<Point>> selectables) {
-        return null;
+        //Show buttons
+        List<Button> toRemove = new ArrayList<>();
+        Platform.runLater(()->{
+            //check if room is present
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
+                Button white = new Button();
+                formatButton(white, MAP_3_WHITE_ROOM_X * width, MAP_3_WHITE_ROOM_Y * height,
+                        ROOM_2_BUTTON_W * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(white);
+                selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
+                toRemove.add(white);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
+                Button purple = new Button();
+                formatButton(purple, MAP_3_PURPLE_ROOM_X * width, MAP_3_PURPLE_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(purple);
+                selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
+                toRemove.add(purple);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
+                Button green = new Button();
+                formatButton(green, MAP_3_GREEN_ROOM_X * width, MAP_3_GREEN_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(green);
+                selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
+                toRemove.add(green);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
+                Button blue = new Button();
+                formatButton(blue, MAP_3_BLUE_ROOM_X * width, MAP_3_BLUE_ROOM_Y * height,
+                        ROOM_2_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                setButtonEffects(blue);
+                selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
+                toRemove.add(blue);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
+                // add room button
+                Button red = new Button();
+                formatButton(red, MAP_3_RED_ROOM_X * width, MAP_3_RED_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * width, ROOM_2_ROTATE_BUTTON_H * height);
+                setButtonEffects(red);
+                selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
+                toRemove.add(red);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
+                Button yellow = new Button();
+                formatButton(yellow, MAP_3_YELLOW_ROOM_X * width, MAP_3_YELLOW_ROOM_Y * height,
+                        ROOM_2X2_BUTTON_WH * height, ROOM_2X2_BUTTON_WH * height);
+                setButtonEffects(yellow);
+                selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
+                toRemove.add(yellow);
+            }
 
+        });
+        // get selected value
+        String selected = selection.getValue();
+
+        // remove buttons
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        //get selected room and return it
+        return selectables.get(getRoomIndex(selectables, it.polimi.ingsw.server.model.Color.valueOf(selected)));
     }
 
     private List<Point> selectRoomMap4(List<List<Point>> selectables) {
-        return null;
+        //Show buttons
+        List<Button> toRemove = new ArrayList<>();
+        Platform.runLater(()->{
+            //check if room is present
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
+                Button blue = new Button();
+                formatButton(blue, MAP_4_BLUE_ROOM_X * width, MAP_4_BLUE_ROOM_Y * height,
+                        ROOM_2_BUTTON_W * width, ROOM_123_BUTTON_H * height);
+                setButtonEffects(blue);
+                selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
+                toRemove.add(blue);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
+                Button purple = new Button();
+                formatButton(purple, MAP_4_PURPLE_ROOM_X * width, MAP_4_PURPLE_ROOM_Y * height,
+                        ROOM_2_BUTTON_W * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(purple);
+                selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
+                toRemove.add(purple);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
+                // add room button
+                Button red = new Button();
+                formatButton(red, MAP_4_RED_ROOM_X * width, MAP_4_RED_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * width, ROOM_2_ROTATE_BUTTON_H * height);
+                setButtonEffects(red);
+                selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
+                toRemove.add(red);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
+                Button yellow = new Button();
+                formatButton(yellow, MAP_4_YELLOW_ROOM_X * width, MAP_4_YELLOW_ROOM_Y * height,
+                        ROOM_123_BUTTON_H * height, ROOM_2_ROTATE_BUTTON_H * height);
+                setButtonEffects(yellow);
+                selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
+                toRemove.add(yellow);
+            }
+            if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
+                Button white = new Button();
+                formatButton(white, MAP_4_WHITE_ROOM_X * width, MAP_4_WHITE_ROOM_Y * height,
+                        ROOM_3_BUTTON_W * height, ROOM_123_BUTTON_H * height);
+                setButtonEffects(white);
+                selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
+                toRemove.add(white);
+            }
 
+        });
+        // get selected value
+        String selected = selection.getValue();
+
+        // remove buttons
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        //get selected room and return it
+        return selectables.get(getRoomIndex(selectables, it.polimi.ingsw.server.model.Color.valueOf(selected)));
     }
 
     /**
