@@ -51,6 +51,7 @@ public class ImageExample extends Application {
     public static final String SQUARE = "/img/squares/yellow.png";
     public static final String SELECTSPAWN = "/img/others/spawn.jpeg";
     public static final String BUTTONRESOURCES= "/img/others/buttonresources.png";
+    public static final String SELECTWEAPONEFFECTS= "/img/others/selectweaponeffects.png";
 
     public static final double ISTANT_RESIZE = 1.01;
     public static final double DELAY_IN = 0.4;
@@ -99,7 +100,8 @@ public class ImageExample extends Application {
         Image selectspawn = new Image (new FileInputStream(urlSelectSpawn.getFile().replace("%20", " ")));
         URL urlButtonResource= getClass().getResource(BUTTONRESOURCES);
         Image buttonresources= new Image(new FileInputStream(urlButtonResource.getFile().replace("%20", " ")));
-
+        URL urlSelectWeaponEffects=getClass().getResource(SELECTWEAPONEFFECTS);
+        Image selectweaponeffects= new Image(new FileInputStream(urlSelectWeaponEffects.getFile().replace("%20", " ")));
 
 
 
@@ -1157,6 +1159,67 @@ public class ImageExample extends Application {
             }
         }
            */
+
+
+// select weapon effects
+        ImageView selectWeaponEffectsView = new ImageView(selectweaponeffects);
+        double selectWeaponEffectsSize = width16*0.6;
+        double selectWeaponEffectsX0= (width16-selectWeaponEffectsSize)/2;
+        selectWeaponEffectsView.setFitWidth(selectWeaponEffectsSize);
+        selectWeaponEffectsView.setX(selectWeaponEffectsX0);
+
+
+        double selectWeaponEffectsY0= (height9-getHeight(selectWeaponEffectsView))/2;
+        selectWeaponEffectsView.setY(selectWeaponEffectsY0);
+
+        selectWeaponEffectsView.setPreserveRatio(true);
+        root.getChildren().add(selectWeaponEffectsView);
+
+
+        double cardselectWeaponEffectsX=width16*0.27;
+        double cardBaseselectWeaponEffectsY=height9*0.34;
+        double cardselectWeaponEffectsSize=height9*0.27;
+        double buttonSelectSizeW= width16*0.10;
+        double buttonSelectSixeH= height9*0.05;
+        double buttonSelectX= width16*0.55;
+        double buttonSelectY= height9*0.35;
+        double buttonSelectOffset= height9*0.12;
+        double buttonShootY= height9*0.76;
+
+        ImageView cardback01selectWeaponEffectsView = new ImageView(cardback01);
+        cardback01selectWeaponEffectsView.setY(cardBaseselectWeaponEffectsY);
+        cardback01selectWeaponEffectsView.setX(cardselectWeaponEffectsX);
+        cardback01selectWeaponEffectsView.setPreserveRatio(true);
+        cardback01selectWeaponEffectsView.setFitWidth(cardselectWeaponEffectsSize);
+        root.getChildren().add(cardback01selectWeaponEffectsView);
+
+
+        for(int j=0; j<3; j++) {
+            Button selectButton = new Button();
+            selectButton.setLayoutX(buttonSelectX);
+            selectButton.setLayoutY(buttonSelectY+(buttonSelectOffset*j));
+            selectButton.setText("Prova " +j );
+            selectButton.setPrefWidth(buttonSelectSizeW);
+            selectButton.setPrefHeight(buttonSelectSixeH);
+            selectButton.setMinHeight(0);
+            selectButton.setMinWidth(0);
+            root.getChildren().add(selectButton);
+        }
+
+        Button shootButton = new Button();
+        shootButton.setLayoutX(buttonSelectX);
+        shootButton.setLayoutY(buttonShootY);
+        shootButton.setText("Shoot");
+        shootButton.setPrefWidth(buttonSelectSizeW);
+        shootButton.setPrefHeight(buttonSelectSixeH);
+        shootButton.setMinHeight(0);
+        shootButton.setMinWidth(0);
+        root.getChildren().add(shootButton);
+
+
+
+
+
 
         // ammo cards
         double ammoX0 = width16*0.12;
