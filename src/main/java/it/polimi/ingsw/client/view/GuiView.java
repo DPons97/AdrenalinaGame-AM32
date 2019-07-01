@@ -155,6 +155,7 @@ public class GuiView extends ClientView{
     private static final double DASHBOARD_POWERUP_OFFSET = 0.15;
     private static final double DASHBOARD_CARDS_SIZE  =0.055;
     private static final String DASHBOARD_PATH  ="/img/tabs/mydashboard.png";
+    public static final String TO_RELOAD_PATH = "/img/others/toreload.png";
 
     // Ammo cards
     private static final String AMMO_DIR = "/img/ammo/";
@@ -649,7 +650,13 @@ public class GuiView extends ClientView{
                     i++;
             }
 
-            Button btnReady = new Button("READY");
+            Button btnReady = new Button();
+
+            if(player.getThisPlayer().isReadyToStart()){
+                btnReady.setText("NOT READY");
+            } else {
+                btnReady.setText("READY");
+            }
             HBox buttons = new HBox(10);
             buttons.setAlignment(Pos.BOTTOM_RIGHT);
             buttons.getChildren().add(btnReady);
@@ -669,7 +676,7 @@ public class GuiView extends ClientView{
             btnReady.setOnAction(e -> {
                 actiontarget.setFill(Color.FIREBRICK);
                 actiontarget.setText("Waiting for other players");
-                player.setReady(true);
+                player.setReady(!player.getThisPlayer().isReadyToStart());
             });
 
             btnBack.setOnAction(e -> {
@@ -714,11 +721,14 @@ public class GuiView extends ClientView{
     @Override
     public String selectPlayer(List<String> selectables) {
         // set buttons
+        waitLoading();
+        System.out.println("SELECT PLAYER");
         Platform.runLater(()-> {
                     selectables.forEach(selectable -> {
                         players.stream().filter(p -> p.getImage().getUrl().
-                                contains(player.getMatch().getPlayerByName(selectable).getColor().toString().toLowerCase() + PAWN_EXTENSION)).
+                                contains(getPawnFileName(player.getMatch().getPlayerByName(selectable)))).
                                 forEach(pawnImg -> {
+                                    System.out.println("SET CLICKABLE "+ selectable);
                                     selection.setNodeClickable(pawnImg, selectable);
                                     setClickableEffects(pawnImg);
                                 });
@@ -1886,6 +1896,14 @@ public class GuiView extends ClientView{
             weaponImg.setFitWidth(DASHBOARD_CARDS_SIZE*width);
             addNode(root,weaponImg);
             weapons.add(weaponImg);
+            if(!player.getThisPlayer().getLoadedWeapons().contains(weapon)){
+                ImageView toreloadView = new ImageView(TO_RELOAD_PATH);
+                toreloadView.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height*i);
+                toreloadView.setY(DASHBOARD_WEAPON_Y*height);
+                toreloadView.setPreserveRatio(true);
+                toreloadView.setFitWidth(WEAPON_CARD_SIZE*width);
+                root.getChildren().add(toreloadView);
+            }
             i++;
         }
     }
@@ -2043,6 +2061,15 @@ public class GuiView extends ClientView{
     private ImageView getDropletImage(Player p){
         String file = DROPLET_DIR+p.getColor().toString().toLowerCase()+DROPLET_EXTENSION;
         return loadImage(file);
+    }
+
+    private ImageView getPawnImage(Player player){
+        String path = getPawnFileName(player);
+        return loadImage(path);
+    }
+
+    private String getPawnFileName(Player player) {
+        return PAWN_DIR + player.getColor().toString().toLowerCase() + PAWN_EXTENSION;
     }
 
     public void setClickableEffects(Node n){
