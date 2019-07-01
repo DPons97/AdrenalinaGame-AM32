@@ -229,13 +229,15 @@ public class PlayerRemote extends PlayerConnection {
 	}
 
 	@Override
-	public void beginLoading() {
-
-	}
-
-	@Override
-	public void beginMatch() {
-
+	public void showLeaderboard(List<Player> leaderboard) {
+		List<String> leaderboardString = leaderboard.stream().map(p->p.getNickname()).collect(Collectors.toList());
+		try {
+			remotePlayer.showLeaderboard(leaderboardString);
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
+		}
 	}
 
 	@Override

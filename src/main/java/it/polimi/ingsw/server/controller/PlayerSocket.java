@@ -437,13 +437,12 @@ public class PlayerSocket extends PlayerConnection {
 	}
 
 	@Override
-	public void beginLoading() {
-		
-	}
-
-	@Override
-	public void beginMatch() {
-
+	public void showLeaderboard(List<Player> leaderboard) {
+		JSONObject msg = new JSONObject();
+		JSONArray leaderboardArray = new JSONArray();
+		leaderboard.forEach(p->leaderboardArray.add(p.getNickname()));
+		msg.put("leaderboard", leaderboardArray);
+		this.sendInstruction(msg);
 	}
 
 	/**

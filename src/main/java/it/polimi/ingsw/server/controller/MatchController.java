@@ -240,8 +240,12 @@ public class MatchController {
 
 			new Thread(()-> {
 				try {
-					startMatch();
-					// TODO Manage returned leaderboard
+					List<Player> leaderboard = startMatch();
+					for(Player p: match.getPlayers()){
+						if(p.getConnection()!= null){
+							p.getConnection().showLeaderboard(leaderboard);
+						}
+					}
 				} catch (PlayerNotReadyException | MatchAlreadyStartedException e) {
 					e.printStackTrace();
 				} catch (NotEnoughPlayersException e) {
