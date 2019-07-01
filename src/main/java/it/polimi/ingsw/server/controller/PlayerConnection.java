@@ -136,14 +136,9 @@ public abstract class PlayerConnection {
 	}
 
 	/**
-	 * Send player message to start loading
+	 * Send player message with the final leaderboard to show
 	 */
-	public abstract void beginLoading();
-
-	/**
-	 * Send player message to start match
-	 */
-	public abstract void beginMatch();
+	public abstract void showLeaderboard(List<Player> leaderboard);
 
 	/**
 	 * Go back to lobby

@@ -79,7 +79,7 @@ public interface ClientFunctionalities extends Remote {
 	 * Shows leaderboard
 	 * @param leaderboard list of players ordered by victory points
 	 */
-	void showLeaderboard(List<String> leaderboard);
+	void showLeaderboard(List<String> leaderboard) throws RemoteException;
 
 	/**
 	 * Updates the match view
