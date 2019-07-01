@@ -65,6 +65,7 @@ public class GuiView extends ClientView{
     private final static String TAB = "/img/tabs/";
     private final static String TAB_EXTENSION = ".png";
     private final static String TAB_BACK = "back";
+    private final static String TAB_BACK_FIRE = "backfire";
     private final static double TAB_OFFSET = 0.175;
     private static final double RELATIVE_TAB_HEIGHT = 0.20;
     private static final double PLAYER_TAB_X = 0;
@@ -842,6 +843,7 @@ public class GuiView extends ClientView{
      * @param HEIGHT size
      */
     private void formatButton(Button button, double X, double Y, double WIDTH, double HEIGHT) {
+        button.setMinHeight(0);
         button.setLayoutX(X);
         button.setLayoutY(Y);
         button.setPrefWidth(WIDTH);
@@ -1287,11 +1289,37 @@ public class GuiView extends ClientView{
                 int i = 0;
                 for(TurnAction t: TurnAction.values()){
                     Button actionButton = new Button();
-                    actionButton.setLayoutX(ACTION_BTN_X0*width);
-                    actionButton.setLayoutY(ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*height*i);
-                    actionButton.setMinHeight(0);
-                    actionButton.setPrefHeight(ACTION_BTN_NO_FRENZY_SIZE_Y*height);
-                    actionButton.setPrefWidth(ACTION_BTN_SIZE_X*height);
+                    formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*height*i,
+                            ACTION_BTN_SIZE_X*height,ACTION_BTN_NO_FRENZY_SIZE_Y*height);
+
+                    setButtonEffects(actionButton);
+                    selection.setNodeClickable(actionButton, t.toString());
+                    FXWindow.getPane().getChildren().add(actionButton);
+                    buttons.add(actionButton);
+                    i++;
+                }
+            }else if (!player.getMatch().isFirstPlayedFrenzy()){
+                int i = 0;
+                for(TurnAction t: TurnAction.values()){
+                    Button actionButton = new Button();
+                    formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_FRENZY_Y0*height+ACTION_BTN_FRENZY_PADDING*height*i,
+                            ACTION_BTN_SIZE_X*height,ACTION_BTN_FRENZY_SIZE_Y*height);
+
+                    setButtonEffects(actionButton);
+                    selection.setNodeClickable(actionButton, t.toString());
+                    FXWindow.getPane().getChildren().add(actionButton);
+                    buttons.add(actionButton);
+                    i++;
+                }
+            } else {
+                // bottom 2 actions
+                int i = 0;
+                for(TurnAction t: TurnAction.values()){
+                    if(t == TurnAction.MOVE) continue;
+                    Button actionButton = new Button();
+                    formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_FRENZY_DOWN_SIZE_Y0*height+ACTION_BTN_FRENZY_PADDING*height*i,
+                            ACTION_BTN_SIZE_X*height,ACTION_BTN_FRENZY_SIZE_Y*height);
+
                     setButtonEffects(actionButton);
                     selection.setNodeClickable(actionButton, t.toString());
                     FXWindow.getPane().getChildren().add(actionButton);
@@ -1299,7 +1327,6 @@ public class GuiView extends ClientView{
                     i++;
                 }
             }
-            //TODO FRENZY ENABLED BUTTONS
         });
 
         String selected = selection.getValue();
@@ -1794,8 +1821,16 @@ public class GuiView extends ClientView{
         return loadImage(file);
     }
     private ImageView getTabImage(Player player) {
-        String file = TAB + player.getColor().toString().toLowerCase() +
-                (player.isFrenzyPlayer() ? "" : TAB_BACK) + TAB_EXTENSION;
+        String ext = TAB_BACK;
+        if(player.getMatch().isFrenzyEnabled()){
+            if(player.isFrenzyPlayer()){
+                ext = "";
+            } else {
+                ext = TAB_BACK_FIRE;
+            }
+        }
+
+        String file = TAB + player.getColor().toString().toLowerCase() + ext + TAB_EXTENSION;
         return loadImage(file);
     }
 
