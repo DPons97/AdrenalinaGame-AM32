@@ -274,14 +274,18 @@ public class CliView extends ClientView {
      * Leaderboard format
      */
     private static final String LEADERBOARD_INTRO =
-            "    ___    ____  ____  _______   _____    __    _____   _____ %n" +
+            "%n    ___    ____  ____  _______   _____    __    _____   _____ %n" +
             "   /   |  / __ \\/ __ \\/ ____/ | / /   |  / /   /  _/ | / /   |%n" +
             "  / /| | / / / / /_/ / __/ /  |/ / /| | / /    / //  |/ / /| |%n" +
             " / ___ |/ /_/ / _, _/ /___/ /|  / ___ |/ /____/ // /|  / ___ |%n" +
             "/_/  |_/_____/_/ |_/_____/_/ |_/_/  |_/_____/___/_/ |_/_/  |_|%n" +
-            "                                                              ";
+            "                                                              %n";
 
-    private static final String LEADERBOARD_HEADER = "╔═══╦════════════════════════╦════════╗";
+    private static final String LEADERBOARD_HEADER =        "\t\t╔═══╦════════════════════════╦═════════╗%n" +
+                                                            "\t\t║   ║         Player         ║  Score  ║%n" +
+                                                            "\t\t╠═══╬════════════════════════╬═════════╣%n";
+    private static final String LEADERBOARD_FORMAT =        "\t\t║ %-3s ║  %s%-20s%s  ║  %-5s  ║%n";
+    private static final String LEADERBOARD_CLOSER =        "\t\t╚═══╩════════════════════════╩═════════╝%n";
 
     /**
      * Default action selection messages
@@ -525,7 +529,6 @@ public class CliView extends ClientView {
             newPlayer5.addAmmo(Resource.RED_BOX);
             newPlayer5.addAmmo(Resource.YELLOW_BOX);
 
-            //newPlayer1.pickWeapon(match.getBoardMap().getSpawnPoints().get(1).getWeapons().get(0));
             newPlayer5.pickWeapon(match.getBoardMap().getSpawnPoints().get(2).getWeapons().get(0), new ArrayList<>());
 
             newPlayer5.addAmmo(Resource.BLUE_BOX);
@@ -543,6 +546,14 @@ public class CliView extends ClientView {
             clientMatch.getPlayers().get(4).setLoadedWeapons(newLoaded);
 
             view.showMatch();
+            List<String> leaderboard = new ArrayList<>();
+            for (int i=0; i < clientMatch.getPlayers().size(); i++) {
+                clientMatch.getPlayers().get(i).setScore( clientMatch.getPlayers().size() - i);
+                leaderboard.add(clientMatch.getPlayers().get(i).getNickname());
+            }
+
+            view.showLeaderboard(leaderboard);
+
         } catch (TooManyPlayersException | MatchAlreadyStartedException | PlayerAlreadyExistsException | InventoryFullException | InsufficientResourcesException e) {
             e.printStackTrace();
         } catch (NoItemInInventoryException e) {
@@ -606,7 +617,7 @@ public class CliView extends ClientView {
             }
         } else if (match.getState() == MatchState.FINAL_SCORING) {
             synchronized (this) {
-                System.out.printf("Match ended. Retrieving leaderboard...");
+                System.out.print("Match ended. Retrieving leaderboard...");
             }
         }
     }
@@ -658,7 +669,19 @@ public class CliView extends ClientView {
     public void showLeaderboard(List<String> leaderboard) {
         clearConsole();
 
+        System.out.printf(LEADERBOARD_INTRO);
+        System.out.printf(LEADERBOARD_HEADER);
 
+        for (String playerName : leaderboard) {
+            Player p = player.getThisPlayer().getMatch().getPlayerByName(playerName);
+
+            if (p == null) continue;
+
+            System.out.format(LEADERBOARD_FORMAT, getANSIColor(p) + AMMO_BLOCK + ANSI_RESET,
+                    getANSIColor(p), p.getNickname(), ANSI_RESET, String.valueOf(p.getScore()));
+        }
+
+        System.out.printf(LEADERBOARD_CLOSER);
     }
 
     /**
