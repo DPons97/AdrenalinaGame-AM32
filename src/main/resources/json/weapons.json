@@ -1539,7 +1539,7 @@
             "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "1",
+            "from": "ANY",
             "differentCells": false,
             "quantity": [
               1,

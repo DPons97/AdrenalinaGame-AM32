@@ -175,14 +175,16 @@ public class Lobby {
 
         JSONArray matches = new JSONArray();
         this.matches.forEach(m -> {
-            JSONObject match = new JSONObject();
-            match.put("n_players", m.getMatch().getPlayerNumber());
-            match.put("mapID", m.getMatch().getMapID());
-            match.put("max_deaths", m.getMatch().getMaxDeaths());
-            JSONArray players = new JSONArray();
-            m.getMatch().getPlayers().forEach(p-> players.add(p.getNickname()));
-            match.put("players", players);
-            matches.add(match);
+            if(!m.getMatch().isStarted()&& m.getMatch().getPlayers().size() < m.getMatch().getPlayerNumber()) {
+                JSONObject match = new JSONObject();
+                match.put("n_players", m.getMatch().getPlayerNumber());
+                match.put("mapID", m.getMatch().getMapID());
+                match.put("max_deaths", m.getMatch().getMaxDeaths());
+                JSONArray players = new JSONArray();
+                m.getMatch().getPlayers().forEach(p -> players.add(p.getNickname()));
+                match.put("players", players);
+                matches.add(match);
+            }
         });
         toRet.put("matches", matches);
         return toRet;

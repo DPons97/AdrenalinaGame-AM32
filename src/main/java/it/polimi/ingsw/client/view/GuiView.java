@@ -763,8 +763,10 @@ public class GuiView extends ClientView{
         // set buttons
         waitLoading();
         System.out.println("SELECT PLAYER");
+        players.forEach(p-> System.out.println(p.getImage().getUrl()));
         Platform.runLater(()-> {
                     selectables.forEach(selectable -> {
+                        System.out.println(selectable);
                         players.stream().filter(p -> p.getImage().getUrl().
                                 contains(getPawnFileName(player.getMatch().getPlayerByName(selectable)))).
                                 forEach(pawnImg -> {
@@ -1316,7 +1318,13 @@ public class GuiView extends ClientView{
             setButtonEffects(buttonNoReload);
         });
 
-        return selectWeapon(selectables);
+        WeaponSelection selected = selectWeapon(selectables);
+
+        Platform.runLater(()->{
+            FXWindow.getPane().getChildren().removeAll(toRemove);
+        });
+
+        return selected;
     }
 
     /**
@@ -1632,6 +1640,7 @@ public class GuiView extends ClientView{
     }
 
     private void loadCellItems(Pane root, Map map) {
+        players.clear();
         for(int i = 0; i<map.getYSize(); i++){
             for(int j = 0; j<map.getXSize(); j++){
                 Cell cell =  map.getCell(j,i);
@@ -1639,10 +1648,8 @@ public class GuiView extends ClientView{
                     int k = 0;
 
                     // players
-                    players.clear();
                     for (Player player : cell.getPlayers()) {
-                        String path = PAWN_DIR + player.getColor().toString().toLowerCase() + PAWN_EXTENSION;
-                        ImageView pawn = loadImage(path);
+                        ImageView pawn = getPawnImage(player);
                         pawn.setX(PAWN_X0*width+PAWN_OFFSET*height*i+PAWN_INTERNAL_OFFSET*height*(k%3));
                         pawn.setY(PAWN_Y0*height+PAWN_OFFSET*height*j+PAWN_INTERNAL_OFFSET*height*(k/3));
                         pawn.setPreserveRatio(true);
