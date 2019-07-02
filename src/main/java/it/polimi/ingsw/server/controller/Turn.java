@@ -367,7 +367,8 @@ public class Turn {
             WeaponSelection toChange = playing.getConnection().chooseWeaponFree(playing.getWeapons());
 
             if (toChange == null) return false;
-            Weapon weaponToChange = getWeapon(pickedWeapon.getWeapon(), playing);
+
+            Weapon weaponToChange = getWeapon(toChange.getWeapon(), playing);
 
             try {
                 // Change chosen weapons
