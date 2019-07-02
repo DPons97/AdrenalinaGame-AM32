@@ -90,6 +90,13 @@ public abstract class PlayerConnection {
 	public abstract WeaponSelection shoot(List<Weapon> loaded);
 
 	/**
+	 * select a weapon without paying
+	 * @param loaded list of loaded weapons
+	 * @return WeaponSelection with weapon to shoot with
+	 */
+	public abstract WeaponSelection chooseWeaponFree(List<Weapon> weapons);
+
+	/**
 	 * select a turn action in a given list
 	 * @return an action to make
 	 */

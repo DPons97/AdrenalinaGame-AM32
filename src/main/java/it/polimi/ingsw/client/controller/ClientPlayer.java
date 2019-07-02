@@ -16,6 +16,7 @@ import org.json.simple.JSONValue;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -224,6 +225,11 @@ public class ClientPlayer implements ClientFunctionalities{
 	@Override
 	public void showLeaderboard(List<String> leaderboard) {
 		view.showLeaderboard(leaderboard);
+	}
+
+	@Override
+	public WeaponSelection weaponFreeSelection(List<String> weapons) throws RemoteException {
+		return view.selectWeaponFree(weapons);
 	}
 
 	/**

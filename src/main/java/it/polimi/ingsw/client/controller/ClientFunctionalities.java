@@ -82,6 +82,13 @@ public interface ClientFunctionalities extends Remote {
 	void showLeaderboard(List<String> leaderboard) throws RemoteException;
 
 	/**
+	 * select a powerup from a list without making user pay its cost
+	 * @param powerup list of selectable powerup
+	 * @return selected powerup
+	 */
+	WeaponSelection weaponFreeSelection(List<String> weapons) throws RemoteException;
+
+	/**
 	 * Updates the match view
 	 * @param toGetUpdateFrom JSON match representation to get update from
 	 */

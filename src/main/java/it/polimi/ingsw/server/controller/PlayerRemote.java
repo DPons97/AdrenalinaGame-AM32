@@ -185,6 +185,19 @@ public class PlayerRemote extends PlayerConnection {
 		return null;
 	}
 
+	@Override
+	public WeaponSelection chooseWeaponFree(List<Weapon> weapons) {
+		try {
+			return remotePlayer.weaponSelection(
+					weapons.stream().map(Weapon::getName).collect(Collectors.toList()));
+		} catch (RemoteException e) {
+			e.printStackTrace();
+			Thread t = new Thread(this::disconnectPlayer);
+			t.start();
+		}
+		return null;
+	}
+
 	/**
 	 * select a turn action in a given list
 	 * @return an action to make

@@ -302,6 +302,15 @@ public class SocketClient extends ServerConnection {
                         sendAnswer(player.weaponSelection(selectableWeapon).toJSON());
 
 						break;
+					case "weapon-free":
+						List<String> selectableFreeWeapon = new ArrayList<>();
+						JSONArray wFreeArray = (JSONArray) message.get("list");
+						for (Object o : wFreeArray) {
+							selectableFreeWeapon.add(o.toString());
+						}
+						sendAnswer(player.weaponSelection(selectableFreeWeapon).toJSON());
+
+						break;
 					default:
 						throw new InvalidSelectionTypeException();
 				}

@@ -533,7 +533,7 @@ class PlayerTest {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 3);
         Player player = new Player(testMatch, victimName);
         player.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
-        player.move(testMatch.getBoardMap().getCell(2,3));
-        assertTrue(player.getCellsToMove(3).contains(testMatch.getBoardMap().getCell(2,1)));
+        player.move(testMatch.getBoardMap().getCell(0,0));
+        assertTrue(player.getCellsToMove(3).contains(testMatch.getBoardMap().getCell(1,0)));
     }
 }

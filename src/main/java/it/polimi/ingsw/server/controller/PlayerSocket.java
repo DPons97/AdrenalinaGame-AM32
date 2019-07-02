@@ -353,6 +353,13 @@ public class PlayerSocket extends PlayerConnection {
 		return getWeaponSelection(loaded, message);
 	}
 
+	@Override
+	public WeaponSelection chooseWeaponFree(List<Weapon> weapons) {
+		JSONObject message = new JSONObject();
+		message.put("function", "select");
+		message.put("type", "weapon-free");
+		return getWeaponSelection(weapons, message);	}
+
 	/**
 	 * Completes the message and parses client response
 	 * @param weapons list of weapons to put in the message

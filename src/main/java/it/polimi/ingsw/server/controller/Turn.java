@@ -356,7 +356,7 @@ public class Turn {
             return true;
         } catch (InventoryFullException invFullE) {
             // Player has too many weapons. Ask for one to change
-            WeaponSelection toChange = playing.getConnection().chooseWeapon(playing.getWeapons());
+            WeaponSelection toChange = playing.getConnection().chooseWeaponFree(playing.getWeapons());
 
             if (toChange == null) return false;
             Weapon weaponToChange = getWeapon(pickedWeapon.getWeapon(), playing);

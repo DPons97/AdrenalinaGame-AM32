@@ -610,9 +610,9 @@ public class Player {
 		if (currCell == null || (visited.contains(currCell) && distanceVisited.get(visited.indexOf(currCell)) > distance)) return new ArrayList<>();
 		if (distance == 0) {
 			List<Cell> lastCell = new ArrayList<>();
-			lastCell.add(currCell);
 			if(!visited.contains(currCell))
-				visited.add(currCell);
+				lastCell.add(currCell);
+			visited.add(currCell);
 			distanceVisited.add(distance);
 			return lastCell;
 		}

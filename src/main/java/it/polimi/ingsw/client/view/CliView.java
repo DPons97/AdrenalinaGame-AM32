@@ -876,6 +876,7 @@ public class CliView extends ClientView {
      * @param selectables list of weapons
      * @return selected weapon and effect
      */
+    @Override
     public WeaponSelection selectWeaponFree(List<String> selectables) {
         StringBuilder messageToPrint = new StringBuilder();
 

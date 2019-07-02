@@ -69,6 +69,13 @@ public abstract class ClientView {
     public abstract WeaponSelection selectReload (List<String> selectables);
 
     /**
+     * Lets client select a weapon  from a list
+     * @param selectables list of weapons
+     * @return selected weapon and effect
+     */
+    public abstract WeaponSelection selectWeaponFree(List<String> selectables);
+
+    /**
      * Lets client select a weapon from a list
      * @param selectables list of weapons
      * @return selected weapon and effect

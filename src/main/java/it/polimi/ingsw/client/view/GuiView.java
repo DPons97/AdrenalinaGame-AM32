@@ -1161,8 +1161,9 @@ public class GuiView extends ClientView{
     @Override
     public WeaponSelection selectShoot(List<String> selectables) {
         waitLoading();
-        WeaponCard toShootWith = selectWeaponFree(selectables);
-        if(toShootWith == null) return new WeaponSelection(null, new ArrayList<>(),new ArrayList<>());
+        String weaponName = selectWeaponFree(selectables).getWeapon();
+        if(weaponName == null) return new WeaponSelection(null, new ArrayList<>(),new ArrayList<>());
+        WeaponCard toShootWith = player.getMatch().getWeaponByName(weaponName);
         WeaponSelection toReturn = new WeaponSelection();
         toReturn.setWeapon(toShootWith.getName());
 
@@ -1389,8 +1390,9 @@ public class GuiView extends ClientView{
         waitLoading();
 
         // select a weapon
-        WeaponCard weaponCardSelected = selectWeaponFree(selectables);
-        if(weaponCardSelected == null)return new WeaponSelection("",new ArrayList<>(), new ArrayList<>());
+        String weaponName = selectWeaponFree(selectables).getWeapon();
+        if(weaponName == null)return new WeaponSelection("",new ArrayList<>(), new ArrayList<>());
+        WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponName);
 
         // set powerup discuont buttons
         List<Resource> toPay = weaponCardSelected.getCost();
@@ -1445,8 +1447,13 @@ public class GuiView extends ClientView{
             else break;
         }
     }
-
-    public WeaponCard selectWeaponFree(List<String> selectables) {
+    /**
+     * Lets client select a weapon  from a list
+     * @param selectables list of weapons
+     * @return selected weapon and effect
+     */
+    @Override
+    public WeaponSelection selectWeaponFree(List<String> selectables) {
         // set weapon buttons
         ArrayList<ImageView> weaponsOnScreen = new ArrayList<>();
         weaponsOnScreen.addAll(weapons);
@@ -1480,7 +1487,7 @@ public class GuiView extends ClientView{
             });
         });
 
-        return weaponCardSelected;
+        return new WeaponSelection(weaponCardSelected.getName(), null, null);
     }
 
     /**
