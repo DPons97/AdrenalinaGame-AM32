@@ -1125,6 +1125,8 @@ public class CliView extends ClientView {
     @Override
     public void showAlert(String message) {
         alertMessage = "ALERT: " + message;
+        if(message.equals("Time's over"))
+            selectionMessage = IDLE_MESSAGE;
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {
@@ -1133,6 +1135,7 @@ public class CliView extends ClientView {
                 alertMessage = "";
             }
         }, ALERT_DURATION * 1000);
+
     }
 
     /**

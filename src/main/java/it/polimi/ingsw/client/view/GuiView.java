@@ -101,7 +101,7 @@ public class GuiView extends ClientView{
     private static final double PLAYER_SKULL_DROPLET_X0 = 0.1;
     private static final double PLAYER_SKULL_DROPLET_OFFSET_Y = 0.175;
     private static final double PLAYER_SKULL_DROPLET_OFFSET_X = 0.022;
-    private static final double PLAYER_SKULL_SIZE = 0.08;
+    private static final double PLAYER_SKULL_SIZE = 0.03;
     private static final double PLAYER_DAMAGE_DROPLET_Y0 = 0.875;
     private static final double PLAYER_DAMAGE_DROPLET_X0 = 0.05;
     private static final double PLAYER_DAMAGE_DROPLET_OFFSET_X = 0.025;
@@ -109,8 +109,8 @@ public class GuiView extends ClientView{
     private static final double PLAYER_MARK_DROPLET_X0 = 0.26;
     private static final double PLAYER_MARK_DROPLET_OFFSET_Y = 0.175;
     private static final double PLAYER_MARK_DROPLET_OFFSET_X = 0.022;
-    private static final double PLAYER_DAMAGE_DROPLET_SIZE = 0.045;
-    private static final double PLAYER_MARK_DROPLET_SIZE = 0.04;
+    private static final double PLAYER_DAMAGE_DROPLET_SIZE = 0.0157;
+    private static final double PLAYER_MARK_DROPLET_SIZE = 0.015;
 
     // enemy cards
     private static final double ENEMY_WEAPON_CARD_Y0 = 0;
@@ -310,13 +310,19 @@ public class GuiView extends ClientView{
     private static final String STANDARD_EFFECT = "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0), 0, 0, 0, 0);" +
                                                   "-fx-cursor: arrow";
     private static final String CLICKABLE_EFFECT =
-            "-fx-effect: dropshadow(three-pass-box, rgba(225,280,82,0.85), 2, 2, 2, 2);" +
-            "-fx-cursor: hand;";
+                                        "-fx-effect: dropshadow(three-pass-box, rgba(225,280,82,0.85), 2, 2, 2, 2);" +
+                                        "-fx-cursor: hand;";
     private static final String BUTTONS_EFFECT = "-fx-background-color: rgba(0,255,0,0.3);" +
                                                  "-fx-cursor: hand;";
 
     private static final String SELECTED_EFFECT = "-fx-background-color: #5af278;";
     private static final String NOT_SELECTED_EFFECT = "-fx-background-color: #6ea5ff;";
+    private static final String ALERT_STYLE = "-fx-background-color: rgba(237, 230, 97, 1);\n" +
+                                            "    -fx-padding: 10;\n" +
+                                            "    -fx-border-radius: 20; \n" +
+                                            "    -fx-background-radius: 20;\n" +
+                                            "    -fx-border-width: 5;\n" +
+                                            "    -fx-font-size: 16;";
 
     private double width;
     private double height;
@@ -326,6 +332,7 @@ public class GuiView extends ClientView{
     private List<ImageView> spawnWeapons;
     private List<ImageView> powerups;
     private List<ImageView> resources;
+    private List<Node> nodesLeftBehid;
 
     private boolean loading;
     private boolean initted;
@@ -345,6 +352,7 @@ public class GuiView extends ClientView{
         spawnWeapons = new ArrayList<>();
         selection = new GuiSelection();
         nodes = new ArrayList<>();
+        nodesLeftBehid = new ArrayList<>();
         initted = false;
     }
 
@@ -522,17 +530,12 @@ public class GuiView extends ClientView{
         Platform.runLater(()->{
             final Popup popup = new Popup();
             popup.setAutoFix(true);
-            popup.setAutoHide(true);
+            popup.setAutoHide(false);
             popup.setHideOnEscape(true);
             Label label = new Label(message);
-            label.setStyle("-fx-background-color: rgba(50,50,50,0.25);\n" +
-                            "    -fx-padding: 10;\n" +
-                            "    -fx-border-radius: 20; \n" +
-                            "    -fx-background-radius: 20;\n" +
-                            "    -fx-border-width: 5;\n" +
-                            "    -fx-font-size: 16;");
+            label.setStyle(ALERT_STYLE);
             popup.getContent().add(label);
-
+            label.setViewOrder(-101);
             Stage stage = FXWindow.getStage();
             popup.setOnShown(new EventHandler<WindowEvent>() {
                 @Override
@@ -650,7 +653,8 @@ public class GuiView extends ClientView{
     private void showGameBoard() {
         AdrenalinaMatch match= player.getMatch();
         Platform.runLater(()-> {
-
+            FXWindow.getPane().getChildren().removeAll(nodesLeftBehid);
+            nodesLeftBehid.clear();
             loadLayout();
 
             setEscExit();
@@ -815,6 +819,7 @@ public class GuiView extends ClientView{
                 selection.setNodeClickable(cellButton, String.valueOf(i));
                 FXWindow.getPane().getChildren().add(cellButton);
                 buttons.add(cellButton);
+                nodesLeftBehid.add(cellButton);
                 i++;
             }
         });
@@ -858,6 +863,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
@@ -866,6 +872,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                nodesLeftBehid.add(blue);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
                 Button white = new Button();
@@ -874,6 +881,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
                 Button yellow = new Button();
@@ -882,6 +890,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                nodesLeftBehid.add(yellow);
             }
         });
         // get selected value
@@ -934,6 +943,7 @@ public class GuiView extends ClientView{
         button.setPrefWidth(WIDTH);
         button.setPrefHeight(HEIGHT);
         FXWindow.getPane().getChildren().add(button);
+        if(!nodesLeftBehid.contains(button))nodesLeftBehid.add(button);
     }
 
     private List<Point> selectRoomMap2(List<List<Point>> selectables) {
@@ -948,6 +958,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
                 Button yellow = new Button();
@@ -956,6 +967,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                nodesLeftBehid.add(yellow);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
                 Button green = new Button();
@@ -964,6 +976,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(green);
                 selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
                 toRemove.add(green);
+                nodesLeftBehid.add(green);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
                 // add room button
@@ -973,6 +986,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
@@ -981,6 +995,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                nodesLeftBehid.add(blue);
             }
 
         });
@@ -1008,6 +1023,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
                 Button purple = new Button();
@@ -1016,6 +1032,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(purple);
                 selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
                 toRemove.add(purple);
+                nodesLeftBehid.add(purple);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
                 Button green = new Button();
@@ -1024,6 +1041,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(green);
                 selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
                 toRemove.add(green);
+                nodesLeftBehid.add(green);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
@@ -1032,6 +1050,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                nodesLeftBehid.add(blue);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
                 // add room button
@@ -1041,6 +1060,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
                 Button yellow = new Button();
@@ -1049,6 +1069,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                nodesLeftBehid.add(yellow);
             }
 
         });
@@ -1076,6 +1097,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                nodesLeftBehid.add(blue);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
                 Button purple = new Button();
@@ -1084,6 +1106,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(purple);
                 selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
                 toRemove.add(purple);
+                nodesLeftBehid.add(purple);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
                 // add room button
@@ -1093,6 +1116,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
                 Button yellow = new Button();
@@ -1101,6 +1125,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                nodesLeftBehid.add(yellow);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
                 Button white = new Button();
@@ -1109,6 +1134,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                nodesLeftBehid.add(white);
             }
 
         });
@@ -1133,7 +1159,7 @@ public class GuiView extends ClientView{
     public WeaponSelection selectShoot(List<String> selectables) {
         waitLoading();
         WeaponCard toShootWith = selectWeaponFree(selectables);
-        if(toShootWith == null) return new WeaponSelection("", new ArrayList<>(),new ArrayList<>());
+        if(toShootWith == null) return new WeaponSelection(null, new ArrayList<>(),new ArrayList<>());
         WeaponSelection toReturn = new WeaponSelection();
         toReturn.setWeapon(toShootWith.getName());
 
@@ -1151,6 +1177,7 @@ public class GuiView extends ClientView{
             selectEffectPopup.setY((height-getHeight(selectEffectPopup))*WEAPON_EFFECT_POPUP_Y);
             root.getChildren().add(selectEffectPopup);
             toRemove.add(selectEffectPopup);
+            nodesLeftBehid.add(selectEffectPopup);
             //load card
             ImageView selectedCard = getWeaponImage(toShootWith.getName());
             selectedCard.setY(WEAPON_EFFECT_CARD_Y*height);
@@ -1159,6 +1186,8 @@ public class GuiView extends ClientView{
             selectedCard.setFitWidth(WEAPON_EFFECT_CARD_SIZE*height);
             root.getChildren().add(selectedCard);
             toRemove.add(selectedCard);
+            nodesLeftBehid.add(selectedCard);
+
             // load effect buttons
             if(toShootWith.isEffect()){
                 // load effects and remember sequence
@@ -1180,6 +1209,20 @@ public class GuiView extends ClientView{
             //undo was pressed
             return new WeaponSelection("", new ArrayList<>(), new ArrayList<>());
         }
+
+        // show button to stop using powerups
+        Platform.runLater(()-> {
+            ImageView buttonResources = loadImage(USE_RESOURCES_PATH);
+            buttonResources.setPreserveRatio(true);
+            buttonResources.setFitWidth(USE_RESOURCES_SIZE*width);
+            buttonResources.setX(USE_RESOURCES_X*width);
+            buttonResources.setY(USE_RESOURCES_Y*height);
+            FXWindow.getPane().getChildren().add(buttonResources);
+            toRemove.add(buttonResources);
+            nodesLeftBehid.add(buttonResources);
+            selection.setNodeClickable(buttonResources, "-1");
+            setButtonEffects(buttonResources);
+        });
 
         // shoot was pressed -> get cost of effects selected and make player select powerups
         List<Resource> toPay = new ArrayList<>();
@@ -1207,6 +1250,7 @@ public class GuiView extends ClientView{
             selectButton.setTooltip(new Tooltip(effect.getDescription()));
             root.getChildren().add(selectButton);
             toRemove.add(selectButton);
+            nodesLeftBehid.add(selectButton);
             selectButton.setOnAction(e->selectedEffects.add(effect));
             selection.setNodeClickable(selectButton, "OK");
             i++;
@@ -1221,6 +1265,7 @@ public class GuiView extends ClientView{
                 "Undo");
         root.getChildren().add(undoButton);
         toRemove.add(undoButton);
+        nodesLeftBehid.add(undoButton);
         selection.setNodeClickable(undoButton,"KO");
     }
 
@@ -1239,6 +1284,7 @@ public class GuiView extends ClientView{
             root.getChildren().add(selectButton);
             toRemove.add(selectButton);
             addedButtons.add(selectButton);
+            nodesLeftBehid.add(selectButton);
             setNotSelectedEffect(selectButton);
             selectButton.setOnAction(e -> {
                 if (!selectedEffects.contains(effect)) {
@@ -1271,6 +1317,7 @@ public class GuiView extends ClientView{
                 "Shoot");
         root.getChildren().add(shootButton);
         toRemove.add(shootButton);
+        nodesLeftBehid.add(shootButton);
         selection.setNodeClickable(shootButton,"OK");
 
         // set undo button
@@ -1283,6 +1330,7 @@ public class GuiView extends ClientView{
                 "Undo");
         root.getChildren().add(undoButton);
         toRemove.add(undoButton);
+        nodesLeftBehid.add(undoButton);
         selection.setNodeClickable(undoButton,"KO");
     }
 
@@ -1357,6 +1405,7 @@ public class GuiView extends ClientView{
             buttonResources.setY(USE_RESOURCES_Y*height);
             FXWindow.getPane().getChildren().add(buttonResources);
             toRemove.add(buttonResources);
+            nodesLeftBehid.add(buttonResources);
             selection.setNodeClickable(buttonResources, "-1");
             setButtonEffects(buttonResources);
         });
@@ -1484,6 +1533,7 @@ public class GuiView extends ClientView{
             spawnPopUp.setY((height-getHeight(spawnPopUp))*SPAWN_POPUP_Y0);
             root.getChildren().add(spawnPopUp);
             toRemove.add(spawnPopUp);
+            nodesLeftBehid.add(spawnPopUp);
             // put cards and put buttons
             int i = 0;
             for(Powerup powerup: selectables){
@@ -1495,6 +1545,7 @@ public class GuiView extends ClientView{
                 setClickableEffects(powerupImg);
                 root.getChildren().add(powerupImg);
                 toRemove.add(powerupImg);
+                nodesLeftBehid.add(powerupImg);
                 selection.setNodeClickable(powerupImg,String.valueOf(i));
                 i++;
             }
@@ -1785,7 +1836,7 @@ public class GuiView extends ClientView{
             droplet.setX(PLAYER_DAMAGE_DROPLET_X0*width+PLAYER_DAMAGE_DROPLET_OFFSET_X*width*i);
             droplet.setY(PLAYER_DAMAGE_DROPLET_Y0*height);
             droplet.setPreserveRatio(true);
-            droplet.setFitWidth(PLAYER_DAMAGE_DROPLET_SIZE);
+            droplet.setFitWidth(PLAYER_DAMAGE_DROPLET_SIZE*width);
             addNode(root,droplet);
             i++;
         }
@@ -1796,7 +1847,7 @@ public class GuiView extends ClientView{
             droplet.setX(PLAYER_MARK_DROPLET_X0*width+PLAYER_MARK_DROPLET_OFFSET_X*width*i);
             droplet.setY(PLAYER_MARK_DROPLET_Y0*height);
             droplet.setPreserveRatio(true);
-            droplet.setFitWidth(PLAYER_MARK_DROPLET_SIZE);
+            droplet.setFitWidth(PLAYER_MARK_DROPLET_SIZE*width);
             addNode(root,droplet);
             i++;
         }
@@ -1806,7 +1857,7 @@ public class GuiView extends ClientView{
             skull.setX(PLAYER_SKULL_DROPLET_X0*width+PLAYER_SKULL_DROPLET_OFFSET_X*width*i);
             skull.setY(PLAYER_SKULL_DROPLET_Y0*height);
             skull.setPreserveRatio(true);
-            skull.setFitWidth(PLAYER_SKULL_SIZE);
+            skull.setFitWidth(PLAYER_SKULL_SIZE*width);
             addNode(root,skull);
             i++;
         }

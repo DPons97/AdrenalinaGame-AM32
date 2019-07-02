@@ -595,7 +595,7 @@ public class Player {
 	 * @return List of cells in which player can move (1, 2 or 3 distance)
 	 */
 	public List<Cell> getCellsToMove(int maxMovement) {
-		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), maxMovement);
+		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), new ArrayList<>(), maxMovement);
 		canMoveTo.remove(position);
 		return canMoveTo;
 	}
@@ -603,24 +603,28 @@ public class Player {
 	/**
 	 * Support function that retreives all cells in which the player can move
 	 */
-	private List<Cell> getCellsWithoutWalls(Cell currCell, List<Cell> visited, int distance) {
-		if (currCell == null || visited.contains(currCell)) return new ArrayList<>();
+	private List<Cell> getCellsWithoutWalls(Cell currCell, List<Cell> visited, List<Integer>distanceVisited, int distance) {
+		if (currCell == null || (visited.contains(currCell) && distanceVisited.get(visited.indexOf(currCell)) > distance)) return new ArrayList<>();
 		if (distance == 0) {
 			List<Cell> lastCell = new ArrayList<>();
 			lastCell.add(currCell);
-			visited.add(currCell);
+			if(!visited.contains(currCell))
+				visited.add(currCell);
+			distanceVisited.add(distance);
 			return lastCell;
 		}
 
 		Map matchMap = match.getBoardMap();
 		List<Cell> canMove = new ArrayList<>();
-		canMove.add(currCell);
+		if(!visited.contains(currCell))
+			canMove.add(currCell);
 
 		visited.add(currCell);
+		distanceVisited.add(distance);
 		for (Direction dir : Direction.values()) {
 			// Player has no wall/door in this direction
 			if (currCell.getSide(dir) != Side.WALL && currCell.getSide(dir) != Side.BORDER) {
-				canMove.addAll(getCellsWithoutWalls(matchMap.getAdjacentCell(currCell, dir), visited, distance - 1));
+				canMove.addAll(getCellsWithoutWalls(matchMap.getAdjacentCell(currCell, dir), visited, distanceVisited, distance - 1));
 			}
 		}
 		return canMove;

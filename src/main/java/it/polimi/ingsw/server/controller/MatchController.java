@@ -91,6 +91,7 @@ public class MatchController {
 
 		// Start turns logic
 		while (match.getMatchState() != MatchState.ENDED) {
+			playerTurn.setSkipTurn(false);
 			Player currentPlayer = match.getTurnPlayer();
 			ExecutorService turnExecutor = Executors.newSingleThreadExecutor();
 			turnExecutor.submit(playerTurn::startNewTurn);
@@ -101,8 +102,15 @@ public class MatchController {
 				e.printStackTrace();
 			}
 			if (!turnExecutor.isTerminated()) {
-				currentPlayer.getConnection().alert("Time's over");
+				playerTurn.setSkipTurn(true);
 				turnExecutor.shutdownNow();
+				currentPlayer.getConnection().alert("Time's over");
+				currentPlayer.getConnection().updateMatch(match);
+				try {
+					TimeUnit.MILLISECONDS.sleep(150);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 
 			match.nextTurn();

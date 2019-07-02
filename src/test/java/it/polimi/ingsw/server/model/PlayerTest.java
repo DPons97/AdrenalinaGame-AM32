@@ -527,4 +527,13 @@ class PlayerTest {
         assertFalse(victimPlayer.isDead());
         assertTrue(victimPlayer.getDmgPoints().isEmpty());
     }
+
+    @Test
+    void getCellsWithoutWalls() {
+        AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 3);
+        Player player = new Player(testMatch, victimName);
+        player.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
+        player.move(testMatch.getBoardMap().getCell(2,3));
+        assertTrue(player.getCellsToMove(3).contains(testMatch.getBoardMap().getCell(2,1)));
+    }
 }

@@ -21,6 +21,8 @@ public class Turn {
      */
     private List<Player> playedFrenzy;
 
+    private boolean skipTurn;
+
     /**
      * Default constructor
      * @param match where this turn takes place
@@ -75,6 +77,14 @@ public class Turn {
         updatePlayers();
     }
 
+    public boolean isSkipTurn() {
+        return skipTurn;
+    }
+
+    public void setSkipTurn(boolean skipTurn) {
+        this.skipTurn = skipTurn;
+    }
+
     /**
      * @param resource to convert
      * @return corresponding color. Null if resource's color is not inside {RED_BOX, BLUE_BOX, YELLOW_BOX}
@@ -109,6 +119,10 @@ public class Turn {
         while (remainingActions > 0) {
             // if player disconnected, skip turn
             if (playing.getConnection() == null) return;
+            if(isSkipTurn()){
+                skipTurn =false;
+                return;
+            }
             // Ask player what to do (RUN, PICK, SHOOT)
             TurnAction currentAcion = playing.getConnection().selectAction();
 

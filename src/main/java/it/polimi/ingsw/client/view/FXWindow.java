@@ -32,11 +32,14 @@ public class FXWindow extends Application {
         }
 
         primaryStage.setTitle("Adrenalina: the best game ever made. \"ITS FUN COZ YOU SHOOT\"");
-        Scene scene = new Scene(mainPane,600, 600);
 
-        stage.setScene(scene);
         stage.setMaximized(true);
         stage.setResizable(false);
+
+        Scene scene = new Scene(mainPane,stage.getWidth(), stage.getHeight());
+
+        stage.setScene(scene);
+
         primaryStage.setOnCloseRequest(event -> {
             System.out.println("Stage is closing");
             Platform.exit();
