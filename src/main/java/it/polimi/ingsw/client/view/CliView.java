@@ -985,7 +985,10 @@ public class CliView extends ClientView {
             showMatch();
 
             String response = getResponse();
-            if (response == null) return null;
+            if (response == null) {
+                selectionLock.notifyAll();
+                return null;
+            }
 
             while (!response.equals("X") && !response.equals("x")) {
                 int choice;
@@ -994,7 +997,10 @@ public class CliView extends ClientView {
                 } catch (NumberFormatException e) {
                     System.out.println(INVALID_SELECTION);
                     response = getResponse();
-                    if (response == null) return null;
+                    if (response == null) {
+                        selectionLock.notifyAll();
+                        return null;
+                    }
                     continue;
                 }
 
@@ -1002,15 +1008,21 @@ public class CliView extends ClientView {
                     selectionMessage = IDLE_MESSAGE;
                     showMatch();
 
+                    selectionLock.notifyAll();
                     return selectables.get(choice);
                 } else {
                     System.out.println(INVALID_SELECTION);
                     response = getResponse();
-                    if (response == null) return null;
+                    if (response == null) {
+                        selectionLock.notifyAll();
+                        return null;
+                    }
                 }
             }
             selectionMessage = IDLE_MESSAGE;
             showMatch();
+
+            selectionLock.notifyAll();
         }
         return null;
     }
@@ -1036,24 +1048,28 @@ public class CliView extends ClientView {
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
+                            selectionLock.notifyAll();
                             return TurnAction.MOVE;
                         case "P":
                         case "p":
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
+                            selectionLock.notifyAll();
                             return TurnAction.PICK;
                         case "S":
                         case "s":
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
+                            selectionLock.notifyAll();
                             return TurnAction.SHOOT;
                         case "u":
                         case "U":
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
+                            selectionLock.notifyAll();
                             return TurnAction.POWERUP;
                         default:
                             System.out.println(INVALID_SELECTION);
@@ -1075,24 +1091,28 @@ public class CliView extends ClientView {
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.SHOOT;
                             case "R":
                             case "r":
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.MOVE;
                             case "P":
                             case "p":
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.PICK;
                             case "u":
                             case "U":
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.POWERUP;
                             default:
                                 System.out.println(INVALID_SELECTION);
@@ -1113,18 +1133,21 @@ public class CliView extends ClientView {
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.SHOOT;
                             case "P":
                             case "p":
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.PICK;
                             case "u":
                             case "U":
                                 selectionMessage = IDLE_MESSAGE;
                                 System.out.println(IDLE_MESSAGE);
 
+                                selectionLock.notifyAll();
                                 return TurnAction.POWERUP;
                             default:
                                 System.out.println(INVALID_SELECTION);

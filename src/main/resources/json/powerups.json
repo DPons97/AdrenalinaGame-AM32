@@ -269,9 +269,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -298,9 +296,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -327,9 +323,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -356,9 +350,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -385,9 +377,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -414,9 +404,7 @@
         },
         {
           "type": "DAMAGE",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -443,9 +431,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -472,9 +458,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -501,9 +485,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -530,9 +512,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -559,9 +539,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -588,9 +566,7 @@
         },
         {
           "type": "MARK",
-          "value": [
-            1
-          ]
+          "value": 1
         }
       ]
     },
@@ -631,11 +607,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     },
@@ -676,11 +648,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     },
@@ -721,11 +689,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     },
@@ -766,11 +730,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     },
@@ -811,11 +771,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     },
@@ -856,11 +812,7 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
-            0,
-            -1
-          ]
+          "type": "MOVE"
         }
       ]
     }

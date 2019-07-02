@@ -819,7 +819,7 @@ public class AdrenalinaMatch {
 					List<Player> foundPlayers = getPlayersByID(id);
 
 					for(Player p: foundPlayers){
-						toReturn.addAll(p.getCellAtDistance(minDistance,maxDistance));
+						toReturn.addAll(p.getCellsToMove(maxDistance));
 					}
 				} /*else {
 					List<Player> playersWithID = getPlayersByID(id);

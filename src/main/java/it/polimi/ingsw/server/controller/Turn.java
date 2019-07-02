@@ -119,6 +119,7 @@ public class Turn {
         while (remainingActions > 0) {
             // if player disconnected, skip turn
             if (playing.getConnection() == null) return;
+
             if(isSkipTurn()){
                 skipTurn =false;
                 return;
@@ -189,6 +190,13 @@ public class Turn {
         if (match.isFirstPlayedFrenzy()) remainingActions = 1;
 
         while (remainingActions > 0) {
+            if (playing.getConnection() == null) return;
+
+            if(isSkipTurn()){
+                skipTurn =false;
+                return;
+            }
+
             // Ask player what to do (RUN, PICK, SHOOT)
             TurnAction currentAcion = playing.getConnection().selectAction();
 
@@ -476,7 +484,7 @@ public class Turn {
                 for (Cell c : visibleCells) {
                     if (c.getPlayers().contains(shooter)) {
                         List<Powerup> grenades = p.getPowerups().stream()
-                                .filter(powerup -> powerup.getName().equals("Tagback grenades")).collect(Collectors.toList());
+                                .filter(powerup -> powerup.getName().equals("Tagback grenade")).collect(Collectors.toList());
 
                         usePowerupEffect(p, grenades);
                         break;
@@ -484,7 +492,7 @@ public class Turn {
                 }
 
                 canUsePowerup = true;
-                break;
+
             }
         }
 
