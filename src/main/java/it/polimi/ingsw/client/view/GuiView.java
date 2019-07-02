@@ -749,7 +749,7 @@ public class GuiView extends ClientView{
         System.out.println("WAITING LOADING");
         do {
             try {
-                TimeUnit.MILLISECONDS.sleep(50);
+                TimeUnit.MILLISECONDS.sleep(100);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -807,6 +807,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public Point selectCell(List<Point> selectables) {
+        waitLoading();
         List<Button> buttons = new ArrayList<>();
         Platform.runLater(()->{
             int i = 0;
@@ -838,6 +839,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public List<Point> selectRoom(List<List<Point>> selectables) {
+        waitLoading();
         switch(player.getMatch().getMapID()){
             case 1:
                 return selectRoomMap1(selectables);
@@ -1597,6 +1599,7 @@ public class GuiView extends ClientView{
      */
     @Override
     public TurnAction actionSelection() {
+        waitLoading();
         System.out.println("ACTION SELECTION");
         List<Node> buttons = new ArrayList<>();
         Platform.runLater(()->{

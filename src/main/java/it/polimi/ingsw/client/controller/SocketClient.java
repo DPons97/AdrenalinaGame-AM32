@@ -182,10 +182,17 @@ public class SocketClient extends ServerConnection {
 					lostConnection();
 				}
 				if(!msg.equals("ping"))
-					//output.println("pong");
-				//else
-					parseMessage((JSONObject) JSONValue.parse(msg));
-			} catch (IOException | InvalidSelectionTypeException e) {
+                {
+                    String finalMsg = msg;
+                    new Thread(()->{
+                        try {
+                            parseMessage((JSONObject) JSONValue.parse(finalMsg));
+                        } catch (InvalidSelectionTypeException e) {
+                            e.printStackTrace();
+                        }
+                    }).start();
+                }
+			} catch (IOException  e) {
 				lostConnection();
 			}
 		}
@@ -221,93 +228,79 @@ public class SocketClient extends ServerConnection {
 						for(Object o: jsonArray){
 							selectablePlayers.add(o.toString());
 						}
-						new Thread(()->sendAnswer(player.playerSelection(selectablePlayers))).start();
+						sendAnswer(player.playerSelection(selectablePlayers));
 
 						break;
 					case "cell":
-						new Thread(()-> {
-							Point selected = player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
+                        Point selected = player.cellSelection(parseCoordinates((JSONArray) message.get("list")));
 
-							JSONObject msg = new JSONObject();
-							msg.put("x", (selected != null) ? selected.getX() : "none");
-							msg.put("y", (selected != null) ? selected.getY() : "none");
-							sendAnswer(msg);
-						}).start();
+                        JSONObject msg = new JSONObject();
+                        msg.put("x", (selected != null) ? selected.getX() : "none");
+                        msg.put("y", (selected != null) ? selected.getY() : "none");
+                        sendAnswer(msg);
 
 						break;
 					case "room":
-						new Thread(()-> {
-							List<List<Point>> rooms = new ArrayList<>();
-							JSONArray roomsArray = (JSONArray) message.get("list");
-							for (Object o : roomsArray) {
-								rooms.add(parseCoordinates((JSONArray) o));
-							}
+                        List<List<Point>> rooms = new ArrayList<>();
+                        JSONArray roomsArray = (JSONArray) message.get("list");
+                        for (Object o : roomsArray) {
+                            rooms.add(parseCoordinates((JSONArray) o));
+                        }
 
-							List<Point> selectedRoom = player.roomSelection(rooms);
-							JSONObject response = new JSONObject();
-							JSONArray room = new JSONArray();
+                        List<Point> selectedRoom = player.roomSelection(rooms);
+                        JSONObject response = new JSONObject();
+                        JSONArray room = new JSONArray();
 
-							selectedRoom.forEach(p -> {
-								JSONObject item = new JSONObject();
-								item.put("x", p.getX());
-								item.put("y", p.getY());
-								room.add(item);
-							});
+                        selectedRoom.forEach(p -> {
+                            JSONObject item = new JSONObject();
+                            item.put("x", p.getX());
+                            item.put("y", p.getY());
+                            room.add(item);
+                        });
 
-							response.put("room", room);
-							sendAnswer(response);
-						}).start();
+                        response.put("room", room);
+                        sendAnswer(response);
 						break;
 					case "load":
-						new Thread(()-> {
-							List<String> reloadableWeapons = new ArrayList<>();
-							JSONArray reloadableArray = (JSONArray) message.get("list");
+                        List<String> reloadableWeapons = new ArrayList<>();
+                        JSONArray reloadableArray = (JSONArray) message.get("list");
 
-							for (Object o : reloadableArray) {
-								reloadableWeapons.add(o.toString());
-							}
+                        for (Object o : reloadableArray) {
+                            reloadableWeapons.add(o.toString());
+                        }
 
-							sendAnswer(player.reloadSelection(reloadableWeapons).toJSON());
-						}).start();
+                        sendAnswer(player.reloadSelection(reloadableWeapons).toJSON());
 						break;
 					case "shoot":
-						new Thread(()-> {
-							List<String> shootableWeapons = new ArrayList<>();
-							JSONArray shootableArray = (JSONArray) message.get("list");
+                        List<String> shootableWeapons = new ArrayList<>();
+                        JSONArray shootableArray = (JSONArray) message.get("list");
 
-							for (Object o : shootableArray) {
-								shootableWeapons.add(o.toString());
-							}
+                        for (Object o : shootableArray) {
+                            shootableWeapons.add(o.toString());
+                        }
 
-							sendAnswer(player.shootSelection(shootableWeapons).toJSON());
-						});
+                        sendAnswer(player.shootSelection(shootableWeapons).toJSON());
 						break;
 					case "action":
-						new Thread(()-> {
-							TurnAction selectedAction = player.actionSelection();
-							if (selectedAction != null) sendAnswer(selectedAction.toString());
-						}).start();
-						break;
+                        TurnAction selectedAction = player.actionSelection();
+                        if (selectedAction != null) sendAnswer(selectedAction.toString());
+                        break;
 					case "powerup":
-						new Thread(()-> {
-							List<String> selectablePowerup = new ArrayList<>();
-							JSONArray pArray = (JSONArray) message.get("list");
-							for (Object o : pArray) {
-								selectablePowerup.add(o.toString());
-							}
-							sendAnswer(player.powerupSelection(selectablePowerup));
-						}).start();
+                        List<String> selectablePowerup = new ArrayList<>();
+                        JSONArray pArray = (JSONArray) message.get("list");
+                        for (Object o : pArray) {
+                            selectablePowerup.add(o.toString());
+                        }
+                        sendAnswer(player.powerupSelection(selectablePowerup));
 						break;
 					case "weapon":
-						new Thread(()-> {
-							List<String> selectableWeapon = new ArrayList<>();
-							JSONArray wArray = (JSONArray) message.get("list");
-							for (Object o : wArray) {
-								selectableWeapon.add(o.toString());
-							}
-							sendAnswer(player.weaponSelection(selectableWeapon).toJSON());
+                        List<String> selectableWeapon = new ArrayList<>();
+                        JSONArray wArray = (JSONArray) message.get("list");
+                        for (Object o : wArray) {
+                            selectableWeapon.add(o.toString());
+                        }
+                        sendAnswer(player.weaponSelection(selectableWeapon).toJSON());
 
-						}).start();
 						break;
 					default:
 						throw new InvalidSelectionTypeException();
@@ -316,7 +309,7 @@ public class SocketClient extends ServerConnection {
 			case "update":
 				switch (message.get("type").toString()){
 					case "match":
-						player.updateMatch((JSONObject) message.get("match"));
+                        player.updateMatch((JSONObject) message.get("match"));
 						break;
 					case "lobby":
 						if(!validResponse) {
