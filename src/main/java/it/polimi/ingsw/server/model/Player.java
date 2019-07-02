@@ -509,6 +509,9 @@ public class Player {
 		if (dmgPoints.size() > maxDamage + 1) {
 			// Player is overkilled (12 dmg)
 			overkilled = true;
+
+
+
 			return true;
 		}
 

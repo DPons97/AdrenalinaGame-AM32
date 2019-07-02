@@ -47,6 +47,8 @@ public class Turn {
             // Manage first turn
             if (match.getTurn()/match.getPlayers().size() == 0) respawnPlayer(currentPlayer);
 
+            repopulateMap();
+
             // Start usual turn, or manage frenzy
             beginTurn(currentPlayer);
 
@@ -64,8 +66,6 @@ public class Turn {
             } catch (PlayerNotExistsException e) {
                 e.printStackTrace();
             }
-
-            repopulateMap();
 
             if (playedFrenzy.size() == match.getPlayers().size()){
                 // All player finished their frenzy turn. End game
@@ -154,9 +154,20 @@ public class Turn {
                         }
                     }
                     break;
+                case POWERUP:
+                    // POWERUP EFFECT management
+
+                    // Get all powerups that can be used during common turn
+                    List<Powerup> selectables = playing.getPowerups().stream()
+                            .filter(powerup -> (powerup.getName().equals("Newton") || powerup.getName().equals("Teleporter")))
+                            .collect(Collectors.toList());
+
+                    usePowerupEffect(playing, selectables);
+
+                    break;
             }
 
-            if (remainingActions > 0) updatePlayers();
+            updatePlayers();
         }
 
         // RELOAD management
@@ -441,11 +452,66 @@ public class Turn {
             // Weapon has to be reloaded
             getWeapon(pickedWeapon.getWeapon(), playing).setLoaded(false);
 
+            powerupManagerAfterShooting(playing);
+
             return true;
         } catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
             e.printStackTrace();
         }
         return false;
+    }
+
+    /**
+     * Manages powerup usages after shooting
+     * @param shooter player that shot
+     */
+    private void powerupManagerAfterShooting(Player shooter) {
+        // Source can use Targetting Scopes
+        boolean canUsePowerup = false;
+        for (Player p : match.getPlayers()) {
+            if (p.isDamagedThisTurn()) {
+                // Damaged player can use Tagback Grenade (Only if he sees damager)
+                List<Cell> visibleCells = p.getVisibleCellsAtDistance(0, -1);
+
+                for (Cell c : visibleCells) {
+                    if (c.getPlayers().contains(shooter)) {
+                        List<Powerup> grenades = p.getPowerups().stream()
+                                .filter(powerup -> powerup.getName().equals("Tagback grenades")).collect(Collectors.toList());
+
+                        usePowerupEffect(p, grenades);
+                        break;
+                    }
+                }
+
+                canUsePowerup = true;
+                break;
+            }
+        }
+
+        if (!canUsePowerup) return;
+
+        List<Powerup> targScopes = shooter.getPowerups().stream()
+                .filter(powerup -> powerup.getName().equals("Targetting scopes")).collect(Collectors.toList());
+
+        usePowerupEffect(shooter, targScopes);
+    }
+
+    /**
+     * Select one of given powerups to use as effect
+     * @param playing player
+     * @param selectables list of selectable powerups
+     */
+    private void usePowerupEffect(Player playing, List<Powerup> selectables) {
+        if (selectables.isEmpty()) return;
+        Powerup selected = playing.getConnection().choosePowerup(selectables);
+        if (selected != null) {
+            try {
+                playing.usePowerupEffect(selected);
+            } catch (NoItemInInventoryException e) {
+                playing.getConnection().alert("You do not own that powerup!");
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -532,7 +598,7 @@ public class Turn {
         // Make player choose one to discard. This card's color is the spawn's cell color
         Powerup toDiscard = currentPlayer.getConnection().choosePowerup(spawnCards);
         if(toDiscard == null) {
-            // player disconnected choose first weapon
+            // Player disconnected. Choose first weapon
             toDiscard = spawnCards.get(0);
         }
         spawnCards.remove(toDiscard);

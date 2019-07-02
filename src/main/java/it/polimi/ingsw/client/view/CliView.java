@@ -240,8 +240,7 @@ public class CliView extends ClientView {
     private static final String MATCHES_HEADER =         "|         Matches:       %-4s                                         |%n";
     private static final String MATCH_INFO_HEADER =     "|  ID  |  Max players  |  Max Deaths  |   Map   |       Players       |%n";
     private static final String MATCH_INFO_FORMAT =     "| %-4s |  %-11s  |  %-10s  |   %-3s   |  %-17s  |%n";
-    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-17s  |%n" +
-                                                        "|      |               |              |         |                     |%n";
+    private static final String MATCH_PLAYER_FORMAT =   "|      |               |              |         |  %-17s  |%n";
     private static final String MATCH_INFO_CLOSER =     "+------+---------------+--------------+---------+---------------------+%n";
 
     private static final int INFO_OFFSET = 20;
@@ -301,6 +300,7 @@ public class CliView extends ClientView {
             "[R]un: move up to 3 cells \n" +
             "[P]ick: move up to 1 cell and pick something (2+ damage >>> +1 movement) \n" +
             "[S]hoot: shoot someone with one of your weapons! (6+ damage >>> +1 movement before shooting) \n\n" +
+            "[U]se powerup (Newton or Teleporter) \n\n" +
             "What's your choice?  ";
 
     private static final String FRENZY_ACTION_BEFORE_FIRST =
@@ -308,12 +308,14 @@ public class CliView extends ClientView {
             "[S] Move up to 1 cell, reload (if you want), then SHOOT! \n" +
             "[R] Move up to 4 cells \n" +
             "[P] Move up to 2 cell, then pick something \n\n" +
+            "[U] Use powerup (Newton or Teleporter) \n\n" +
             "What's your choice?  ";
 
     private static final String FRENZY_ACTION_AFTER_FIRST =
             "FREEEEEEEENZYYYYY! Now it's your last chance to get those points! Here's what you can do: \n\n" +
             "[S] Move up to 2 cell, reload (if you want), then SHOOT! \n" +
             "[P] Move up to 3 cell, then pick something \n\n" +
+            "[U] Use powerup (Newton or Teleporter) \n\n" +
             "What's your choice?  ";
 
     /**
@@ -354,6 +356,8 @@ public class CliView extends ClientView {
     private String selectionMessage;
 
     private String alertMessage;
+
+    private final Object selectionLock = new Object();
 
     public CliView(ClientPlayer player) {
         super(player);
@@ -403,10 +407,10 @@ public class CliView extends ClientView {
         System.out.format(MATCHES_HEADER, matches.size());
         System.out.printf(MATCH_INFO_CLOSER);
 
-        for(int i = 0; i < matches.size(); i++){
-            // Print header table
-            System.out.format(MATCH_INFO_HEADER + MATCH_INFO_CLOSER);
+        // Print header table
+        System.out.format(MATCH_INFO_HEADER + MATCH_INFO_CLOSER);
 
+        for(int i = 0; i < matches.size(); i++){
             // Print table
             JSONObject match = (JSONObject) matches.get(i);
             int maxPlayers = Integer.parseInt(match.get("n_players").toString());
@@ -953,6 +957,8 @@ public class CliView extends ClientView {
     public Powerup selectPowerup(List<Powerup> selectables) {
         StringBuilder messageToPrint = new StringBuilder();
 
+        messageToPrint.append(POWERUP_SELECTION);
+
         // Print powerups that can be choosen
         for (int i = 0; i < selectables.size(); i++) {
             messageToPrint.append("[").append(i+1).append("] ").append(selectables.get(i).getName()).append(" - ")
@@ -973,36 +979,38 @@ public class CliView extends ClientView {
     private <T> T getIndexedResponse(List<T> selectables, StringBuilder messageToPrint) {
         messageToPrint.append("\n[X] to STOP selection");
 
-        selectionMessage = messageToPrint.toString();
-        showMatch();
+        synchronized (selectionLock) {
+            selectionMessage = messageToPrint.toString();
+            showMatch();
 
-        String response = getResponse();
-        if (response == null) return null;
+            String response = getResponse();
+            if (response == null) return null;
 
-        while (!response.equals("X") && !response.equals("x")) {
-            int choice;
-            try {
-                choice = Integer.parseInt(response) - 1;
-            } catch (NumberFormatException e) {
-                System.out.println(INVALID_SELECTION);
-                response = getResponse();
-                if (response == null) return null;
-                continue;
+            while (!response.equals("X") && !response.equals("x")) {
+                int choice;
+                try {
+                    choice = Integer.parseInt(response) - 1;
+                } catch (NumberFormatException e) {
+                    System.out.println(INVALID_SELECTION);
+                    response = getResponse();
+                    if (response == null) return null;
+                    continue;
+                }
+
+                if (choice >= 0 && choice < selectables.size()) {
+                    selectionMessage = IDLE_MESSAGE;
+                    showMatch();
+
+                    return selectables.get(choice);
+                } else {
+                    System.out.println(INVALID_SELECTION);
+                    response = getResponse();
+                    if (response == null) return null;
+                }
             }
-
-            if (choice >= 0 && choice < selectables.size()) {
-                selectionMessage = IDLE_MESSAGE;
-                showMatch();
-
-                return selectables.get(choice);
-            } else {
-                System.out.println(INVALID_SELECTION);
-                response = getResponse();
-                if (response == null) return null;
-            }
+            selectionMessage = IDLE_MESSAGE;
+            showMatch();
         }
-        selectionMessage = IDLE_MESSAGE;
-        showMatch();
         return null;
     }
 
@@ -1012,52 +1020,16 @@ public class CliView extends ClientView {
      */
     @Override
     public TurnAction actionSelection() {
-        if (!player.getMatch().isFrenzyEnabled()) {
-            selectionMessage = ACTION_SELECTION;
-
-            String response = getResponse();
-            while (true) {
-                if (response == null) return null;
-
-                switch (response) {
-                    case "R":
-                    case "r":
-                        selectionMessage = IDLE_MESSAGE;
-                        System.out.println(IDLE_MESSAGE);
-
-                        return TurnAction.MOVE;
-                    case "P":
-                    case "p":
-                        selectionMessage = IDLE_MESSAGE;
-                        System.out.println(IDLE_MESSAGE);
-
-                        return TurnAction.PICK;
-                    case "S":
-                    case "s":
-                        selectionMessage = IDLE_MESSAGE;
-                        System.out.println(IDLE_MESSAGE);
-
-                        return TurnAction.SHOOT;
-                    default:
-                        System.out.println(INVALID_SELECTION);
-                        response = getResponse();
-                }
-            }
-        } else {
-            if (!player.getMatch().isFirstPlayedFrenzy()) {
-                selectionMessage = FRENZY_ACTION_BEFORE_FIRST;
+        synchronized (selectionLock) {
+            if (!player.getMatch().isFrenzyEnabled()) {
+                selectionMessage = ACTION_SELECTION;
+                showMatch();
 
                 String response = getResponse();
                 while (true) {
                     if (response == null) return null;
 
                     switch (response) {
-                        case "S":
-                        case "s":
-                            selectionMessage = IDLE_MESSAGE;
-                            System.out.println(IDLE_MESSAGE);
-
-                            return TurnAction.SHOOT;
                         case "R":
                         case "r":
                             selectionMessage = IDLE_MESSAGE;
@@ -1070,34 +1042,93 @@ public class CliView extends ClientView {
                             System.out.println(IDLE_MESSAGE);
 
                             return TurnAction.PICK;
-                        default:
-                            System.out.println(INVALID_SELECTION);
-                            response = getResponse();
-                    }
-                }
-            } else {
-                selectionMessage = FRENZY_ACTION_AFTER_FIRST;
-
-                String response = getResponse();
-                while (true) {
-                    if (response == null) return null;
-
-                    switch (response) {
                         case "S":
                         case "s":
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
                             return TurnAction.SHOOT;
-                        case "P":
-                        case "p":
+                        case "u":
+                        case "U":
                             selectionMessage = IDLE_MESSAGE;
                             System.out.println(IDLE_MESSAGE);
 
-                            return TurnAction.PICK;
+                            return TurnAction.POWERUP;
                         default:
                             System.out.println(INVALID_SELECTION);
                             response = getResponse();
+                    }
+                }
+            } else {
+                if (!player.getMatch().isFirstPlayedFrenzy()) {
+                    selectionMessage = FRENZY_ACTION_BEFORE_FIRST;
+                    showMatch();
+
+                    String response = getResponse();
+                    while (true) {
+                        if (response == null) return null;
+
+                        switch (response) {
+                            case "S":
+                            case "s":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.SHOOT;
+                            case "R":
+                            case "r":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.MOVE;
+                            case "P":
+                            case "p":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.PICK;
+                            case "u":
+                            case "U":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.POWERUP;
+                            default:
+                                System.out.println(INVALID_SELECTION);
+                                response = getResponse();
+                        }
+                    }
+                } else {
+                    selectionMessage = FRENZY_ACTION_AFTER_FIRST;
+                    showMatch();
+
+                    String response = getResponse();
+                    while (true) {
+                        if (response == null) return null;
+
+                        switch (response) {
+                            case "S":
+                            case "s":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.SHOOT;
+                            case "P":
+                            case "p":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.PICK;
+                            case "u":
+                            case "U":
+                                selectionMessage = IDLE_MESSAGE;
+                                System.out.println(IDLE_MESSAGE);
+
+                                return TurnAction.POWERUP;
+                            default:
+                                System.out.println(INVALID_SELECTION);
+                                response = getResponse();
+                        }
                     }
                 }
             }
@@ -1464,7 +1495,7 @@ public class CliView extends ClientView {
         int playerBoxY = startingY + boxYOffset;
 
         for (Player p : playersToDraw) {
-            charMap[playerBoxX][playerBoxY] = getANSIColor(p) + p.getNickname().charAt(0) + ANSI_RESET;
+            charMap[playerBoxX][playerBoxY] = getANSIColor(p) + Character.toUpperCase(p.getNickname().charAt(0)) + ANSI_RESET;
 
             if (playerBoxY > startingY + boxYOffset + PLAYER_BOX_WIDTH - 2) {
                 playerBoxX = playerBoxX + 2;

@@ -8,5 +8,6 @@ import java.io.Serializable;
 public enum TurnAction {
 	MOVE,
 	PICK,
-	SHOOT
+	SHOOT,
+	POWERUP
 }

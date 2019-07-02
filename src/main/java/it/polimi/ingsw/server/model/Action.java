@@ -183,6 +183,9 @@ public class Action {
 	public BaseAction markLambda(JSONObject baseActionJSON) {
 		return caller -> {
 			List<Player> toApply = selectTargets();
+
+			toApply.remove(caller);
+
 			toApply.forEach(p-> {
 				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
 				IntStream.range(0,dmg).forEach(a-> p.takeMark(caller));
@@ -201,6 +204,9 @@ public class Action {
 	public BaseAction damageLambda(JSONObject baseActionJSON) {
 		return caller -> {
 			List<Player> toApply = selectTargets();
+
+			toApply.remove(caller);
+
 			toApply.forEach(p-> {
 				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
 				IntStream.range(0,dmg).forEach(a-> {
@@ -224,7 +230,7 @@ public class Action {
 						List<Cell> selected = caller.getConnection().selectRoom(couldBeAdded);
 						targetCells.addAll(selected);
 
-						if (selected.isEmpty()) {
+						if (!selected.isEmpty()) {
 							nSelected++;
 
 							// Set ids to selected players

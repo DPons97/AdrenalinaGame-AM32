@@ -1,14 +1,14 @@
 {
   "Powerups": [
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "Y",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -22,23 +22,34 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "Y",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -52,23 +63,34 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "R",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -82,23 +104,34 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "R",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -112,23 +145,34 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "B",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -142,23 +186,34 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "newton",
+      "name": "Newton",
       "bonusResource": "B",
       "description": "You may play this card on your turn before or after any action. Choose any other player's figure and move it 1 or 2 squares in one direction. (You can't use this to move a figure after it respawns at the end of your turn. That would be too late.)",
       "cost": [],
       "actions": [
         {
           "type": "SELECT",
-          "ID": -1,
+          "ID": 1,
           "target": "PLAYER",
           "from": "ANY",
           "differentSelection": false,
@@ -172,16 +227,27 @@
           ]
         },
         {
-          "type": "MOVE",
-          "value": [
+          "type": "SELECT",
+          "ID": -1,
+          "target": "CELL",
+          "from": "1",
+          "differentSelection": false,
+          "quantity": [
             1,
+            1
+          ],
+          "distance": [
+            0,
             2
           ]
+        },
+        {
+          "type": "MOVE"
         }
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "Y",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -210,7 +276,7 @@
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "Y",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -239,7 +305,7 @@
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "R",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -268,7 +334,7 @@
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "R",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -297,7 +363,7 @@
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "B",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -326,7 +392,7 @@
       ]
     },
     {
-      "name": "targetting scopes",
+      "name": "Targetting scopes",
       "bonusResource": "B",
       "description": "You may play this card when you are dealing damage to one or more targets. Pay 1 ammo cube of any color. Choose 1 of those targets and give it an extra point of damage. Note: You cannot use this to do 1 damage to a target that is receiving only marks.",
       "cost": ["U"],
@@ -355,7 +421,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "Y",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -384,7 +450,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "Y",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -413,7 +479,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "R",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -442,7 +508,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "R",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -471,7 +537,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "B",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -500,7 +566,7 @@
       ]
     },
     {
-      "name": "tagback grenade",
+      "name": "Tagback grenade",
       "bonusResource": "B",
       "description": "You may play this card when you receive damage from a player you can see. Give that player 1 mark.",
       "cost": [],
@@ -529,7 +595,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "Y",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
@@ -574,7 +640,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "Y",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
@@ -619,7 +685,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "R",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
@@ -664,7 +730,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "R",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
@@ -709,7 +775,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "B",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
@@ -754,7 +820,7 @@
       ]
     },
     {
-      "name": "teleporter",
+      "name": "Teleporter",
       "bonusResource": "B",
       "description": "You may play this card on your turn before or after any action. Pick up your figure and set it down on any square of the board. (You can't use this after you see where someone respawns at the end of your turn. By then it is too late.)",
       "cost": [],
