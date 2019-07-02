@@ -203,6 +203,7 @@ public class GuiView extends ClientView{
     private static final double ACTION_BTN_FRENZY_DOWN_SIZE_Y0 = 0.94;
     private static final double ACTION_BTN_NO_FRENZY_PADDING = 0.03;
     private static final double ACTION_BTN_FRENZY_PADDING = 0.025;
+    public static final String USE_POWERUP_PATH = "/img/others/buttonusepowerup.png";
 
     // spawn selection popup
     private static final String SPAWN_POPUP_PATH = "/img/others/spawn.jpeg";
@@ -1597,11 +1598,15 @@ public class GuiView extends ClientView{
     @Override
     public TurnAction actionSelection() {
         System.out.println("ACTION SELECTION");
-        List<Button> buttons = new ArrayList<>();
+        List<Node> buttons = new ArrayList<>();
         Platform.runLater(()->{
             if(!player.getMatch().isFrenzyEnabled()){
                 int i = 0;
                 for(TurnAction t: TurnAction.values()){
+                    if(t.equals(TurnAction.POWERUP)){
+                        setUsePowerupButton(buttons);
+                        continue;
+                    }
                     Button actionButton = new Button();
                     formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_NO_FRENZY_Y0*height+ACTION_BTN_NO_FRENZY_PADDING*height*i,
                             ACTION_BTN_SIZE_X*height,ACTION_BTN_NO_FRENZY_SIZE_Y*height);
@@ -1614,6 +1619,10 @@ public class GuiView extends ClientView{
             }else if (!player.getMatch().isFirstPlayedFrenzy()){
                 int i = 0;
                 for(TurnAction t: TurnAction.values()){
+                    if(t.equals(TurnAction.POWERUP)){
+                        setUsePowerupButton(buttons);
+                        continue;
+                    }
                     Button actionButton = new Button();
                     formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_FRENZY_Y0*height+ACTION_BTN_FRENZY_PADDING*height*i,
                             ACTION_BTN_SIZE_X*height,ACTION_BTN_FRENZY_SIZE_Y*height);
@@ -1627,7 +1636,11 @@ public class GuiView extends ClientView{
                 // bottom 2 actions
                 int i = 0;
                 for(TurnAction t: TurnAction.values()){
-                    if(t == TurnAction.MOVE) continue;
+                    if(t.equals(TurnAction.POWERUP)){
+                        setUsePowerupButton(buttons);
+                        continue;
+                    }
+                    if(t.equals(TurnAction.MOVE)) continue;
                     Button actionButton = new Button();
                     formatButton(actionButton,ACTION_BTN_X0*width,ACTION_BTN_FRENZY_DOWN_SIZE_Y0*height+ACTION_BTN_FRENZY_PADDING*height*i,
                             ACTION_BTN_SIZE_X*height,ACTION_BTN_FRENZY_SIZE_Y*height);
@@ -1647,6 +1660,19 @@ public class GuiView extends ClientView{
         });
 
         return TurnAction.valueOf(selected);
+    }
+
+    private void setUsePowerupButton(List<Node> buttons) {
+        ImageView usePowerup = loadImage(USE_POWERUP_PATH);
+        usePowerup.setX(USE_RESOURCES_X*width);
+        usePowerup.setY(USE_RESOURCES_Y*height);
+        usePowerup.setPreserveRatio(true);
+        usePowerup.setFitWidth(USE_RESOURCES_SIZE*width);
+        buttons.add(usePowerup);
+        nodesLeftBehid.add(usePowerup);
+        setButtonEffects(usePowerup);
+        FXWindow.getPane().getChildren().add(usePowerup);
+        selection.setNodeClickable(usePowerup, TurnAction.POWERUP.toString());
     }
 
     private void loadLayout(){

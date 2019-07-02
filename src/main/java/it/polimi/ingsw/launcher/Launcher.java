@@ -39,7 +39,6 @@ public class Launcher{
     private static final String CLI = "-cli";
     private static final String GUI = "-gui";
     private static final String NICK = "-n";
-    private static final String CFG = "-cfg";
     private static final String CONNECTION = "-c";
 
     public void startLaunherCli(){
@@ -317,10 +316,6 @@ public class Launcher{
         return -1;
     }
 
-    private String parseCfgFile(List<String> args){
-        return args.contains(CFG)? args.get(args.indexOf(CFG)+1) : null;
-    }
-
     private boolean needLauncher(List<String> args){
         return ! (args.contains(MODE) && (parseMode(args).equals("s") || ( args.contains(SERVER) &&
                  args.contains(NICK) &&  args.contains(PORT) && args.contains(CONNECTION) &&
@@ -328,23 +323,15 @@ public class Launcher{
                 (args.contains(CLI) || args.contains(GUI)))));
     }
 
-    private void parseFile(String file){
-        //TODO PARSE CONFIG FROM FILE
-    }
-
     public static void main(String[] args) {
         // read params and start right launcher
         Launcher l= new Launcher();
         List<String> argsList = new ArrayList<>(Arrays.asList(args));
-        String cfgFile = l.parseCfgFile(argsList);
-        if(cfgFile!= null) {
-            l.parseFile(cfgFile);
-            return;
-        }
+
         if(l.needLauncher(argsList)) {
             int view = l.parseView(argsList);
-            if(view == 1 ) l.startLauncherGui();
-            else l.startLaunherCli();
+            if(view == 0 ) l.startLaunherCli();
+            else l.startLauncherGui();
         } else {
             if(l.parseMode(argsList).equals("s")){
                 l.startServer();
