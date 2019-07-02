@@ -209,9 +209,7 @@ public class Action {
 
 			toApply.forEach(p-> {
 				int dmg = Integer.parseInt((baseActionJSON.get("value")).toString());
-				IntStream.range(0,dmg).forEach(a-> {
-					p.takeDamage(caller);
-				});
+				IntStream.range(0,dmg).forEach(a-> p.takeDamage(caller));
 			});
 		};
 	}

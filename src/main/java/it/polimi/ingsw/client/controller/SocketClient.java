@@ -251,10 +251,16 @@ public class SocketClient extends ServerConnection {
                         JSONObject response = new JSONObject();
                         JSONArray room = new JSONArray();
 
+                        if (selectedRoom == null) {
+                        	response.put("room", "none");
+                        	sendAnswer(response);
+                        	break;
+						}
+
                         selectedRoom.forEach(p -> {
                             JSONObject item = new JSONObject();
-                            item.put("x", p.getX());
-                            item.put("y", p.getY());
+                            item.put("x", (p != null) ? p.getX() : "none");
+                            item.put("y", (p != null) ? p.getY() : "none");
                             room.add(item);
                         });
 

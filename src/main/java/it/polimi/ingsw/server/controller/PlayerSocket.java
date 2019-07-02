@@ -258,6 +258,9 @@ public class PlayerSocket extends PlayerConnection {
         this.sendInstruction(message);
 
         JSONObject selected = (JSONObject) JSONValue.parse(this.getResponse());
+
+        if (selected.get("room").toString().equals("none")) return new ArrayList<>();
+
         JSONArray room = (JSONArray) selected.get("room");
         for(List<Cell> r : selectable){
             for(Cell c : r){
@@ -266,7 +269,7 @@ public class PlayerSocket extends PlayerConnection {
                 	return r;
             }
         }
-        return null;
+        return new ArrayList<>();
     }
 
 	/**
