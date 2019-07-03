@@ -711,7 +711,14 @@ public class AdrenalinaMatch {
 				break;
 			default:
 				// from is an integer id
-				int id = Integer.parseInt(from);
+				int id;
+				try {
+					id = Integer.parseInt(from);
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid \"from\" id in player selection");
+					break;
+				}
+
 
 				// we are selecting players-> first control if there are players with requested id
 				toReturn.addAll(players.stream()
@@ -727,14 +734,7 @@ public class AdrenalinaMatch {
 							toReturn.addAll(pC.getPlayers());
 						}
 					}
-				} /*else {
-					// look for players at given distance
-					toReturn = intersection(toReturn,
-							toReturn.get(0).getCellAtDistance(minDistance,maxDistance).stream().
-									map(Cell::getPlayers).
-									flatMap(List::stream).
-									collect(Collectors.toList()));
-				}*/
+				}
 		}
 
 		// filter notID
@@ -810,8 +810,13 @@ public class AdrenalinaMatch {
 				break;
 			default:
 				// from is an integer id
-				int id = Integer.parseInt(from);
-				// we are selecting cells -> first control if there are cells with requested id
+				int id;
+				try {
+					id = Integer.parseInt(from);
+				} catch (NumberFormatException e) {
+					System.out.println("Invalid \"from\" id in player selection");
+					break;
+				}				// we are selecting cells -> first control if there are cells with requested id
 				toReturn.addAll(boardMap.getCellsByID(id));
 
 				// if none were found, the id should be a player id

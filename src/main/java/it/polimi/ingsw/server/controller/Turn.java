@@ -204,7 +204,7 @@ public class Turn {
             // Ask player what to do (RUN, PICK, SHOOT)
             TurnAction currentAcion = playing.getConnection().selectAction();
 
-            if (match.isFirstPlayedFrenzy()) {
+            if (!match.isFirstPlayedFrenzy()) {
                 switch (currentAcion) {
                     case MOVE:
                         if (movePlayer(playing, 4)) remainingActions--;

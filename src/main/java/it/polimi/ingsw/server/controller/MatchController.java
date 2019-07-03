@@ -205,7 +205,7 @@ public class MatchController {
 
 		// Final leaderboard
 		List<Player> leaderBoard = new ArrayList<>(match.getPlayers());
-		leaderBoard.sort(Comparator.comparing(Player::getScore));
+		leaderBoard.sort(Comparator.comparing(Player::getScore).reversed());
 
 		// Manage player with same score
 		boolean modifiedLeaderboard;
@@ -223,6 +223,10 @@ public class MatchController {
 			if (modifiedLeaderboard) i = 0;
 			else i++;
 		}
+
+		// Leaderboard is inverted
+
+
 		match.setMatchState(MatchState.ENDED);
 		return leaderBoard;
 	}
