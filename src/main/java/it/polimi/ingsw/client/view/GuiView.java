@@ -856,6 +856,7 @@ public class GuiView extends ClientView{
         //Show buttons
         List<Button> toRemove = new ArrayList<>();
         Platform.runLater(()->{
+            Pane root = FXWindow.getPane();
             //check if room is present
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
                 // add room button
@@ -866,6 +867,7 @@ public class GuiView extends ClientView{
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
                 nodesLeftBehid.add(red);
+                root.getChildren().add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
@@ -875,6 +877,7 @@ public class GuiView extends ClientView{
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
                 nodesLeftBehid.add(blue);
+                root.getChildren().add(blue);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
                 Button white = new Button();
@@ -883,6 +886,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                root.getChildren().add(white);
                 nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
@@ -892,6 +896,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                root.getChildren().add(yellow);
                 nodesLeftBehid.add(yellow);
             }
         });
@@ -950,6 +955,7 @@ public class GuiView extends ClientView{
 
     private List<Point> selectRoomMap2(List<List<Point>> selectables) {
         //Show buttons
+        Pane root = FXWindow.getPane();
         List<Button> toRemove = new ArrayList<>();
         Platform.runLater(()->{
             //check if room is present
@@ -960,6 +966,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                root.getChildren().add(white);
                 nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
@@ -969,6 +976,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
                 toRemove.add(yellow);
+                root.getChildren().add(yellow);
                 nodesLeftBehid.add(yellow);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
@@ -978,6 +986,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(green);
                 selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
                 toRemove.add(green);
+                root.getChildren().add(green);
                 nodesLeftBehid.add(green);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
@@ -988,6 +997,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                root.getChildren().add(red);
                 nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
@@ -997,6 +1007,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                root.getChildren().add(blue);
                 nodesLeftBehid.add(blue);
             }
 
@@ -1017,6 +1028,7 @@ public class GuiView extends ClientView{
         //Show buttons
         List<Button> toRemove = new ArrayList<>();
         Platform.runLater(()->{
+            Pane root = FXWindow.getPane();
             //check if room is present
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.WHITE)){
                 Button white = new Button();
@@ -1025,6 +1037,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                root.getChildren().add(white);
                 nodesLeftBehid.add(white);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
@@ -1034,6 +1047,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(purple);
                 selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
                 toRemove.add(purple);
+                root.getChildren().add(purple);
                 nodesLeftBehid.add(purple);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.GREEN)){
@@ -1043,6 +1057,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(green);
                 selection.setNodeClickable(green,  it.polimi.ingsw.server.model.Color.GREEN.toString());
                 toRemove.add(green);
+                root.getChildren().add(green);
                 nodesLeftBehid.add(green);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
@@ -1051,6 +1066,7 @@ public class GuiView extends ClientView{
                         ROOM_2_BUTTON_W * width, ROOM_123_BUTTON_H * height);
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
+                root.getChildren().add(blue);
                 toRemove.add(blue);
                 nodesLeftBehid.add(blue);
             }
@@ -1061,6 +1077,7 @@ public class GuiView extends ClientView{
                         ROOM_123_BUTTON_H * width, ROOM_2_ROTATE_BUTTON_H * height);
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
+                root.getChildren().add(red);
                 toRemove.add(red);
                 nodesLeftBehid.add(red);
             }
@@ -1070,6 +1087,7 @@ public class GuiView extends ClientView{
                         ROOM_2X2_BUTTON_WH * height, ROOM_2X2_BUTTON_WH * height);
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
+                root.getChildren().add(yellow);
                 toRemove.add(yellow);
                 nodesLeftBehid.add(yellow);
             }
@@ -1092,6 +1110,7 @@ public class GuiView extends ClientView{
         List<Button> toRemove = new ArrayList<>();
         Platform.runLater(()->{
             //check if room is present
+            Pane root = FXWindow.getPane();
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.BLUE)){
                 Button blue = new Button();
                 formatButton(blue, MAP_4_BLUE_ROOM_X * width, MAP_4_BLUE_ROOM_Y * height,
@@ -1099,6 +1118,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(blue);
                 selection.setNodeClickable(blue,  it.polimi.ingsw.server.model.Color.BLUE.toString());
                 toRemove.add(blue);
+                root.getChildren().add(blue);
                 nodesLeftBehid.add(blue);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.PURPLE)){
@@ -1108,6 +1128,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(purple);
                 selection.setNodeClickable(purple,  it.polimi.ingsw.server.model.Color.PURPLE.toString());
                 toRemove.add(purple);
+                root.getChildren().add(purple);
                 nodesLeftBehid.add(purple);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.RED)) {
@@ -1118,6 +1139,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(red);
                 selection.setNodeClickable(red, it.polimi.ingsw.server.model.Color.RED.toString());
                 toRemove.add(red);
+                root.getChildren().add(red);
                 nodesLeftBehid.add(red);
             }
             if(isRoomPresent(selectables, it.polimi.ingsw.server.model.Color.YELLOW)){
@@ -1126,6 +1148,7 @@ public class GuiView extends ClientView{
                         ROOM_123_BUTTON_H * height, ROOM_2_ROTATE_BUTTON_H * height);
                 setButtonEffects(yellow);
                 selection.setNodeClickable(yellow,  it.polimi.ingsw.server.model.Color.YELLOW.toString());
+                root.getChildren().add(yellow);
                 toRemove.add(yellow);
                 nodesLeftBehid.add(yellow);
             }
@@ -1136,6 +1159,7 @@ public class GuiView extends ClientView{
                 setButtonEffects(white);
                 selection.setNodeClickable(white,  it.polimi.ingsw.server.model.Color.WHITE.toString());
                 toRemove.add(white);
+                root.getChildren().add(white);
                 nodesLeftBehid.add(white);
             }
 
