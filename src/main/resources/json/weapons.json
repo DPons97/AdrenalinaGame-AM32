@@ -1796,24 +1796,9 @@
           },
           {
             "type": "SELECT",
-            "ID": 1,
-            "target": "CELL",
-            "from": "DIRECTION_VISIBLE",
-            "differentCells": false,
-            "quantity": [
-              1,
-              1
-            ],
-            "distance": [
-              0,
-              2
-            ]
-          },
-          {
-            "type": "SELECT",
             "ID": -1,
             "target": "CELL",
-            "from": "1",
+            "from": "DIRECTION_VISIBLE",
             "differentCells": false,
             "quantity": [
               1,

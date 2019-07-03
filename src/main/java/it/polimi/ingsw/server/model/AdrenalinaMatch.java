@@ -530,6 +530,7 @@ public class AdrenalinaMatch {
 			overkills.add(isOverkill);
 			if (currentDeaths>= maxDeaths) {
 				state = MatchState.FRENZY_TURN;
+				System.out.println("FRENZY MODE STARTING");
 				// All players without damage change their rewards to frenzy, and reset their deaths to 0
 				for (Player p : players)
 					if (p.getDmgPoints().isEmpty()) p.enableFrenzy();

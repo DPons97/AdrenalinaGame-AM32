@@ -1794,9 +1794,9 @@ public class GuiView extends ClientView{
         for(int i = 0, j = 0; i<overkills.size(); i++, j++){
             ImageView droplet = getDropletImage(deathtrack.get(i));
             droplet.setY(DEATHTRACK_DROPLET_Y0*height);
-            droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*j);
+            droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j);
             droplet.setPreserveRatio(true);
-            droplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+            droplet.setFitWidth(DEATHTRACK_DROPLET_SIZE*width);
             addNode(root,droplet);
             if(overkills.get(j)){
                 i++;
@@ -1804,7 +1804,7 @@ public class GuiView extends ClientView{
                 additionalDroplet.setY(DEATHTRACK_DROPLET_Y0*height);
                 additionalDroplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j+DEATHTRACK_DROPLET_OFFSET_X2*height);
                 additionalDroplet.setPreserveRatio(true);
-                additionalDroplet.setFitWidth(DEATHTRACK_DROPLET_SIZE);
+                additionalDroplet.setFitWidth(DEATHTRACK_DROPLET_SIZE*width);
                 addNode(root,additionalDroplet);
             }
         }
