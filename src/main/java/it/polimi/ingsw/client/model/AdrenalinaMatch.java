@@ -276,7 +276,6 @@ public class AdrenalinaMatch {
         }
 
         this.state = MatchState.valueOf(o.get("state").toString());
-        System.out.println(this.state);
         this.map =  Map.parseJSON((JSONObject) o.get("map"), weapons, players);
 
         JSONArray deathTrackArray = (JSONArray) o.get("deathTrack");
@@ -291,7 +290,7 @@ public class AdrenalinaMatch {
             overkills.add(Boolean.parseBoolean(overkill.toString()));
         }
 
-        System.out.println("match model updated");
+        //System.out.println("match model updated");
     }
 
     private void initPlayers(JSONArray playersArray) {

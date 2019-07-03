@@ -450,6 +450,8 @@ public class PlayerSocket extends PlayerConnection {
 	public void showLeaderboard(List<Player> leaderboard) {
 		JSONObject msg = new JSONObject();
 		JSONArray leaderboardArray = new JSONArray();
+		msg.put("function", "update");
+		msg.put("type", "leaderboard");
 		leaderboard.forEach(p->leaderboardArray.add(p.getNickname()));
 		msg.put("leaderboard", leaderboardArray);
 		this.sendInstruction(msg);

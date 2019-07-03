@@ -337,6 +337,15 @@ public class SocketClient extends ServerConnection {
 					default:
 				}
 				break;
+			case "leaderboard":
+				List<String> user = new ArrayList<>();
+				JSONArray jsonArray= (JSONArray) message.get("leaderboard");
+				for(Object o: jsonArray){
+					user.add(o.toString());
+				}
+				player.showLeaderboard(user		);
+
+				break;
 			case "alert":
 				player.alert(message.get("msg").toString());
 				break;

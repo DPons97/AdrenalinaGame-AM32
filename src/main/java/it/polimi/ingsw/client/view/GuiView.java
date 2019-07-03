@@ -327,6 +327,8 @@ public class GuiView extends ClientView{
     private double width;
     private double height;
 
+    private final TurnAction[] frenzyActions = {TurnAction.SHOOT, TurnAction.MOVE, TurnAction.PICK};
+
     private List<ImageView> players;
     private List<ImageView> weapons;
     private List<ImageView> spawnWeapons;
@@ -640,7 +642,7 @@ public class GuiView extends ClientView{
             int i = 0;
             for(String s: leaderboard){
                 Label user = new Label();
-                String text = i + ". " + s + ": " +player.getMatch().getPlayerByName(s).getScore();
+                String text = (i+1) + ". " + s + ": " +player.getMatch().getPlayerByName(s).getScore();
                 user.setStyle(LEADERBOARD_LABEL_STYLE);
                 if(i == 0)user.setTextFill(Color.web("#f6ff00"));
                 user.setText(text);
@@ -1658,7 +1660,7 @@ public class GuiView extends ClientView{
                 }
             }else if (!player.getMatch().isFirstPlayedFrenzy()){
                 int i = 0;
-                for(TurnAction t: TurnAction.values()){
+                for(TurnAction t: frenzyActions){
                     if(t.equals(TurnAction.POWERUP)){
                         setUsePowerupButton(buttons);
                         continue;
@@ -1675,7 +1677,7 @@ public class GuiView extends ClientView{
             } else {
                 // bottom 2 actions
                 int i = 0;
-                for(TurnAction t: TurnAction.values()){
+                for(TurnAction t: frenzyActions){
                     if(t.equals(TurnAction.POWERUP)){
                         setUsePowerupButton(buttons);
                         continue;
