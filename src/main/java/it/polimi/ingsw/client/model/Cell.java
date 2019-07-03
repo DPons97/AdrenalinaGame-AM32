@@ -85,25 +85,25 @@ public abstract class Cell {
     }
 
     /**
-     * return the north side
+     * @return the north side
      */
     public Side getNorth() {
         return north;
     }
     /**
-     * return the south side
+     * @return the south side
      */
     public Side getSouth() {
         return south;
     }
     /**
-     * return the west side
+     * @return the west side
      */
     public Side getWest() {
         return west;
     }
     /**
-     * return the east side
+     * @return the east side
      */
     public Side getEast() {
         return east;

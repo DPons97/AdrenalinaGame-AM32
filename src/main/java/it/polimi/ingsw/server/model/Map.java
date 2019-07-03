@@ -206,7 +206,7 @@ public class Map {
      * @param minDist Minimum distance
      * @param maxDist Maximum distance. -1 is equal to INFINITE
      * @return List of all cells between [minDist] and [maxDist] distance
-     * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
+     * @throws IllegalArgumentException if minDist less than 0 or maxDist less than -1
      */
     protected List<Cell> getCellAtDistance(Cell relativeCell, int minDist, int maxDist) {
         if (minDist < 0 || maxDist < -1) throw new IllegalArgumentException();

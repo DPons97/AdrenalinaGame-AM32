@@ -112,6 +112,7 @@ public class Turn {
 
     /**
      *	Game turn logic (Run/Pick/Shoot + reloading)
+     * @param playing player playing this turn
      */
     public void beginTurn(Player playing) {
         int remainingActions = 2;
@@ -319,6 +320,7 @@ public class Turn {
 
     /** Player pick logic during frenzy
      * @param playing player
+     * @param playingBeforeFirst boolean idetifying if the player is before or after the first player
      * @return true if pick was successful
      */
     private boolean frenzyPick(Player playing, boolean playingBeforeFirst) {

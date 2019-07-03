@@ -53,9 +53,10 @@ public class SocketClient extends ServerConnection {
 	private String response;
 	private boolean validResponse;
 	private static final Object  lock= new Object();
-	/**
-	 * Constructor
-	 */
+
+    /**
+     * @param player ClientPlayer object creating the connection object
+     */
 	public SocketClient(ClientPlayer player) {
 
 		super(player);
@@ -84,6 +85,7 @@ public class SocketClient extends ServerConnection {
 
 	/**
 	 *	Gets last message sent from client or waits for it until it comes.
+	 * @returns string from server
 	 */
 	private String getResponse(){
 		String msg;
@@ -359,6 +361,7 @@ public class SocketClient extends ServerConnection {
 	/**
 	 * Parses coordinates from a JSONObject
 	 * @param coords to send
+	 * @return parsed coordinates
 	 */
 	private List<Point> parseCoordinates(JSONArray coords){
 		List<Point> toRet = new ArrayList<>();

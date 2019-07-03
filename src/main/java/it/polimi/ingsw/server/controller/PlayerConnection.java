@@ -29,6 +29,7 @@ public abstract class PlayerConnection {
 
 	/**
 	 * Default constructor
+	 * @param name player name
 	 */
 	public PlayerConnection(String name) {
 		this.name=name;
@@ -91,7 +92,7 @@ public abstract class PlayerConnection {
 
 	/**
 	 * select a weapon without paying
-	 * @param loaded list of loaded weapons
+	 * @param weapons list of loaded weapons
 	 * @return WeaponSelection with weapon to shoot with
 	 */
 	public abstract WeaponSelection chooseWeaponFree(List<Weapon> weapons);
@@ -144,11 +145,14 @@ public abstract class PlayerConnection {
 
 	/**
 	 * Send player message with the final leaderboard to show
+	 * @param leaderboard ordered list of players representing the leaderboard
 	 */
 	public abstract void showLeaderboard(List<Player> leaderboard);
 
 	/**
 	 * Go back to lobby
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerNotExistsException
 	 */
 	public void backToLobby() throws MatchAlreadyStartedException, PlayerNotExistsException {
 		currentMatch.backToLobby(this);

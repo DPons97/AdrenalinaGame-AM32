@@ -66,6 +66,14 @@ public class ClientPlayer implements ClientFunctionalities{
 	/**
 	 * Constructor
 	 * Initializes nickname and server connection
+	 * @param nickname player nickname
+	 * @param connectionType rmi/socket
+	 * @param ip server ip
+	 * @param port server port
+	 * @param gui gui/cli true/false
+	 * @throws IOException
+	 * @throws NotBoundException
+	 * @throws UsernameTakenException
 	 */
 	public ClientPlayer(String nickname, ConnectionType connectionType,String ip, int port, boolean gui) throws IOException, NotBoundException, UsernameTakenException {
 		this.nickname = nickname;
@@ -85,6 +93,7 @@ public class ClientPlayer implements ClientFunctionalities{
 	/**
 	 * Constructor
 	 * Initializes nickname and server connection
+	 * @param nickname player nickname
 	 */
 	public ClientPlayer(String nickname) {
 		this.nickname = nickname;
@@ -281,7 +290,7 @@ public class ClientPlayer implements ClientFunctionalities{
 		server.backToLobby();
 	}
 
-	/**
+	/*
 	 * Main method to test connection
 	 */
 	public static void main(String[] args) {

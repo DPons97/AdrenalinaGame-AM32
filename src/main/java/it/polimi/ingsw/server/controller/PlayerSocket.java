@@ -38,7 +38,11 @@ public class PlayerSocket extends PlayerConnection {
 
 
 	/**
-	 * Default constructor
+	 * Builds a player socket connection
+	 * @param name player name
+	 * @param output output buffer
+	 * @param input input buffer
+	 * @throws IOException
 	 */
 	public PlayerSocket(String name, PrintWriter output, BufferedReader input) throws IOException {
 		super(name);
@@ -95,6 +99,7 @@ public class PlayerSocket extends PlayerConnection {
 
 	/**
 	 *	parses message in case it's a push message from client
+	 * @param message to parse
 	 */
 	private void parseMessage(String message) {
 		JSONObject msg  = (JSONObject) JSONValue.parse(message);
@@ -156,6 +161,7 @@ public class PlayerSocket extends PlayerConnection {
 
 	/**
 	 *	Gets last message sent from client or waits for it until it comes.
+	 * @return string from client socket
 	 */
 	private String getResponse(){
 		String msg;
@@ -367,6 +373,7 @@ public class PlayerSocket extends PlayerConnection {
 	/**
 	 * Completes the message and parses client response
 	 * @param weapons list of weapons to put in the message
+	 * @param message message to complete and send
 	 * @return WeaponSelection parsed from JSON received from client
 	 */
 	private WeaponSelection getWeaponSelection(List<Weapon> weapons, JSONObject message) {

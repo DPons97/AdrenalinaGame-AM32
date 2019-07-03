@@ -36,7 +36,7 @@ public class RemoteClient extends ServerConnection {
 
 
 	/**
-	 * Constructor
+	 * @param player ClientPlayer object creating the connection
 	 */
 	public RemoteClient(ClientPlayer player) {
 		super(player);

@@ -102,6 +102,12 @@ public class LobbyController {
 
 	/**
 	 * Allow user to create a game while in the lobby
+	 * @param player connection object of player joining the game
+	 * @param gameID id of the game to join
+	 * @throws TooManyPlayersException
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerAlreadyExistsException
+	 * @throws PlayerNotExistsException
 	 */
 	public synchronized void joinMatch(PlayerConnection player, int gameID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
 		if(lobby.getJoinableMatches().isEmpty()){
@@ -115,6 +121,16 @@ public class LobbyController {
 
 	/**
 	 * Allow to join a game while in the lobby
+	 * @param host connection object of player hosting the game
+	 * @param maxPlayers in the game
+	 * @param maxDeaths in the game
+	 * @param turnDuration in the game
+	 * @param mapID of the map to play (between 1 and 4)
+	 * @throws TooManyMatchesException
+	 * @throws TooManyPlayersException
+	 * @throws PlayerNotExistsException
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerAlreadyExistsException
 	 */
 	public synchronized void hostMatch(PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
 		lobby.createMatch(this, host, maxPlayers,maxDeaths,turnDuration,mapID);

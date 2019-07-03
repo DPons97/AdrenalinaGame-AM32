@@ -183,7 +183,8 @@ public class AdrenalinaMatch {
     }
 
     /**
-     *
+     * @param name of player to find
+     * @return the player object having the passed name
      */
     public Player getPlayerByName(String name){
         return players.stream().filter(p->p.getNickname().equals(name)).collect(Collectors.toList()).get(0);

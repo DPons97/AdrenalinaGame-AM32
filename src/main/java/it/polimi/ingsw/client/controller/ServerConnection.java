@@ -16,7 +16,7 @@ public abstract class ServerConnection {
 	protected ClientPlayer player;
 
 	/**
-	 * Default constructor
+	 * @param player requesting the connection
 	 */
 	public ServerConnection(ClientPlayer player) {
 		this.player = player;
@@ -26,6 +26,9 @@ public abstract class ServerConnection {
 	 * Connect client to a server at ip and port passed
 	 * @param ip server ip
 	 * @param port server port
+	 * @throws IOException
+	 * @throws NotBoundException
+	 * @throws UsernameTakenException
 	 */
 	public abstract void connect(String ip, int port) throws IOException, NotBoundException, UsernameTakenException;
 
@@ -42,6 +45,7 @@ public abstract class ServerConnection {
 
     /**
      * Updates the lobby view
+	 * @param name name of the player requesting the update
      * @return JSON lobby representation to get update from
      */
     public abstract String updateLobby(String name);
