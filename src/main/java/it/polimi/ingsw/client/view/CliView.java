@@ -1695,7 +1695,7 @@ public class CliView extends ClientView {
                 }
                 int stringLen = weaponCost.length() - colorLength;
                 // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-                weaponCost.append(" ".repeat(18-stringLen));
+                weaponCost.append(" ".repeat(Math.max(0, 18-stringLen)));
 
 
                 charMap[startingX+i][startingY] = String.format((j == 0) ? PLAYER_WEAPON_HEADER : PLAYER_WEAPON_FORMAT, weaponsString, weaponCost);
@@ -1744,7 +1744,7 @@ public class CliView extends ClientView {
         }
         stringLen = ammos.length() - colorLength;
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        ammos.append(" ".repeat(18-stringLen));
+        ammos.append(" ".repeat(Math.max(0, 18-stringLen)));
         return ammos;
     }
 
@@ -1766,7 +1766,7 @@ public class CliView extends ClientView {
         }
         stringLen = marks.length() - colorLength;
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        marks.append(" ".repeat(6-stringLen));
+        marks.append(" ".repeat(Math.max(0, 6-stringLen)));
         return marks;
     }
 
@@ -1798,7 +1798,7 @@ public class CliView extends ClientView {
         stringLen = rewards.length() - colorLength;
         rewards.append((p.isFrenzyPlayer()) ? "    >>  " : ">>  ").append(ANSI_RED).append("D M").append(ANSI_RESET);
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        rewards.append(" ".repeat(((p.isFrenzyPlayer()) ? 13 : 17) - stringLen));
+        rewards.append(" ".repeat(Math.max(0, (((p.isFrenzyPlayer()) ? 13 : 17) - stringLen))));
         return rewards;
     }
 
@@ -1819,7 +1819,7 @@ public class CliView extends ClientView {
         }
         int stringLen = dmgTrack.length() - colorLength;
         // Formatted string allocates 24 characters for dmg track. Changing lost chars with spaces
-        dmgTrack.append(" ".repeat(24-stringLen));
+        dmgTrack.append(" ".repeat(Math.max(0, 24-stringLen)));
         return dmgTrack;
     }
 

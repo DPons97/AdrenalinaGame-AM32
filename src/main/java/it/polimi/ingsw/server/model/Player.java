@@ -435,10 +435,15 @@ public class Player {
 	public List<Powerup> getPowerups() { return new ArrayList<>(powerups); }
 
 	/**
-	 * ONLY FOR TESTING
 	 * @param toAdd powerup to add to player's inventory
 	 */
 	public void addPowerup(Powerup toAdd) { powerups.add(toAdd); }
+
+	/**
+	 *
+	 * @param toRemove
+	 */
+	public void removePowerup(Powerup toRemove) { powerups.remove(toRemove); }
 
 	/**
 	 * @param toLoad Weapon to reload
@@ -540,7 +545,8 @@ public class Player {
 		// Count how many marks the source gave to other players
 		int sourceMarks = source.givenMarks;
 
-		if (sourceMarks < maxMarks && marksFromSource < maxMarks) {
+		// Introducing restrain on maximum marks even if game rules allow for 3 marks from every player (View limits)
+		if (sourceMarks < maxMarks && marksFromSource < maxMarks && marks.size() < maxMarks) {
 			marks.add(source);
 			source.increaseGivenMarks();
 		}
@@ -596,11 +602,16 @@ public class Player {
 	}
 
 	/**
+	 * @param minMovement Minimum distance
+	 * @param maxMovement Maximum distance
 	 * @return List of cells in which player can move (1, 2 or 3 distance)
 	 */
-	public List<Cell> getCellsToMove(int maxMovement) {
+	public List<Cell> getCellsToMove(int minMovement, int maxMovement) {
 		List<Cell> canMoveTo = getCellsWithoutWalls(position, new ArrayList<>(), new ArrayList<>(), maxMovement);
-		canMoveTo.remove(position);
+
+		// Remove all cells below min movement
+		if (minMovement > 0) canMoveTo.removeAll(getCellAtDistance(0, minMovement - 1));
+
 		return canMoveTo;
 	}
 

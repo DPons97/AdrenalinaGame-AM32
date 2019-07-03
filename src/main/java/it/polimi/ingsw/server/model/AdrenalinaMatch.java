@@ -667,26 +667,42 @@ public class AdrenalinaMatch {
 				// start from caller cell go in the four cardinal direction one at a time,
 				// stop when current cell has border or wall on the direction you are exploring
 
+				// Add self cell only once if minimum distance is 0. Also skip first cell for door visibility mechanics
+				if (minDistance == 0) toReturn.addAll(boardMap.getCell(pX, pY).getPlayers());
+
 				int i;
 				// exploring east -> right
-				for(i = pX; boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
+				for(i = pY + 1; i < boardMap.getYSize() &&
+						boardMap.getCell(pX, i).getEast()!= Side.BORDER &&
+						boardMap.getCell(pX, i).getEast()!= Side.WALL &&
+						boardMap.getCell(pX, i).getEast()!= Side.DOOR; i++)
 					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
-				toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
+				if (i < boardMap.getYSize()) toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 				// exploring west -> left
-				for(i = pX; boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
+				for(i = pY + 1; i > 0 &&
+						boardMap.getCell(pX, i).getWest()!= Side.BORDER &&
+						boardMap.getCell(pX, i).getWest()!= Side.WALL &&
+						boardMap.getCell(pX, i).getWest()!= Side.DOOR; i--)
 					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
-				toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
+				if (i > 0) toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 				// exploring north -> up
-				for(i = pY; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
+				for(i = pX + 1; i > 0 &&
+						boardMap.getCell(i,pY).getNorth()!= Side.BORDER &&
+						boardMap.getCell(i,pY).getNorth()!= Side.WALL &&
+						boardMap.getCell(i,pY).getNorth()!= Side.DOOR; i--)
 					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
-				toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
 
+				if (i > 0) toReturn.addAll(boardMap.getCell(i, pY).getPlayers());
 				// exploring south -> down
-				for(i = pY; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
+				for(i = pX + 1; i < boardMap.getXSize() &&
+						boardMap.getCell(i,pY).getSouth()!= Side.BORDER &&
+						boardMap.getCell(i,pY).getSouth()!= Side.WALL &&
+						boardMap.getCell(i,pY).getSouth()!= Side.DOOR; i++)
 					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
-				toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
+
+				if (i < boardMap.getXSize()) toReturn.addAll(boardMap.getCell(i, pY).getPlayers());
 
 				// keep only the ones at right distance
 				toReturn = intersection(toReturn,
@@ -784,25 +800,45 @@ public class AdrenalinaMatch {
 				// start from caller cell go in the four cardinal direction one at a time,
 				// stop when current cell has border or wall on the direction you are exploring
 
+				// Add self cell only once if minimum distance is 0. Also skip first cell for door visibility mechanics
+				if (minDistance == 0) toReturn.add(boardMap.getCell(pX, pY));
+
 				int i;
 				// exploring east -> right
-				for(i = pY; i<boardMap.getYSize() && boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
+				for(i = pY + 1; i < boardMap.getYSize() && boardMap.getCell(pX, i) != null &&
+						boardMap.getCell(pX, i).getEast()!= Side.BORDER &&
+						boardMap.getCell(pX, i).getEast()!= Side.WALL &&
+						boardMap.getCell(pX, i).getEast()!= Side.DOOR; i++)
 					toReturn.add(boardMap.getCell(pX, i));
-				toReturn.add(boardMap.getCell(pX, i));
+
+				if (i < boardMap.getYSize()) toReturn.add(boardMap.getCell(pX, i));
 				// exploring west -> left
-				for(i = pY; i>0 && boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
+				for(i = pY + 1; i > 0 && boardMap.getCell(pX, i) != null &&
+						boardMap.getCell(pX, i).getWest()!= Side.BORDER &&
+						boardMap.getCell(pX, i).getWest()!= Side.WALL &&
+						boardMap.getCell(pX, i).getWest()!= Side.DOOR; i--)
 					toReturn.add(boardMap.getCell(pX, i));
-				toReturn.add(boardMap.getCell(pX, i));
+
+				if (i > 0) toReturn.add(boardMap.getCell(pX, i));
 				// exploring north -> up
-				for(i = pX; i>0 && boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
+				for(i = pX + 1; i > 0 && boardMap.getCell(i, pY) != null &&
+						boardMap.getCell(i,pY).getNorth()!= Side.BORDER &&
+						boardMap.getCell(i,pY).getNorth()!= Side.WALL &&
+						boardMap.getCell(i,pY).getNorth()!= Side.DOOR; i--)
 					toReturn.add(boardMap.getCell(i,pY));
-				toReturn.add(boardMap.getCell(i, pY));
+
+				if (i > 0) toReturn.add(boardMap.getCell(i, pY));
 				// exploring south -> down
-				for(i = pX; i<boardMap.getXSize() && boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
+				for(i = pX + 1; i < boardMap.getXSize() && boardMap.getCell(i, pY) != null &&
+						boardMap.getCell(i,pY).getSouth()!= Side.BORDER &&
+						boardMap.getCell(i,pY).getSouth()!= Side.WALL &&
+						boardMap.getCell(i,pY).getSouth()!= Side.DOOR; i++)
 					toReturn.add(boardMap.getCell(i,pY));
-				toReturn.add(boardMap.getCell(i, pY));
+
+				if (i < boardMap.getXSize()) toReturn.add(boardMap.getCell(i, pY));
+
 				// keep only the ones at right distance
-				toReturn = intersection(toReturn, caller.getCellAtDistance(minDistance,maxDistance));
+				toReturn = intersection(toReturn, caller.getVisibleCellsAtDistance(minDistance,maxDistance));
 
 				break;
 			case "ANY":
@@ -825,7 +861,7 @@ public class AdrenalinaMatch {
 					List<Player> foundPlayers = getPlayersByID(id);
 
 					for(Player p: foundPlayers){
-						toReturn.addAll(p.getCellsToMove(maxDistance));
+						toReturn.addAll(p.getCellsToMove(minDistance, maxDistance));
 					}
 				} /*else {
 					List<Player> playersWithID = getPlayersByID(id);

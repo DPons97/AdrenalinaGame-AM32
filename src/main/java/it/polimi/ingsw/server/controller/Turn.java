@@ -144,7 +144,7 @@ public class Turn {
                     // SHOOT management
                     if (playing.getDmgPoints().size() >= 6) {
                         // Move 0 or 1 cell
-                        List<Cell> canMove = playing.getCellsToMove(1);
+                        List<Cell> canMove = playing.getCellsToMove(1, 1);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
                     }
@@ -214,7 +214,7 @@ public class Turn {
                         break;
                     case SHOOT:
                         // Move 0 or 1 cell
-                        List<Cell> canMove = playing.getCellsToMove(1);
+                        List<Cell> canMove = playing.getCellsToMove(1, 1);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
 
@@ -241,7 +241,7 @@ public class Turn {
                         break;
                     case SHOOT:
                         // Move 0, 1 or 2 cell
-                        List<Cell> canMove = playing.getCellsToMove(2);
+                        List<Cell> canMove = playing.getCellsToMove(1, 2);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
 
@@ -276,7 +276,7 @@ public class Turn {
     private boolean movePlayer(Player playing, int maxMoves) {
         // MOVE management
         // Select one of cells at 1, 2, 3 or 4 distance
-        List<Cell> selectable = playing.getCellsToMove(maxMoves);
+        List<Cell> selectable = playing.getCellsToMove(1, maxMoves);
         Cell destination = playing.getConnection().selectCell(selectable);
         if (destination != null) {
             playing.move(destination);
@@ -312,7 +312,7 @@ public class Turn {
      */
     private boolean playerPick(Player playing) {
         // Get cells that can be picked doing from 0 to 1 or 2 movements
-        List<Cell> canPick = playing.getCellsToMove((playing.getDmgPoints().size() >= 3) ? 2 : 1);
+        List<Cell> canPick = playing.getCellsToMove(1, (playing.getDmgPoints().size() >= 3) ? 2 : 1);
 
         return grabSomething(playing, canPick);
     }
@@ -327,8 +327,8 @@ public class Turn {
         // Get cells that can be picked doing from 0 to 1 or 2 movements
         List<Cell> canPick;
 
-        if (playingBeforeFirst) canPick = playing.getCellsToMove(2);
-        else canPick = playing.getCellsToMove(3);
+        if (playingBeforeFirst) canPick = playing.getCellsToMove(1, 2);
+        else canPick = playing.getCellsToMove(1, 3);
 
         return grabSomething(playing, canPick);
     }
@@ -631,6 +631,7 @@ public class Turn {
             if (!currentPlayer.getPowerups().contains(powerup)) currentPlayer.addPowerup(powerup);
         }
 
+        currentPlayer.removePowerup(toDiscard);
 
         // Spawn player in right cell
         Color spawnColor;

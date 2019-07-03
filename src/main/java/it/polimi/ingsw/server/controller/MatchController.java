@@ -195,9 +195,13 @@ public class MatchController {
 		// Final scoring
 		match.setMatchState(MatchState.FINAL_SCORING);
 		for (Player p : match.getPlayers()) {
-			// First to damage deadPlayer gets 1 point (First Blood)
-			if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
-			match.rewardPlayers(p.getDmgPoints(), p.getReward());
+			if (!p.getDmgPoints().isEmpty()) {
+				// First to damage deadPlayer gets 1 point (First Blood)
+				if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
+
+				// Score points as usual
+				match.rewardPlayers(p.getDmgPoints(), p.getReward());
+			}
 		}
 
 		// Give points to players in death track

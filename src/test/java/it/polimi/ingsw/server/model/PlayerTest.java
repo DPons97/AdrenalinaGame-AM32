@@ -275,7 +275,7 @@ class PlayerTest {
 
         testPlayer.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
 
-        List<Cell> canMoveTo = testPlayer.getCellsToMove(3);
+        List<Cell> canMoveTo = testPlayer.getCellsToMove(1, 3);
 
         Cell playerPos = testPlayer.getPosition();
         for (Direction dir : Direction.values()) {
@@ -534,6 +534,6 @@ class PlayerTest {
         Player player = new Player(testMatch, victimName);
         player.respawn(testMatch.getBoardMap().getSpawnPoints().get(0));
         player.move(testMatch.getBoardMap().getCell(0,0));
-        assertTrue(player.getCellsToMove(3).contains(testMatch.getBoardMap().getCell(1,0)));
+        assertTrue(player.getCellsToMove(1, 3).contains(testMatch.getBoardMap().getCell(1,0)));
     }
 }
