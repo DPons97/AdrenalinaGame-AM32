@@ -517,6 +517,7 @@ public class Player {
 
 		if (dmgPoints.size() == maxDamage + 1) {
 			// Player is dead, but not overkilled
+			System.out.println(nickname+" IS DEAD");
 			deaths++;
 			dead = true;
 			overkilled = false;

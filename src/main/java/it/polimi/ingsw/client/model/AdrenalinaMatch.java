@@ -200,14 +200,7 @@ public class AdrenalinaMatch {
      * @return true if is enabled
      */
     public boolean isFrenzyEnabled() {
-        return frenzyEnabled;
-    }
-
-    /**
-     * @param frenzyEnabled freanzyEnabled to set
-     */
-    public void setFrenzyEnabled(boolean frenzyEnabled) {
-        this.frenzyEnabled = frenzyEnabled;
+        return state == MatchState.FRENZY_TURN;
     }
 
     /**
@@ -283,6 +276,7 @@ public class AdrenalinaMatch {
         }
 
         this.state = MatchState.valueOf(o.get("state").toString());
+        System.out.println(this.state);
         this.map =  Map.parseJSON((JSONObject) o.get("map"), weapons, players);
 
         JSONArray deathTrackArray = (JSONArray) o.get("deathTrack");

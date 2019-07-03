@@ -42,7 +42,7 @@ public class Turn {
         Player currentPlayer = match.getTurnPlayer();
         if (currentPlayer.getConnection() == null) return;
 
-        if (match.getMatchState() != MatchState.FRENZY_TURN) {
+        if (!match.getMatchState().equals(MatchState.FRENZY_TURN)) {
             // Start round logic
             // Manage first turn
             if (match.getTurn()/match.getPlayers().size() == 0) respawnPlayer(currentPlayer);
@@ -59,6 +59,8 @@ public class Turn {
             }
             repopulateMap();
         } else {
+            System.out.println("STARTING FRENZY TURN");
+            repopulateMap();
             frenzyTurn(currentPlayer);
 
             try {
@@ -66,6 +68,7 @@ public class Turn {
             } catch (PlayerNotExistsException e) {
                 e.printStackTrace();
             }
+            repopulateMap();
 
             if (playedFrenzy.size() == match.getPlayers().size()){
                 // All player finished their frenzy turn. End game
@@ -150,6 +153,7 @@ public class Turn {
                     List<Weapon> loaded = playing.getWeapons().stream().filter(Weapon::isLoaded).collect(Collectors.toList());
                     if(!loaded.isEmpty()) {
                         WeaponSelection pickedWeapon = playing.getConnection().shoot(loaded);
+
                         if (executeShooting(playing, pickedWeapon)) {
                             remainingActions--;
                         }
@@ -438,6 +442,7 @@ public class Turn {
         List<Integer> effectIds = pickedWeapon.getEffectID();
 
         // Check all chosen effects are valid
+        if(pickedWeapon.getWeapon()==null || pickedWeapon.getWeapon().equals("")) return false;
         if (!getWeapon(pickedWeapon.getWeapon(), playing).isValidActionSequence(effectIds)) return false;
 
         // Check player can pay all the effects' cost
@@ -581,7 +586,7 @@ public class Turn {
 
                 // If frenzy enabled, flip dead player's board
                 if (match.getMatchState() == MatchState.FRENZY_TURN) p.enableFrenzy();
-
+                updatePlayers();
                 deadPlayers++;
             }
         }

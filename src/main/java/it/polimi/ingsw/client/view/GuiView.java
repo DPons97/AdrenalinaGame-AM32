@@ -334,6 +334,8 @@ public class GuiView extends ClientView{
     private List<ImageView> resources;
     private List<Node> nodesLeftBehid;
 
+    private List<Image> loadedImages;
+
     private boolean loading;
     private boolean initted;
 
@@ -353,6 +355,7 @@ public class GuiView extends ClientView{
         selection = new GuiSelection();
         nodes = new ArrayList<>();
         nodesLeftBehid = new ArrayList<>();
+        loadedImages = new ArrayList<>();
         initted = false;
     }
 
@@ -613,6 +616,7 @@ public class GuiView extends ClientView{
                 break;
             case LOADING:
             case PLAYER_TURN:
+            case FRENZY_TURN:
                 loading = true;
                 showGameBoard();
                 loading = false;
@@ -2082,16 +2086,21 @@ public class GuiView extends ClientView{
     private ImageView loadImage(String filePath){
         System.out.println(filePath);
         URL url = getClass().getResource(filePath);
-        System.out.println(url.toString());
-        //try {
-            //Image img = new Image(new FileInputStream(url.getFile().replace("%20", " ")));
-            Image img = new Image(url.toString().replace("%20", " "));
-            return new ImageView(img);
+        String urlString = url.toString().replace("%20", " ");
+        System.out.println(urlString);
+        Image img = getLoadedImage(urlString);
+        if(img == null ){ // image hasnt loadad yet
+            img = new Image(urlString);
+            loadedImages.add(img);
+        }
 
-        //} catch (FileNotFoundException e) {
-        //    e.printStackTrace();
-        //}
-        //return null;
+        return new ImageView(img);
+
+    }
+    private Image getLoadedImage(String url){
+        List<Image> loaded = loadedImages.stream().filter(i->i.getUrl().contains(url)).collect(Collectors.toList());
+        if(loaded.isEmpty())return null;
+        else return loaded.get(0);
     }
 
     private Double getWidth(ImageView i){

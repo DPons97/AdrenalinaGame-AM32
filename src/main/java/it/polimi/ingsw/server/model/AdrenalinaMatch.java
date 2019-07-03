@@ -786,19 +786,19 @@ public class AdrenalinaMatch {
 
 				int i;
 				// exploring east -> right
-				for(i = pY; boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
+				for(i = pY; i<boardMap.getYSize() && boardMap.getCell(pX, i).getEast()!= Side.BORDER && boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
 					toReturn.add(boardMap.getCell(pX, i));
 				toReturn.add(boardMap.getCell(pX, i));
 				// exploring west -> left
-				for(i = pY; boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
+				for(i = pY; i>0 && boardMap.getCell(pX, i).getWest()!= Side.BORDER && boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
 					toReturn.add(boardMap.getCell(pX, i));
 				toReturn.add(boardMap.getCell(pX, i));
 				// exploring north -> up
-				for(i = pX; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
+				for(i = pX; i>0 && boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
 					toReturn.add(boardMap.getCell(i,pY));
 				toReturn.add(boardMap.getCell(i, pY));
 				// exploring south -> down
-				for(i = pX; boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
+				for(i = pX; i<boardMap.getXSize() && boardMap.getCell(i,pY).getNorth()!= Side.BORDER && boardMap.getCell(i,pY).getNorth()!= Side.WALL; i++)
 					toReturn.add(boardMap.getCell(i,pY));
 				toReturn.add(boardMap.getCell(i, pY));
 				// keep only the ones at right distance
