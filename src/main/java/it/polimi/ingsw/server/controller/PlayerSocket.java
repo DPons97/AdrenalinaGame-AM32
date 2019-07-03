@@ -452,7 +452,11 @@ public class PlayerSocket extends PlayerConnection {
 		JSONArray leaderboardArray = new JSONArray();
 		msg.put("function", "update");
 		msg.put("type", "leaderboard");
-		leaderboard.forEach(p->leaderboardArray.add(p.getNickname()));
+		System.out.println("SOCKET SHOW LEADERBOARD");
+		leaderboard.forEach(p->{
+			leaderboardArray.add(p.getNickname());
+			System.out.println(p.getNickname());
+		});
 		msg.put("leaderboard", leaderboardArray);
 		this.sendInstruction(msg);
 	}
