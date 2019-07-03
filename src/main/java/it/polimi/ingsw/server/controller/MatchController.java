@@ -200,6 +200,7 @@ public class MatchController {
 				if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
 
 				// Score points as usual
+
 				match.rewardPlayers(p.getDmgPoints(), p.getReward());
 			}
 		}

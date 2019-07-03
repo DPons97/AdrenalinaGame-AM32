@@ -307,8 +307,9 @@ public class PlayerSocket extends PlayerConnection {
 		String selected = this.getResponse();
 
 		if (selected == null || selectable.isEmpty()) return null;
-		return selectable.stream().filter(p->p.toJSON().toString().equals(selected))
-				.collect(Collectors.toList()).get(0);
+		List<Powerup> matching = selectable.stream().filter(p->p.toJSON().toString().equals(selected))
+				.collect(Collectors.toList());
+		return matching.isEmpty() ? null : matching.get(0);
 	}
 
 	/**

@@ -334,18 +334,19 @@ public class SocketClient extends ServerConnection {
 								lock.notifyAll();
 							}
 						}
+						break;
+					case "leaderboard":
+						List<String> user = new ArrayList<>();
+						JSONArray jsonArray= (JSONArray) message.get("leaderboard");
+						for(Object o: jsonArray){
+							user.add(o.toString());
+						}
+						System.out.println("RECEIVED SHOW LEADERBOARD");
+						player.showLeaderboard(user);
+
+						break;
 					default:
 				}
-				break;
-			case "leaderboard":
-				List<String> user = new ArrayList<>();
-				JSONArray jsonArray= (JSONArray) message.get("leaderboard");
-				for(Object o: jsonArray){
-					user.add(o.toString());
-				}
-				System.out.println("RECEIVED SHOW LEADERBOARD");
-				player.showLeaderboard(user);
-
 				break;
 			case "alert":
 				player.alert(message.get("msg").toString());
