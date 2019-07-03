@@ -349,7 +349,7 @@ public class Player {
 		this.dead = Boolean.parseBoolean(toParse.get("dead").toString());
 		this.color = Color.valueOf(toParse.get("color").toString());
 		this.isFrenzyPlayer = Boolean.parseBoolean(toParse.get("isFrenzyPlayer").toString());
-
+		this.score = Integer.parseInt(toParse.get("score").toString());
 		JSONArray weaponsArray = (JSONArray) toParse.get("weapons");
 		JSONArray powerupsArray = (JSONArray) toParse.get("powerups");
 		JSONArray marksArray = (JSONArray) toParse.get("marks");

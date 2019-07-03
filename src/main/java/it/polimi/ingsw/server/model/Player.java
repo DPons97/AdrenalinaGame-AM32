@@ -881,7 +881,7 @@ public class Player {
 		player.put("ammos", ammosArray);
 		player.put("loadedweapons", loadedWeaponsArray);
 		player.put("color", color.toString());
-
+		player.put("score", score);
 		return player;
 	}
 

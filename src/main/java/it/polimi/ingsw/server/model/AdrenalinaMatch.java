@@ -501,7 +501,7 @@ public class AdrenalinaMatch {
 	 */
 	public void nextTurn() {
 	    turn++;
-	    if (state != MatchState.FRENZY_TURN) setMatchState(MatchState.PLAYER_TURN);
+	    if (state != MatchState.FRENZY_TURN && state != MatchState.ENDED) setMatchState(MatchState.PLAYER_TURN);
 	}
 
 	/**
