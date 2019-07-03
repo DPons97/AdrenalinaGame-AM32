@@ -1797,7 +1797,7 @@ public class GuiView extends ClientView{
     private void loadDeathTrack(Pane root) {
         List<Player> deathtrack = player.getMatch().getDeathTrack();
         List<Boolean> overkills = player.getMatch().getOverkills();
-        for(int i = 0, j = 0; i<overkills.size(); i++, j++){
+        for(int i = 0, j = 0; j<overkills.size(); i++, j++){
             ImageView droplet = getDropletImage(deathtrack.get(i));
             droplet.setY(DEATHTRACK_DROPLET_Y0*height);
             droplet.setX(DEATHTRACK_DROPLET_X0*width+DEATHTRACK_DROPLET_OFFSET_X*height*j);

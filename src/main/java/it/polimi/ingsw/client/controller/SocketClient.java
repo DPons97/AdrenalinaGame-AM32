@@ -343,7 +343,8 @@ public class SocketClient extends ServerConnection {
 				for(Object o: jsonArray){
 					user.add(o.toString());
 				}
-				player.showLeaderboard(user		);
+				System.out.println("RECEIVED SHOW LEADERBOARD");
+				player.showLeaderboard(user);
 
 				break;
 			case "alert":
