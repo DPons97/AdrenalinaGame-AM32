@@ -33,7 +33,7 @@ public class AdrenalinaMatch {
 	/**
 	 * Minimum number of players in a game (as defined in rules)
 	 */
-	private static int minPlayers = 3;
+	private static int minPlayers = 2;
 
 	/**
 	 * Reference to map

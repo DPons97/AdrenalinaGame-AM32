@@ -1,16 +1,14 @@
 package it.polimi.ingsw.client.view;
 
 import it.polimi.ingsw.client.controller.ClientPlayer;
-import it.polimi.ingsw.client.model.*;
-import it.polimi.ingsw.client.model.AdrenalinaMatch;
-import it.polimi.ingsw.client.model.AmmoCell;
 import it.polimi.ingsw.client.model.Cell;
-import it.polimi.ingsw.client.model.Map;
-import it.polimi.ingsw.client.model.Player;
-import it.polimi.ingsw.client.model.SpawnCell;
+import it.polimi.ingsw.client.model.*;
 import it.polimi.ingsw.server.controller.TurnAction;
 import it.polimi.ingsw.server.controller.WeaponSelection;
-import it.polimi.ingsw.server.model.*;
+import it.polimi.ingsw.server.model.Ammo;
+import it.polimi.ingsw.server.model.MatchState;
+import it.polimi.ingsw.server.model.Powerup;
+import it.polimi.ingsw.server.model.Resource;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,7 +23,10 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -38,8 +39,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -2031,7 +2030,7 @@ public class GuiView extends ClientView{
             addNode(root,weaponImg);
             weapons.add(weaponImg);
             if(!player.getThisPlayer().getLoadedWeapons().contains(weapon)){
-                ImageView toreloadView = new ImageView(TO_RELOAD_PATH);
+                ImageView toreloadView = loadImage(TO_RELOAD_PATH);
                 toreloadView.setX(DASHBOARD_WEAPON_X*width+DASHBOARD_WEAPON_OFFSET_X*height*i);
                 toreloadView.setY(DASHBOARD_WEAPON_Y*height);
                 toreloadView.setPreserveRatio(true);
