@@ -43,6 +43,7 @@ public class GuiSelection {
     }
 
     public void setNodeClickable(Node node, String value){
+        System.out.println("SETTING LISTENR WITH RETURN VALUE: "+value);
         Platform.runLater(()->{
             node.setViewOrder(-100);
             node.setOnMouseClicked(new EventHandler<MouseEvent>() {

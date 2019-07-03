@@ -1490,7 +1490,9 @@ public class GuiView extends ClientView{
                             selection.setNodeClickable(w, selectable);
                             setClickableEffects(w);
                             System.out.println("SETTING CLICKABLE "+selectable);
-                            w.setViewOrder(-100);
+                            if(!FXWindow.getPane().getChildren().contains(w)){
+                                FXWindow.getPane().getChildren().add(w);
+                            }
                         });
             });
         });
