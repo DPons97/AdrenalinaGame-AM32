@@ -1466,12 +1466,13 @@ public class GuiView extends ClientView{
                             selection.setNodeClickable(w, selectable);
                             setClickableEffects(w);
                             System.out.println("SETTING CLICKABLE "+selectable);
+                            w.setViewOrder(-100);
                         });
             });
         });
         // get selected weapon
         String weaponSelected = selection.getValue();
-        if(weaponSelected.equals(""))return null;
+        if(weaponSelected.equals(""))return new WeaponSelection(null, null, null);
 
         WeaponCard weaponCardSelected = player.getMatch().getWeaponByName(weaponSelected);
         // remove weapon  button
