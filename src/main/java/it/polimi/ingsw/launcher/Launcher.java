@@ -44,10 +44,32 @@ public class Launcher{
     public void startLaunherCli(){
 
         Scanner in = new Scanner(System.in);
-        System.out.print("Launch as Server [0] or Client [1]?");
-        if(in.nextInt()==0)
+        int selected ;
+        do {
+            System.out.print("Launch as Server [0] or Client [1]?");
+            try {
+                selected = in.nextInt();
+            }catch(Exception e){
+                in.nextLine();
+                selected = -1;
+            }
+        }while(!(selected == 0 || selected == 1));
+        if(selected==0)
         {
-            startServer();
+            LoginHandler started;
+            do {
+                int port;
+                do {
+                    System.out.println("Listen on port: ");
+                    try {
+                        port = in.nextInt();
+                    } catch (Exception e) {
+                        in.nextLine();
+                        port = 0;
+                    }
+                } while (port == 0);
+                started = startServer(port);
+            }while(started == null);
         } else {
             int res = 1;
             do{
@@ -56,7 +78,12 @@ public class Launcher{
                 System.out.print("Server address: ");
                 serverddress = in.next();
                 System.out.print("Server port: ");
-                port = in.nextInt();
+                try {
+                    port = in.nextInt();
+                }catch (Exception e){
+                    in.nextLine();
+                    continue;
+                }
                 System.out.print("Connection type [Socket 0, RMI 1]");
                 ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
                 System.out.print("Nickname: ");
@@ -126,12 +153,12 @@ public class Launcher{
             grid.add(labelSktRmi, 0, 3);
             grid.add(srBox, 1, 3);
 
-
             Label ip = new Label("Ip:");
             grid.add(ip, 0, 5);
 
             TextField ipBox = new TextField();
             grid.add(ipBox, 1, 5);
+            ipBox.setViewOrder(-1);
 
             Label port = new Label("Port:");
             grid.add(port, 0, 6);
@@ -149,14 +176,24 @@ public class Launcher{
 
                 return null;
             };
-            TextFormatter<String> textFormatter = new TextFormatter<>(filter);
-            portBox.setTextFormatter(textFormatter);
+            TextFormatter<String> textFormatterPort = new TextFormatter<>(filter);
+            portBox.setTextFormatter(textFormatterPort);
+
+            Label portServer = new Label("Port:");
+            grid.add(portServer, 0, 3);
+            portServer.setVisible(false);
+
+            TextField portBoxServer = new TextField();
+            grid.add(portBoxServer, 1, 3);
+            portBoxServer.setVisible(false);
+            TextFormatter<String> textFormatterPortServer = new TextFormatter<>(filter);
+            portBoxServer.setTextFormatter(textFormatterPortServer);
 
             Button btnServer = new Button("START SERVER");
             HBox hbBtnServer = new HBox(10);
             hbBtnServer.setAlignment(Pos.BOTTOM_RIGHT);
             hbBtnServer.getChildren().add(btnServer);
-            grid.add(hbBtnServer, 1, 4);
+            grid.add(hbBtnServer, 1, 5);
             btnServer.setVisible(false);
 
             Button btnClient = new Button("START CLIENT");
@@ -177,9 +214,11 @@ public class Launcher{
                 userName.setVisible(!rbServer.isSelected());
                 userTextField.setVisible(!rbServer.isSelected());
                 ip.setVisible(!rbServer.isSelected());
-                ipBox.setVisible(!rbServer.isSelected());
                 port.setVisible(!rbServer.isSelected());
                 portBox.setVisible(!rbServer.isSelected());
+                ipBox.setVisible(!rbServer.isSelected());
+                portServer.setVisible(rbServer.isSelected());
+                portBoxServer.setVisible(rbServer.isSelected());
                 btnClient.setVisible(!rbServer.isSelected()); //CLIENT
                 btnServer.setVisible(rbServer.isSelected()); //SERVER
                 srBox.setVisible(!rbServer.isSelected());
@@ -190,9 +229,11 @@ public class Launcher{
                 userTextField.setVisible(rbClient.isSelected());
                 userName.setVisible(rbClient.isSelected());
                 ip.setVisible(rbClient.isSelected());
-                port.setVisible(rbClient.isSelected());
                 ipBox.setVisible(rbClient.isSelected());
+                port.setVisible(rbClient.isSelected());
                 portBox.setVisible(rbClient.isSelected());
+                port.setVisible(rbServer.isSelected());
+                portBox.setVisible(rbServer.isSelected());
                 btnServer.setVisible(!rbClient.isSelected()); //SERVER
                 btnClient.setVisible(rbClient.isSelected()); //CLIENT
                 srBox.setVisible(rbClient.isSelected());
@@ -231,7 +272,13 @@ public class Launcher{
             btnServer.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    LoginHandler server = startServer();
+                    LoginHandler server;
+                    try{
+                        server = startServer(Integer.parseInt(portBoxServer.getText()));
+                    }catch (Exception e2) {
+                        e2.printStackTrace();
+                        server =startServer();
+                    }
                     grid.getChildren().clear();
                     if(server != null) {
                         Text scenetitle = new Text("Adrenalina server is running...");
@@ -258,6 +305,24 @@ public class Launcher{
 
     public LoginHandler startServer(){
         return LoginHandler.startServer();
+    }
+
+    public LoginHandler startServer(String port){
+        try {
+            int toSet = Integer.parseInt(port);
+            return LoginHandler.startServer(toSet);
+        } catch (Exception e){
+            e.printStackTrace();
+            return LoginHandler.startServer();
+        }
+    }
+
+    public LoginHandler startServer(int port){
+        try {
+            return LoginHandler.startServer(port);
+        } catch (Exception e){
+            return null;
+        }
     }
 
     public int startClient(String server, int port, String nick, ConnectionType c, int view){
@@ -334,7 +399,11 @@ public class Launcher{
             else l.startLauncherGui();
         } else {
             if(l.parseMode(argsList).equals("s")){
-                l.startServer();
+                if(l.parseServerPort(argsList) != null){
+                    l.startServer(l.parseServerPort(argsList));
+                } else {
+                    l.startServer();
+                }
             } else {
                 int port = Integer.parseInt(l.parseServerPort(argsList));
                 String server = l.parseServerAddress(argsList);

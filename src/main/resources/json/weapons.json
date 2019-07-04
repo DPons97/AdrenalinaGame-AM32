@@ -28,7 +28,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": 12
+            "value": 2
           },
           {
             "type": "MARK",
@@ -306,7 +306,7 @@
           },
           {
             "type": "DAMAGE",
-            "value": 12
+            "value": 2
           }
         ]
       },

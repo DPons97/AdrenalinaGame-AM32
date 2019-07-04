@@ -570,7 +570,7 @@ public class GuiView extends ClientView{
                 Scene scene = new Scene(borders, stage.getScene().getWidth(), stage.getScene().getHeight());
                 borders.setCenter(root);
                 stage.setScene(scene);
-                stage.setMaximized(true);
+                stage.setFullScreen(true);
                 stage.setResizable(false);
 
                 double pV, pH;

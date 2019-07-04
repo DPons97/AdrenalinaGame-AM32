@@ -325,6 +325,22 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		return loginHandler;
 	}
 
+	public static LoginHandler startServer(int port){
+		LoginHandler loginHandler;
+		try {
+			loginHandler = new LoginHandler(port, port+1);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+		Thread t1 = new Thread(loginHandler::listenSocketConnection);
+		t1.start();
+		Thread t2 = new Thread(loginHandler::checkRMIConnections);
+		t2.start();
+		return loginHandler;
+	}
+
 	/*
      * Main method to test connections
      */
