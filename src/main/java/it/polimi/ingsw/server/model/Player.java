@@ -384,8 +384,14 @@ public class Player {
 	public List<Integer> getReward() {
 
 		if(this.deaths <= 0 && match.getMatchState()!=MatchState.NOT_STARTED){
-			if(match.getMatchState() == MatchState.ENDED) return new ArrayList<>(Arrays.asList());
-			else return new ArrayList<>();
+			if(match.getMatchState() == MatchState.ENDED){
+				List<Integer> toReturn = new ArrayList<>();
+				for(int i: frenzyRewards){
+					toReturn.add(i);
+				}
+				return toReturn;
+			}
+			else if(getDmgPoints().isEmpty()) return new ArrayList<>();
 		}
 
 		int[] currentRewards = (isFrenzyPlayer) ? frenzyRewards : killRewards;
