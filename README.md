@@ -38,9 +38,9 @@ Parameters can be written in any order and the read ones are:<br>
 - -m (mode) follower by c for client or s for server<br>
 - -gui to load a graphical user interface<br>
 - -cli to load a command line interface (if both -cli and -gui are passed it will load only the gui) <br>
-- -p in case of client, to specify server port<br>
-- -c in case of client, to specify connection type: followed by r for rmi or s for socket<br>
-- -n in case of client, followed by a string to specify client nickname<br>
+- -p (port) in case of client, to specify server port<br>
+- -c (connection) in case of client, to specify connection type: followed by r for rmi or s for socket<br>
+- -n (nickname) in case of client, followed by a string to specify client nickname<br>
 
 for example:
 - to launch a server in the cli just pass: -m s
