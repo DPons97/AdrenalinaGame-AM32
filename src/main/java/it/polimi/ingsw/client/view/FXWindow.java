@@ -33,7 +33,7 @@ public class FXWindow extends Application {
 
         primaryStage.setTitle("Adrenalina: the best game ever made. \"ITS FUN COZ YOU SHOOT\"");
 
-        stage.setMaximized(true);
+        stage.setFullScreen(true);
         stage.setResizable(false);
 
         Scene scene = new Scene(mainPane,stage.getWidth(), stage.getHeight());

@@ -119,7 +119,7 @@
           <artifactId>javafx-maven-plugin</artifactId>
           <version>0.0.2</version>
           <configuration>
-            <mainClass>src/main/java/it.polimi.ingsw.client.view.FXExample</mainClass>
+            <mainClass>src/main/java/it.polimi.ingsw.client.view.FXWindow</mainClass>
           </configuration>
         </plugin>
         <!--end of JAVA FX-->
