@@ -1,0 +1,8 @@
+module:AdrenalinaGame
+it.polimi.ingsw.client.controller
+it.polimi.ingsw.client.model
+it.polimi.ingsw.client.view
+it.polimi.ingsw.custom_exceptions
+it.polimi.ingsw.launcher
+it.polimi.ingsw.server.controller
+it.polimi.ingsw.server.model

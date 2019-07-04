@@ -85,7 +85,7 @@ public class SocketClient extends ServerConnection {
 
 	/**
 	 *	Gets last message sent from client or waits for it until it comes.
-	 * @returns string from server
+	 * @return string from server
 	 */
 	private String getResponse(){
 		String msg;
