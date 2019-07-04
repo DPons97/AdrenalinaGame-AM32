@@ -239,6 +239,9 @@ public class MatchController {
 
 
 		match.setMatchState(MatchState.ENDED);
+		// update players
+		match.getPlayers().stream().filter(player -> player.getConnection() != null)
+				.forEach(p -> p.getConnection().updateMatch(match));
 		return leaderBoard;
 	}
 
