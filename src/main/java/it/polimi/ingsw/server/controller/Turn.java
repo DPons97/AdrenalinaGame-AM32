@@ -409,7 +409,6 @@ public class Turn {
      */
     private boolean grabSomething(Player playing, List<Cell> canPick) {
         // PICK management
-        canPick.add(playing.getPosition());
         removeEmptyCells(canPick);
 
         // Remove cells with no pickable weapons

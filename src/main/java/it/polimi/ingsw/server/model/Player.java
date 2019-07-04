@@ -610,6 +610,7 @@ public class Player {
 		// Remove all cells below min movement
 		if (minMovement > 0) canMoveTo.removeAll(getCellAtDistance(0, minMovement - 1));
 
+		// Remove duplicates
 		return canMoveTo;
 	}
 
