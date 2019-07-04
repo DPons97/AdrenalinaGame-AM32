@@ -190,6 +190,7 @@ public class Turn {
         // Calculate available actions
         if (playing.equals(match.getFirstPlayer())) {
             match.setFirstPlayedFrenzy(true);
+            updatePlayers();
         }
 
         if (match.isFirstPlayedFrenzy()) remainingActions = 1;
