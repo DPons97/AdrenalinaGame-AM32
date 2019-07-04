@@ -1710,6 +1710,21 @@
             ]
           },
           {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "SELF",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
+            ]
+          },
+          {
             "type": "MOVE"
           },
           {
@@ -1742,6 +1757,21 @@
             "distance": [
               0,
               0
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": -1,
+            "target": "SELF",
+            "from": "ANY",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              -1
             ]
           },
           {
