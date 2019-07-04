@@ -25,9 +25,6 @@ class PlayerTest {
         Player victimPlayer = new Player(testMatch, victimName);
         Player killerPlayer = new Player(testMatch, killerName);
 
-        // Victim never died
-        assertTrue(victimPlayer.getReward().isEmpty());
-
         // Kill victim until reward list is constant
         for (int i=0; i < Player.getKillRewards().size(); i++) {
             // Kill victim

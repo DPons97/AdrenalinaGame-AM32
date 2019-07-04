@@ -381,8 +381,6 @@ public class Player {
 	 * @return last kill reward list. Empty list if player never died
 	 */
 	public List<Integer> getReward() {
-		// Player never died
-		if (deaths <= 0) return new ArrayList<>();
 
 		int[] currentRewards = (isFrenzyPlayer) ? frenzyRewards : killRewards;
 
