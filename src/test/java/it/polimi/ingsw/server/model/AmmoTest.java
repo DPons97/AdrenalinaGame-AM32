@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AmmoTest {
 
+    /**
+     * Tests constructors correctness
+     */
     @Test
     void ammoTestConstructor1(){
         Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX, Resource.BLUE_BOX);
@@ -16,6 +19,9 @@ class AmmoTest {
         assertEquals(3,a.getResources().size());
     }
 
+    /**
+     * Test contructor correctness
+     */
     @Test
     void ammoTestConstructor2(){
         Ammo a = new Ammo(Resource.RED_BOX, Resource.YELLOW_BOX);

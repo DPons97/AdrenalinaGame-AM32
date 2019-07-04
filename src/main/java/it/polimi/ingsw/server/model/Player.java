@@ -381,8 +381,6 @@ public class Player {
 	 * @return last kill reward list. Empty list if player never died
 	 */
 	public List<Integer> getReward() {
-		// Player never died
-		if (deaths <= 0) return new ArrayList<>();
 
 		int[] currentRewards = (isFrenzyPlayer) ? frenzyRewards : killRewards;
 
@@ -556,7 +554,7 @@ public class Player {
 	 * @param minDist Minimum distance
 	 * @param maxDist Maximum distance. -1 is equal to INFINITE
 	 * @return List of all cells between [minDist] and [maxDist] distance from player
-	 * @throws IllegalArgumentException if minDist < 0 or maxDist < -1
+	 * @throws IllegalArgumentException if minDist less than 0 or maxDist less than -1
 	 */
 	public List<Cell> getCellAtDistance(int minDist, int maxDist) {
 		return match.getBoardMap().getCellAtDistance(position, minDist, maxDist);

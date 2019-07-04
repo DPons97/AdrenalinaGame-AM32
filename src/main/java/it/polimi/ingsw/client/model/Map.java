@@ -36,7 +36,9 @@ public class Map {
     private int ySize;
 
     /**
-     * @param o json to parsee 1e
+     * @param obj json to parse
+     * @param weaponList list of weaponcards in game
+     * @param playersList list of players in game
      * @return parsed Map object
      */
     public static Map parseJSON(JSONObject obj, List<WeaponCard> weaponList, List<Player> playersList) {

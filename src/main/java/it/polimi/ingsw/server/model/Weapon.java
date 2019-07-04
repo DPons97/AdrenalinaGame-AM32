@@ -103,9 +103,9 @@ public abstract class Weapon implements Serializable {
 
 	/**
 	 * @return list of possible shoot actions.
-	 * 			[0] -> Primary action / mode
-	 * 			[1] -> First optional / secondary mode
-	 * 			[2] -> Second optional / null
+	 * 			[0]  Primary action / mode
+	 * 			[1]  First optional / secondary mode
+	 * 			[2]  Second optional / null
 	 */
 	public abstract List<Action> getShootActions();
 
@@ -121,8 +121,7 @@ public abstract class Weapon implements Serializable {
 	public abstract boolean isValidActionSequence(List<Integer> sequence);
 
 	/**
-	 * @param actions json object read from weapon file
-	 * @return
+	 * @param actions json object read from weapon file*
 	 */
 	protected abstract void parseEffects(JSONObject actions);
 

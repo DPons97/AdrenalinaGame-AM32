@@ -92,7 +92,18 @@ public class Lobby {
 
     /**
      * Create and add a new match to the lobby
+     * @param lobby lobby controller to pass to match
+     * @param host player hosting the match
+     * @param maxPlayers for the game
+     * @param maxDeaths for the game
+     * @param turnDuration in seconds
+     * @param mapID of the map to play
      * @return Controller to new match
+     * @throws TooManyPlayersException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     * @throws TooManyMatchesException
+     * @throws PlayerNotExistsException
      */
     public MatchController createMatch(LobbyController lobby, PlayerConnection host, int maxPlayers, int maxDeaths, int turnDuration, int mapID) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException, TooManyMatchesException, PlayerNotExistsException {
         if (matches.size() >= maxMatches) throw new TooManyMatchesException();

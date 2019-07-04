@@ -15,6 +15,9 @@ import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Checks the correctness of the weapon parser
+ */
 class WeaponCardTest {
 
     @Test

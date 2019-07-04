@@ -57,6 +57,7 @@ public class AmmoCell extends Cell {
 
 	/**
 	 * @param toPlace ammo card to place on cell
+	 * @throws AmmoAlreadyOnCellException
 	 */
 	public void setAmmo(Ammo toPlace) throws AmmoAlreadyOnCellException {
 		if(resource==null){

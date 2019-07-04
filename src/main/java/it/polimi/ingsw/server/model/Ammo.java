@@ -22,6 +22,9 @@ public class Ammo {
 
 	/**
 	 * Constructor for ammo card with 3 resources
+	 * @param res1 first resource
+	 * @param res2 second resource
+	 * @param res3 third resource
 	 */
 	public Ammo(Resource res1, Resource res2, Resource res3) {
 		this.resources = new ArrayList<>();
@@ -33,6 +36,8 @@ public class Ammo {
 
     /**
      * Constructor for ammo card with 2 resources and a perk card
+	 * @param res1 first resource
+	 * @param res2 second resource
      */
 	public Ammo(Resource res1, Resource res2) {
 		this.resources = new ArrayList<>();

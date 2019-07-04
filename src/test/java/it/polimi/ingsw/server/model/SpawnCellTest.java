@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SpawnCellTest {
 
+    /**
+     * Test addWeapon method
+     * @throws InventoryFullException
+     */
     @Test
     void addWeapons() throws InventoryFullException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);

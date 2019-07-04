@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MapTest {
+    /**
+     * Loads all maps and checks topology
+     */
     @Test
     void checkMaps(){
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);

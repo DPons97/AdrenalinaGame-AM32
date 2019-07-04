@@ -1428,7 +1428,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "PLAYER",
             "from": "VISIBLE",
             "differentCells": false,
@@ -1444,6 +1444,21 @@
           {
             "type": "DAMAGE",
             "value": 1
+          },
+          {
+            "type": "SELECT",
+            "ID": 1,
+            "target": "PLAYER",
+            "from": "1",
+            "differentCells": false,
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
           },
           {
             "type": "MARK",

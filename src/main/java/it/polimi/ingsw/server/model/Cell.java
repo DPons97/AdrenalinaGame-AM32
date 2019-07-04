@@ -74,21 +74,21 @@ public abstract class Cell {
 	}
 
 	/**
-	 * return the cell id
+	 * @return the cell id
 	 */
 	public int getID() {
 		return id;
 	}
 
 	/**
-	 * set cell id
+	 * @param id set cell id
 	 */
 	public void setID(int id) {
 		this.id = id;
 	}
 
 	/**
- 	 * @param direction
+ 	 * @param direction to get the corresponding side
 	 * @return type of side in [direction]
 	 */
 	public Side getSide(Direction direction) {
@@ -107,25 +107,25 @@ public abstract class Cell {
 	}
 
 	/**
-	 * return the north side
+	 * @return the north side
 	 */
 	public Side getNorth() {
 		return north;
 	}
 	/**
-	 * return the south side
+	 * @return the south side
 	 */
 	public Side getSouth() {
 		return south;
 	}
 	/**
-	 * return the west side
+	 * @return the west side
 	 */
 	public Side getWest() {
 		return west;
 	}
 	/**
-	 * return the east side
+	 * @return the east side
 	 */
 	public Side getEast() {
 		return east;

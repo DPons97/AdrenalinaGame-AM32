@@ -10,7 +10,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class AdrenalinaMatchTest {
 
     /**
-     *  tests add death method
+     * tests add death method, it should not trhow any exception
+     * @throws PlayerNotExistsException
+     * @throws MatchAlreadyStartedException
+     * @throws TooManyPlayersException
+     * @throws PlayerAlreadyExistsException
      */
     @Test
     void addDeath() throws PlayerNotExistsException, MatchAlreadyStartedException, TooManyPlayersException, PlayerAlreadyExistsException {
@@ -41,6 +45,13 @@ class AdrenalinaMatchTest {
         assertSame(MatchState.FRENZY_TURN, testMatch.getMatchState());
     }
 
+    /**
+     * Tests startMatch method
+     * @throws MatchAlreadyStartedException
+     * @throws TooManyPlayersException
+     * @throws NotEnoughPlayersException
+     * @throws PlayerAlreadyExistsException
+     */
     @Test
     void startMatch() throws MatchAlreadyStartedException, TooManyPlayersException, NotEnoughPlayersException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
@@ -54,6 +65,9 @@ class AdrenalinaMatchTest {
         assertThrows(MatchAlreadyStartedException.class, testMatch::startMatch);
     }
 
+    /**
+     * Test the checks made when  adding players to a match
+     */
     @Test
     public void addPlayer() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3, 5,120, 1);
@@ -69,6 +83,12 @@ class AdrenalinaMatchTest {
         assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.addPlayer(new Player(testMatch, "testPlayer5")));
     }
 
+    /**
+     * tests kicking function
+     * @throws TooManyPlayersException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     */
     @Test
     public void kickPlayer() throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 5,120, 1);
@@ -90,6 +110,14 @@ class AdrenalinaMatchTest {
         assertThrows(MatchAlreadyStartedException.class, ()-> testMatch.kickPlayer(p2));
     }
 
+    /**
+     * test the reward mechanism, shouldn't throw any exception
+     * @throws DeadPlayerException
+     * @throws PlayerNotExistsException
+     * @throws TooManyPlayersException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     */
     @Test
     public void rewardPlayer() throws DeadPlayerException, PlayerNotExistsException, TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 6,120, 1);

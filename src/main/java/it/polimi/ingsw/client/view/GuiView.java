@@ -231,10 +231,10 @@ public class GuiView extends ClientView{
     private static final double WEAPON_EFFECT_BUTTON_UNDO_Y = 0.79;
 
     // use resources button
-    private static final String USE_RESOURCES_PATH = "/img/others/buttonresources.png";
-    private static final double USE_RESOURCES_SIZE = 0.1;
-    private static final double USE_RESOURCES_Y= 0.73;
-    private static final double USE_RESOURCES_X = 0.03;
+    private static final String NO_POWERUP_PATH = "/img/others/buttonnopowerup.png";
+    private static final double NO_POWERUP_SIZE = 0.1;
+    private static final double NO_POWERUP_Y = 0.73;
+    private static final double NO_POWERUP_X = 0.03;
 
     // button no reload
     private static final String NO_RELOAD_PATH = "/img/others/buttonnoreload.png";
@@ -1243,20 +1243,6 @@ public class GuiView extends ClientView{
             return new WeaponSelection("", new ArrayList<>(), new ArrayList<>());
         }
 
-        // show button to stop using powerups
-        Platform.runLater(()-> {
-            ImageView buttonResources = loadImage(USE_RESOURCES_PATH);
-            buttonResources.setPreserveRatio(true);
-            buttonResources.setFitWidth(USE_RESOURCES_SIZE*width);
-            buttonResources.setX(USE_RESOURCES_X*width);
-            buttonResources.setY(USE_RESOURCES_Y*height);
-            FXWindow.getPane().getChildren().add(buttonResources);
-            toRemove.add(buttonResources);
-            nodesLeftBehid.add(buttonResources);
-            selection.setNodeClickable(buttonResources, "-1");
-            setButtonEffects(buttonResources);
-        });
-
         // shoot was pressed -> get cost of effects selected and make player select powerups
         List<Resource> toPay = new ArrayList<>();
         selectedEffects.forEach(effect -> toPay.addAll(effect.getCost()));
@@ -1429,28 +1415,8 @@ public class GuiView extends ClientView{
           toPay.remove(0);
         }
 
-        List<ImageView> toRemove = new ArrayList<>();
-        // show button to stop using powerups
-        Platform.runLater(()-> {
-            ImageView buttonResources = loadImage(USE_RESOURCES_PATH);
-            buttonResources.setPreserveRatio(true);
-            buttonResources.setFitWidth(USE_RESOURCES_SIZE*width);
-            buttonResources.setX(USE_RESOURCES_X*width);
-            buttonResources.setY(USE_RESOURCES_Y*height);
-            FXWindow.getPane().getChildren().add(buttonResources);
-            toRemove.add(buttonResources);
-            nodesLeftBehid.add(buttonResources);
-            selection.setNodeClickable(buttonResources, "-1");
-            setButtonEffects(buttonResources);
-        });
-
-
         List<Powerup> selectedPowerups = new ArrayList<>();
         payWithPowerups(toPay, selectedPowerups);
-
-        Platform.runLater(()->{
-            FXWindow.getPane().getChildren().removeAll(toRemove);
-        });
 
         WeaponSelection selected= new WeaponSelection();
         selected.setWeapon(weaponCardSelected.getName());
@@ -1530,9 +1496,25 @@ public class GuiView extends ClientView{
     @Override
     public Powerup selectPowerup(List<Powerup> selectables) {
         waitLoading();
-        if(player.getMatch().getPlayerByName(player.getNickname()).getPowerups().containsAll(selectables)) { // is a standard selection
+        if(selectables.size() <= player.getThisPlayer().getPowerups().size() && player.getMatch().getPlayerByName(player.getNickname()).getPowerups().containsAll(selectables)) { // is a standard selection
             // set buttons
             Platform.runLater(()->{
+
+                List<ImageView> toRemove = new ArrayList<>();
+
+                // show button to stop using powerups
+                ImageView buttonResources = loadImage(NO_POWERUP_PATH);
+                buttonResources.setPreserveRatio(true);
+                buttonResources.setFitWidth(NO_POWERUP_SIZE *width);
+                buttonResources.setX(NO_POWERUP_X *width);
+                buttonResources.setY(NO_POWERUP_Y *height);
+                FXWindow.getPane().getChildren().add(buttonResources);
+                toRemove.add(buttonResources);
+                nodesLeftBehid.add(buttonResources);
+                selection.setNodeClickable(buttonResources, "-1");
+                setButtonEffects(buttonResources);
+
+                // set powerup cards selectable
                 selectables.forEach(selectable -> {
                     String fileName = getPowerupFileName(selectable);
                     powerups.stream().filter(p -> p.getImage().getUrl().contains(fileName)).forEach(p -> {
@@ -1706,10 +1688,10 @@ public class GuiView extends ClientView{
 
     private void setUsePowerupButton(List<Node> buttons) {
         ImageView usePowerup = loadImage(USE_POWERUP_PATH);
-        usePowerup.setX(USE_RESOURCES_X*width);
-        usePowerup.setY(USE_RESOURCES_Y*height);
+        usePowerup.setX(NO_POWERUP_X *width);
+        usePowerup.setY(NO_POWERUP_Y *height);
         usePowerup.setPreserveRatio(true);
-        usePowerup.setFitWidth(USE_RESOURCES_SIZE*width);
+        usePowerup.setFitWidth(NO_POWERUP_SIZE *width);
         buttons.add(usePowerup);
         nodesLeftBehid.add(usePowerup);
         setButtonEffects(usePowerup);

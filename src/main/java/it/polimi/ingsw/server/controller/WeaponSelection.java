@@ -39,7 +39,10 @@ public class WeaponSelection implements Serializable {
     }
 
     /**
-     * constructor for JSON parsing
+     * Builds a weapon selection from params
+     * @param weapon to set
+     * @param effectID to set
+     * @param powerups to set
      */
     public WeaponSelection(String weapon, List<Integer> effectID, List<Powerup> powerups) {
         super();

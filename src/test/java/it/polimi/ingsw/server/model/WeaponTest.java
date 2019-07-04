@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class WeaponTest {
+    /**
+     * Test weapon effects
+     */
     @Test
     void weaponTest(){
         AdrenalinaMatch tMatch = new AdrenalinaMatch(3,8, 120,1);

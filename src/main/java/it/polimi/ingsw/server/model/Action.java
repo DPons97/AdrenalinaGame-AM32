@@ -20,7 +20,7 @@ public class Action {
 	 */
 	public interface BaseAction {
 		/**
-		 *
+		 * @param caller player calling the execution
 		 */
 		void applyOn(Player caller);
 	}

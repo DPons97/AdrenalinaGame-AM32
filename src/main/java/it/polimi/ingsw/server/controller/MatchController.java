@@ -32,7 +32,8 @@ public class MatchController {
 	private LobbyController serverLobby;
 
 	/**
-	 * Default constructor
+	 * @param toControl match to control
+	 * @param serverLobby reference to server lobby in case a player leaves
 	 */
 	public MatchController(AdrenalinaMatch toControl, LobbyController serverLobby) {
 		this.match = toControl;
@@ -65,6 +66,8 @@ public class MatchController {
 	 * Start controlling match
 	 * @return List representing leaderboard
 	 * @throws PlayerNotReadyException if there is at least one player that is not ready to start match
+	 * @throws NotEnoughPlayersException
+	 * @throws MatchAlreadyStartedException
 	 */
 	public List<Player> startMatch() throws PlayerNotReadyException, NotEnoughPlayersException, MatchAlreadyStartedException {
 		for (Player player : match.getPlayers()) {
@@ -171,6 +174,8 @@ public class MatchController {
 	/**
 	 * Make player leave match and go back to server lobby
 	 * @param playerLeaving player that leaves
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerNotExistsException
 	 */
 	public void backToLobby(PlayerConnection playerLeaving) throws MatchAlreadyStartedException, PlayerNotExistsException {
 		Player toKick = getPlayer(playerLeaving.getName());
@@ -190,6 +195,7 @@ public class MatchController {
 
 	/**
 	 * Resolve final scoring of not dead players
+	 * @return leaderbord in shape of a list first to last
 	 */
 	private List<Player> finalScore() {
 		// Final scoring
@@ -200,6 +206,7 @@ public class MatchController {
 				if (!p.isFrenzyPlayer()) p.getDmgPoints().get(0).addScore(1);
 
 				// Score points as usual
+
 				match.rewardPlayers(p.getDmgPoints(), p.getReward());
 			}
 		}
@@ -238,6 +245,7 @@ public class MatchController {
 	/**
 	 *	set correspondent player object state to ready
 	 * @param player player connection object of the player to set ready
+	 * @param isReady bolean representing player readiness
 	 */
 	public void setPlayerReady(PlayerConnection player, boolean isReady) {
 		synchronized (this) {

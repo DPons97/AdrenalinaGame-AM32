@@ -15,14 +15,15 @@ class PlayerTest {
     private static String victimName = "Victim";
     private static String killerName = "Killer";
 
+    /**
+     * tests get reward logic
+     * @throws DeadPlayerException
+     */
     @Test
     void getReward() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
         Player victimPlayer = new Player(testMatch, victimName);
         Player killerPlayer = new Player(testMatch, killerName);
-
-        // Victim never died
-        assertTrue(victimPlayer.getReward().isEmpty());
 
         // Kill victim until reward list is constant
         for (int i=0; i < Player.getKillRewards().size(); i++) {
@@ -46,7 +47,13 @@ class PlayerTest {
     }
 
     /**
-     *
+     * test reload logic
+     * @throws InventoryFullException
+     * @throws AmmoAlreadyOnCellException
+     * @throws InsufficientResourcesException
+     * @throws NoItemInInventoryException
+     * @throws WeaponNotLoadedException
+     * @throws RequirementsNotMetException
      */
     @Test
     void reload() throws InventoryFullException, AmmoAlreadyOnCellException, InsufficientResourcesException, NoItemInInventoryException, WeaponNotLoadedException, RequirementsNotMetException {
@@ -121,6 +128,9 @@ class PlayerTest {
         assertTrue(testPlayer.getPowerups().isEmpty());
     }
 
+    /**
+     * Tests correctness of move logic
+     */
     @Test
     void move() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -142,6 +152,10 @@ class PlayerTest {
         assertTrue(destCell.getPlayers().contains(testPlayer));
     }
 
+    /**
+     * Tests take damage logic
+     * @throws DeadPlayerException
+     */
     @Test
     void takeDamage() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -176,6 +190,9 @@ class PlayerTest {
         assertEquals(Player.getMaxMarks() + 1, victimPlayer.getDmgPoints().size());
     }
 
+    /**
+     * Tests take mark logic
+     */
     @Test
     void takeMark() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -195,6 +212,10 @@ class PlayerTest {
         assertEquals(3, killerPlayer.getGivenMarks());
     }
 
+    /**
+     * Tests getCellAtDistanceLogic
+     * @throws IllegalArgumentException
+     */
     @Test
     void getCellAtDistance() throws IllegalArgumentException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -224,6 +245,9 @@ class PlayerTest {
         }
     }
 
+    /**
+     * Tests getVisivleCells method
+     */
     @Test
     void getVisibleCells() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -246,6 +270,9 @@ class PlayerTest {
         }
     }
 
+    /**
+     * tests getOutOfSightCells method
+     */
     @Test
     void getOutOfSightCells() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -268,6 +295,9 @@ class PlayerTest {
         }
     }
 
+    /**
+     * Tests getCellsToMove method
+     */
     @Test
     void getCellsToMove() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -298,6 +328,10 @@ class PlayerTest {
         }
     }
 
+    /**
+     * Tests pickAmmo method
+     * @throws AmmoAlreadyOnCellException
+     */
     @Test
     void pickAmmo() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -357,6 +391,11 @@ class PlayerTest {
         assertNull(newAmmoCell.getResource());
     }
 
+    /**
+     * Tests udePowe
+     * @throws AmmoAlreadyOnCellException
+     * @throws NoItemInInventoryException
+     */
     @Test
     void usePowerupEffect() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -376,6 +415,11 @@ class PlayerTest {
         assertFalse(testPlayer.getPowerups().contains(toBeUsed));
     }
 
+    /**
+     * Test usePowerups
+     * @throws AmmoAlreadyOnCellException
+     * @throws NoItemInInventoryException
+     */
     @Test
     void usePowerupResource() throws AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -395,6 +439,10 @@ class PlayerTest {
         assertFalse(testPlayer.getPowerups().contains(toBeUsed));
     }
 
+    /**
+     * Tests getAllPowerupsByResource
+     * @throws AmmoAlreadyOnCellException
+     */
     @Test
     void getAllPowerupByResource()  throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -428,6 +476,13 @@ class PlayerTest {
         }
     }
 
+    /**
+     * Tests pick weapon
+     * @throws InventoryFullException
+     * @throws InsufficientResourcesException
+     * @throws AmmoAlreadyOnCellException
+     * @throws NoItemInInventoryException
+     */
     @Test
     void pickWeapon() throws InventoryFullException, InsufficientResourcesException, AmmoAlreadyOnCellException, NoItemInInventoryException {
         AdrenalinaMatch newMatch = new AdrenalinaMatch(3,8,120,1);
@@ -467,11 +522,10 @@ class PlayerTest {
         assertThrows(InventoryFullException.class, () -> testPlayer.pickWeapon(testWeapon4, new ArrayList<>()));
     }
 
-    @Test
-    void shoot() {
-        // TODO: Implement after getSelectable()
-    }
-
+    /**
+     * Checks can pay method
+     * @throws AmmoAlreadyOnCellException
+     */
     @Test
     void canPay() throws AmmoAlreadyOnCellException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(3,8,120,1);
@@ -511,6 +565,10 @@ class PlayerTest {
         assertTrue(testPlayer.canPay(testPayment, toUseAsRes));
     }
 
+    /**
+     * Check respawn method
+     * @throws DeadPlayerException
+     */
     @Test
     void respawn() throws DeadPlayerException {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 1);
@@ -528,6 +586,9 @@ class PlayerTest {
         assertTrue(victimPlayer.getDmgPoints().isEmpty());
     }
 
+    /**
+     * Tests getCellWithoutWeapons correctness
+     */
     @Test
     void getCellsWithoutWalls() {
         AdrenalinaMatch testMatch = new AdrenalinaMatch(4, 8, 60, 3);

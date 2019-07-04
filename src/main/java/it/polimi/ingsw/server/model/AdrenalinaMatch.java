@@ -319,6 +319,10 @@ public class AdrenalinaMatch {
 
 	/**
 	 *	Add  new player to the game, only possible before the match starts
+	 * @param toAdd player to add
+	 * @throws TooManyPlayersException
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerAlreadyExistsException
 	 */
 	public void addPlayer(Player toAdd) throws TooManyPlayersException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
 		if(state == MatchState.NOT_STARTED){
@@ -345,6 +349,8 @@ public class AdrenalinaMatch {
 	/**
 	 * Kick a player from match and set his match to null
 	 * @param toKick player that wants to leave
+	 * @throws MatchAlreadyStartedException
+	 * @throws PlayerNotExistsException
 	 */
 	public void kickPlayer(Player toKick) throws MatchAlreadyStartedException, PlayerNotExistsException {
 		if(state == MatchState.NOT_STARTED){
@@ -397,7 +403,7 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * @return a List<Player> with the players in the game.
+	 * @return a list of players with the players in the game.
 	 */
 	public List<Player> getPlayers() {
 		return players;
@@ -424,7 +430,7 @@ public class AdrenalinaMatch {
 	}
 
 	/**
-	 * @return a Deck<Ammo> with the ammo cards.
+	 * @return a deck of ammos.
 	 */
 	public Deck<Ammo> getAmmoDeck() {
 		return ammoDeck;
@@ -521,6 +527,9 @@ public class AdrenalinaMatch {
 
 	/**
 	 * Insert new death in the game board, updates # of deaths and death track
+	 * @param killer player that killed
+	 * @param isOverkill boolean identifying if the kill was overkill
+	 * @throws PlayerNotExistsException
 	 */
 	public void addDeath(Player killer, boolean isOverkill) throws PlayerNotExistsException {
 		if(players.contains(killer)) {
@@ -541,6 +550,8 @@ public class AdrenalinaMatch {
 
 	/**
 	 * Sets attributes to start the match
+	 * @throws NotEnoughPlayersException
+	 * @throws MatchAlreadyStartedException
 	 */
 	public void startMatch() throws NotEnoughPlayersException, MatchAlreadyStartedException {
 		if (nPlayers == players.size()) {
@@ -559,6 +570,9 @@ public class AdrenalinaMatch {
 
 	/**
 	 * gat Resource associated with string
+	 * @param s string to get resource from
+	 * @return resource corresponding to string passed
+	 * @throws InvalidStringException
 	 */
 	public static Resource stringToResource(String s) throws InvalidStringException {
 		switch (s){
@@ -576,7 +590,9 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @param s string to get color from
 	 * @return color Colo associated with string
+	 * @throws InvalidStringException
 	 */
 	public static Color stringToColor(String s) throws InvalidStringException {
 		switch (s) {
@@ -598,7 +614,9 @@ public class AdrenalinaMatch {
 	}
 
 	/**
+	 * @param s string to get side from
 	 * @return Side associated with string
+	 * @throws InvalidStringException
 	 */
 	public static Side stringToSide(String s) throws InvalidStringException {
 		switch (s) {

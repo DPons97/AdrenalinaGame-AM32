@@ -25,7 +25,9 @@ public class PlayerRemote extends PlayerConnection {
 	private boolean pinged;
 
 	/**
-	 * Default constructor
+	 * Build a player remote from a name and a remote client object
+	 * @param name player name
+	 * @param remoteClient remote client object
 	 */
 	public PlayerRemote(String name, ClientFunctionalities remoteClient) {
 		super(name);

@@ -59,6 +59,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	/**
 	 * Default constructor
 	 * Registers self in rmi register and opens socket
+	 * @throws IOException
 	 */
 	public LoginHandler() throws IOException {
 		super();
@@ -324,7 +325,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		return loginHandler;
 	}
 
-	/**
+	/*
      * Main method to test connections
      */
     public static void main(String[] args) {
