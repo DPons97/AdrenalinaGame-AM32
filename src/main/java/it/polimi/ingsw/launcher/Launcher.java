@@ -153,20 +153,18 @@ public class Launcher{
             grid.add(labelSktRmi, 0, 3);
             grid.add(srBox, 1, 3);
 
-
             Label ip = new Label("Ip:");
             grid.add(ip, 0, 5);
 
             TextField ipBox = new TextField();
             grid.add(ipBox, 1, 5);
+            ipBox.setViewOrder(-1);
 
             Label port = new Label("Port:");
             grid.add(port, 0, 6);
 
             TextField portBox = new TextField();
             grid.add(portBox, 1, 6);
-
-
 
             //port allows only integers
             UnaryOperator<TextFormatter.Change> filter = change -> {
