@@ -6,6 +6,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -381,6 +382,11 @@ public class Player {
 	 * @return last kill reward list. Empty list if player never died
 	 */
 	public List<Integer> getReward() {
+
+		if(this.deaths <= 0 && match.getMatchState()!=MatchState.NOT_STARTED){
+			if(match.getMatchState() == MatchState.ENDED) return new ArrayList<>(Arrays.asList());
+			else return new ArrayList<>();
+		}
 
 		int[] currentRewards = (isFrenzyPlayer) ? frenzyRewards : killRewards;
 
