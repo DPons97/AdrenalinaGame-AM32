@@ -26,21 +26,21 @@
 -->
 
 ### Extracting jar and running it:
-We are extracting only only one jar from the Launcher class in the package launcher. <br>
-We are extracting it with the intellij tool from Project Structure -> Artifacts -> Add JAR from modules with dependencies.<br>
-The main class to set is it.polimi.ingsw.launcher.Launcher <br>
-The META-INF/MANIFEST.MF is to place in src\main\java\resources <br>
-Then we build the jar from Build -> Build artifacts <br>
+We are extracting only one jar from the Launcher class in the package *launcher*. <br>
+We are extracting it with the intellij tool from *Project Structure -> Artifacts -> Add JAR from modules with dependencies*.<br>
+The main class to set is *it.polimi.ingsw.launcher.Launcher* <br>
+*META-INF/MANIFEST.MF* needs to be placed in *src\main\java\resources*. <br>
+Then we build the .jar from *Build -> Build artifacts* <br>
 
-As we only extract one jar we added parameters to the jar in order to change the behaviour of the program.<br>
+As we only extract one jar, we added parameters in order to change the startup behaviour of the program.<br>
 If no parameters are passed it will start a gui launcher that lets the user select options from a form.<br>
 Parameters can be written in any order and the read ones are:<br>
-- -m (mode) follower by c for client or s for server<br>
-- -gui to load a graphical user interface<br>
-- -cli to load a command line interface (if both -cli and -gui are passed it will load only the gui) <br>
-- -p (port) in case of client, to specify server port<br>
-- -c (connection) in case of client, to specify connection type: followed by r for rmi or s for socket<br>
-- -n (nickname) in case of client, followed by a string to specify client nickname<br>
+- **-m** (mode) followed by **c** for client or **s** for server<br>
+- **-gui** to load a graphical user interface<br>
+- **-cli** to load a command line interface (if both -cli and -gui are passed it will load only the gui) <br>
+- **-p** (port) in case of client, to specify server port<br>
+- **-c** (connection) in case of client, to specify connection type: followed by **r** for rmi or **s** for socket<br>
+- **-n** (nickname) in case of client, followed by a string to specify client nickname<br>
 
 for example:
 - to launch a server in the cli just pass: -m s
