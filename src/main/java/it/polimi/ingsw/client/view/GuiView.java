@@ -1641,6 +1641,7 @@ public class GuiView extends ClientView{
                     i++;
                 }
             }else if (!player.getMatch().isFirstPlayedFrenzy()){
+                waitLoading();
                 int i = 0;
                 for(TurnAction t: frenzyActions){
                     if(t.equals(TurnAction.POWERUP)){
