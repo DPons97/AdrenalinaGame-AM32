@@ -9,7 +9,17 @@ import org.junit.jupiter.api.Test;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+
 public class LobbyTest {
+
+    /**
+     * Tests lobby logic in match creation
+     * @throws TooManyPlayersException
+     * @throws TooManyMatchesException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     * @throws PlayerNotExistsException
+     */
     @Test
     public void createMatch() throws TooManyPlayersException, TooManyMatchesException, MatchAlreadyStartedException, PlayerAlreadyExistsException, PlayerNotExistsException {
         Lobby testLobby = new Lobby(3);
@@ -51,6 +61,15 @@ public class LobbyTest {
         assertThrows(TooManyMatchesException.class, () -> testLobby.createMatch(null,newMatchPlayer.getConnection(), 5, 8, 60, 1));
     }
 
+    /**
+     * Tests correctness of jaoinable matches getter
+     * @throws TooManyMatchesException
+     * @throws TooManyPlayersException
+     * @throws PlayerNotExistsException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     * @throws NotEnoughPlayersException
+     */
     @Test
     public void getJoinableMatches() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException, NotEnoughPlayersException {
         Lobby testLobby = new Lobby(3);
@@ -74,6 +93,14 @@ public class LobbyTest {
         assertTrue(testLobby.getJoinableMatches().isEmpty());
     }
 
+    /**
+     * Tests joinMatch logic
+     * @throws TooManyMatchesException
+     * @throws TooManyPlayersException
+     * @throws PlayerNotExistsException
+     * @throws MatchAlreadyStartedException
+     * @throws PlayerAlreadyExistsException
+     */
     @Test
     public void joinMatch() throws TooManyMatchesException, TooManyPlayersException, PlayerNotExistsException, MatchAlreadyStartedException, PlayerAlreadyExistsException {
         Lobby testLobby = new Lobby(3);

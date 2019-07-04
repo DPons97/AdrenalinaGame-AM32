@@ -7,6 +7,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class AmmoCellTest {
 
+    /**
+     * checks set ammo logic
+     * @throws AmmoAlreadyOnCellException
+     */
     @Test
     void setAmmo() throws AmmoAlreadyOnCellException {
         AmmoCell cellTest = new AmmoCell(Side.BORDER, Side.DOOR, Side.FREE, Side.WALL, Color.BLUE, 3, 5);

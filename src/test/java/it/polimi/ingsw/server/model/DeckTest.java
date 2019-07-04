@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class DeckTest {
 
+    /**
+     * Tests deck logic
+     */
     @Test
     void testDeckFunctionality() {
         Deck<Integer> deckTest = new Deck<Integer>();

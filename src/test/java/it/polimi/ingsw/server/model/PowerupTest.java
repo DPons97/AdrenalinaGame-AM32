@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 class PowerupTest {
+    /**
+     * Tests poerup effects
+     */
     @Test
     void powerupTest(){
         AdrenalinaMatch tMatch = new AdrenalinaMatch(3,8, 120,1);
