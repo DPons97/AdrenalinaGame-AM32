@@ -384,7 +384,7 @@ public class Player {
 	public List<Integer> getReward() {
 
 		if(this.deaths <= 0 && match.getMatchState()!=MatchState.NOT_STARTED){
-			if(match.getMatchState() == MatchState.ENDED){
+			if(match.getMatchState() == MatchState.FINAL_SCORING){
 				List<Integer> toReturn = new ArrayList<>();
 				for(int i: frenzyRewards){
 					toReturn.add(i);
