@@ -253,7 +253,8 @@ public class Action {
 
 	public BaseAction selectPlayerLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, boolean diffCells, int minQty, int maxQty) {
 		return caller -> {
-			targetPlayers.clear();
+			if (!baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetPlayers.clear();
+
 			List<Player> couldBeAdded = caller.getMatch().
 					getSelectablePlayers(caller,
 							baseActionJSON.get("from").toString(),
@@ -288,7 +289,6 @@ public class Action {
 							// Set ids to selected players
 							if (id != -2) {
 								selected.setID(id);
-								//selected.getPosition().setID(id);
 							}
 
 							couldBeAdded.remove(selected);
@@ -303,7 +303,8 @@ public class Action {
 
 	public BaseAction selectCellLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, int minQty, int maxQty) {
 		return caller -> {
-			targetCells.clear();
+			if (!baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetCells.clear();
+
 			List<Cell> couldBeAdded = caller.getMatch().
 					getSelectableCells(caller,
 							baseActionJSON.get("from").toString(),

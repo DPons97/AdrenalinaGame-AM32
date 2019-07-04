@@ -144,7 +144,7 @@ public class Turn {
                     // SHOOT management
                     if (playing.getDmgPoints().size() >= 6) {
                         // Move 0 or 1 cell
-                        List<Cell> canMove = playing.getCellsToMove(1, 1);
+                        List<Cell> canMove = playing.getCellsToMove(0, 1);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
                     }
@@ -214,7 +214,7 @@ public class Turn {
                         break;
                     case SHOOT:
                         // Move 0 or 1 cell
-                        List<Cell> canMove = playing.getCellsToMove(1, 1);
+                        List<Cell> canMove = playing.getCellsToMove(0, 1);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
 
@@ -241,7 +241,7 @@ public class Turn {
                         break;
                     case SHOOT:
                         // Move 0, 1 or 2 cell
-                        List<Cell> canMove = playing.getCellsToMove(1, 2);
+                        List<Cell> canMove = playing.getCellsToMove(0, 2);
                         canMove.add(playing.getPosition());
                         playing.move(playing.getConnection().selectCell(canMove));
 
@@ -312,7 +312,7 @@ public class Turn {
      */
     private boolean playerPick(Player playing) {
         // Get cells that can be picked doing from 0 to 1 or 2 movements
-        List<Cell> canPick = playing.getCellsToMove(1, (playing.getDmgPoints().size() >= 3) ? 2 : 1);
+        List<Cell> canPick = playing.getCellsToMove(0, (playing.getDmgPoints().size() >= 3) ? 2 : 1);
 
         return grabSomething(playing, canPick);
     }
@@ -327,8 +327,8 @@ public class Turn {
         // Get cells that can be picked doing from 0 to 1 or 2 movements
         List<Cell> canPick;
 
-        if (playingBeforeFirst) canPick = playing.getCellsToMove(1, 2);
-        else canPick = playing.getCellsToMove(1, 3);
+        if (playingBeforeFirst) canPick = playing.getCellsToMove(0, 2);
+        else canPick = playing.getCellsToMove(0, 3);
 
         return grabSomething(playing, canPick);
     }
