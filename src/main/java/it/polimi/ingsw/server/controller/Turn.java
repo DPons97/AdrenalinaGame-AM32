@@ -466,7 +466,14 @@ public class Turn {
         // IDs' order matter!
         try {
             for (Integer id : effectIds) {
-                playing.shoot(getWeapon(pickedWeapon.getWeapon(), playing), id, pickedWeapon.getPowerups());
+                try {
+                    playing.shoot(getWeapon(pickedWeapon.getWeapon(), playing), id, pickedWeapon.getPowerups());
+                    updatePlayers();
+                } catch (RequirementsNotMetException req) {
+                    req.printStackTrace();
+                    updatePlayers();
+                    return true;
+                }
             }
 
             // Reset ids
@@ -480,7 +487,7 @@ public class Turn {
             powerupManagerAfterShooting(playing);
 
             return true;
-        } catch (RequirementsNotMetException | InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
+        } catch (InsufficientResourcesException | NoItemInInventoryException | WeaponNotLoadedException e) {
             e.printStackTrace();
         }
         return false;

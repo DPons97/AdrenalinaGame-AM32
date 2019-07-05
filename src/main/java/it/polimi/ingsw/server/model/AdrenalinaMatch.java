@@ -692,32 +692,28 @@ public class AdrenalinaMatch {
 				// exploring east -> right
 				for(i = pY + 1; i < boardMap.getYSize() &&
 						boardMap.getCell(pX, i).getEast()!= Side.BORDER &&
-						boardMap.getCell(pX, i).getEast()!= Side.WALL &&
-						boardMap.getCell(pX, i).getEast()!= Side.DOOR; i++)
+						boardMap.getCell(pX, i).getEast()!= Side.WALL; i++)
 					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
 				if (i < boardMap.getYSize()) toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 				// exploring west -> left
 				for(i = pY + 1; i > 0 &&
 						boardMap.getCell(pX, i).getWest()!= Side.BORDER &&
-						boardMap.getCell(pX, i).getWest()!= Side.WALL &&
-						boardMap.getCell(pX, i).getWest()!= Side.DOOR; i--)
+						boardMap.getCell(pX, i).getWest()!= Side.WALL; i--)
 					toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 
 				if (i > 0) toReturn.addAll(boardMap.getCell(pX, i).getPlayers());
 				// exploring north -> up
 				for(i = pX + 1; i > 0 &&
 						boardMap.getCell(i,pY).getNorth()!= Side.BORDER &&
-						boardMap.getCell(i,pY).getNorth()!= Side.WALL &&
-						boardMap.getCell(i,pY).getNorth()!= Side.DOOR; i--)
+						boardMap.getCell(i,pY).getNorth()!= Side.WALL; i--)
 					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
 
 				if (i > 0) toReturn.addAll(boardMap.getCell(i, pY).getPlayers());
 				// exploring south -> down
 				for(i = pX + 1; i < boardMap.getXSize() &&
 						boardMap.getCell(i,pY).getSouth()!= Side.BORDER &&
-						boardMap.getCell(i,pY).getSouth()!= Side.WALL &&
-						boardMap.getCell(i,pY).getSouth()!= Side.DOOR; i++)
+						boardMap.getCell(i,pY).getSouth()!= Side.WALL; i++)
 					toReturn.addAll(boardMap.getCell(i,pY).getPlayers());
 
 				if (i < boardMap.getXSize()) toReturn.addAll(boardMap.getCell(i, pY).getPlayers());

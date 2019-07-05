@@ -168,8 +168,15 @@ public class WeaponEffect extends Weapon {
 			for (Action action : actionSequence) {
 				// Get require
 				for(Action a: getShootActions()){
-					if(a.getName().equals(action.getRequires()) && !actionSequence.contains(a)) canBeExecuted = false;
+					if(a.getName().equals(action.getRequires()) &&
+							(!actionSequence.contains(a) ||
+							actionSequence.indexOf(a) > actionSequence.indexOf(action))) {
+						canBeExecuted = false;
+						break;
+					}
 				}
+
+				if (!canBeExecuted) break;
 			}
 		}
 		return canBeExecuted;
