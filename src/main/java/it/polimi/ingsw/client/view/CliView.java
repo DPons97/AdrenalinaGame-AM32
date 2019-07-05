@@ -458,7 +458,7 @@ public class CliView extends ClientView {
         }
     }
 
-    // TODO Remove once finished testing
+    // Main for testing cli
     public static void main(String[] args) {
         it.polimi.ingsw.server.model.AdrenalinaMatch match = new it.polimi.ingsw.server.model.AdrenalinaMatch(5, 8, 120, 1);
 
