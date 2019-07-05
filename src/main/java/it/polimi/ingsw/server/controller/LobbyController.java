@@ -33,8 +33,6 @@ public class LobbyController {
 	 */
 	private List<String> disconnectedPlayers;
 
-
-
 	/**
 	 * Default constructor
 	 * initializes new lobby and new list of players
@@ -44,7 +42,6 @@ public class LobbyController {
 		this.players = new ArrayList<>();
 		this.disconnectedPlayers = new ArrayList<>();
 	}
-
 
 	/**
 	 * @return list of current players inside lobby and waiting to join

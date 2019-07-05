@@ -203,6 +203,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	@Override
 	public void ping(String name) {
 		System.out.println("Got ping from "+ name);
+
 		if(lobby.getPlayersNames().contains(name)){
 			lobby.getPlayerByName(name).setPinged(true);
 		} else if(lobby.getPlayersNameInGame().contains(name)){

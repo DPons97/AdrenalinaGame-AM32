@@ -3,14 +3,20 @@ package it.polimi.ingsw.client.controller;
 import it.polimi.ingsw.custom_exceptions.UsernameTakenException;
 import it.polimi.ingsw.server.controller.ServerFunctionalities;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.exit;
+import static java.lang.System.out;
 
 /**
  * 
@@ -41,8 +47,31 @@ public class RemoteClient extends ServerConnection {
 	public RemoteClient(ClientPlayer player) {
 		super(player);
 		try {
+			String address = "";
+			Enumeration<NetworkInterface> n = NetworkInterface.getNetworkInterfaces();
+			StringBuilder addresses = new StringBuilder();
+			for (;n.hasMoreElements();){
+				NetworkInterface e = n.nextElement();
+				Enumeration<InetAddress> a = e.getInetAddresses();
+
+				if(a.hasMoreElements()) {
+					InetAddress addr = a.nextElement();
+					if(addr.getHostAddress().length() > 15) continue;
+					if(!addr.getHostAddress().substring(0,4).contains("127")){
+						address = addr.getHostAddress();
+						break;
+					}
+				}
+
+			}
+			if(address.isEmpty())address = InetAddress.getLocalHost().getHostAddress();
+			System.setProperty("java.rmi.server.hostname", address);
 			UnicastRemoteObject.exportObject(this.player, 0);
 		} catch (RemoteException e) {
+			e.printStackTrace();
+		} catch (SocketException e) {
+			e.printStackTrace();
+		} catch (UnknownHostException e) {
 			e.printStackTrace();
 		}
 
