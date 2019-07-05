@@ -30,7 +30,12 @@ We are extracting only one jar from the Launcher class in the package *launcher*
 We are extracting it with the intellij tool from *Project Structure -> Artifacts -> Add JAR from modules with dependencies*.<br>
 The main class to set is *it.polimi.ingsw.launcher.Launcher* <br>
 *META-INF/MANIFEST.MF* needs to be placed in *src\main\java\resources*. <br>
-Then we build the .jar from *Build -> Build artifacts* <br>
+Then we build the .jar from *Build -> Build artifacts* <br><br><br>
+
+**Ready-to-use JARs**: We built ready-to-use jars for everyone to use if needed. They can be found inside *jar/* folder.<br>
+As the naming convention says you have to use the right jar for your operating system:
+* *AdrenalinaWindows.jar* - For Windows operating systems
+* *AdrenalinaMacOS.jar* - For MacOS systems 
 
 As we only extract one jar, we added parameters in order to change the startup behaviour of the program.<br>
 If no parameters are passed it will start a gui launcher that lets the user select options from a form.<br>
