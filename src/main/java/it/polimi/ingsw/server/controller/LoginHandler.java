@@ -79,8 +79,8 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 				if(addr.getHostAddress().length() > 15) continue;
 				addresses.append("     ").append(addr.getHostAddress());
 			}
-
 		}
+
 		address = addresses.toString();
 		System.out.println("Server address = " + addresses + ", Port RMI= " + rmiPort+" / Port socket= "+socketPort);
 

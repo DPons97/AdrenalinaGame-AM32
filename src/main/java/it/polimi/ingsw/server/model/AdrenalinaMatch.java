@@ -641,11 +641,11 @@ public class AdrenalinaMatch {
 	 * @param notID id to exclude
 	 * @param minDistance minimum distance between caller and target
 	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
-	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
+	 * @param targetPlayers list of players for PREV_TARGET or TARGET_VISIBLE
 	 * @return List with players that satisfy query
 	 */
 	public List<Player> getSelectablePlayers(Player caller, String from, int notID, int minDistance,
-											  int maxDistance, List<Player> players) {
+											  int maxDistance, List<Player> targetPlayers) {
 		List<Player> toReturn = new ArrayList<>();
 		int pX;
 		int pY;
@@ -660,9 +660,9 @@ public class AdrenalinaMatch {
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "TARGET_VISIBLE":
-				if (players.isEmpty()) break;
+				if (targetPlayers.isEmpty()) break;
 
-				for(Cell c: players.get(0).getVisibleCellsAtDistance(minDistance, maxDistance))
+				for(Cell c: targetPlayers.get(0).getVisibleCellsAtDistance(minDistance, maxDistance))
 					toReturn.addAll(c.getPlayers());
 				break;
 			case "DIRECTION":
@@ -785,11 +785,11 @@ public class AdrenalinaMatch {
 	 * @param notID id to exclude
 	 * @param minDistance minimum distance between caller and target
 	 * @param maxDistance maximum distance between caller and target (-1 if no max is required)
-	 * @param players list of players for PREV_TARGET or TARGET_VISIBLE
+	 * @param targetPlayers list of players for PREV_TARGET or TARGET_VISIBLE
 	 * @return List with cells that satisfy query
 	 */
 	public List<Cell> getSelectableCells(Player caller, String from, int notID, int minDistance,
-										 int maxDistance, List<Player> players) {
+										 int maxDistance, List<Player> targetPlayers) {
 		List<Cell> toReturn = new ArrayList<>();
 		int pX;
 		int pY;
@@ -801,7 +801,7 @@ public class AdrenalinaMatch {
 				toReturn.addAll(caller.getOutOfSightCells(minDistance,maxDistance));
 				break;
 			case "TARGET_VISIBLE":
-				toReturn.addAll(players.get(0).getVisibleCellsAtDistance(minDistance,maxDistance));
+				toReturn.addAll(targetPlayers.get(0).getVisibleCellsAtDistance(minDistance,maxDistance));
 				break;
 			case "DIRECTION":
 				pX = caller.getPosition().getCoordX();
@@ -877,11 +877,7 @@ public class AdrenalinaMatch {
 					for(Player p: foundPlayers){
 						toReturn.addAll(p.getCellsToMove(minDistance, maxDistance));
 					}
-				} /*else {
-					List<Player> playersWithID = getPlayersByID(id);
-
-					if (!playersWithID.isEmpty()) toReturn = intersection(toReturn, playersWithID.get(0).getCellAtDistance(minDistance,maxDistance));
-				}*/
+				}
 		}
 
 		// filter notID

@@ -362,7 +362,7 @@
         "actions": [
           {
             "type": "SELECT",
-            "ID": -1,
+            "ID": 1,
             "target": "PLAYER",
             "from": "1",
             "quantity": [

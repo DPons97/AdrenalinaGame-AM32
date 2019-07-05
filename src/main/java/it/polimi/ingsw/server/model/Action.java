@@ -253,6 +253,7 @@ public class Action {
 
 	public BaseAction selectPlayerLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, boolean diffCells, int minQty, int maxQty) {
 		return caller -> {
+			// Move targetPayer clear after getting player that can be added
 			if (!baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetPlayers.clear();
 
 			List<Player> couldBeAdded = caller.getMatch().
@@ -281,6 +282,9 @@ public class Action {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
 						Player selected = caller.getConnection().selectPlayer(couldBeAdded);
+
+						if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetPlayers.clear();
+
 						targetPlayers.add(selected);
 
 						if (selected != null) {
@@ -303,6 +307,7 @@ public class Action {
 
 	public BaseAction selectCellLambda(JSONObject baseActionJSON, Object notID, JSONArray distance, int minQty, int maxQty) {
 		return caller -> {
+			// Move targetPayer clear after getting player that can be added
 			if (!baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetCells.clear();
 
 			List<Cell> couldBeAdded = caller.getMatch().
@@ -327,6 +332,9 @@ public class Action {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
 						Cell selected = caller.getConnection().selectCell(couldBeAdded);
+
+						if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetCells.clear();
+
 						targetCells.add(selected);
 
 						if (selected != null) {
