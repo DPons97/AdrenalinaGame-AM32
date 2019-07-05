@@ -34,8 +34,9 @@ Then we build the .jar from *Build -> Build artifacts* <br><br><br>
 
 **Ready-to-use JARs**: We built ready-to-use jars for everyone to use if needed. They can be found inside *jar/* folder.<br>
 As the naming convention says you have to use the right jar for your operating system:
-* *AdrenalinaWindows.jar* - For Windows operating systems
-* *AdrenalinaMacOS.jar* - For MacOS systems 
+* *Adrenalina_W10.jar* - For Windows operating systems
+* *Adrenalina_MacOS.jar* - For MacOS systems
+* *Adrenalina_LINUX.jar* - For Linux systems
 
 As we only extract one jar, we added parameters in order to change the startup behaviour of the program.<br>
 If no parameters are passed it will start a gui launcher that lets the user select options from a form.<br>
