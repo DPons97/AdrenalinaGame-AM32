@@ -266,6 +266,7 @@ public class Action {
 					);
 
 			couldBeAdded.remove(caller);
+			if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetPlayers.clear();
 
 			int id = Integer.parseInt(baseActionJSON.get("ID").toString());
 			if((!diffCells && maxQty == -1) || (minQty == maxQty && minQty >= couldBeAdded.size())) {
@@ -282,8 +283,6 @@ public class Action {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
 						Player selected = caller.getConnection().selectPlayer(couldBeAdded);
-
-						if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetPlayers.clear();
 
 						targetPlayers.add(selected);
 
@@ -319,6 +318,8 @@ public class Action {
 							targetPlayers
 					);
 
+			if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetCells.clear();
+
 			int id = Integer.parseInt(baseActionJSON.get("ID").toString());
 			if( maxQty == -1 || (minQty == maxQty && minQty >= couldBeAdded.size())) {
 				// if there is no choice -> add all you could add
@@ -332,8 +333,6 @@ public class Action {
 					int nSelected = 0;
 					while (nSelected < maxQty && !couldBeAdded.isEmpty()) {
 						Cell selected = caller.getConnection().selectCell(couldBeAdded);
-
-						if (baseActionJSON.get("from").toString().equals("TARGET_VISIBLE")) targetCells.clear();
 
 						targetCells.add(selected);
 

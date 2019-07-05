@@ -1679,7 +1679,7 @@
           {
             "type": "SELECT",
             "ID": 3,
-            "target": "PLAYER",
+            "target": "CELL",
             "from": "ANY",
             "notID": 2,
             "quantity": [
@@ -1692,13 +1692,9 @@
             ]
           },
           {
-            "type": "DAMAGE",
-            "value": 2
-          },
-          {
             "type": "SELECT",
             "ID": 3,
-            "target": "CELL",
+            "target": "PLAYER",
             "from": "3",
             "quantity": [
               1,
@@ -1708,6 +1704,10 @@
               0,
               0
             ]
+          },
+          {
+            "type": "DAMAGE",
+            "value": 2
           },
           {
             "type": "SELECT",
@@ -1730,6 +1730,20 @@
           {
             "type": "SELECT",
             "ID": 1,
+            "target": "CELL",
+            "from": "1",
+            "quantity": [
+              1,
+              1
+            ],
+            "distance": [
+              0,
+              0
+            ]
+          },
+          {
+            "type": "SELECT",
+            "ID": 1,
             "target": "PLAYER",
             "from": "1",
             "quantity": [
@@ -1744,20 +1758,6 @@
           {
             "type": "DAMAGE",
             "value": 2
-          },
-          {
-            "type": "SELECT",
-            "ID": 1,
-            "target": "CELL",
-            "from": "1",
-            "quantity": [
-              1,
-              1
-            ],
-            "distance": [
-              0,
-              0
-            ]
           },
           {
             "type": "SELECT",
