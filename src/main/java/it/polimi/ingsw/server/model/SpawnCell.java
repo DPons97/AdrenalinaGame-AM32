@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Single map cell containing spawn and weapons
  */
 public class SpawnCell extends Cell {
 	/**

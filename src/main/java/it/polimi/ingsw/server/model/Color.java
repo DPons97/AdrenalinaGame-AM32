@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 /**
- * 
+ * Possible colors inside game
  */
 public enum Color {
 	BLUE,

@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * 
+ * Powerup abstraction
  */
 public class Powerup implements Serializable {
 

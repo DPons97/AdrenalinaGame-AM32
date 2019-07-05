@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Single weapon card
  */
 public abstract class Weapon implements Serializable {
 	/**

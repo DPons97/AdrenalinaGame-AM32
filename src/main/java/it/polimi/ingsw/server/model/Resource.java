@@ -1,7 +1,7 @@
 package it.polimi.ingsw.server.model;
 
 /**
- * 
+ * Possible pickable resources
  */
 public enum Resource {
 	RED_BOX,

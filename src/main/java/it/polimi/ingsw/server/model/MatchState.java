@@ -1,5 +1,8 @@
 package it.polimi.ingsw.server.model;
 
+/**
+ * Possible match states
+ */
 public enum MatchState {
     NOT_STARTED,
     LOADING,

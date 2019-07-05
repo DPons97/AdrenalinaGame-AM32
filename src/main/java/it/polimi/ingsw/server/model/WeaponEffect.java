@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 
+ * Single weapon card that contains effects
  */
 public class WeaponEffect extends Weapon {
 	/**

@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Ammunition class (Resources + Bonus powerups)
  */
 public class Ammo {
 	/**

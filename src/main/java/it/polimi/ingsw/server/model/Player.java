@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 
 /**
- *
+ * Main player class
  */
 public class Player {
 	/**

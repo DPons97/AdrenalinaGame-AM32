@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * 
+ * Manages weapon and powerup effects / modes
  */
 public class Action {
 

@@ -2,7 +2,7 @@ package it.polimi.ingsw.server.model;
 import it.polimi.ingsw.custom_exceptions.AmmoAlreadyOnCellException;
 
 /**
- * 
+ * Single map cell containing ammo card
  */
 public class AmmoCell extends Cell {
 	/**

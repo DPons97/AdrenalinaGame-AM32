@@ -8,6 +8,9 @@ import org.json.simple.JSONObject;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Abstraction of game map
+ */
 public class Map {
     /**
      * Representation of the map, bidemensional array of cells.

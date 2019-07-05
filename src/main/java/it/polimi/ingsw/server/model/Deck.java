@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 /**
- * 
+ * Generic deck of cards (Weapons, powerups, ammos)
  */
 public class Deck<T> {
 	/**

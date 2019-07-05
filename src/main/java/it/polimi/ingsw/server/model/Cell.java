@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Single map cell
  */
 public abstract class Cell {
 	/**

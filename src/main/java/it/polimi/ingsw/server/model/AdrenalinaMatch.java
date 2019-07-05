@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 
 
 /**
- *
+ * Main match class that stores and manages game data
+ * One AdrenalinaMatch represents one game match
  */
 public class AdrenalinaMatch {
 

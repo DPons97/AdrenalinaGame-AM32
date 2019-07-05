@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * Single weapon card with modes
  */
 public class WeaponMode extends Weapon {
 	/**
