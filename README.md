@@ -38,10 +38,18 @@ Parameters can be written in any order and the read ones are:<br>
 - **-m** (mode) followed by **c** for client or **s** for server<br>
 - **-gui** to load a graphical user interface<br>
 - **-cli** to load a command line interface (if both -cli and -gui are passed it will load only the gui) <br>
-- **-p** (port) in case of client, to specify server port<br>
+- **-p** (port) in case of client or server, to specify server port<br>
 - **-c** (connection) in case of client, to specify connection type: followed by **r** for rmi or **s** for socket<br>
 - **-n** (nickname) in case of client, followed by a string to specify client nickname<br>
 
 for example:
-- to launch a server in the cli just pass: -m s
-- to launch a socket client with gui named Bob : -m c -n Bob -s <server_ip> -p <server_port> -c s -gui
+- to start the gui launcher just double click on the jar or open a terminal, move into the jar directory, then:<br>
+    ```java -jar "jarname.jar" -gui```<br>
+-to start the cli launcher open a terminal, move into the jar directory, then: <br>
+    ```java -jar "jarname.jar"``` <br>
+- to launch a server in the cli that listens on the port 12345, open a terminal, move into the jar directory, then:<br>
+    ```java -jar "jarname.jar" -m s -p 12345```<br>
+- to launch a socket client with gui named Bob, open a terminal, move into the jar folder, then: <br>
+    ```java -jar "jarname.jar" -m c -n Bob -s <server_ip> -p <server_socket_port> -c s -gui```<br>
+- to launch a cli rmi client named Lian, onep a temrinal, move into the jar folder, then:<br>
+    ```java -jar "jarname.jar" -m c -s <server_ip> -n Lian -p <server_rmi_port> -cli -c r ```<br>
