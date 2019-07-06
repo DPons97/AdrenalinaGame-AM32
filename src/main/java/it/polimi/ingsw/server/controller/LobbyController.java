@@ -6,6 +6,7 @@ import it.polimi.ingsw.server.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -184,11 +185,21 @@ public class LobbyController {
 	 * Sends a broadcast message to all players to update their model
 	 * @return list of threads that ned to be joined if there is need of being sure that all disconnected clients have been removed
 	 */
-	public synchronized List<Thread> pingALl() {
+	public synchronized void pingALl() {
 		List<Thread> toJoin= new ArrayList<>();
 		players.forEach(p-> toJoin.add(p.ping()));
 
-		return toJoin;
+		toJoin.stream().filter(Objects::nonNull).forEach(p->
+		{
+			try {
+				if(p.getState() == Thread.State.NEW){
+					p.start();
+				}
+				p.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		});
 	}
 
 	/**

@@ -129,14 +129,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
                 clientSocket= serverSocket.accept();
                 System.out.println("Received socket connection request.");
 
-                lobby.pingALl().stream().filter(Objects::nonNull).forEach(p->
-				{
-					try {
-						p.join();
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-				});
+                lobby.pingALl();
 
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 name = input.readLine();
@@ -174,17 +167,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 	public boolean login(String name, ClientFunctionalities client){
 		System.out.println("Received RMI connection request");
 
-		lobby.pingALl().stream().filter(Objects::nonNull).forEach(p->
-		{
-			try {
-			    if(p.getState() == Thread.State.NEW){
-			        p.start();
-                }
-				p.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
+		lobby.pingALl();
 
 		if(lobby.getDisconnectedPlayers().contains(name) ||  lobby.getDisconnectedPlayersInGame().contains(name)) {
 			lobby.reconnectPlayer(new PlayerRemote(name, client));
