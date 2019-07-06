@@ -128,6 +128,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
             try {
                 clientSocket= serverSocket.accept();
                 System.out.println("Received socket connection request.");
+
                 lobby.pingALl().stream().filter(Objects::nonNull).forEach(thread -> {
 					try {
 						thread.join();
@@ -135,6 +136,7 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 						e.printStackTrace();
 					}
 				});
+
                 input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                 name = input.readLine();
                 if(lobby.getDisconnectedPlayers().contains(name) || lobby.getDisconnectedPlayersInGame().contains(name)) {

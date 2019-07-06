@@ -189,7 +189,6 @@ public class LobbyController {
 		players.forEach(p-> toJoin.add(p.ping()));
 
 		return toJoin;
-
 	}
 
 	/**

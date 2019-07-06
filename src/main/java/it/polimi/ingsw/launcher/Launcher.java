@@ -81,7 +81,8 @@ public class Launcher{
                 try {
                     port = in.nextInt();
                 }catch (Exception e){
-                    in.nextLine();
+                    System.out.print("Invalid port");
+                    // in.nextLine();
                     continue;
                 }
                 System.out.print("Connection type [Socket 0, RMI 1]");
@@ -94,7 +95,7 @@ public class Launcher{
                 }else if (res == 2){
                     System.out.println("Error connecting: username already in use");
                 }
-            }while(res != 0);
+            } while(res != 0);
         }
     }
 

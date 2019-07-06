@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +35,20 @@ public class PlayerSocket extends PlayerConnection {
 	 */
 	private String response;
 
+	/**
+	 * True if last response from client was valid
+	 */
 	private boolean validResponse;
+
+	/**
+	 * Waiting time for handshake in millis
+	 */
+	private static final int PING_WAITING_TIME = 1000;
+
+	/**
+	 * True if client responded to ping
+	 */
+	private boolean ponged;
 
 
 	/**
@@ -70,7 +84,9 @@ public class PlayerSocket extends PlayerConnection {
 					return;
 				} else if(message.contains("PUSH")) {
 					parseMessage(message);
-				}else if(!validResponse){
+				} else if (message.equals("pong")){
+					ponged = true;
+				} else if(!validResponse) {
 					synchronized (this) {
 						response = message;
 						validResponse = true;
@@ -440,17 +456,26 @@ public class PlayerSocket extends PlayerConnection {
 	@Override
 	public Thread ping() {
 		output.println("ping");
-		/*try {
-			if(!input.readLine().equals("pong")) {
-				Thread t = new Thread(this::disconnect);
-				t.start();
-				return t;
+
+		// Wait for pong...
+		long currTimeStamp = System.currentTimeMillis();
+		while (System.currentTimeMillis() - currTimeStamp <= PING_WAITING_TIME) {
+			if (ponged) {
+				ponged = false;
+				return null;
 			}
-		} catch (IOException e) {
-			Thread t = new Thread(this::disconnect);
-			t.start();
-			return t;
-		}*/
+
+			try {
+				TimeUnit.MILLISECONDS.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Player didn't pong in time. Disconnecting...
+		Thread t = new Thread(this::disconnect);
+		t.start();
+
 		return null;
 	}
 

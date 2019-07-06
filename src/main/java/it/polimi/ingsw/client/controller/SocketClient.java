@@ -180,11 +180,14 @@ public class SocketClient extends ServerConnection {
 			try {
 				msg = input.readLine();
 				// System.out.println(msg);
-				if(msg == null) {
+				if (msg == null) {
 					lostConnection();
+					continue;
 				}
-				if(!msg.equals("ping"))
-                {
+
+				if (msg.equals("ping")) {
+					sendAnswer("pong");
+				} else {
                     String finalMsg = msg;
                     new Thread(()->{
                         try {
