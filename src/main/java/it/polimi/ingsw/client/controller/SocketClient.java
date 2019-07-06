@@ -186,6 +186,12 @@ public class SocketClient extends ServerConnection {
 
 				if (msg.equals("ping")) {
 					sendAnswer("pong");
+				} else if (msg.equals("NOT_IN_LOBBY")) {
+					synchronized (lock) {
+						validResponse = true;
+						response = null;
+						lock.notifyAll();
+					}
 				} else {
                     String finalMsg = msg;
                     new Thread(()->{

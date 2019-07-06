@@ -164,7 +164,7 @@ public class PlayerSocket extends PlayerConnection {
 				if(getServerLobby()!=null) {
 					this.updateLobby(getServerLobby().lobby);
 				} else {
-					this.updateLobby(new Lobby(3));
+					output.print("NOT_IN_LOBBY");
 				}
 				break;
 			case "back_to_lobby":
