@@ -597,9 +597,9 @@ public class GuiView extends ClientView{
                 root.setStyle("-fx-background-color: #222");
 
                 root.setPrefSize(stage.getHeight() * 16 / 9, stage.getHeight());
+                loading = false;
             });
             initted = true;
-            loading = false;
         }
     }
 
@@ -619,9 +619,7 @@ public class GuiView extends ClientView{
             case LOADING:
             case PLAYER_TURN:
             case FRENZY_TURN:
-                loading = true;
                 showGameBoard();
-                loading = false;
                 break;
         }
     }
@@ -657,14 +655,15 @@ public class GuiView extends ClientView{
     }
 
     private void showGameBoard() {
-        AdrenalinaMatch match= player.getMatch();
+        loading = true;
+
         Platform.runLater(()-> {
             FXWindow.getPane().getChildren().removeAll(nodesLeftBehid);
             nodesLeftBehid.clear();
             loadLayout();
 
             setEscExit();
-
+            loading = false;
         });
     }
 

@@ -96,9 +96,25 @@ public class MatchController {
 		while (match.getMatchState() != MatchState.ENDED) {
 			playerTurn.setSkipTurn(false);
 			Player currentPlayer = match.getTurnPlayer();
+
+			// Check current player connection
+			Thread pinger = null;
+			if (currentPlayer.getConnection() != null) pinger = currentPlayer.getConnection().ping();
+			if (pinger != null) {
+				try {
+					if (pinger.getState() == Thread.State.NEW) {
+						pinger.start();
+					}
+					pinger.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
 			ExecutorService turnExecutor = Executors.newSingleThreadExecutor();
 			turnExecutor.submit(playerTurn::startNewTurn);
 			turnExecutor.shutdown();
+
 			try {
 				turnExecutor.awaitTermination(match.getTurnDuration(), TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
@@ -107,8 +123,12 @@ public class MatchController {
 			if (!turnExecutor.isTerminated()) {
 				playerTurn.setSkipTurn(true);
 				turnExecutor.shutdownNow();
-				currentPlayer.getConnection().alert("Time's over");
-				currentPlayer.getConnection().updateMatch(match);
+
+				if (currentPlayer.getConnection() != null) {
+					currentPlayer.getConnection().alert("Time's over");
+					currentPlayer.getConnection().updateMatch(match);
+				}
+
 				try {
 					TimeUnit.MILLISECONDS.sleep(150);
 				} catch (InterruptedException e) {

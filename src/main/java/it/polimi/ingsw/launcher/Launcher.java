@@ -82,17 +82,18 @@ public class Launcher{
                     port = in.nextInt();
                 }catch (Exception e){
                     System.out.print("Invalid port");
-                    // in.nextLine();
                     continue;
                 }
                 System.out.print("Connection type [Socket 0, RMI 1]");
-                ConnectionType c = in.next().equals("1") ? ConnectionType.RMI : ConnectionType.SOCKET;
+                ConnectionType c = (in.next().equals("1")) ? ConnectionType.RMI : ConnectionType.SOCKET;
+
                 System.out.print("Nickname: ");
                 nickname = in.next();
+
                 res = startClient(serverddress, port, nickname, c, 0);
-                if(res == 1){
+                if (res == 1) {
                     System.out.println("Error connecting: ip/port not valid");
-                }else if (res == 2){
+                } else if (res == 2) {
                     System.out.println("Error connecting: username already in use");
                 }
             } while(res != 0);
@@ -259,7 +260,7 @@ public class Launcher{
                         int p = startClient(ipBox.getText(), Integer.parseInt(portBox.getText()), userTextField.getText(), c, 1);
                         if(p==1){
                             actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("Error connecting to the server: invlid ip/port");
+                            actiontarget.setText("Error connecting to the server: invalid ip/port");
                         } else  if (p == 2) {
                             actiontarget.setFill(Color.FIREBRICK);
                             actiontarget.setText("Error connecting to the server: username already in use");

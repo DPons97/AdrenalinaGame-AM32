@@ -185,21 +185,12 @@ public class LobbyController {
 	 * Sends a broadcast message to all players to update their model
 	 * @return list of threads that ned to be joined if there is need of being sure that all disconnected clients have been removed
 	 */
-	public synchronized void pingALl() {
+	public synchronized List<Thread> pingALl() {
 		List<Thread> toJoin= new ArrayList<>();
 		players.forEach(p-> toJoin.add(p.ping()));
+		getPlayersInGame().forEach(p-> toJoin.add(p.ping()));
 
-		toJoin.stream().filter(Objects::nonNull).forEach(p->
-		{
-			try {
-				if(p.getState() == Thread.State.NEW){
-					p.start();
-				}
-				p.join();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		});
+		return toJoin;
 	}
 
 	/**

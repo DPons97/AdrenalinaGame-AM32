@@ -78,9 +78,8 @@ public class SocketClient extends ServerConnection {
 		output.println(player.getNickname());
 		Thread t = new Thread(this::listen);
 		String confirm = input.readLine();
-		if(confirm.contains("KO")) throw new UsernameTakenException();
+		if(!confirm.contains("OK")) throw new UsernameTakenException();
 		t.start();
-
 	}
 
 	/**
