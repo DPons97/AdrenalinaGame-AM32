@@ -63,6 +63,7 @@ public class PlayerSocket extends PlayerConnection {
 		this.input= input;
 		this.output= output;
 		validResponse = false;
+		ponged = false;
 		Thread t = new Thread(this::listen);
 		t.start();
 	}
@@ -475,8 +476,7 @@ public class PlayerSocket extends PlayerConnection {
 		// Player didn't pong in time. Disconnecting...
 		Thread t = new Thread(this::disconnect);
 		t.start();
-
-		return null;
+		return t;
 	}
 
 	@Override
