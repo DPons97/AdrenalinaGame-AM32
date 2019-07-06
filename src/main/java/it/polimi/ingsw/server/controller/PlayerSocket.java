@@ -475,7 +475,6 @@ public class PlayerSocket extends PlayerConnection {
 
 		// Player didn't pong in time. Disconnecting...
 		Thread t = new Thread(this::disconnect);
-		t.start();
 		return t;
 	}
 

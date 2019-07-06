@@ -177,6 +177,9 @@ public class LoginHandler extends UnicastRemoteObject implements ServerFunctiona
 		lobby.pingALl().stream().filter(Objects::nonNull).forEach(p->
 		{
 			try {
+			    if(p.getState() == Thread.State.NEW){
+			        p.start();
+                }
 				p.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
