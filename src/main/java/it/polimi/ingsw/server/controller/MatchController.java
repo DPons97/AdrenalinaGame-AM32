@@ -136,6 +136,12 @@ public class MatchController {
 				}
 			}
 
+			try {
+				playerTurn.resolveDeaths(currentPlayer);
+			} catch (PlayerNotExistsException e) {
+				e.printStackTrace();
+			}
+
 			match.nextTurn();
 			playerTurn.updatePlayers();
 		}

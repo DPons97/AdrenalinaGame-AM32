@@ -52,22 +52,12 @@ public class Turn {
             // Start usual turn, or manage frenzy
             beginTurn(currentPlayer);
 
-            try {
-                resolveDeaths(currentPlayer);
-            } catch (PlayerNotExistsException e) {
-                e.printStackTrace();
-            }
             repopulateMap();
         } else {
             System.out.println("STARTING FRENZY TURN");
             repopulateMap();
             frenzyTurn(currentPlayer);
 
-            try {
-                resolveDeaths(currentPlayer);
-            } catch (PlayerNotExistsException e) {
-                e.printStackTrace();
-            }
             repopulateMap();
 
             if (playedFrenzy.size() == match.getPlayers().size()){
@@ -583,7 +573,7 @@ public class Turn {
      * @param currentPlayer player who has just finished his turn
      * @throws PlayerNotExistsException if player doesn't exists inside match
      */
-    private void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
+    public void resolveDeaths(Player currentPlayer) throws PlayerNotExistsException {
         int deadPlayers = 0;
 
         for (Player p : match.getPlayers()) {
