@@ -25,6 +25,12 @@
 [![GREEN](https://placehold.it/15/44bb44/44bb44)](#)
 -->
 
+### Screenshots
+![gui](Adrenalina_01.png "Adrenalina - GUI")
+
+
+![cli](Adrenalina_02.png "Adrenalina - CLI")
+
 ### Extracting jar and running it:
 We are extracting only one jar from the Launcher class in the package *launcher*. <br>
 We are extracting it with the intellij tool from *Project Structure -> Artifacts -> Add JAR from modules with dependencies*.<br>
@@ -59,9 +65,3 @@ for example:
     ```java -jar "jarname.jar" -m c -n Bob -s <server_ip> -p <server_socket_port> -c s -gui```<br>
 - to launch a cli rmi client named Lian, onep a temrinal, move into the jar folder, then:<br>
     ```java -jar "jarname.jar" -m c -s <server_ip> -n Lian -p <server_rmi_port> -cli -c r ```<br>
-    
-## Screenshots
-![gui](Adrenalina_01.png "Adrenalina - GUI")
-
-
-![cli](Adrenalina_02.png "Adrenalina - CLI")
